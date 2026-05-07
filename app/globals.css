@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #fafaf9;
+  --color-fg: #18181b;
+  --color-accent: #f43f5e;
+  --color-muted: #71717a;
+}
+
+@theme inline {
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-fg);
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
