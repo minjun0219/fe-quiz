@@ -41,7 +41,7 @@ MBTI 검사처럼 결과 공유 바이럴이 핵심.
 - **호스팅**: Vercel (선정 사유: Next.js 네이티브, `next/og` 빌트인, MVP 단계 비용 0)
 - **OG 이미지**: `next/og` (Next.js 빌트인, satori 기반)
 - **공유 ID**: nanoid (6-8자리)
-- **콘텐츠**: `.md` + frontmatter, gray-matter로 파싱
+- **콘텐츠**: `.yaml` 파일, `yaml` 패키지로 파싱 + `zod` 스키마 검증
 - **폰트**: Pretendard (CDN)
 
 > 핸드오프 문서 원본은 Next.js 15를 명시했지만, `create-next-app@latest`가 v16을 끌어와
@@ -49,23 +49,25 @@ MBTI 검사처럼 결과 공유 바이럴이 핵심.
 
 ## 아키텍처
 
-### 질문 콘텐츠는 .md, DB는 공유에만
+### 질문 콘텐츠는 .yaml, DB는 공유에만
+
+마크다운 본문이 없고 메타데이터만 다루므로 `.md` frontmatter 대신 그냥 YAML 파일을 사용합니다.
+파서/툴체인이 단순해지고(`gray-matter` 불필요, `yaml` 패키지만으로 충분), 스키마 검증도 직접적입니다.
 
 ```
 content/questions/
   javascript/
-    01-event-loop.md
-    02-closure.md
+    01-event-loop.yaml
+    02-closure.yaml
   react/
-    01-hooks.md
+    01-hooks.yaml
   css/
-    01-flexbox.md
+    01-flexbox.yaml
 ```
 
-각 .md frontmatter 스키마:
+각 `.yaml` 스키마:
 
 ```yaml
----
 id: js-001
 category: javascript
 difficulty: medium
@@ -83,10 +85,11 @@ answer: 1  # 0-indexed
 explanation: |
   마이크로태스크 큐가 매크로태스크 큐보다 먼저 처리됩니다.
 tags: [event-loop, async]
----
 ```
 
-빌드 타임에 `.md` → 정적 JSON 변환. Next.js에 인라인.
+빌드 타임에 `.yaml` → 정적 JSON 변환. Next.js에 인라인.
+파서: `yaml` 패키지(`yaml.parse(fs.readFileSync(...))`).
+스키마 검증: `zod` 권장(런타임 + 컴파일타임 타입 동시 확보).
 
 ### Supabase 스키마
 
@@ -146,7 +149,7 @@ RLS는 익명 INSERT/SELECT만 허용.
 
 - **단일 public 저장소**
 - 코드: MIT (`/LICENSE`)
-- 콘텐츠 (`content/` 하위 .md): CC BY-SA 4.0 (`content/LICENSE`)
+- 콘텐츠 (`content/` 하위 `.yaml` 등): CC BY-SA 4.0 (`content/LICENSE`)
 
 ## 비용 추정
 
@@ -166,7 +169,7 @@ Haiku 4.5 기준 ($1/$5 per million tokens):
 | --- | --- | --- |
 | 1 | Next.js 16 + TypeScript + Tailwind 프로젝트 초기화 + 로드맵 박제 | ✅ 진행 중 (이 PR) |
 | 2 | Supabase 연결 + `shares` 테이블 마이그레이션 + RLS | ⬜ |
-| 3 | `content/questions/` `.md` 스키마 + 예시 3개 + gray-matter 빌드 파이프라인 | ⬜ |
+| 3 | `content/questions/` `.yaml` 스키마 + 예시 3개 + `yaml`/`zod` 빌드 파이프라인 | ⬜ |
 | 4 | `/play` 라운드 페이지 — 5문제 진행 UI | ⬜ |
 | 5 | 서버사이드 정답 검증 API (`/api/quiz/submit`) | ⬜ |
 | 6 | 결과 진단 로직 (카테고리별 정확도 → 진단명 매핑) | ⬜ |
@@ -203,7 +206,7 @@ fe-quiz/
 │   └── globals.css       # Tailwind v4 @theme
 ├── content/
 │   ├── LICENSE           # CC BY-SA 4.0
-│   └── questions/        # .md 시드 문제 (Step 3+)
+│   └── questions/        # .yaml 시드 문제 (Step 3+)
 │       ├── javascript/
 │       ├── react/
 │       └── css/

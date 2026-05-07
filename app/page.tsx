@@ -11,8 +11,7 @@ export default function Home() {
       </h1>
       <p className="mb-10 max-w-md text-base leading-relaxed text-zinc-600">
         면접 압박 없이, 단톡방에서 친구 던지듯.
-        <br />
-        다 풀면 AI가 친구처럼 피드백 줘.
+        <br />다 풀면 AI가 친구처럼 피드백 줘.
       </p>
       <button
         type="button"

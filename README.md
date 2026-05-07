@@ -30,7 +30,9 @@ npm run dev
 | `npm run dev` | 개발 서버 |
 | `npm run build` | 프로덕션 빌드 |
 | `npm run start` | 빌드된 앱 실행 |
-| `npm run lint` | ESLint |
+| `npm run lint` | Biome 린트 |
+| `npm run format` | Biome 포맷터 (덮어쓰기) |
+| `npm run check` | Biome 린트 + 포맷 검사 (CI용) |
 
 ## 라이선스
 
