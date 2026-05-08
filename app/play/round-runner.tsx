@@ -67,7 +67,14 @@ export default function RoundRunner({ questions }: Props) {
         </span>
       </header>
 
-      <div className="mb-3 h-1 overflow-hidden rounded-full bg-zinc-200">
+      <div
+        className="mb-3 h-1 overflow-hidden rounded-full bg-zinc-200"
+        role="progressbar"
+        aria-label="라운드 진행 상황"
+        aria-valuenow={index + (canProceed ? 1 : 0)}
+        aria-valuemin={0}
+        aria-valuemax={questions.length}
+      >
         <div
           className="h-full bg-rose-500 transition-all"
           style={{
