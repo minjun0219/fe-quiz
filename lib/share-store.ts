@@ -1,5 +1,6 @@
 import "server-only";
 import { nanoid } from "nanoid";
+import { cache } from "react";
 import type { GradedRound } from "./grading";
 import type { ShareRow } from "./share.schema";
 import { getSupabase } from "./supabase";
@@ -42,8 +43,14 @@ export async function createShare({
   return slug;
 }
 
-/** Fetch a shares row by slug. Returns null if not found. */
-export async function getShareById(id: string): Promise<ShareRow | null> {
+/**
+ * Fetch a shares row by slug. Returns null if not found.
+ *
+ * Wrapped in React's `cache()` so per-request memoization holds across the
+ * `generateMetadata` + page-component pair (both call this with the same
+ * slug; without cache it would round-trip Supabase twice).
+ */
+export const getShareById = cache(async (id: string): Promise<ShareRow | null> => {
   const { data, error } = await getSupabase().from("shares").select("*").eq("id", id).maybeSingle();
 
   if (error) {
@@ -51,4 +58,4 @@ export async function getShareById(id: string): Promise<ShareRow | null> {
   }
   if (!data) return null;
   return data as ShareRow;
-}
+});

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
-import { findResultType } from "@/lib/diagnosis";
+import { findResultType, STRONG_THRESHOLD, WEAK_THRESHOLD } from "@/lib/diagnosis";
 import type { Category } from "@/lib/question.schema";
 import { getShareById } from "@/lib/share-store";
 
@@ -71,9 +71,10 @@ export default async function SharePage({ params }: Props) {
               { correct: number; total: number },
             ][]
           ).map(([cat, score]) => {
-            const pct = score.total === 0 ? 0 : Math.round((score.correct / score.total) * 100);
-            const isStrong = pct >= 80;
-            const isWeak = pct < 40;
+            const acc = score.total === 0 ? 0 : score.correct / score.total;
+            const pct = Math.round(acc * 100);
+            const isStrong = acc >= STRONG_THRESHOLD;
+            const isWeak = acc < WEAK_THRESHOLD;
             return (
               <li key={cat} className="flex items-center gap-3">
                 <span className="w-24 shrink-0 text-sm font-medium text-zinc-700">

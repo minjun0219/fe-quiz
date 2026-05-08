@@ -7,9 +7,14 @@ interface DiagnosisInput {
   category_scores: Partial<Record<Category, CategoryScore>>;
 }
 
-const STRONG_THRESHOLD = 0.8;
-const OK_THRESHOLD = 0.6;
-const WEAK_THRESHOLD = 0.4;
+/**
+ * Per-category accuracy buckets. Exported so view layers can color-code
+ * progress bars consistently with the diagnosis logic instead of redefining
+ * `>= 0.8` / `< 0.4` inline. Values are in [0..1]; multiply by 100 for pct.
+ */
+export const STRONG_THRESHOLD = 0.8;
+export const OK_THRESHOLD = 0.6;
+export const WEAK_THRESHOLD = 0.4;
 
 interface ResultTypeBucket {
   result_type: string;

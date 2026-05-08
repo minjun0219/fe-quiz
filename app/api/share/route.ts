@@ -57,10 +57,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       feedback: parsed.data.feedback,
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "failed to create share" },
-      { status: 500 },
-    );
+    // Log full detail server-side; never echo DB / internal messages to the
+    // client — they can leak schema info or auth state.
+    console.error("[/api/share] createShare failed:", err);
+    return NextResponse.json({ error: "failed to create share" }, { status: 500 });
   }
 
   const response: ShareCreateResponse = {
