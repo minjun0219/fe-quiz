@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { PublicQuestion } from "@/lib/question.schema";
 import type { QuizSubmitResponse, SubmittedAnswer } from "@/lib/quiz-submit.schema";
 import Result from "./result";
@@ -40,6 +40,7 @@ export default function RoundRunner({ questions }: Props) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerState[]>(() => initialAnswers(questions));
   const [phase, setPhase] = useState<Phase>({ kind: "answering" });
+  const groupNameBase = useId();
 
   async function submit() {
     setPhase({ kind: "submitting" });
@@ -50,6 +51,7 @@ export default function RoundRunner({ questions }: Props) {
         body: JSON.stringify({
           question_ids: questions.map((q) => q.id),
           answers: answers.map(normalize),
+          displayed_choice_ids: questions.map((q) => q.choices.map((c) => c.id)),
         }),
       });
       if (!res.ok) {
@@ -109,6 +111,10 @@ export default function RoundRunner({ questions }: Props) {
   const selected = answers[index];
   const isMulti = current.type === "multi_choice";
   const proceed = canProceed(current, selected);
+  // Radio inputs need a shared `name` to form an exclusive group; making it
+  // unique per question prevents cross-question interference if two rounds
+  // ever share the same DOM (StrictMode remounts, etc.).
+  const radioGroupName = `${groupNameBase}-${current.id}`;
 
   function toggleChoice(choiceId: string) {
     setAnswers((prev) => {
@@ -166,52 +172,66 @@ export default function RoundRunner({ questions }: Props) {
         />
       </div>
 
-      <h1 className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed">
-        {current.question}
-      </h1>
+      <fieldset className="contents">
+        <legend className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed">
+          {current.question}
+        </legend>
 
-      {current.code && (
-        <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
-          <code>{current.code}</code>
-        </pre>
-      )}
+        {current.code && (
+          <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
+            <code>{current.code}</code>
+          </pre>
+        )}
 
-      {isMulti && (
-        <p className="mb-3 text-xs font-medium text-zinc-500">
-          정답이 여러 개일 수 있어. 해당하는 걸 모두 골라줘.
-        </p>
-      )}
+        {isMulti && (
+          <p className="mb-3 text-xs font-medium text-zinc-500">
+            정답이 여러 개일 수 있어. 해당하는 걸 모두 골라줘.
+          </p>
+        )}
 
-      <ul className="flex flex-col gap-3">
-        {current.choices.map((choice) => {
-          const isSelected = isChoiceSelected(choice.id);
-          return (
-            <li key={`${current.id}::${choice.id}`}>
-              <button
-                type="button"
-                onClick={() => toggleChoice(choice.id)}
-                aria-pressed={isSelected}
-                className={`flex w-full items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base transition active:scale-[0.99] ${
-                  isSelected
-                    ? "border-rose-500 bg-rose-50 text-zinc-900"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
-                }`}
-              >
-                <span
-                  aria-hidden
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center border-2 ${
-                    isMulti ? "rounded-md" : "rounded-full"
-                  } ${isSelected ? "border-rose-500 bg-rose-500 text-white" : "border-zinc-300 bg-white"}`}
+        <ul className="flex flex-col gap-3">
+          {current.choices.map((choice) => {
+            const isSelected = isChoiceSelected(choice.id);
+            const inputId = `${groupNameBase}-${current.id}-${choice.id}`;
+            return (
+              <li key={`${current.id}::${choice.id}`}>
+                <input
+                  id={inputId}
+                  type={isMulti ? "checkbox" : "radio"}
+                  name={isMulti ? inputId : radioGroupName}
+                  value={choice.id}
+                  checked={isSelected}
+                  onChange={() => toggleChoice(choice.id)}
+                  className="peer sr-only"
+                />
+                <label
+                  htmlFor={inputId}
+                  className={`flex w-full cursor-pointer items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base transition active:scale-[0.99] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-rose-500 ${
+                    isSelected
+                      ? "border-rose-500 bg-rose-50 text-zinc-900"
+                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+                  }`}
                 >
-                  {isSelected &&
-                    (isMulti ? "✓" : <span className="h-2 w-2 rounded-full bg-white" />)}
-                </span>
-                <span className="flex-1">{choice.text}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  <span
+                    aria-hidden
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center border-2 ${
+                      isMulti ? "rounded-md" : "rounded-full"
+                    } ${
+                      isSelected
+                        ? "border-rose-500 bg-rose-500 text-white"
+                        : "border-zinc-300 bg-white"
+                    }`}
+                  >
+                    {isSelected &&
+                      (isMulti ? "✓" : <span className="h-2 w-2 rounded-full bg-white" />)}
+                  </span>
+                  <span className="flex-1">{choice.text}</span>
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
 
       <div className="mt-auto pt-10">
         <button

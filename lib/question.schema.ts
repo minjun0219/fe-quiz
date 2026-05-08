@@ -110,7 +110,7 @@ export const QuestionSchema = z
         }
         seenAnswer.add(a);
       });
-      if (q.answer.length === q.choices.length) {
+      if (seenAnswer.size === q.choices.length) {
         ctx.addIssue({
           code: "custom",
           path: ["answer"],

@@ -47,13 +47,18 @@ export function gradeRound(
     if (is_correct) bucket.correct++;
     category_scores[q.category] = bucket;
 
+    const displayedOrder = req.displayed_choice_ids?.[i];
+    const orderedChoices = displayedOrder
+      ? reorderChoices(q.choices, displayedOrder, id)
+      : q.choices;
+
     per_question.push({
       id: q.id,
       category: q.category,
       type: q.type,
       question: q.question,
       code: q.code,
-      choices: q.choices,
+      choices: orderedChoices,
       your_answer: yours,
       correct_answer: q.answer,
       is_correct,
@@ -105,6 +110,33 @@ function checkAnswer(
     if (!yourSet.has(a)) return false;
   }
   return true;
+}
+
+function reorderChoices(
+  choices: Question["choices"],
+  displayedOrder: string[],
+  qid: string,
+): Question["choices"] {
+  if (displayedOrder.length !== choices.length) {
+    throw new GradingError(
+      `displayed_choice_ids for "${qid}" has ${displayedOrder.length} ids; expected ${choices.length}`,
+    );
+  }
+  const byId = new Map(choices.map((c) => [c.id, c]));
+  const out: Question["choices"] = [];
+  const seen = new Set<string>();
+  for (const id of displayedOrder) {
+    if (seen.has(id)) {
+      throw new GradingError(`duplicate displayed_choice_id "${id}" for "${qid}"`);
+    }
+    seen.add(id);
+    const c = byId.get(id);
+    if (!c) {
+      throw new GradingError(`displayed_choice_id "${id}" not in choices for "${qid}"`);
+    }
+    out.push(c);
+  }
+  return out;
 }
 
 export class GradingError extends Error {
