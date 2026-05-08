@@ -44,9 +44,10 @@ export default function Result({ data }: Props) {
           question_ids: data.per_question.map((q) => q.id),
           answers: data.per_question.map((q) => q.your_answer),
           // If feedback failed/unavailable, send a stub so the share endpoint
-          // (which requires non-empty feedback) accepts it. The 2000-char cap
-          // is enforced server-side by the share schema.
-          feedback: feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)",
+          // (which requires non-empty feedback) accepts it. The schema rejects
+          // anything > 2000 chars with a 400; clamp here so a rare runaway
+          // generation can't block the user from sharing.
+          feedback: (feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)").slice(0, 2000),
         }),
       });
       if (!res.ok) {
