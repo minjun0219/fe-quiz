@@ -1,0 +1,16 @@
+id: css-014
+category: css
+difficulty: medium
+type: multiple_choice
+question: |
+  `flex: 1` 단축 표기는 어떤 longhand 값으로 풀려?
+choices:
+  - "flex-grow: 1; flex-shrink: 1; flex-basis: 0%"
+  - "flex-grow: 1; flex-shrink: 1; flex-basis: auto"
+  - "flex-grow: 1; flex-shrink: 0; flex-basis: auto"
+  - "flex-grow: 1; flex-shrink: 1; flex-basis: 100%"
+answer: 0
+explanation: |
+  `flex: 1`은 `flex: 1 1 0%`와 동일하게 풀려. 핵심은 `flex-basis: 0%`라는 점이야. 기본 크기를 0으로 두고 남은 공간을 grow 비율대로 나눠 갖기 때문에, 자식들이 콘텐츠 크기와 무관하게 비율대로 균등 분배돼.
+  헷갈리는 게 `flex-basis: auto`인 경우야. 이건 콘텐츠/`width`를 먼저 반영한 뒤 남은 공간만 grow에 분배하므로, 콘텐츠 길이에 따라 너비가 달라져 균등 분배가 안 돼. `flex: auto`(= 1 1 auto), `flex: none`(= 0 0 auto)도 같이 외워 두면 좋아.
+tags: [flexbox, flex-shorthand, layout]
