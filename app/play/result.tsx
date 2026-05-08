@@ -51,7 +51,13 @@ export default function Result({ data }: Props) {
           if (done || ignore) break;
           setFeedback((prev) => prev + decoder.decode(value, { stream: true }));
         }
-        if (!ignore) setFeedbackStatus("done");
+        // Flush any byte sequence that was held back on a UTF-8 boundary —
+        // Korean characters are 3 bytes, easy to bisect across chunks.
+        if (!ignore) {
+          const tail = decoder.decode();
+          if (tail) setFeedback((prev) => prev + tail);
+          setFeedbackStatus("done");
+        }
       } catch (err) {
         if (ignore || (err as { name?: string }).name === "AbortError") return;
         setFeedbackStatus("error");
