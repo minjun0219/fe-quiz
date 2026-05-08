@@ -1,0 +1,17 @@
+id: js-006
+category: javascript
+difficulty: easy
+type: multiple_choice
+question: |
+  사용자가 검색창에 타이핑하는 동안에는 API를 부르지 않다가, 입력이 멈춘 뒤 300ms가 지나면 한 번만 부르고 싶어. 어떤 패턴이 적합해?
+choices:
+  - "디바운스(debounce)"
+  - "스로틀(throttle)"
+  - "requestAnimationFrame"
+  - "setInterval"
+answer: 0
+explanation: |
+  디바운스는 "마지막 호출로부터 N ms가 지나야 실행"하는 방식. 타이핑처럼 잠잠해진 뒤 한 번만 처리하고 싶을 때 잘 맞아.
+  스로틀은 "N ms마다 최대 한 번만 실행"이라 스크롤·리사이즈처럼 연속 이벤트의 빈도를 제한할 때 어울려.
+  `requestAnimationFrame`은 페인트 타이밍에 맞춘 애니메이션용, `setInterval`은 일정 주기 반복용이라 "입력 멈춤 감지"엔 안 맞아.
+tags: [debounce, throttle, performance]

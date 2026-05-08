@@ -1,0 +1,25 @@
+id: js-004
+category: javascript
+difficulty: medium
+type: multiple_choice
+question: |
+  다음 코드의 출력은?
+code: |
+  const obj = {
+    name: '하늘',
+    arrow: () => this.name,
+    normal() { return this.name }
+  }
+  console.log(obj.arrow(), '/', obj.normal())
+choices:
+  - "undefined / 하늘"
+  - "하늘 / 하늘"
+  - "하늘 / undefined"
+  - "undefined / undefined"
+answer: 0
+explanation: |
+  화살표 함수는 자기 `this`를 안 만들고, 정의된 시점의 상위 스코프 `this`를 그대로 써.
+  `arrow`는 `obj` 객체 리터럴이 만들어지는 시점의 바깥 스코프(보통 `globalThis` 또는 모듈 스코프) `this`를 잡으니 `this.name`은 `undefined`.
+  반면 `normal`은 일반 메서드라 호출 방식(`obj.normal()`)에 따라 `this`가 `obj`로 바인딩돼서 `'하늘'`이 나와.
+  → "객체 메서드를 화살표로 쓰면 `this`가 망가진다"가 핵심.
+tags: [this, arrow-function, scope]
