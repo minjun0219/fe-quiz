@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { PublicQuestion } from "@/lib/round";
+import type { PublicQuestion } from "@/lib/question.schema";
 
 interface Props {
   questions: PublicQuestion[];
