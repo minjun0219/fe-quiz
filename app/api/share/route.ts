@@ -63,9 +63,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "failed to create share" }, { status: 500 });
   }
 
+  // `new URL(...)` normalizes trailing slashes etc. so a SITE_URL of
+  // "https://x.com/" doesn't yield "https://x.com//r/abc".
   const response: ShareCreateResponse = {
     slug,
-    url: `${siteUrl()}/r/${slug}`,
+    url: new URL(`/r/${slug}`, siteUrl()).toString(),
   };
   return NextResponse.json(response);
 }

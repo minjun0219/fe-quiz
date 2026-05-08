@@ -1,6 +1,10 @@
-import { pickRoundQuestions, pickRoundQuestionsByIds } from "@/lib/round";
+import { pickRoundQuestions, pickRoundQuestionsByIds, ROUND_SIZE } from "@/lib/round";
 import { getShareById } from "@/lib/share-store";
 import RoundRunner from "./round-runner";
+
+/** Hard cap on replay length. Defends against a row whose `question_ids`
+ *  somehow exceeds the round-size budget (RLS allows anon INSERT). */
+const REPLAY_CAP = ROUND_SIZE;
 
 // Each visit picks a fresh round; never cache.
 export const dynamic = "force-dynamic";
@@ -28,6 +32,6 @@ async function resolveQuestions(from: string | undefined) {
   if (!from) return pickRoundQuestions();
   const share = await getShareById(from).catch(() => null);
   if (!share) return pickRoundQuestions();
-  const replayed = pickRoundQuestionsByIds(share.question_ids);
+  const replayed = pickRoundQuestionsByIds(share.question_ids.slice(0, REPLAY_CAP));
   return replayed.length > 0 ? replayed : pickRoundQuestions();
 }

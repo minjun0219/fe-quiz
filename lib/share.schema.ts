@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Category } from "./question.schema";
+import { Category } from "./question.schema";
 
 /**
  * Body of POST /api/share.
@@ -23,6 +23,20 @@ export const ShareCreateRequest = z
         message: `answers.length (${req.answers.length}) must equal question_ids.length (${req.question_ids.length})`,
       });
     }
+    // Match QuizSubmitRequest: forbid duplicate question_ids — duplicates
+    // skew grading and replay (same question would repeat in the friend's
+    // round).
+    const seen = new Set<string>();
+    req.question_ids.forEach((id, i) => {
+      if (seen.has(id)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["question_ids", i],
+          message: `duplicate question_id "${id}"`,
+        });
+      }
+      seen.add(id);
+    });
   });
 
 export type ShareCreateRequest = z.infer<typeof ShareCreateRequest>;
@@ -32,14 +46,26 @@ export interface ShareCreateResponse {
   url: string;
 }
 
-/** A row from the `shares` table, post-fetch. */
-export interface ShareRow {
-  id: string;
-  question_ids: string[];
-  /** 0-100 inclusive (matches DB CHECK constraint) */
-  score: number;
-  feedback: string;
-  result_type: string;
-  category_scores: Partial<Record<Category, { correct: number; total: number }>>;
-  created_at: string;
-}
+/**
+ * Runtime validator for a row pulled from `shares`. RLS allows anonymous
+ * INSERT, so any read of the table must defend against malformed JSON in
+ * `category_scores`. Use `safeParse` and treat parse failures as "row not
+ * found" rather than rendering NaNs.
+ */
+export const ShareRowSchema = z.object({
+  id: z.string().min(1),
+  question_ids: z.array(z.string().min(1)).min(1).max(20),
+  score: z.number().int().min(0).max(100),
+  feedback: z.string(),
+  result_type: z.string(),
+  category_scores: z.record(
+    Category,
+    z.object({
+      correct: z.number().int().nonnegative(),
+      total: z.number().int().nonnegative(),
+    }),
+  ),
+  created_at: z.string(),
+});
+
+export type ShareRow = z.infer<typeof ShareRowSchema>;

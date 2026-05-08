@@ -10,17 +10,22 @@ export const dynamic = "force-dynamic";
 const FONT_URL =
   "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Bold.woff2";
 
-// Cache the font fetch across requests on the same warm server.
+// Cache the font fetch across requests on the same warm server. On *any*
+// failure (non-2xx, network reject, DNS) we null the cache so the next
+// request can retry — otherwise a single transient error would pin a
+// rejected promise for the lifetime of the process.
 let fontPromise: Promise<ArrayBuffer> | null = null;
 function getFontData(): Promise<ArrayBuffer> {
   if (!fontPromise) {
-    fontPromise = fetch(FONT_URL).then((r) => {
-      if (!r.ok) {
-        fontPromise = null; // allow retry on next request
-        throw new Error(`Pretendard font fetch failed: ${r.status}`);
-      }
-      return r.arrayBuffer();
-    });
+    fontPromise = fetch(FONT_URL)
+      .then((r) => {
+        if (!r.ok) throw new Error(`Pretendard font fetch failed: ${r.status}`);
+        return r.arrayBuffer();
+      })
+      .catch((err) => {
+        fontPromise = null;
+        throw err;
+      });
   }
   return fontPromise;
 }

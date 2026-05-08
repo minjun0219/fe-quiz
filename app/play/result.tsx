@@ -39,8 +39,9 @@ export default function Result({ data }: Props) {
           question_ids: data.per_question.map((q) => q.id),
           answers: data.per_question.map((q) => q.your_answer),
           // If feedback failed/unavailable, send a stub so the share endpoint
-          // (which requires non-empty feedback) accepts it.
-          feedback: feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)",
+          // (which requires non-empty feedback) accepts it. Hard-cap to the
+          // server's 2000-char schema limit so a chatty model can't 400.
+          feedback: (feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)").slice(0, 2000),
         }),
       });
       if (!res.ok) {
