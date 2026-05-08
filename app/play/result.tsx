@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 
@@ -14,9 +14,53 @@ const CATEGORY_LABEL: Record<Category, string> = {
   css: "CSS",
 };
 
+type FeedbackStatus = "loading" | "streaming" | "done" | "error" | "unavailable";
+
 export default function Result({ data }: Props) {
   const [open, setOpen] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("loading");
   const overallPct = Math.round((data.total_correct / data.total) * 100);
+  const fetchedRef = useRef(false);
+
+  useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    const abort = new AbortController();
+
+    (async () => {
+      try {
+        const res = await fetch("/api/quiz/feedback", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            question_ids: data.per_question.map((q) => q.id),
+            answers: data.per_question.map((q) => q.your_answer),
+          }),
+          signal: abort.signal,
+        });
+        if (res.status === 503) {
+          setFeedbackStatus("unavailable");
+          return;
+        }
+        if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+        setFeedbackStatus("streaming");
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          setFeedback((prev) => prev + decoder.decode(value, { stream: true }));
+        }
+        setFeedbackStatus("done");
+      } catch (err) {
+        if ((err as { name?: string }).name === "AbortError") return;
+        setFeedbackStatus("error");
+      }
+    })();
+
+    return () => abort.abort();
+  }, [data]);
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
@@ -31,6 +75,38 @@ export default function Result({ data }: Props) {
           {data.total_correct} <span className="text-zinc-400">/</span> {data.total}
           <span className="ml-2 text-base font-medium text-zinc-500">({overallPct}%)</span>
         </p>
+      </section>
+
+      <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5">
+        <div className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
+          <span>친구의 한마디</span>
+          {feedbackStatus === "loading" && (
+            <span className="animate-pulse text-zinc-400 normal-case">생각 중…</span>
+          )}
+          {feedbackStatus === "streaming" && (
+            <span className="animate-pulse text-zinc-400 normal-case">타이핑 중…</span>
+          )}
+        </div>
+        {feedbackStatus === "error" && (
+          <p className="text-sm text-zinc-500">
+            앗 친구가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
+          </p>
+        )}
+        {feedbackStatus === "unavailable" && (
+          <p className="text-sm text-zinc-500">
+            (개발자에게: <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code>를
+            <code className="ml-1 rounded bg-zinc-100 px-1">.env.local</code>에 넣으면 친구가
+            깨어나요)
+          </p>
+        )}
+        {feedback && (
+          <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800">
+            {feedback}
+            {feedbackStatus === "streaming" && (
+              <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-rose-400 align-middle" />
+            )}
+          </p>
+        )}
       </section>
 
       <section className="mb-8">
