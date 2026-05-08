@@ -1,0 +1,27 @@
+id: js-011
+category: javascript
+difficulty: easy
+type: single_choice
+question: |
+  다음 코드를 실행했을 때 콘솔 출력은?
+code: |
+  const user = { name: 'jun', count: 0, label: '' }
+  console.log(user.count ?? 'default')
+  console.log(user.label || 'default')
+  console.log(user.address?.city ?? 'unknown')
+choices:
+  - id: a
+    text: 0 / default / unknown
+  - id: b
+    text: default / default / unknown
+  - id: c
+    text: 0 / '' / undefined
+  - id: d
+    text: default / '' / unknown
+answer: a
+explanation: |
+  - `??`(nullish coalescing)은 좌측이 `null`/`undefined`일 때만 우측을 써. `0`은 nullish가 아니라 그대로 `0`.
+  - `||`는 falsy(`0`, `''`, `null`, `undefined`, `NaN`, `false`)에 모두 우측이 나오므로 빈 문자열은 `'default'`로 대체돼.
+  - `?.`은 좌측이 nullish면 평가를 멈추고 `undefined`를 돌려줘. 거기에 `?? 'unknown'`을 붙였으니 `'unknown'`.
+  실수로 0이나 빈 문자열을 기본값으로 갈아엎고 싶지 않다면 `||` 대신 `??`를 쓰는 게 안전해.
+tags: [ optional-chaining, nullish-coalescing, es2020 ]
