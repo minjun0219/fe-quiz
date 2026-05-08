@@ -1,11 +1,6 @@
+import { CATEGORY_SHORT_LABEL } from "./category-labels";
 import type { GradedRound } from "./grading";
 import type { Category } from "./question.schema";
-
-const CATEGORY_LABEL: Record<Category, string> = {
-  javascript: "JS",
-  react: "React",
-  css: "CSS",
-};
 
 /**
  * Friend-tone feedback system prompt for Haiku 4.5.
@@ -42,10 +37,10 @@ export function buildFeedbackUserPrompt({ diagnosis, graded }: BuildFeedbackUser
   const lines: string[] = [];
   lines.push(`진단: ${diagnosis.result_type} (${graded.total_correct}/${graded.total}, ${pct}%)`);
   if (diagnosis.strengths.length > 0) {
-    lines.push(`강점: ${diagnosis.strengths.map((c) => CATEGORY_LABEL[c]).join(", ")}`);
+    lines.push(`강점: ${diagnosis.strengths.map((c) => CATEGORY_SHORT_LABEL[c]).join(", ")}`);
   }
   if (diagnosis.weaknesses.length > 0) {
-    lines.push(`약점: ${diagnosis.weaknesses.map((c) => CATEGORY_LABEL[c]).join(", ")}`);
+    lines.push(`약점: ${diagnosis.weaknesses.map((c) => CATEGORY_SHORT_LABEL[c]).join(", ")}`);
   }
   lines.push("");
   lines.push("푼 문제:");
@@ -57,7 +52,7 @@ export function buildFeedbackUserPrompt({ diagnosis, graded }: BuildFeedbackUser
     const correctLabel = `[${q.correct_answer}] ${q.choices[q.correct_answer]}`;
 
     lines.push(
-      `${i + 1}. [${CATEGORY_LABEL[q.category]} · ${mark}] ${q.question.replace(/\n+/g, " ").trim()}`,
+      `${i + 1}. [${CATEGORY_SHORT_LABEL[q.category]} · ${mark}] ${q.question.replace(/\n+/g, " ").trim()}`,
     );
     lines.push(`   사용자 답: ${yourLabel}`);
     if (!q.is_correct) {

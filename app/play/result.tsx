@@ -1,18 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 
 interface Props {
   data: QuizSubmitResponse;
 }
-
-const CATEGORY_LABEL: Record<Category, string> = {
-  javascript: "JavaScript",
-  react: "React",
-  css: "CSS",
-};
 
 type FeedbackStatus = "loading" | "streaming" | "done" | "error" | "unavailable";
 
@@ -21,11 +16,15 @@ export default function Result({ data }: Props) {
   const [feedback, setFeedback] = useState("");
   const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("loading");
   const overallPct = Math.round((data.total_correct / data.total) * 100);
-  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
+    // Reset on every dep change so a new round (different `data`) gets a
+    // fresh stream instead of accumulating on top of the previous one. The
+    // `ignore` flag guards against StrictMode double-invoke + late updates
+    // from a stale effect.
+    setFeedback("");
+    setFeedbackStatus("loading");
+    let ignore = false;
     const abort = new AbortController();
 
     (async () => {
@@ -40,26 +39,29 @@ export default function Result({ data }: Props) {
           signal: abort.signal,
         });
         if (res.status === 503) {
-          setFeedbackStatus("unavailable");
+          if (!ignore) setFeedbackStatus("unavailable");
           return;
         }
         if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
-        setFeedbackStatus("streaming");
+        if (!ignore) setFeedbackStatus("streaming");
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done || ignore) break;
           setFeedback((prev) => prev + decoder.decode(value, { stream: true }));
         }
-        setFeedbackStatus("done");
+        if (!ignore) setFeedbackStatus("done");
       } catch (err) {
-        if ((err as { name?: string }).name === "AbortError") return;
+        if (ignore || (err as { name?: string }).name === "AbortError") return;
         setFeedbackStatus("error");
       }
     })();
 
-    return () => abort.abort();
+    return () => {
+      ignore = true;
+      abort.abort();
+    };
   }, [data]);
 
   return (
@@ -121,7 +123,7 @@ export default function Result({ data }: Props) {
             return (
               <li key={cat} className="flex items-center gap-3">
                 <span className="w-24 shrink-0 text-sm font-medium text-zinc-700">
-                  {CATEGORY_LABEL[cat]}
+                  {CATEGORY_DISPLAY_LABEL[cat]}
                 </span>
                 <div className="flex-1 overflow-hidden rounded-full bg-zinc-200 h-2">
                   <div

@@ -9,6 +9,10 @@ import { QuizSubmitRequest } from "@/lib/quiz-submit.schema";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+// Reused across requests on the same warm Node process; the SDK reads
+// ANTHROPIC_API_KEY lazily on first call.
+const anthropic = new Anthropic();
+
 export async function POST(request: Request): Promise<Response> {
   let body: unknown;
   try {
@@ -47,11 +51,9 @@ export async function POST(request: Request): Promise<Response> {
   });
   const userPrompt = buildFeedbackUserPrompt({ diagnosis, graded });
 
-  const client = new Anthropic();
-
   // Stream Claude Haiku 4.5 output as plain text. The client reads byte chunks
   // off the response body and appends them to the UI as they arrive.
-  const sdkStream = client.messages.stream({
+  const sdkStream = anthropic.messages.stream({
     model: "claude-haiku-4-5",
     max_tokens: 1024,
     system: FEEDBACK_SYSTEM_PROMPT,
