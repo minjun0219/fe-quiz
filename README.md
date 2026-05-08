@@ -14,11 +14,14 @@ MBTI 검사처럼 결과 공유 바이럴이 핵심.
 
 ## 로컬 실행
 
+패키지 매니저는 **pnpm**을 사용해요. `package.json`의 `packageManager` 필드가 명시되어 있어 corepack 켜져 있으면 자동으로 잡힙니다.
+
 ```bash
-nvm use      # .nvmrc 기준 Node 22
-npm install
+nvm use                            # .nvmrc 기준 Node 22
+corepack enable                    # pnpm 자동 활성화 (최초 1회)
+pnpm install
 cp .env.local.example .env.local   # 값 채우기 (현재 PR에서는 불필요)
-npm run dev
+pnpm dev
 ```
 
 → http://localhost:3000
@@ -27,12 +30,12 @@ npm run dev
 
 | 명령어 | 용도 |
 | --- | --- |
-| `npm run dev` | 개발 서버 |
-| `npm run build` | 프로덕션 빌드 |
-| `npm run start` | 빌드된 앱 실행 |
-| `npm run lint` | Biome 린트 |
-| `npm run format` | Biome 포맷터 (덮어쓰기) |
-| `npm run check` | Biome 린트 + 포맷 검사 (CI용) |
+| `pnpm dev` | 개발 서버 |
+| `pnpm build` | 프로덕션 빌드 |
+| `pnpm start` | 빌드된 앱 실행 |
+| `pnpm lint` | Biome 린트 |
+| `pnpm format` | Biome 포맷터 (덮어쓰기) |
+| `pnpm check` | Biome 린트 + 포맷 검사 (CI용) |
 
 ## 라이선스
 
