@@ -1,0 +1,17 @@
+id: react-010
+category: react
+difficulty: medium
+type: multiple_choice
+question: |
+  React의 Render Phase와 Commit Phase에 대한 설명 중 **올은** 것은?
+choices:
+  - "Render Phase는 순수해야 하고(side effect 없음), DOM 변경·useEffect 콜백 실행 같은 부수효과는 Commit 이후에 일어난다"
+  - "Render Phase에서 직접 DOM을 수정해도 React가 잘 동기화해준다"
+  - "Commit Phase는 Virtual DOM 트리를 만드는 단계다"
+  - "useEffect 콜백은 Render Phase 안에서 실행된다"
+answer: 0
+explanation: |
+  Render Phase는 React가 컴포넌트를 호출해 새 Virtual DOM을 만들고 diff를 계산하는 단계야. 같은 입력에 같은 출력이 나와야 해서 **순수**해야 하고, StrictMode에서 일부러 두 번 호출해 검사하기도 해.
+  Commit Phase에서야 실제 DOM에 변경을 적용하고, 그 후에 `componentDidMount`/`componentDidUpdate`나 `useEffect` 콜백이 실행돼.
+  그래서 render 안에서 `setState`를 무한히 부르거나 DOM을 직접 만지면 안 되는 거야.
+tags: [render-phase, commit-phase, lifecycle]

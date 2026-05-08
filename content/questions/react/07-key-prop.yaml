@@ -1,0 +1,21 @@
+id: react-007
+category: react
+difficulty: medium
+type: multiple_choice
+question: |
+  아래 코드에서 `items` 배열 **앞쪽에** 새 항목을 `unshift`하면 어떤 일이 벌어져?
+code: |
+  {items.map((item, i) => (
+    <Row key={i} item={item} />
+  ))}
+choices:
+  - "기존 Row들이 인덱스가 한 칸씩 밀려 잘못된 item과 재매칭돼, 내부 state·input 포커스·애니메이션이 엉킨다"
+  - "맨 앞에 새 Row만 마운트되고 나머지는 그대로 유지된다"
+  - "React가 자동으로 key를 재계산해 문제가 생기지 않는다"
+  - "key 충돌로 컴파일 에러가 발생한다"
+answer: 0
+explanation: |
+  `key={i}`로 인덱스를 쓰면 React 입장에서 "0번 자리, 1번 자리, ..."로 식별하는 셌이야.
+  앞에 항목이 추가되면 모든 인덱스가 한 칸씩 밀리는데, key는 그대로 0,1,2...이니까 React는 "같은 key의 컴포넌트가 다른 item을 받았다"고 판단해 props만 갈아끼우게 돼.
+  그러면 Row 내부 state(예: 입력 중인 텍스트)나 포커스가 엉뚱한 항목에 따라붙어. 해결책은 항목 고유의 안정적인 id를 key로 쓰는 거야.
+tags: [key, list, reconciliation]
