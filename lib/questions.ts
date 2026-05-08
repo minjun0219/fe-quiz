@@ -1,52 +1,24 @@
-import { readdirSync, readFileSync } from "node:fs";
+import "server-only";
 import { join } from "node:path";
-import { parse as parseYaml } from "yaml";
-import { type Question, QuestionSchema } from "./question.schema";
+import { loadAllQuestions } from "./load-questions";
+import type { Question } from "./question.schema";
 
 const ROOT = join(process.cwd(), "content/questions");
 
-let cache: Question[] | null = null;
+let cache: readonly Question[] | null = null;
 
 /**
- * Load all question YAML files from `content/questions/<category>/*.yaml`.
- * Validates each via zod; throws with file path on first failure.
- *
- * Server-only — uses node:fs. Module-level cache means the file system is
- * walked once per process.
+ * Public server-only API — return all validated questions.
+ * Walks the filesystem once per process (cached + frozen so callers can't
+ * mutate the shared array). Server components and route handlers only.
  */
-export function getAllQuestions(): Question[] {
+export function getAllQuestions(): readonly Question[] {
   if (cache) return cache;
-
-  const out: Question[] = [];
-  const categories = readdirSync(ROOT, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .map((d) => d.name);
-
-  for (const category of categories) {
-    const dir = join(ROOT, category);
-    const entries = readdirSync(dir, { withFileTypes: true }).filter(
-      (e) => e.isFile() && e.name.endsWith(".yaml"),
-    );
-    for (const entry of entries) {
-      const path = join(dir, entry.name);
-      const raw = readFileSync(path, "utf8");
-      const data = parseYaml(raw);
-      const result = QuestionSchema.safeParse(data);
-      if (!result.success) {
-        throw new Error(
-          `Invalid question at ${category}/${entry.name}: ${JSON.stringify(result.error.issues, null, 2)}`,
-        );
-      }
-      out.push(result.data);
-    }
-  }
-
-  out.sort((a, b) => a.id.localeCompare(b.id));
-  cache = out;
+  cache = Object.freeze(loadAllQuestions(ROOT));
   return cache;
 }
 
-export function getQuestionsByCategory(category: Question["category"]): Question[] {
+export function getQuestionsByCategory(category: Question["category"]): readonly Question[] {
   return getAllQuestions().filter((q) => q.category === category);
 }
 
