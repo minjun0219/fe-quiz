@@ -24,15 +24,17 @@ export function getAllQuestions(): Question[] {
 
   for (const category of categories) {
     const dir = join(ROOT, category);
-    const files = readdirSync(dir).filter((f) => f.endsWith(".yaml"));
-    for (const file of files) {
-      const path = join(dir, file);
+    const entries = readdirSync(dir, { withFileTypes: true }).filter(
+      (e) => e.isFile() && e.name.endsWith(".yaml"),
+    );
+    for (const entry of entries) {
+      const path = join(dir, entry.name);
       const raw = readFileSync(path, "utf8");
       const data = parseYaml(raw);
       const result = QuestionSchema.safeParse(data);
       if (!result.success) {
         throw new Error(
-          `Invalid question at ${category}/${file}: ${JSON.stringify(result.error.issues, null, 2)}`,
+          `Invalid question at ${category}/${entry.name}: ${JSON.stringify(result.error.issues, null, 2)}`,
         );
       }
       out.push(result.data);
