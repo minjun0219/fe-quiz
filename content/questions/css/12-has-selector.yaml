@@ -1,0 +1,23 @@
+id: css-012
+category: css
+difficulty: easy
+type: multiple_choice
+question: |
+  "체크된 input을 가진 label"의 배경색만 바꾸려고 한다. 가장 알맞은 셀렉터는?
+code: |
+  <label>
+    <input type="checkbox" />
+    동의합니다
+  </label>
+choices:
+  - "label > input:checked { background: yellow }"
+  - "label:has(input:checked) { background: yellow }"
+  - "label:checked { background: yellow }"
+  - "input:checked + label { background: yellow }"
+answer: 1
+explanation: |
+  `:has()`는 인자로 들어간 셀렉터에 매칭되는 자손/자식을 가진 **부모**를 선택할 수 있는 관계형 가상 클래스(2023년부터 모던 브라우저 전반 지원). `label:has(input:checked)`는 "체크된 input을 자식으로 가진 label" 자체를 잡으니 label에 스타일을 줄 수 있어.
+  - 1번은 `input` 자체에 배경을 주는 셀렉터로, 부모 label은 못 바꿔.
+  - 3번은 `:checked`가 input에만 적용되는 가상 클래스라 label엘 매칭이 안 돼.
+  - 4번은 `+` 형제 선택자라 label이 input 옆에 있을 때만 동작하고, 위 마크업처럼 input이 label의 자식인 구조엔 맞지 않아.
+tags: [selectors, has, modern-css]
