@@ -167,9 +167,9 @@ Haiku 4.5 기준 ($1/$5 per million tokens):
 
 | # | 단계 | 상태 |
 | --- | --- | --- |
-| 1 | Next.js 16 + TypeScript + Tailwind 프로젝트 초기화 + 로드맵 박제 | ✅ 진행 중 (이 PR) |
-| 2 | Supabase 연결 + `shares` 테이블 마이그레이션 + RLS | ✅ 진행 중 (이 PR) |
-| 3 | `content/questions/` `.yaml` 스키마 + 예시 3개 + `yaml`/`zod` 빌드 파이프라인 | ⬜ |
+| 1 | Next.js 16 + TypeScript + Tailwind 프로젝트 초기화 + 로드맵 박제 | ✅ #1 머지 |
+| 2 | Supabase 연결 + `shares` 테이블 마이그레이션 + RLS | ✅ #1 머지 |
+| 3 | `content/questions/` `.yaml` 스키마 + 예시 3개 + `yaml`/`zod` 빌드 파이프라인 | ✅ 진행 중 (이 PR) |
 | 4 | `/play` 라운드 페이지 — 5문제 진행 UI | ⬜ |
 | 5 | 서버사이드 정답 검증 API (`/api/quiz/submit`) | ⬜ |
 | 6 | 결과 진단 로직 (카테고리별 정확도 → 진단명 매핑) | ⬜ |
