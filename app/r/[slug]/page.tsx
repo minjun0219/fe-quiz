@@ -31,7 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SharePage({ params }: Props) {
   const { slug } = await params;
-  const share = await getShareById(slug).catch(() => null);
+  // Let Supabase / config errors throw — Next renders 500. Swallowing them
+  // would mask outages as "share not found", which is misleading. notFound()
+  // is reserved for the real "row doesn't exist" case (`null`).
+  const share = await getShareById(slug);
   if (!share) notFound();
 
   const bucket = findResultType(share.result_type);

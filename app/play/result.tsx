@@ -22,10 +22,11 @@ export default function Result({ data }: Props) {
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
   const overallPct = Math.round((data.total_correct / data.total) * 100);
 
-  // Share is only meaningful once the AI feedback finished streaming —
-  // otherwise the friend would land on a share page without a "친구의 한마디".
-  // "unavailable" (no API key configured) is also acceptable to share without.
-  const canShare = feedbackStatus === "done" || feedbackStatus === "unavailable";
+  // Share is enabled once the feedback flow has settled in any terminal
+  // state — including "error" / "unavailable", where we'll fall back to a
+  // stub message so a transient Anthropic outage doesn't block the core
+  // share flow.
+  const canShare = feedbackStatus !== "loading" && feedbackStatus !== "streaming";
 
   async function handleShare() {
     if (!canShare || shareStatus === "creating") return;
