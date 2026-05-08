@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 
@@ -8,15 +9,66 @@ interface Props {
   data: QuizSubmitResponse;
 }
 
-const CATEGORY_LABEL: Record<Category, string> = {
-  javascript: "JavaScript",
-  react: "React",
-  css: "CSS",
-};
+type FeedbackStatus = "loading" | "streaming" | "done" | "error" | "unavailable";
 
 export default function Result({ data }: Props) {
   const [open, setOpen] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("loading");
   const overallPct = Math.round((data.total_correct / data.total) * 100);
+
+  useEffect(() => {
+    // Reset on every dep change so a new round (different `data`) gets a
+    // fresh stream instead of accumulating on top of the previous one. The
+    // `ignore` flag guards against StrictMode double-invoke + late updates
+    // from a stale effect.
+    setFeedback("");
+    setFeedbackStatus("loading");
+    let ignore = false;
+    const abort = new AbortController();
+
+    (async () => {
+      try {
+        const res = await fetch("/api/quiz/feedback", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            question_ids: data.per_question.map((q) => q.id),
+            answers: data.per_question.map((q) => q.your_answer),
+          }),
+          signal: abort.signal,
+        });
+        if (res.status === 503) {
+          if (!ignore) setFeedbackStatus("unavailable");
+          return;
+        }
+        if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+        if (!ignore) setFeedbackStatus("streaming");
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done || ignore) break;
+          setFeedback((prev) => prev + decoder.decode(value, { stream: true }));
+        }
+        // Flush any byte sequence that was held back on a UTF-8 boundary —
+        // Korean characters are 3 bytes, easy to bisect across chunks.
+        if (!ignore) {
+          const tail = decoder.decode();
+          if (tail) setFeedback((prev) => prev + tail);
+          setFeedbackStatus("done");
+        }
+      } catch (err) {
+        if (ignore || (err as { name?: string }).name === "AbortError") return;
+        setFeedbackStatus("error");
+      }
+    })();
+
+    return () => {
+      ignore = true;
+      abort.abort();
+    };
+  }, [data]);
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
@@ -33,6 +85,38 @@ export default function Result({ data }: Props) {
         </p>
       </section>
 
+      <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5">
+        <div className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
+          <span>친구의 한마디</span>
+          {feedbackStatus === "loading" && (
+            <span className="animate-pulse text-zinc-400 normal-case">생각 중…</span>
+          )}
+          {feedbackStatus === "streaming" && (
+            <span className="animate-pulse text-zinc-400 normal-case">타이핑 중…</span>
+          )}
+        </div>
+        {feedbackStatus === "error" && (
+          <p className="text-sm text-zinc-500">
+            앗 친구가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
+          </p>
+        )}
+        {feedbackStatus === "unavailable" && (
+          <p className="text-sm text-zinc-500">
+            (개발자에게: <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code>를
+            <code className="ml-1 rounded bg-zinc-100 px-1">.env.local</code>에 넣으면 친구가
+            깨어나요)
+          </p>
+        )}
+        {feedback && (
+          <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800">
+            {feedback}
+            {feedbackStatus === "streaming" && (
+              <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-rose-400 align-middle" />
+            )}
+          </p>
+        )}
+      </section>
+
       <section className="mb-8">
         <h2 className="mb-3 text-sm font-semibold text-zinc-500">카테고리별</h2>
         <ul className="flex flex-col gap-3">
@@ -45,7 +129,7 @@ export default function Result({ data }: Props) {
             return (
               <li key={cat} className="flex items-center gap-3">
                 <span className="w-24 shrink-0 text-sm font-medium text-zinc-700">
-                  {CATEGORY_LABEL[cat]}
+                  {CATEGORY_DISPLAY_LABEL[cat]}
                 </span>
                 <div className="flex-1 overflow-hidden rounded-full bg-zinc-200 h-2">
                   <div
