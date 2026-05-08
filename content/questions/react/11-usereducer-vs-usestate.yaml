@@ -1,16 +1,20 @@
 id: react-011
 category: react
 difficulty: easy
-type: multiple_choice
+type: single_choice
 question: |
   `useState` 대신 `useReducer`를 쓰는 게 가장 자연스러운 상황은?
 choices:
-  - "단일 boolean 토글 상태 하나만 관리할 때"
-  - "여러 액션 타입과 복잡한 상태 전이가 있고, 다음 상태가 이전 상태와 액션에 따라 결정될 때"
-  - "서버에서 받아온 값을 단순히 보여 주기만 할 때"
-  - "한 컴포넌트 안에서만 쓰는 임시 입력 값을 잠깐 저장할 때"
-answer: 1
+  - id: a
+    text: 단일 boolean 토글 상태 하나만 관리할 때
+  - id: b
+    text: 여러 액션 타입과 복잡한 상태 전이가 있고, 다음 상태가 이전 상태와 액션에 따라 결정될 때
+  - id: c
+    text: 서버에서 받아온 값을 단순히 보여 주기만 할 때
+  - id: d
+    text: 한 컴포넌트 안에서만 쓰는 임시 입력 값을 잠깐 저장할 때
+answer: b
 explanation: |
   `useReducer`는 (state, action) → state 형태로 상태 전이를 한 곳(reducer)에 모으기 때문에, 액션 종류가 많고 분기가 복잡하거나 여러 필드를 한 번에 갱신해야 할 때 가독성·테스트성에서 이점이 커.
   단순 토글이나 텍스트 입력처럼 전이가 자명한 경우엔 `useState`가 더 짧고 명확해. "상태가 다음 상태를 만들고, 패턴이 반복된다"는 신호가 보이면 `useReducer`를 떠올리면 돼.
-tags: [hooks, useReducer, state-management]
+tags: [ hooks, useReducer, state-management ]

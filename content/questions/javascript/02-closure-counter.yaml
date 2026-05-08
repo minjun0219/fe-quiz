@@ -1,7 +1,7 @@
 id: js-002
 category: javascript
 difficulty: medium
-type: multiple_choice
+type: single_choice
 question: |
   다음 코드의 출력은?
 code: |
@@ -14,14 +14,18 @@ code: |
   a(); a(); b()
   console.log(a(), b())
 choices:
-  - "3 1"
-  - "2 2"
-  - "3 2"
-  - "1 1"
-answer: 2
+  - id: a
+    text: 3 1
+  - id: b
+    text: 2 2
+  - id: c
+    text: 3 2
+  - id: d
+    text: 1 1
+answer: c
 explanation: |
   `makeCounter`를 두 번 호출했으니 `a`와 `b`는 서로 다른 클로저(=다른 `count` 변수)를 잡아.
   `a()`는 두 번 호출돼서 count(a)=2까지 올라간 상태, 마지막 `a()`에서 ++ 돼 3 반환.
   `b()`는 한 번 호출돼서 count(b)=1, 마지막 `b()`에서 ++ 돼 2 반환.
   → "3 2". 같은 함수에서 만든 인스턴스라도 클로저는 호출마다 새로 생긴다는 게 포인트야.
-tags: [closure, scope]
+tags: [ closure, scope ]

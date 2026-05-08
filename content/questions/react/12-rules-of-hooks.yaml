@@ -1,7 +1,7 @@
 id: react-012
 category: react
 difficulty: medium
-type: multiple_choice
+type: single_choice
 question: |
   React Hook 규칙에 따라 다음 코드에서 **규칙을 위반**하는 항목을 모두 고르면?
 code: |
@@ -17,11 +17,15 @@ code: |
     return <div>{data?.name}</div>
   }
 choices:
-  - "(가)만"
-  - "(가), (나)"
-  - "(가), (다)"
-  - "(가), (나), (다) 모두"
-answer: 3
+  - id: a
+    text: (가)만
+  - id: b
+    text: (가), (나)
+  - id: c
+    text: (가), (다)
+  - id: d
+    text: (가), (나), (다) 모두
+answer: d
 explanation: |
   훅은 컴포넌트가 매 렌더에서 **항상 같은 순서, 같은 개수**로 호출돼야 해. `if`/`for`/조기 `return` 등으로 호출 여부가 바뀌는 위치에서 훅을 쓰면 안 돼.
   - (가)는 `if (!userId)` 블록 안에서 `useState`를 호출해 명백한 위반.
@@ -37,4 +41,4 @@ explanation: |
   }
   ```
   ESLint 플러그인 `react-hooks/rules-of-hooks`를 켜 두면 이런 패턴을 자동으로 잡아 줘.
-tags: [hooks, rules-of-hooks, lint]
+tags: [ hooks, rules-of-hooks, lint ]

@@ -31,7 +31,10 @@ function shuffle<T>(input: readonly T[]): T[] {
 export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
   const safeCount = Math.max(0, Math.floor(count));
   const all = getAllQuestions();
-  return shuffle(all).slice(0, Math.min(safeCount, all.length)).map(publicView);
+  return shuffle(all)
+    .slice(0, Math.min(safeCount, all.length))
+    .map(publicView)
+    .map((q) => ({ ...q, choices: shuffle(q.choices) }));
 }
 
 /**

@@ -47,9 +47,16 @@ export function buildFeedbackUserPrompt({ diagnosis, graded }: BuildFeedbackUser
 
   graded.per_question.forEach((q, i) => {
     const mark = q.is_correct ? "✓ 정답" : "✗ 오답";
+    const textOf = (id: string) => q.choices.find((c) => c.id === id)?.text ?? id;
     const yourLabel =
-      q.your_answer === null ? "선택 없음" : `[${q.your_answer}] ${q.choices[q.your_answer]}`;
-    const correctLabel = `[${q.correct_answer}] ${q.choices[q.correct_answer]}`;
+      q.your_answer === null
+        ? "선택 없음"
+        : Array.isArray(q.your_answer)
+          ? q.your_answer.map(textOf).join(" / ")
+          : textOf(q.your_answer);
+    const correctLabel = Array.isArray(q.correct_answer)
+      ? q.correct_answer.map(textOf).join(" / ")
+      : textOf(q.correct_answer);
 
     lines.push(
       `${i + 1}. [${CATEGORY_SHORT_LABEL[q.category]} · ${mark}] ${q.question.replace(/\n+/g, " ").trim()}`,

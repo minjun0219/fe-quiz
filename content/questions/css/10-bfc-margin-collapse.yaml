@@ -1,17 +1,22 @@
 id: css-010
 category: css
 difficulty: hard
-type: multiple_choice
+type: single_choice
 question: |
   부모 div 안의 첫 자식 div에 `margin-top: 40px`을 줬는데, 그 마진이 부모 안에 머물지 않고 **부모 바깥으로 빠져나가** 부모 위에 간격이 생겼어. 가장 표준적인 해결책은?
 choices:
-  - "자식의 `margin-top`을 같은 크기의 `padding-top`으로 바꾼다"
-  - "부모를 BFC로 만든다 (예: `display: flow-root`, `overflow: hidden`, padding-top·border-top 추가)"
-  - "자식을 `position: absolute`로 띄운다"
-  - "`<html>` 요소에 `overflow: hidden`을 적용한다"
-answer: 1
+  - id: a
+    text: 자식의 `margin-top`을 같은 크기의 `padding-top`으로 바꾼다
+  - id: b
+    text: "부모를 BFC로 만든다 (예: `display: flow-root`, `overflow: hidden`,
+      padding-top·border-top 추가)"
+  - id: c
+    text: "자식을 `position: absolute`로 띄운다"
+  - id: d
+    text: "`<html>` 요소에 `overflow: hidden`을 적용한다"
+answer: b
 explanation: |
   부모와 첫 자식의 인접한 마진은 **collapse**돼서 더 큰 쪽 하나로 합쳐지고, 그게 부모 바깥으로 빠져나간 것처럼 보이는 거야 (parent-child margin collapse).
   부모를 **BFC**(Block Formatting Context)로 만들면 자식 마진이 BFC 경계를 못 넘어 부모 안에 갇혀. 모던하게는 `display: flow-root`가 부수효과 없이 가장 깔끔해.
   `padding-top` 교체는 마진과 의미가 달라 레이아웃이 어긋날 수 있고, `position: absolute`는 흐름 자체를 빼버려 다른 형제와 겹치는 부작용이 있어.
-tags: [bfc, margin-collapse, layout, flow-root]
+tags: [ bfc, margin-collapse, layout, flow-root ]

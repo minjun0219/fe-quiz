@@ -36,10 +36,13 @@ jobs:
   factcheck:
     # 무한 루프 방지: factcheck가 만든 PR에서는 다시 돌지 않음
     # 포크에서 올라온 PR은 secrets 미주입으로 실패하므로 skip
+    # `skip-factcheck` 라벨이 달린 PR은 의도적으로 우회 (스키마/구조만 바꾸고
+    # 콘텐츠 텍스트는 그대로인 리팩터 PR 등)
     if: >
       !startsWith(github.head_ref, 'claude/factcheck-') &&
       (github.event_name != 'pull_request' ||
-       github.event.pull_request.head.repo.full_name == github.repository)
+       (github.event.pull_request.head.repo.full_name == github.repository &&
+        !contains(github.event.pull_request.labels.*.name, 'skip-factcheck')))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

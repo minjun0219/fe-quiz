@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { PublicQuestion } from "@/lib/question.schema";
-import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
+import type { QuizSubmitResponse, SubmittedAnswer } from "@/lib/quiz-submit.schema";
 import Result from "./result";
 
 interface Props {
@@ -15,10 +15,32 @@ type Phase =
   | { kind: "done"; result: QuizSubmitResponse }
   | { kind: "error"; message: string };
 
+/**
+ * Per-question working state. `null` means untouched. For multi_choice we keep
+ * an array even before any pick so the toggle handler can stay shape-stable;
+ * an empty array submits as `null` to mean "skipped".
+ */
+type AnswerState = string | string[] | null;
+
+function initialAnswers(questions: PublicQuestion[]): AnswerState[] {
+  return questions.map((q) => (q.type === "multi_choice" ? [] : null));
+}
+
+function canProceed(q: PublicQuestion, a: AnswerState): boolean {
+  if (q.type === "multi_choice") return Array.isArray(a) && a.length > 0;
+  return typeof a === "string";
+}
+
+function normalize(a: AnswerState): SubmittedAnswer {
+  if (Array.isArray(a)) return a.length === 0 ? null : a;
+  return a;
+}
+
 export default function RoundRunner({ questions }: Props) {
   const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<(number | null)[]>(() => questions.map(() => null));
+  const [answers, setAnswers] = useState<AnswerState[]>(() => initialAnswers(questions));
   const [phase, setPhase] = useState<Phase>({ kind: "answering" });
+  const groupNameBase = useId();
 
   async function submit() {
     setPhase({ kind: "submitting" });
@@ -28,7 +50,8 @@ export default function RoundRunner({ questions }: Props) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           question_ids: questions.map((q) => q.id),
-          answers,
+          answers: answers.map(normalize),
+          displayed_choice_ids: questions.map((q) => q.choices.map((c) => c.id)),
         }),
       });
       if (!res.ok) {
@@ -86,17 +109,34 @@ export default function RoundRunner({ questions }: Props) {
   const current = questions[index];
   const isLast = index === questions.length - 1;
   const selected = answers[index];
-  const canProceed = selected !== null;
+  const isMulti = current.type === "multi_choice";
+  const proceed = canProceed(current, selected);
+  // Radio inputs need a shared `name` to form an exclusive group; making it
+  // unique per question prevents cross-question interference if two rounds
+  // ever share the same DOM (StrictMode remounts, etc.).
+  const radioGroupName = `${groupNameBase}-${current.id}`;
 
-  function selectChoice(choiceIdx: number) {
+  function toggleChoice(choiceId: string) {
     setAnswers((prev) => {
       const next = prev.slice();
-      next[index] = choiceIdx;
+      if (current.type === "multi_choice") {
+        const arr = Array.isArray(prev[index]) ? (prev[index] as string[]) : [];
+        next[index] = arr.includes(choiceId)
+          ? arr.filter((id) => id !== choiceId)
+          : [...arr, choiceId];
+      } else {
+        next[index] = choiceId;
+      }
       return next;
     });
   }
 
-  function next() {
+  function isChoiceSelected(choiceId: string): boolean {
+    if (Array.isArray(selected)) return selected.includes(choiceId);
+    return selected === choiceId;
+  }
+
+  function nextStep() {
     if (isLast) {
       submit();
       return;
@@ -112,6 +152,7 @@ export default function RoundRunner({ questions }: Props) {
         </span>
         <span className="text-xs uppercase tracking-wider text-zinc-400">
           {current.category} · {current.difficulty}
+          {isMulti && <span className="ml-2 text-rose-500">· 복수 선택</span>}
         </span>
       </header>
 
@@ -119,55 +160,84 @@ export default function RoundRunner({ questions }: Props) {
         className="mb-3 h-1 overflow-hidden rounded-full bg-zinc-200"
         role="progressbar"
         aria-label="라운드 진행 상황"
-        aria-valuenow={index + (canProceed ? 1 : 0)}
+        aria-valuenow={index + (proceed ? 1 : 0)}
         aria-valuemin={0}
         aria-valuemax={questions.length}
       >
         <div
           className="h-full bg-rose-500 transition-all"
           style={{
-            width: `${((index + (canProceed ? 1 : 0)) / questions.length) * 100}%`,
+            width: `${((index + (proceed ? 1 : 0)) / questions.length) * 100}%`,
           }}
         />
       </div>
 
-      <h1 className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed">
-        {current.question}
-      </h1>
+      <fieldset className="contents">
+        <legend className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed">
+          {current.question}
+        </legend>
 
-      {current.code && (
-        <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
-          <code>{current.code}</code>
-        </pre>
-      )}
+        {current.code && (
+          <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
+            <code>{current.code}</code>
+          </pre>
+        )}
 
-      <ul className="flex flex-col gap-3">
-        {current.choices.map((choice, i) => {
-          const isSelected = selected === i;
-          return (
-            <li key={`${current.id}::${choice}`}>
-              <button
-                type="button"
-                onClick={() => selectChoice(i)}
-                aria-pressed={isSelected}
-                className={`w-full rounded-2xl border-2 px-5 py-4 text-left text-base transition active:scale-[0.99] ${
-                  isSelected
-                    ? "border-rose-500 bg-rose-50 text-zinc-900"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
-                }`}
-              >
-                {choice}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+        {isMulti && (
+          <p className="mb-3 text-xs font-medium text-zinc-500">
+            정답이 여러 개일 수 있어. 해당하는 걸 모두 골라줘.
+          </p>
+        )}
+
+        <ul className="flex flex-col gap-3">
+          {current.choices.map((choice) => {
+            const isSelected = isChoiceSelected(choice.id);
+            const inputId = `${groupNameBase}-${current.id}-${choice.id}`;
+            return (
+              <li key={`${current.id}::${choice.id}`}>
+                <input
+                  id={inputId}
+                  type={isMulti ? "checkbox" : "radio"}
+                  name={isMulti ? inputId : radioGroupName}
+                  value={choice.id}
+                  checked={isSelected}
+                  onChange={() => toggleChoice(choice.id)}
+                  className="peer sr-only"
+                />
+                <label
+                  htmlFor={inputId}
+                  className={`flex w-full cursor-pointer items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base transition active:scale-[0.99] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-rose-500 ${
+                    isSelected
+                      ? "border-rose-500 bg-rose-50 text-zinc-900"
+                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+                  }`}
+                >
+                  <span
+                    aria-hidden
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center border-2 ${
+                      isMulti ? "rounded-md" : "rounded-full"
+                    } ${
+                      isSelected
+                        ? "border-rose-500 bg-rose-500 text-white"
+                        : "border-zinc-300 bg-white"
+                    }`}
+                  >
+                    {isSelected &&
+                      (isMulti ? "✓" : <span className="h-2 w-2 rounded-full bg-white" />)}
+                  </span>
+                  <span className="flex-1">{choice.text}</span>
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
 
       <div className="mt-auto pt-10">
         <button
           type="button"
-          onClick={next}
-          disabled={!canProceed}
+          onClick={nextStep}
+          disabled={!proceed}
           className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99]"
         >
           {isLast ? "결과 보기" : "다음 →"}

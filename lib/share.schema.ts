@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Category } from "./question.schema";
+import { SubmittedAnswer } from "./quiz-submit.schema";
 
 /**
  * Body of POST /api/share.
@@ -12,7 +13,7 @@ import { Category } from "./question.schema";
 export const ShareCreateRequest = z
   .object({
     question_ids: z.array(z.string().min(1)).min(1).max(20),
-    answers: z.array(z.number().int().nonnegative().nullable()).min(1).max(20),
+    answers: z.array(SubmittedAnswer).min(1).max(20),
     feedback: z.string().min(1).max(2000),
   })
   .superRefine((req, ctx) => {

@@ -1,7 +1,7 @@
 id: react-014
 category: react
 difficulty: medium
-type: multiple_choice
+type: single_choice
 question: |
   부모에서 자식 함수형 컴포넌트의 `<input>` DOM에 ref를 직접 연결하려고 한다. 다음 중 React 18 기준 올바른 패턴은?
 code: |
@@ -9,13 +9,19 @@ code: |
   const ref = useRef(null)
   return <MyInput ref={ref} />
 choices:
-  - "자식을 그냥 `function MyInput(props) { return <input {...props} /> }`로 두고 부모에서 ref를 넘긴다."
-  - "자식에 `ref` prop을 직접 받아 `<input ref={props.ref} />`로 넘긴다."
-  - "자식에서 `useImperativeHandle`만 호출하면 자동으로 ref가 연결된다."
-  - "자식을 `const MyInput = forwardRef((props, ref) => <input ref={ref} {...props} />)`로 정의한다."
-answer: 3
+  - id: a
+    text: 자식을 그냥 `function MyInput(props) { return <input {...props} /> }`로 두고 부모에서
+      ref를 넘긴다.
+  - id: b
+    text: 자식에 `ref` prop을 직접 받아 `<input ref={props.ref} />`로 넘긴다.
+  - id: c
+    text: 자식에서 `useImperativeHandle`만 호출하면 자동으로 ref가 연결된다.
+  - id: d
+    text: 자식을 `const MyInput = forwardRef((props, ref) => <input ref={ref}
+      {...props} />)`로 정의한다.
+answer: d
 explanation: |
   React 18까지의 함수형 컴포넌트는 기본적으로 `ref` prop을 받지 못해. 그래서 부모가 `<MyInput ref={ref} />`처럼 넘겨도 자식에 닿지 않고, "Function components cannot be given refs" 경고가 떠.
   해결은 `forwardRef`로 컴포넌트를 감싸 두 번째 인자로 들어오는 `ref`를 자식 DOM에 연결하는 것. 더 추상화된 명령형 API가 필요하면 그 안에서 `useImperativeHandle`을 조합해 쓰면 돼.
   참고로 React 19부터는 함수형 컴포넌트가 `ref`를 일반 prop처럼 받을 수 있어 `forwardRef`가 점차 필요 없어질 예정이지만, 대부분의 코드베이스에선 여전히 forwardRef 사용이 일반적이야.
-tags: [refs, forwardRef, dom]
+tags: [ refs, forwardRef, dom ]

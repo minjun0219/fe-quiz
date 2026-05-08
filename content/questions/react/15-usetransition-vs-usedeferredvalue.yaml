@@ -1,18 +1,23 @@
 id: react-015
 category: react
 difficulty: hard
-type: multiple_choice
+type: single_choice
 question: |
   `useTransition`과 `useDeferredValue`의 차이로 가장 정확한 설명은?
 choices:
-  - "둘 다 동일한 API이며 React 19부터는 useTransition이 deprecated된다."
-  - "`useTransition`은 컴포넌트를 메모이즈하고, `useDeferredValue`는 effect 실행을 지연시킨다."
-  - "둘 다 동기 렌더링을 강제해 사용자 입력 응답성을 높인다."
-  - "`useTransition`은 상태 업데이트(setter 호출) 자체를 낮은 우선순위 트랜지션으로 감쌀 때, `useDeferredValue`는 렌더에서 소비할 값의 지연된 복사본을 만들어 무거운 서브트리의 우선순위를 낮추고 싶을 때 쓴다."
-answer: 3
+  - id: a
+    text: 둘 다 동일한 API이며 React 19부터는 useTransition이 deprecated된다.
+  - id: b
+    text: "`useTransition`은 컴포넌트를 메모이즈하고, `useDeferredValue`는 effect 실행을 지연시킨다."
+  - id: c
+    text: 둘 다 동기 렌더링을 강제해 사용자 입력 응답성을 높인다.
+  - id: d
+    text: "`useTransition`은 상태 업데이트(setter 호출) 자체를 낮은 우선순위 트랜지션으로 감쌀 때,
+      `useDeferredValue`는 렌더에서 소비할 값의 지연된 복사본을 만들어 무거운 서브트리의 우선순위를 낮추고 싶을 때 쓴다."
+answer: d
 explanation: |
   - `useTransition`은 `startTransition(() => setState(...))`처럼 **상태 업데이트(setter 호출)** 를 "긴급하지 않은 트랜지션"으로 마킹해, 무거운 리렌더가 입력 같은 더 급한 업데이트를 막지 않도록 해 줘. 보너스로 `isPending`을 받아 로딩 표시도 가능.
   - `useDeferredValue`는 어떤 값(직접 가진 state든 부모로부터 받은 props든 파생 값이든)을 인자로 받아 **한 박자 늦은 "지연된 복사본"** 을 돌려줘. 이 deferred value를 무거운 서브트리에 흘려 보내면 그 트리의 리렌더만 낮은 우선순위로 처리돼서, 입력 같은 급한 업데이트를 가로막지 않게 돼.
   - 그래서 setter를 내가 가지고 있지 않은 props에 대해서도 쓸 수 있지만, 거꾸로 `const deferred = useDeferredValue(state)`처럼 내가 만든 state에 그대로 적용해도 OK야.
   큰 그림은 비슷하지만 "어느 지점에서 우선순위를 낮추느냐"가 달라 — 업데이트 발생 지점(setter 호출 단위)에서 낮추면 `useTransition`, 렌더에서 소비할 값 단위로 낮추면 `useDeferredValue`.
-tags: [concurrent, useTransition, useDeferredValue]
+tags: [ concurrent, useTransition, useDeferredValue ]

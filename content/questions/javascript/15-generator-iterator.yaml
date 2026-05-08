@@ -1,7 +1,7 @@
 id: js-015
 category: javascript
 difficulty: hard
-type: multiple_choice
+type: single_choice
 question: |
   다음 코드의 출력 순서는?
 code: |
@@ -17,13 +17,17 @@ code: |
   console.log(g.next().value)
   console.log(g.next().done)
 choices:
-  - "1 A 2 B C true"
-  - "A B C 1 2 true"
-  - "A 1 B 2 C false"
-  - "A 1 B 2 C true"
-answer: 3
+  - id: a
+    text: 1 A 2 B C true
+  - id: b
+    text: A B C 1 2 true
+  - id: c
+    text: A 1 B 2 C false
+  - id: d
+    text: A 1 B 2 C true
+answer: d
 explanation: |
   generator는 호출 즉시 실행되지 않고 iterator를 반환해. `g.next()`가 처음 호출되면 함수 본문이 시작돼 `'A'`를 찍고 `yield 1`에서 멈춰 `{ value: 1, done: false }`를 돌려줘.
   두 번째 `g.next()`는 멈췄던 자리에서 재개해 `'B'` → `yield 2`. 세 번째 `g.next()`는 `'C'`까지 실행하고 함수가 끝나 `{ value: undefined, done: true }`를 반환해.
   그래서 출력은 `A` `1` `B` `2` `C` `true` 순. 일시 중단/재개를 활용해 lazy 시퀀스를 만들거나 비동기 흐름 제어에 유용해.
-tags: [generator, iterator, control-flow]
+tags: [ generator, iterator, control-flow ]
