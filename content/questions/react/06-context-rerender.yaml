@@ -14,11 +14,11 @@ code: |
     )
   }
 choices:
-  - "Provider의 `value` 객체를 `useMemo`로 감싸 의존성이 같을 때 같은 참조를 유지한다"
   - "Provider 자체를 `React.memo`로 감싼다"
   - "`useCallback`으로 `value` 객체를 감싼다"
   - "`value`를 JSON 문자열로 변환해 넘긴다"
-answer: 0
+  - "Provider의 `value` 객체를 `useMemo`로 감싸 의존성이 같을 때 같은 참조를 유지한다"
+answer: 3
 explanation: |
   매 렌더마다 `{ name: '하늘' }`이 **새 객체 리터럴**로 만들어져 참조가 바뀌니까, Context는 "값이 바뀌었네" 판단하고 모든 consumer를 리렌더해.
   `useMemo(() => ({ name: '하늘' }), [])`로 감싸면 의존성이 바뀌지 않는 한 같은 참조를 유지해서 consumer가 안 흔들려.

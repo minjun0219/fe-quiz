@@ -5,11 +5,11 @@ type: multiple_choice
 question: |
   개발 환경에서 `<StrictMode>`로 감싼 컴포넌트의 useEffect가 **두 번** 실행되는 이유는?
 choices:
-  - "마운트 → 언마운트 → 재마운트를 시뮬레이션해서 cleanup 누락이나 부수효과를 잡아내기 위해 (개발 모드 전용)"
   - "React 19부터 모든 effect가 두 번 실행되도록 기본 동작이 바뀌어서"
   - "의존성 배열이 빈 배열일 때만 두 번 실행되는 버그"
+  - "마운트 → 언마운트 → 재마운트를 시뮬레이션해서 cleanup 누락이나 부수효과를 잡아내기 위해 (개발 모드 전용)"
   - "Hot Reload 때문에 항상 두 번 실행됨"
-answer: 0
+answer: 2
 explanation: |
   StrictMode는 **개발 환경에서만** 컴포넌트를 한 번 더 마운트/언마운트해서 effect의 cleanup이 제대로 되는지 강제로 검사해줘.
   그래서 cleanup이 없는 effect가 두 번 작동하면 서버 호출이 중복되거나 타이머가 두 개 도는 등 버그가 드러나는 거야. 그게 의도된 거.

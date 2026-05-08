@@ -10,11 +10,11 @@ code: |
   b.user.name = '바다'
   console.log(a.user.name, '/', a.version)
 choices:
-  - "바다 / 1"
   - "하늘 / 1"
   - "바다 / 2"
+  - "바다 / 1"
   - "하늘 / 2"
-answer: 0
+answer: 2
 explanation: |
   스프레드는 **얕은 복사**야. `b`는 `a`의 최상위 프로퍼티만 새로 복사하고, 안쪽 객체(`user`)는 참조를 그대로 공유해.
   그래서 `b.user.name = '바다'`로 바꾸면 `a.user`도 같은 객체라 같이 바뀌어 → `a.user.name`은 `'바다'`.

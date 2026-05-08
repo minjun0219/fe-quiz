@@ -5,11 +5,11 @@ type: multiple_choice
 question: |
   다음 중 새로운 stacking context를 **만들지 않는** 것은?
 choices:
-  - "`position: relative` 단독 적용 (z-index 없음)"
   - "`opacity: 0.5` 적용"
   - "`transform: translateZ(0)` 적용"
   - "`position: relative` + `z-index: 0`"
-answer: 0
+  - "`position: relative` 단독 적용 (z-index 없음)"
+answer: 3
 explanation: |
   stacking context는 z-index 비교의 "독립된 우주"를 만들어. context 안의 자식 z-index는 바깥과 비교 안 되고, context 자체의 위치만 바깥과 경쟁해.
   `position: relative`만 적용하고 z-index가 `auto`면 context를 만들지 **않아**. z-index가 정수로 지정돼야 비로소 context가 생겨.

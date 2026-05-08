@@ -12,11 +12,11 @@ code: |
     box-sizing: border-box;
   }
 choices:
-  - "150px"
   - "200px"
+  - "150px"
   - "230px"
   - "250px"
-answer: 0
+answer: 1
 explanation: |
   `box-sizing: border-box`는 `width`가 **border + padding + content**를 모두 포함한 박스의 전체 너비라는 뜻이야.
   그래서 콘텐츠 영역 = 200 - (padding 20×2) - (border 5×2) = 200 - 40 - 10 = **150px**.

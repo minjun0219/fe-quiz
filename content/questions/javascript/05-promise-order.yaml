@@ -16,11 +16,11 @@ code: |
   f()
   console.log('F')
 choices:
-  - "A, D, F, C, E, B"
   - "A, D, F, E, C, B"
+  - "A, D, F, C, E, B"
   - "A, B, C, D, E, F"
   - "A, F, D, C, E, B"
-answer: 0
+answer: 1
 explanation: |
   동기 코드부터: `A` → `f()` 호출 → `D` (await 만나서 일시 중단) → `F`. 여기까지 동기 한 사이클.
   마이크로태스크 큐엔 먼저 등록된 `Promise.resolve().then(C)`가 앞에 있고, 그 뒤에 `await` 다음에 이어지는 `E`가 들어가.

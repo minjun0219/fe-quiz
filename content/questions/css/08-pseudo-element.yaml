@@ -12,11 +12,11 @@ code: |
     display: inline-block;
   }
 choices:
-  - "`content` 속성이 없으면 `::before`/`::after`는 렌더링되지 않는다"
   - "`::before`는 항상 `display: none` 상태가 기본이다"
   - "`background-color`로 써야지 `background`로는 색이 적용되지 않는다"
   - "`::before`는 부모가 `position: relative`여야만 보인다"
-answer: 0
+  - "`content` 속성이 없으면 `::before`/`::after`는 렌더링되지 않는다"
+answer: 3
 explanation: |
   `::before`/`::after`는 "이 요소의 앞/뒤에 가짜 자식을 만들어줘"라는 거라, **`content` 속성이 명시돼야 비로소 박스가 생성돼**.
   값이 비어 있어도 좋으니 `content: ""`라고만 써주면 다른 스타일이 살아나. 가장 흔한 실수 중 하나야.

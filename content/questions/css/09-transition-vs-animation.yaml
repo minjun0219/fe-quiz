@@ -3,7 +3,7 @@ category: css
 difficulty: easy
 type: multiple_choice
 question: |
-  버튼에 hover하면 색이 부드럽게 변하다가, 마우스를 뗼면 다시 부드럽게 원래 색으로 돌아오게 만들고 싶어. 가장 적절한 도구는?
+  버튼에 hover하면 색이 부드럽게 변하다가, 마우스를 떼면 다시 부드럽게 원래 색으로 돌아오게 만들고 싶어. 가장 적절한 도구는?
 choices:
   - "`transition`으로 변환할 속성과 duration을 지정한다"
   - "`@keyframes`와 `animation`으로 from/to를 정의한다"
