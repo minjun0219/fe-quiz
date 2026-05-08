@@ -168,7 +168,7 @@ Haiku 4.5 기준 ($1/$5 per million tokens):
 | # | 단계 | 상태 |
 | --- | --- | --- |
 | 1 | Next.js 16 + TypeScript + Tailwind 프로젝트 초기화 + 로드맵 박제 | ✅ 진행 중 (이 PR) |
-| 2 | Supabase 연결 + `shares` 테이블 마이그레이션 + RLS | ⬜ |
+| 2 | Supabase 연결 + `shares` 테이블 마이그레이션 + RLS | ✅ 진행 중 (이 PR) |
 | 3 | `content/questions/` `.yaml` 스키마 + 예시 3개 + `yaml`/`zod` 빌드 파이프라인 | ⬜ |
 | 4 | `/play` 라운드 페이지 — 5문제 진행 UI | ⬜ |
 | 5 | 서버사이드 정답 검증 API (`/api/quiz/submit`) | ⬜ |
@@ -210,14 +210,31 @@ fe-quiz/
 │       ├── javascript/
 │       ├── react/
 │       └── css/
-├── lib/                  # 도메인 로직 (검증, 진단, 프롬프트)
+├── lib/                  # 도메인 로직
+│   ├── supabase.ts       # 서버 클라이언트 팩토리
+│   └── database.types.ts # shares 테이블 TS 타입
+├── supabase/
+│   └── migrations/       # SQL 마이그레이션 (수동 적용)
 ├── docs/
 │   └── ROADMAP.md        # 이 문서
 ├── public/
 ├── .env.local.example
+├── .mcp.json             # Supabase MCP server 설정
 ├── .nvmrc                # Node 22
+├── biome.json            # Biome 린터/포맷터
 └── LICENSE               # MIT
 ```
+
+## 마이그레이션 적용 방법
+
+`supabase/migrations/*.sql` 파일들은 자동 적용되지 않아요(GitHub 통합 미사용).
+새 마이그레이션이 추가되면:
+
+1. Supabase 대시보드 → SQL Editor 진입
+2. 해당 `.sql` 파일 내용 복사 → 붙여넣기 → Run
+3. 적용된 시점/파일명을 PR description에 기록
+
+향후 마이그레이션이 늘면 Supabase CLI 도입 검토 (로컬 dev DB + push 명령).
 
 ## 목표
 
