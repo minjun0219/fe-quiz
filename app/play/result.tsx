@@ -66,12 +66,14 @@ export default function Result({ data }: Props) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls="result-questions"
           className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-700"
         >
           {open ? "▾" : "▸"} 문제 다시 보기
         </button>
         {open && (
-          <ol className="flex flex-col gap-4">
+          <ol id="result-questions" className="flex flex-col gap-4">
             {data.per_question.map((q, i) => (
               <li key={q.id} className="rounded-2xl border border-zinc-200 bg-white p-4">
                 <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wider text-zinc-400">
