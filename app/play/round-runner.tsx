@@ -2,15 +2,48 @@
 
 import { useState } from "react";
 import type { PublicQuestion } from "@/lib/question.schema";
+import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
+import Result from "./result";
 
 interface Props {
   questions: PublicQuestion[];
 }
 
+type Phase =
+  | { kind: "answering" }
+  | { kind: "submitting" }
+  | { kind: "done"; result: QuizSubmitResponse }
+  | { kind: "error"; message: string };
+
 export default function RoundRunner({ questions }: Props) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(() => questions.map(() => null));
-  const [submitted, setSubmitted] = useState(false);
+  const [phase, setPhase] = useState<Phase>({ kind: "answering" });
+
+  async function submit() {
+    setPhase({ kind: "submitting" });
+    try {
+      const res = await fetch("/api/quiz/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          question_ids: questions.map((q) => q.id),
+          answers,
+        }),
+      });
+      if (!res.ok) {
+        const detail = await res.text();
+        throw new Error(`HTTP ${res.status}: ${detail.slice(0, 200)}`);
+      }
+      const result = (await res.json()) as QuizSubmitResponse;
+      setPhase({ kind: "done", result });
+    } catch (err) {
+      setPhase({
+        kind: "error",
+        message: err instanceof Error ? err.message : "알 수 없는 오류",
+      });
+    }
+  }
 
   if (questions.length === 0) {
     return (
@@ -21,18 +54,33 @@ export default function RoundRunner({ questions }: Props) {
     );
   }
 
-  if (submitted) {
-    // Step 5에서 /api/quiz/submit + 결과 페이지로 교체될 placeholder
+  if (phase.kind === "submitting") {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-        <p className="mb-3 text-sm font-medium text-rose-500">친구가 채점 중…</p>
-        <h1 className="mb-4 text-3xl font-bold">다 풀었네! 👏</h1>
-        <p className="mb-2 max-w-md text-zinc-600">채점이랑 AI 피드백은 다음 PR에서 연결할게.</p>
-        <pre className="mt-6 max-w-md whitespace-pre-wrap rounded-2xl bg-zinc-100 p-4 text-left text-xs text-zinc-700">
-          {JSON.stringify({ question_ids: questions.map((q) => q.id), answers }, null, 2)}
-        </pre>
+        <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">친구가 채점 중…</p>
+        <h1 className="text-2xl font-bold">잠깐만, 답 맞춰볼게</h1>
       </main>
     );
+  }
+
+  if (phase.kind === "error") {
+    return (
+      <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+        <h1 className="mb-3 text-2xl font-bold">앗, 채점이 안 됐어 😵</h1>
+        <p className="mb-6 max-w-md text-sm text-zinc-600">{phase.message}</p>
+        <button
+          type="button"
+          onClick={submit}
+          className="inline-flex h-12 items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-semibold text-white hover:bg-zinc-800"
+        >
+          다시 시도
+        </button>
+      </main>
+    );
+  }
+
+  if (phase.kind === "done") {
+    return <Result data={phase.result} />;
   }
 
   const current = questions[index];
@@ -50,7 +98,7 @@ export default function RoundRunner({ questions }: Props) {
 
   function next() {
     if (isLast) {
-      setSubmitted(true);
+      submit();
       return;
     }
     setIndex((i) => i + 1);
@@ -120,7 +168,7 @@ export default function RoundRunner({ questions }: Props) {
           type="button"
           onClick={next}
           disabled={!canProceed}
-          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:active:scale-[0.99] enabled:hover:bg-zinc-800"
+          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99]"
         >
           {isLast ? "결과 보기" : "다음 →"}
         </button>
