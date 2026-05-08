@@ -1,0 +1,149 @@
+name: Quiz Fact Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: "대상 카테고리"
+        default: "all"
+        type: choice
+        options:
+          - all
+          - javascript
+          - react
+          - css
+      dry_run:
+        description: "수정 없이 검증만 (read-only, PR 생성 안 함)"
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - "content/questions/**/*.yaml"
+  schedule:
+    # 약 3주에 한 번: 매월 1일과 22일 03:00 UTC (= 12:00 KST)
+    - cron: "0 3 1,22 * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: factcheck-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  factcheck:
+    # 무한 루프 방지: factcheck가 만든 PR에서는 다시 돌지 않음
+    # 포크에서 올라온 PR은 secrets 미주입으로 실패하므로 skip
+    if: >
+      !startsWith(github.head_ref, 'claude/factcheck-') &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run /factcheck (dry run, read-only)
+        if: github.event.inputs.dry_run == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            `/factcheck ${{ github.event.inputs.category || 'all' }}` 를 **dry-run 모드**로 실행하라.
+
+            중요: YAML 파일을 절대 수정하지 마라. `Edit` 도구를 호출하지 마라.
+            대신 어떤 파일의 어떤 필드를 어떻게 고쳐야 하는지 사유와 출처 URL만 보고하라.
+          mcp_config: ".mcp.json"
+          allowed_tools: "Task,Read,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
+          timeout_minutes: "25"
+
+      - name: Run /factcheck via Claude Code
+        if: github.event.inputs.dry_run != 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: "/factcheck ${{ github.event.inputs.category || 'all' }}"
+          mcp_config: ".mcp.json"
+          allowed_tools: "Task,Read,Edit,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
+          timeout_minutes: "25"
+
+      - name: Verify schema and lint
+        run: |
+          pnpm questions:check
+          pnpm check
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet content/questions/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat content/questions/ >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # 안전장치: factcheck가 content/questions/ 밖을 건드리면 즉시 실패
+          if ! git diff --quiet -- ':!content/questions'; then
+            echo "::error::factcheck가 content/questions/ 외부 파일을 수정했습니다. 워크플로 로그를 확인하세요."
+            git diff --stat -- ':!content/questions' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: PR mode — surface pending fact-check fixes
+        if: >
+          steps.diff.outputs.changed == 'true' &&
+          github.event_name == 'pull_request'
+        run: |
+          {
+            echo "## ⚠️ 적용되지 않은 fact-check 수정"
+            echo ""
+            echo "이 PR의 YAML에 사양/문서와 어긋나는 부분이 있어 factcheck가 수정안을 만들었지만, PR로 자동 반영하지 않습니다."
+            echo "아래 diff를 검토하고 수동으로 적용하세요."
+            echo ""
+            echo "\`\`\`diff"
+            git diff content/questions/
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::이 PR에 적용되지 않은 fact-check 수정이 있습니다. step summary의 diff를 확인하세요."
+          exit 1
+
+      - name: Create draft PR
+        if: >
+          steps.diff.outputs.changed == 'true' &&
+          github.event_name != 'pull_request' &&
+          github.event.inputs.dry_run != 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: claude/factcheck-${{ github.run_id }}
+          add-paths: |
+            content/questions/**
+          title: "chore(quiz): /factcheck 자동 수정 제안"
+          body: |
+            `/factcheck` 스킬이 카테고리별 sub-agent로 병렬 팩트체크 후 자동 수정한 결과입니다.
+
+            - 트리거: `${{ github.event_name }}`
+            - 카테고리: `${{ github.event.inputs.category || 'all' }}`
+            - 워크플로 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            ⚠️ **반드시 사람이 인용 출처(URL)를 검토한 뒤 머지하세요.** LLM이 잘못된 사양을 주장할 수 있습니다.
+
+            상세 변경 사유는 위 워크플로 로그의 `Run /factcheck via Claude Code` 단계 출력을 참조하세요.
+          commit-message: "chore(quiz): factcheck auto-fix"
+          labels: |
+            factcheck
+            automated
+          draft: true
