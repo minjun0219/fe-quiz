@@ -1,0 +1,23 @@
+id: js-009
+category: javascript
+difficulty: easy
+type: multiple_choice
+question: |
+  다음 코드 실행 후 `nums`의 값은?
+code: |
+  const nums = [1, 2, 3, 4]
+  const doubled = nums.map(n => n * 2)
+  const evens = nums.filter(n => n % 2 === 0)
+  nums.forEach(n => n * 100)
+choices:
+  - "[2, 4, 6, 8]"
+  - "[1, 2, 3, 4]"
+  - "[2, 4]"
+  - "[100, 200, 300, 400]"
+answer: 1
+explanation: |
+  `map`/`filter`는 새 배열을 반환하지, 원본을 건드리지 않아.
+  `forEach`도 콜백의 반환값을 그냥 무시할 뿐, 원본 배열 자체를 바꾸진 않아 (콜백 안에서 직접 인덱스를 쓰는 게 아니라면).
+  → 그래서 `nums`는 원래 `[1, 2, 3, 4]` 그대로.
+  원본을 바꾸는 메서드는 `push`, `pop`, `splice`, `sort`, `reverse` 같은 mutating 메서드들이야.
+tags: [array, immutability, map, filter, forEach]

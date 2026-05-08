@@ -1,0 +1,17 @@
+id: react-008
+category: react
+difficulty: easy
+type: multiple_choice
+question: |
+  React form input에서 controlled와 uncontrolled를 구분하는 핵심 차이는?
+choices:
+  - "controlled는 onChange 핸들러가 없고, uncontrolled는 onChange가 있다"
+  - "controlled는 input의 값을 React state로 관리하고, uncontrolled는 DOM이 자체적으로 값을 들고 있다가 ref로 읽는다"
+  - "controlled는 form submit 시 자동으로 reset된다"
+  - "둘은 동작이 같고 코드 스타일만 다르다"
+answer: 1
+explanation: |
+  controlled는 `value={state}` + `onChange={...}`로 React가 input 값의 단일 출처(single source of truth)를 갖는 패턴이야.
+  uncontrolled는 `defaultValue`로 초기값만 주고, 실제 값은 DOM이 알아서 들고 있다가 필요할 때 `ref.current.value`로 읽는 패턴.
+  controlled는 검증·동적 표시가 쉽고, uncontrolled는 큰 폼에서 리렌더 비용이 적어. 상황에 맞게 골라.
+tags: [form, controlled, uncontrolled, ref]

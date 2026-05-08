@@ -1,0 +1,17 @@
+id: js-007
+category: javascript
+difficulty: easy
+type: multiple_choice
+question: |
+  `<ul>` 안에 `<li>`가 1000개 있고, 각각을 클릭했을 때 동작이 필요해. 가장 효율적인 패턴은?
+choices:
+  - "각 `<li>`마다 `addEventListener`를 호출해 핸들러를 단다"
+  - "각 `<li>`에 인라인 `onclick` 속성으로 핸들러를 작성한다"
+  - "캡처 단계에서 각 `<li>`마다 `addEventListener`를 단다"
+  - "부모 `<ul>`에 한 번만 클릭 핸들러를 달고, `event.target`으로 어떤 `<li>`인지 판별한다"
+answer: 3
+explanation: |
+  이벤트 위임(delegation) 패턴이야. 클릭은 자식에서 발생해도 버블링으로 부모까지 올라오니까, 부모에 한 번만 달면 1000개 자식을 다 커버할 수 있어.
+  핸들러 함수가 1000개씩 메모리를 차지하지 않고, 자식이 동적으로 추가/삭제돼도 핸들러 재등록이 필요 없는 게 핵심 장점.
+  실제 구현은 `event.target.closest('li')`로 안전하게 li까지 올라가서 처리하면 돼.
+tags: [event-delegation, bubbling, browser]

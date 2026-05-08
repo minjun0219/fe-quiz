@@ -1,0 +1,24 @@
+id: js-004
+category: javascript
+difficulty: medium
+type: multiple_choice
+question: |
+  다음 코드의 출력은?
+code: |
+  const outer = this
+  const obj = {
+    arrow: () => this === outer,
+    normal() { return this === outer }
+  }
+  console.log(obj.arrow(), '/', obj.normal())
+choices:
+  - "true / false"
+  - "false / true"
+  - "true / true"
+  - "false / false"
+answer: 0
+explanation: |
+  화살표 함수는 자기 `this`를 만들지 않고, 정의 시점의 상위 스코프 `this`를 그대로 캡처해. 그래서 어떤 실행 환경(모듈/스크립트, strict/sloppy)이든 `obj.arrow()`의 `this`는 바깥의 `this`(= `outer`)와 항상 같아 → `true`.
+  반면 `normal`은 일반 메서드라 호출 방식(`obj.normal()`)에 따라 `this`가 호출 객체(`obj`)로 바인딩돼. `obj`는 `outer`와 다른 객체니까 → `false`.
+  → "객체 메서드를 화살표로 쓰면 `this`가 호출 객체를 가리키지 않고, 정의 위치의 상위 `this`를 그대로 따라간다"가 핵심.
+tags: [this, arrow-function, scope]

@@ -1,0 +1,22 @@
+id: js-008
+category: javascript
+difficulty: medium
+type: multiple_choice
+question: |
+  다음 코드의 출력은?
+code: |
+  function Dog(name) { this.name = name }
+  Dog.prototype.bark = function () { return 'bark' }
+  const d = new Dog('coco')
+  console.log(d.hasOwnProperty('name'), d.hasOwnProperty('bark'))
+choices:
+  - "true false"
+  - "true true"
+  - "false true"
+  - "false false"
+answer: 0
+explanation: |
+  `name`은 생성자 안에서 `this.name = name`으로 인스턴스 자신에게 직접 박아 넣은 속성 → `hasOwnProperty('name')`은 `true`.
+  `bark`는 `Dog.prototype`에 정의돼 있어. `d.bark()`처럼 호출은 되지만 그건 프로토타입 체인을 따라가서 찾는 거고, `d` 자신이 갖고 있는 속성은 아니라서 `hasOwnProperty('bark')`는 `false`.
+  → 인스턴스 own property와 프로토타입 체인을 구분하는 게 포인트야.
+tags: [prototype, inheritance, hasOwnProperty]
