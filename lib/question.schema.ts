@@ -41,6 +41,29 @@ export const QuestionSchema = z
         message: `id "${q.id}" must start with "${expected}-" for category "${q.category}"`,
       });
     }
+    // Choices are competing answers — duplicates would be a content bug AND
+    // collide with React keys keyed off choice text.
+    const seen = new Set<string>();
+    for (let i = 0; i < q.choices.length; i++) {
+      const choice = q.choices[i];
+      if (seen.has(choice)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["choices", i],
+          message: `duplicate choice text "${choice}"`,
+        });
+      }
+      seen.add(choice);
+    }
   });
 
 export type Question = z.infer<typeof QuestionSchema>;
+
+/**
+ * Client-safe view of a question. The answer + explanation are intentionally
+ * omitted so the correct answer never reaches the browser bundle.
+ *
+ * Lives here (not in `lib/round.ts`) so client components can `import type`
+ * this without crossing a `server-only` module boundary.
+ */
+export type PublicQuestion = Omit<Question, "answer" | "explanation">;

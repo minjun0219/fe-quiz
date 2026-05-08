@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 py-16 text-center">
@@ -13,15 +15,12 @@ export default function Home() {
         면접 압박 없이, 단톡방에서 친구 던지듯.
         <br />다 풀면 AI가 친구처럼 피드백 줘.
       </p>
-      <button
-        type="button"
-        disabled
-        aria-disabled
-        title="다음 PR에서 열려요"
-        className="inline-flex h-14 cursor-not-allowed items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white opacity-60"
+      <Link
+        href="/play"
+        className="inline-flex h-14 items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition hover:bg-zinc-800 active:scale-[0.98]"
       >
-        곧 시작 ✨
-      </button>
+        지금 풀어보기 →
+      </Link>
       <p className="mt-6 text-xs text-zinc-400">JS · React · CSS / 약 3분</p>
     </main>
   );
