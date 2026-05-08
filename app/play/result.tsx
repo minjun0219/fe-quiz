@@ -1,21 +1,56 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
+import type { ShareCreateResponse } from "@/lib/share.schema";
 
 interface Props {
   data: QuizSubmitResponse;
 }
 
 type FeedbackStatus = "loading" | "streaming" | "done" | "error" | "unavailable";
+type ShareStatus = "idle" | "creating" | "error";
 
 export default function Result({ data }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("loading");
+  const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
   const overallPct = Math.round((data.total_correct / data.total) * 100);
+
+  // Share is only meaningful once the AI feedback finished streaming —
+  // otherwise the friend would land on a share page without a "친구의 한마디".
+  // "unavailable" (no API key configured) is also acceptable to share without.
+  const canShare = feedbackStatus === "done" || feedbackStatus === "unavailable";
+
+  async function handleShare() {
+    if (!canShare || shareStatus === "creating") return;
+    setShareStatus("creating");
+    try {
+      const res = await fetch("/api/share", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          question_ids: data.per_question.map((q) => q.id),
+          answers: data.per_question.map((q) => q.your_answer),
+          // If feedback failed/unavailable, send a stub so the share endpoint
+          // (which requires non-empty feedback) accepts it.
+          feedback: feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)",
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const body = (await res.json()) as ShareCreateResponse;
+      router.push(`/r/${body.slug}`);
+    } catch {
+      setShareStatus("error");
+    }
+  }
 
   useEffect(() => {
     // Reset on every dep change so a new round (different `data`) gets a
@@ -215,16 +250,24 @@ export default function Result({ data }: Props) {
         )}
       </section>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-2">
         <button
           type="button"
-          disabled
-          aria-disabled
-          title="다음 PR(공유 플로우)에서 열려요"
-          className="inline-flex h-14 w-full cursor-not-allowed items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white opacity-50"
+          onClick={handleShare}
+          disabled={!canShare || shareStatus === "creating"}
+          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99]"
         >
-          친구한테 보내기 (곧)
+          {shareStatus === "creating"
+            ? "공유 만드는 중…"
+            : !canShare
+              ? "친구의 한마디 기다리는 중…"
+              : "친구한테 보내기 →"}
         </button>
+        {shareStatus === "error" && (
+          <p className="text-center text-sm text-rose-500">
+            공유 만들기에 실패했어. 잠시 후 다시 눌러봐.
+          </p>
+        )}
       </div>
     </main>
   );

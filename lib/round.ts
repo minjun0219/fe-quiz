@@ -1,6 +1,6 @@
 import "server-only";
 import type { PublicQuestion, Question } from "./question.schema";
-import { getAllQuestions } from "./questions";
+import { getAllQuestions, getQuestionMap } from "./questions";
 
 /** Number of questions per round. Falls back to pool size when seed < target. */
 export const ROUND_SIZE = 5;
@@ -32,4 +32,22 @@ export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
   const safeCount = Math.max(0, Math.floor(count));
   const all = getAllQuestions();
   return shuffle(all).slice(0, Math.min(safeCount, all.length)).map(publicView);
+}
+
+/**
+ * Replay a round by exact ID list, preserving the original order. Used by the
+ * share flow so a friend's "나도 풀어보기" gets the same 5 questions in the
+ * same sequence — that's what makes score comparisons meaningful.
+ *
+ * Unknown IDs are silently dropped (a question may have been retired between
+ * the original round and the friend's replay).
+ */
+export function pickRoundQuestionsByIds(ids: readonly string[]): PublicQuestion[] {
+  const map = getQuestionMap();
+  const out: PublicQuestion[] = [];
+  for (const id of ids) {
+    const q = map.get(id);
+    if (q) out.push(publicView(q));
+  }
+  return out;
 }
