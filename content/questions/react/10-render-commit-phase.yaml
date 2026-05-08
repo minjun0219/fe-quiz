@@ -8,10 +8,10 @@ choices:
   - "Render Phase에서 직접 DOM을 수정해도 React가 잘 동기화해준다"
   - "Commit Phase는 Virtual DOM 트리를 만드는 단계다"
   - "useEffect 콜백은 Render Phase 안에서 실행된다"
-  - "Render Phase는 순수해야 하고(side effect 없음), DOM 변경·useEffect 콜백 실행 등의 부수효과는 Commit 이후에 일어난다"
+  - "Render Phase는 순수해야 하고(side effect 없음), 실제 DOM 변경은 Commit Phase에서, useEffect 콜백은 Commit이 끝난 뒤에 실행된다"
 answer: 3
 explanation: |
   Render Phase는 React가 컴포넌트를 호출해 새 Virtual DOM을 만들고 diff를 계산하는 단계야. 같은 입력에 같은 출력이 나와야 해서 **순수**해야 하고, StrictMode에서 일부러 두 번 호출해 검사하기도 해.
-  Commit Phase에서야 실제 DOM에 변경을 적용하고, 그 후에 `componentDidMount`/`componentDidUpdate`나 `useEffect` 콜백이 실행돼.
+  실제 DOM 변경(mutation)은 **Commit Phase 안에서** 적용되고, `componentDidMount`/`componentDidUpdate`나 `useEffect` 콜백은 그 뒤(보통 브라우저 paint 이후) 비동기적으로 실행돼. `useLayoutEffect`만 paint 전, Commit 단계에서 동기로 돌아.
   그래서 render 안에서 `setState`를 무한히 부르거나 DOM을 직접 만지면 안 되는 거야.
 tags: [render-phase, commit-phase, lifecycle]
