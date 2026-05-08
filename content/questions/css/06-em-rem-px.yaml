@@ -1,0 +1,17 @@
+id: css-006
+category: css
+difficulty: easy
+type: multiple_choice
+question: |
+  CSS 단위 `em`, `rem`, `px`에 대한 설명 중 **올은** 것은?
+choices:
+  - "`rem`은 항상 root(html) 요소의 font-size를 기준으로 계산된다"
+  - "`em`은 root 요소의 font-size 기준으로 계산된다"
+  - "`px`는 사용자 브라우저의 글자 크기 설정에 따라 자동으로 스케일된다"
+  - "`rem`은 부모 요소의 font-size 기준으로 계산된다"
+answer: 0
+explanation: |
+  `rem` = "root em". 이름 그대로 항상 `<html>`의 font-size를 기준으로 잡아. 그래서 사용자가 브라우저 설정에서 글자 크기를 키우면 `rem` 단위는 따라 커져 접근성에 좋아.
+  `em`은 **현재 요소의 font-size**(상속/재정의 포함) 기준이라, 중첩되면 곱연산처럼 누적될 수 있어 (`em` 안의 `em` 안의 `em`...).
+  `px`는 절대 단위로, 사용자 글자 크기 설정에 영향받지 않아 (브라우저 줌은 별개).
+tags: [units, em, rem, font-size]

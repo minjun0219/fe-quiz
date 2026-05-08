@@ -1,0 +1,23 @@
+id: css-007
+category: css
+difficulty: easy
+type: multiple_choice
+question: |
+  아래 grid 컨테이너에 자식 요소 7개를 넣으면 어떻게 배치돼?
+code: |
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+choices:
+  - "3열 × 3행, 마지막 행에는 1개만 채워지고 나머지 2칸은 비어 있다"
+  - "3열 × 7행, 매 행에 자식 하나씩"
+  - "7열 × 1행, 1fr씩 균등 분할"
+  - "1열 × 7행"
+answer: 0
+explanation: |
+  `grid-template-columns: repeat(3, 1fr)`은 "3열, 각 열은 남은 공간을 1:1:1로 나눠 가져라"라는 뜻이야.
+  자식이 7개니까 자연스레 줄바꿈되어 3 + 3 + 1로 들어가서 행이 3개 만들어져 (`grid-auto-rows`로 행이 자동 생성).
+  마지막 행의 빈 2칸은 비어있는 grid cell이고, 다음 자식이 추가되면 거기부터 채워져.
+tags: [grid, layout, repeat]
