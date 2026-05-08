@@ -49,7 +49,7 @@ export default function Result({ data }: Props) {
                 </span>
                 <div className="flex-1 overflow-hidden rounded-full bg-zinc-200 h-2">
                   <div
-                    className={`h-full transition-all ${isStrong ? "bg-emerald-500" : isWeak ? "bg-amber-500" : "bg-rose-500"}`}
+                    className={`h-full transition-all ${isStrong ? "bg-emerald-500" : isWeak ? "bg-rose-500" : "bg-amber-500"}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>

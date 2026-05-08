@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
 import { GradingError, gradeRound } from "@/lib/grading";
-import type { Question } from "@/lib/question.schema";
-import { getAllQuestions } from "@/lib/questions";
+import { getQuestionMap } from "@/lib/questions";
 import { QuizSubmitRequest, type QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 
 export const dynamic = "force-dynamic";
@@ -26,8 +25,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const all = getAllQuestions();
-  const lookup = new Map<string, Question>(all.map((q) => [q.id, q]));
+  const lookup = getQuestionMap();
 
   let graded: ReturnType<typeof gradeRound>;
   try {

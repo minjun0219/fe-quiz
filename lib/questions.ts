@@ -22,6 +22,19 @@ export function getQuestionsByCategory(category: Question["category"]): readonly
   return getAllQuestions().filter((q) => q.category === category);
 }
 
+let mapCache: ReadonlyMap<string, Question> | null = null;
+
+/**
+ * Cached id → Question index. Built once per process the first time it's
+ * asked for, so route handlers (e.g., /api/quiz/submit) don't pay an
+ * O(n) Map construction per request.
+ */
+export function getQuestionMap(): ReadonlyMap<string, Question> {
+  if (mapCache) return mapCache;
+  mapCache = new Map(getAllQuestions().map((q) => [q.id, q]));
+  return mapCache;
+}
+
 export function getQuestionById(id: string): Question | undefined {
-  return getAllQuestions().find((q) => q.id === id);
+  return getQuestionMap().get(id);
 }

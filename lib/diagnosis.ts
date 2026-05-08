@@ -8,6 +8,7 @@ interface DiagnosisInput {
 }
 
 const STRONG_THRESHOLD = 0.8;
+const OK_THRESHOLD = 0.6;
 const WEAK_THRESHOLD = 0.4;
 
 /**
@@ -27,7 +28,7 @@ export function diagnose(input: DiagnosisInput): Diagnosis {
     result_type = "프론트엔드 마스터";
     emoji = "🏆";
     blurb = "이건 그냥 책 한 권 다 외운 사람 아냐?";
-  } else if (overall >= 0.6) {
+  } else if (overall >= OK_THRESHOLD) {
     result_type = "탄탄한 실무자";
     emoji = "💪";
     blurb = "현업에서 자주 마주치는 패턴은 다 잡고 있네.";
