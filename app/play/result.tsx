@@ -44,9 +44,9 @@ export default function Result({ data }: Props) {
           question_ids: data.per_question.map((q) => q.id),
           answers: data.per_question.map((q) => q.your_answer),
           // If feedback failed/unavailable, send a stub so the share endpoint
-          // (which requires non-empty feedback) accepts it. Hard-cap to the
-          // server's 2000-char schema limit so a chatty model can't 400.
-          feedback: (feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)").slice(0, 2000),
+          // (which requires non-empty feedback) accepts it. The 2000-char cap
+          // is enforced server-side by the share schema.
+          feedback: feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)",
         }),
       });
       if (!res.ok) {
@@ -142,13 +142,18 @@ export default function Result({ data }: Props) {
             앗 친구가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
           </p>
         )}
-        {feedbackStatus === "unavailable" && (
-          <p className="text-sm text-zinc-500">
-            (개발자에게: <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code>를
-            <code className="ml-1 rounded bg-zinc-100 px-1">.env.local</code>에 넣으면 친구가
-            깨어나요)
-          </p>
-        )}
+        {feedbackStatus === "unavailable" &&
+          (process.env.NODE_ENV === "development" ? (
+            <p className="text-sm text-zinc-500">
+              (개발자에게: <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code>를
+              <code className="ml-1 rounded bg-zinc-100 px-1">.env.local</code>에 넣으면 친구가
+              깨어나요)
+            </p>
+          ) : (
+            <p className="text-sm text-zinc-500">
+              앗 친구가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
+            </p>
+          ))}
         {feedback && (
           <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800">
             {feedback}

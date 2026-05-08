@@ -36,12 +36,21 @@ interface Props {
 
 export default async function Image({ params }: Props) {
   const { slug } = await params;
+  // Pretendard is hosted on a third-party CDN; if that fetch fails (DNS,
+  // 5xx, blocked egress) we still want a renderable image rather than a
+  // 500 on the OG endpoint. satori falls back to its built-in sans when
+  // `fonts` is omitted.
   const [share, fontData] = await Promise.all([
     getShareById(slug).catch(() => null),
-    getFontData(),
+    getFontData().catch((err) => {
+      console.warn("[og] Pretendard fetch failed:", err);
+      return null;
+    }),
   ]);
 
-  const fonts = [{ name: "Pretendard", data: fontData, weight: 700 as const }];
+  const fonts = fontData
+    ? [{ name: "Pretendard", data: fontData, weight: 700 as const }]
+    : undefined;
 
   if (!share) {
     return new ImageResponse(
