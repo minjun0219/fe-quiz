@@ -6,33 +6,50 @@ export type Category = z.infer<typeof Category>;
 export const Difficulty = z.enum(["easy", "medium", "hard"]);
 export type Difficulty = z.infer<typeof Difficulty>;
 
+export const QuestionType = z.enum(["single_choice", "multi_choice"]);
+export type QuestionType = z.infer<typeof QuestionType>;
+
 const ID_PREFIX: Record<Category, string> = {
   javascript: "js",
   react: "react",
   css: "css",
 };
 
+export const ChoiceSchema = z.object({
+  id: z
+    .string()
+    .min(1)
+    .max(8)
+    .regex(/^[a-z0-9_-]+$/, "choice id must be lowercase letters/digits/_-"),
+  text: z.string().min(1),
+});
+
+export type Choice = z.infer<typeof ChoiceSchema>;
+
+const Base = z.object({
+  id: z.string().min(1),
+  category: Category,
+  difficulty: Difficulty,
+  question: z.string().min(1),
+  code: z.string().optional(),
+  choices: z.array(ChoiceSchema).min(2).max(6),
+  explanation: z.string().min(1),
+  tags: z.array(z.string()).default([]),
+});
+
+const SingleChoice = Base.extend({
+  type: z.literal("single_choice"),
+  answer: z.string().min(1),
+});
+
+const MultiChoice = Base.extend({
+  type: z.literal("multi_choice"),
+  answer: z.array(z.string().min(1)).min(1),
+});
+
 export const QuestionSchema = z
-  .object({
-    id: z.string().min(1),
-    category: Category,
-    difficulty: Difficulty,
-    type: z.literal("multiple_choice"),
-    question: z.string().min(1),
-    code: z.string().optional(),
-    choices: z.array(z.string().min(1)).min(2).max(6),
-    answer: z.number().int().nonnegative(),
-    explanation: z.string().min(1),
-    tags: z.array(z.string()).default([]),
-  })
+  .discriminatedUnion("type", [SingleChoice, MultiChoice])
   .superRefine((q, ctx) => {
-    if (q.answer >= q.choices.length) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["answer"],
-        message: `answer ${q.answer} is out of bounds (choices.length=${q.choices.length})`,
-      });
-    }
     const expected = ID_PREFIX[q.category];
     if (!q.id.startsWith(`${expected}-`)) {
       ctx.addIssue({
@@ -41,19 +58,65 @@ export const QuestionSchema = z
         message: `id "${q.id}" must start with "${expected}-" for category "${q.category}"`,
       });
     }
-    // Choices are competing answers — duplicates would be a content bug AND
-    // collide with React keys keyed off choice text.
-    const seen = new Set<string>();
+
+    const seenIds = new Set<string>();
+    const seenText = new Set<string>();
     for (let i = 0; i < q.choices.length; i++) {
-      const choice = q.choices[i];
-      if (seen.has(choice)) {
+      const c = q.choices[i];
+      if (seenIds.has(c.id)) {
         ctx.addIssue({
           code: "custom",
-          path: ["choices", i],
-          message: `duplicate choice text "${choice}"`,
+          path: ["choices", i, "id"],
+          message: `duplicate choice id "${c.id}"`,
         });
       }
-      seen.add(choice);
+      seenIds.add(c.id);
+      if (seenText.has(c.text)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["choices", i, "text"],
+          message: `duplicate choice text "${c.text}"`,
+        });
+      }
+      seenText.add(c.text);
+    }
+
+    const choiceIds = new Set(q.choices.map((c) => c.id));
+
+    if (q.type === "single_choice") {
+      if (!choiceIds.has(q.answer)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["answer"],
+          message: `answer "${q.answer}" does not match any choice id`,
+        });
+      }
+    } else {
+      const seenAnswer = new Set<string>();
+      q.answer.forEach((a, i) => {
+        if (!choiceIds.has(a)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["answer", i],
+            message: `answer "${a}" does not match any choice id`,
+          });
+        }
+        if (seenAnswer.has(a)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["answer", i],
+            message: `duplicate answer id "${a}"`,
+          });
+        }
+        seenAnswer.add(a);
+      });
+      if (q.answer.length === q.choices.length) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["answer"],
+          message: "all choices marked correct — multi_choice must have at least one wrong choice",
+        });
+      }
     }
   });
 

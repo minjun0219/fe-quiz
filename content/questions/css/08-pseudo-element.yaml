@@ -1,7 +1,7 @@
 id: css-008
 category: css
 difficulty: medium
-type: multiple_choice
+type: single_choice
 question: |
   아래 CSS만 작성했는데 화면에 빨간 점이 안 보여. 가장 큰 이유는?
 code: |
@@ -12,13 +12,17 @@ code: |
     display: inline-block;
   }
 choices:
-  - "`::before`는 항상 `display: none` 상태가 기본이다"
-  - "`background-color`로 써야지 `background`로는 색이 적용되지 않는다"
-  - "`::before`는 부모가 `position: relative`여야만 보인다"
-  - "`content` 속성이 없으면 `::before`/`::after`는 렌더링되지 않는다"
-answer: 3
+  - id: a
+    text: "`::before`는 항상 `display: none` 상태가 기본이다"
+  - id: b
+    text: "`background-color`로 써야지 `background`로는 색이 적용되지 않는다"
+  - id: c
+    text: "`::before`는 부모가 `position: relative`여야만 보인다"
+  - id: d
+    text: "`content` 속성이 없으면 `::before`/`::after`는 렌더링되지 않는다"
+answer: d
 explanation: |
   `::before`/`::after`는 "이 요소의 앞/뒤에 가짜 자식을 만들어줘"라는 거라, **`content` 속성이 명시돼야 비로소 박스가 생성돼**.
   값이 비어 있어도 좋으니 `content: ""`라고만 써주면 다른 스타일이 살아나. 가장 흔한 실수 중 하나야.
   `background`는 단축 속성이라 `background-color`로 쓰지 않아도 색이 잘 적용되고, `::before`도 부모의 position과 무관하게 그릴 수 있어.
-tags: [pseudo-element, before, after, content]
+tags: [ pseudo-element, before, after, content ]

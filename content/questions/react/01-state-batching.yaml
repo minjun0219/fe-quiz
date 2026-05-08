@@ -1,7 +1,7 @@
 id: react-001
 category: react
 difficulty: medium
-type: multiple_choice
+type: single_choice
 question: |
   버튼을 한 번 클릭했을 때, 클릭 직후 화면에 표시되는 숫자와 console에 찍히는 값은?
 code: |
@@ -16,13 +16,17 @@ code: |
     return <button onClick={handleClick}>{n}</button>
   }
 choices:
-  - "버튼: 1, console: clicked, n = 0"
-  - "버튼: 3, console: clicked, n = 3"
-  - "버튼: 1, console: clicked, n = 1"
-  - "버튼: 3, console: clicked, n = 0"
-answer: 0
+  - id: a
+    text: "버튼: 1, console: clicked, n = 0"
+  - id: b
+    text: "버튼: 3, console: clicked, n = 3"
+  - id: c
+    text: "버튼: 1, console: clicked, n = 1"
+  - id: d
+    text: "버튼: 3, console: clicked, n = 0"
+answer: a
 explanation: |
   `setN(n + 1)`은 클로저로 잡힌 `n`(=0)을 사용해 매번 같은 값(1)을 예약. React는 같은 결과를 배치해서 한 번만 렌더하므로 화면엔 1.
   `console.log`는 클릭 시점의 렌더 컨텍스트 안이라 그 시점의 `n`(=0)을 그대로 출력.
   3까지 올리고 싶으면 함수형 업데이트 `setN(prev => prev + 1)`로 바꿔야 해.
-tags: [hooks, useState, closure, batching]
+tags: [ hooks, useState, closure, batching ]

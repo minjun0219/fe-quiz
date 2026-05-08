@@ -11,6 +11,11 @@ interface Props {
 
 type FeedbackStatus = "loading" | "streaming" | "done" | "error" | "unavailable";
 
+function matches(target: string | string[] | null, id: string): boolean {
+  if (target === null) return false;
+  return Array.isArray(target) ? target.includes(id) : target === id;
+}
+
 export default function Result({ data }: Props) {
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -183,12 +188,12 @@ export default function Result({ data }: Props) {
                   </pre>
                 )}
                 <ul className="mb-3 flex flex-col gap-1.5 text-sm">
-                  {q.choices.map((choice, ci) => {
-                    const isCorrect = ci === q.correct_answer;
-                    const isYours = ci === q.your_answer;
+                  {q.choices.map((choice) => {
+                    const isCorrect = matches(q.correct_answer, choice.id);
+                    const isYours = matches(q.your_answer, choice.id);
                     return (
                       <li
-                        key={`${q.id}::${choice}`}
+                        key={`${q.id}::${choice.id}`}
                         className={`rounded-lg border px-3 py-2 ${
                           isCorrect
                             ? "border-emerald-300 bg-emerald-50 text-emerald-900"
@@ -198,7 +203,7 @@ export default function Result({ data }: Props) {
                         }`}
                       >
                         <span className="mr-2">{isCorrect ? "✓" : isYours ? "✗" : "·"}</span>
-                        {choice}
+                        {choice.text}
                         {isYours && !isCorrect && (
                           <span className="ml-2 text-xs text-rose-500">(내 답)</span>
                         )}

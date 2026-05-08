@@ -1,7 +1,7 @@
 id: js-005
 category: javascript
 difficulty: hard
-type: multiple_choice
+type: single_choice
 question: |
   다음 코드의 출력 순서는?
 code: |
@@ -16,15 +16,19 @@ code: |
   f()
   console.log('F')
 choices:
-  - "A, D, F, E, C, B"
-  - "A, D, F, C, E, B"
-  - "A, B, C, D, E, F"
-  - "A, F, D, C, E, B"
-answer: 1
+  - id: a
+    text: A, D, F, E, C, B
+  - id: b
+    text: A, D, F, C, E, B
+  - id: c
+    text: A, B, C, D, E, F
+  - id: d
+    text: A, F, D, C, E, B
+answer: b
 explanation: |
   동기 코드부터: `A` → `f()` 호출 → `D` (await 만나서 일시 중단) → `F`. 여기까지 동기 한 사이클.
   마이크로태스크 큐엔 먼저 등록된 `Promise.resolve().then(C)`가 앞에 있고, 그 뒤에 `await` 다음에 이어지는 `E`가 들어가.
   → 마이크로태스크 처리: `C` → `E`.
   매크로태스크인 `setTimeout(B)`는 마이크로태스크 큐가 다 비워진 다음에야 실행 → `B`.
   최종: `A, D, F, C, E, B`.
-tags: [promise, async, await, event-loop, microtask]
+tags: [ promise, async, await, event-loop, microtask ]
