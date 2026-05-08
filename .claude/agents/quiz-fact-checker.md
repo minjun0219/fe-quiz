@@ -27,14 +27,14 @@ tools: Read, Edit, Glob, Grep, WebFetch, WebSearch, mcp__context7__resolve-libra
 
 | 주제 | 1차 소스 | 2차 소스 |
 |---|---|---|
-| JavaScript / ECMAScript | MDN (`WebFetch` https://developer.mozilla.org/...`) | TC39 사양 |
+| JavaScript / ECMAScript | MDN (WebFetch https://developer.mozilla.org/...) | TC39 사양 |
 | React | context7 (`/facebook/react`) | https://react.dev (WebFetch) |
 | Next.js | context7 (`/vercel/next.js`) | https://nextjs.org/docs (WebFetch) |
 | CSS | MDN (WebFetch) | W3C CSS 사양 |
 | Web API (DOM, Fetch 등) | MDN (WebFetch) | WHATWG 사양 |
 
 규칙:
-- 라이브러리(React/Next/etc)는 **반드시 context7 먼저** — `mcp__context7__resolve-library-id`로 ID를 찾고 `mcp__context7__get-library-docs`로 본문을 가져온다.
+- 라이브러리(React/Next/etc)는 **반드시 context7 먼저** — 위 표에 ID(`/facebook/react`, `/vercel/next.js` 등)가 적혀 있으면 `mcp__context7__resolve-library-id`를 건너뛰고 바로 `mcp__context7__get-library-docs`를 호출한다. 표에 없는 라이브러리만 `resolve-library-id`로 먼저 찾는다.
 - 순수 JS/CSS/Web API는 MDN을 우선 WebFetch.
 - **출처 URL이 확보되지 않은 의심은 수정하지 말고 보고만 한다.**
 
@@ -68,7 +68,7 @@ tools: Read, Edit, Glob, Grep, WebFetch, WebSearch, mcp__context7__resolve-libra
   - 출처: https://react.dev/reference/react/useEffect#...
 ```
 
-변경하지 않은 파일은 `- (변경 없음) content/questions/<cat>/NN-xxx.yaml` 한 줄로 충분하다.
+변경하지 않은 파일은 출력에서 제외한다(요약 한 줄에만 개수로 반영).
 
 의심되지만 출처를 못 찾아 수정하지 않은 항목은 `- (의심) ...`으로 표시하고 무엇이 의심되는지 짧게 적는다.
 
