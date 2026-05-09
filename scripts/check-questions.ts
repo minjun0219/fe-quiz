@@ -17,11 +17,15 @@ const MAX_CODE_LINE_LEN = 80;
 
 try {
   const all = loadAllQuestions(ROOT);
-  console.log(`✓ ${all.length} question${all.length === 1 ? "" : "s"} validated`);
+  console.log(
+    `✓ ${all.length} question${all.length === 1 ? "" : "s"} validated`,
+  );
 
   const warnings: string[] = [];
   for (const q of all) {
-    if (!q.code) continue;
+    if (!q.code) {
+      continue;
+    }
     const lines = q.code.split("\n");
     lines.forEach((line, i) => {
       if (line.length > MAX_CODE_LINE_LEN) {
@@ -35,7 +39,9 @@ try {
     console.warn(
       `\n⚠ ${warnings.length} code line${isOne ? "" : "s"} exceed${isOne ? "s" : ""} ${MAX_CODE_LINE_LEN} chars — 좁은 화면에서 줄바꿈이 어색할 수 있어. 가능하면 60~70자에서 끊자.`,
     );
-    for (const w of warnings) console.warn(w);
+    for (const w of warnings) {
+      console.warn(w);
+    }
   }
 } catch (err) {
   console.error("✗ Question validation failed:\n");

@@ -19,9 +19,16 @@ export const TARGET_MIN_PER_CATEGORY = 2;
  * size. Drops to `floor(roundSize / N)` (min 1) when packing 2-per-cat would
  * exceed the round budget.
  */
-export function effectiveMinPerCategory(roundSize: number, categoryCount: number): number {
-  if (categoryCount <= 0 || roundSize <= 0) return 0;
-  if (categoryCount * TARGET_MIN_PER_CATEGORY <= roundSize) return TARGET_MIN_PER_CATEGORY;
+export function effectiveMinPerCategory(
+  roundSize: number,
+  categoryCount: number,
+): number {
+  if (categoryCount <= 0 || roundSize <= 0) {
+    return 0;
+  }
+  if (categoryCount * TARGET_MIN_PER_CATEGORY <= roundSize) {
+    return TARGET_MIN_PER_CATEGORY;
+  }
   return Math.max(1, Math.floor(roundSize / categoryCount));
 }
 
@@ -61,7 +68,9 @@ export function pickStratified(
   getPool: (cat: Category) => readonly Question[],
 ): Question[] {
   const safeCount = Math.max(0, Math.floor(roundSize));
-  if (safeCount === 0) return [];
+  if (safeCount === 0) {
+    return [];
+  }
 
   const minPerCat = effectiveMinPerCategory(safeCount, CATEGORY_IDS.length);
 
@@ -93,7 +102,9 @@ export function pickStratified(
   // the `seen` guard meaningful.
   if (picked.length < safeCount && remainder.length > 0) {
     for (const q of shuffle(remainder)) {
-      if (picked.length >= safeCount) break;
+      if (picked.length >= safeCount) {
+        break;
+      }
       if (!seen.has(q.id)) {
         picked.push(q);
         seen.add(q.id);

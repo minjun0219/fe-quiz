@@ -5,7 +5,10 @@ import type { Category } from "./question.schema";
 
 const THEME = "github-dark-default";
 
-const CATEGORY_TO_LANG: Record<Category, "javascript" | "tsx" | "css" | "typescript" | "html"> = {
+const CATEGORY_TO_LANG: Record<
+  Category,
+  "javascript" | "tsx" | "css" | "typescript" | "html"
+> = {
   javascript: "javascript",
   react: "tsx",
   css: "css",
@@ -32,7 +35,10 @@ function getHighlighter(): Promise<HighlighterCore> {
   return highlighterPromise;
 }
 
-export async function highlightCode(code: string, category: Category): Promise<string> {
+export async function highlightCode(
+  code: string,
+  category: Category,
+): Promise<string> {
   const highlighter = await getHighlighter();
   return highlighter.codeToHtml(code, {
     lang: CATEGORY_TO_LANG[category],
@@ -86,7 +92,9 @@ export function highlightInlineBackticks(text: string): string {
     out += escapeHtml(text.slice(i, tick));
 
     let runEnd = tick;
-    while (runEnd < text.length && text[runEnd] === "`") runEnd++;
+    while (runEnd < text.length && text[runEnd] === "`") {
+      runEnd++;
+    }
     const openLen = runEnd - tick;
 
     if (openLen !== 1) {
@@ -106,7 +114,9 @@ export function highlightInlineBackticks(text: string): string {
         continue;
       }
       let k = scan;
-      while (k < text.length && text[k] === "`") k++;
+      while (k < text.length && text[k] === "`") {
+        k++;
+      }
       if (k - scan === 1) {
         closeStart = scan;
         break;

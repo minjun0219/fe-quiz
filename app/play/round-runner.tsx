@@ -2,7 +2,10 @@
 
 import { useId, useState } from "react";
 import type { PublicQuestion } from "@/lib/question.schema";
-import type { QuizSubmitResponse, SubmittedAnswer } from "@/lib/quiz-submit.schema";
+import type {
+  QuizSubmitResponse,
+  SubmittedAnswer,
+} from "@/lib/quiz-submit.schema";
 import Result from "./result";
 
 interface Props {
@@ -27,18 +30,24 @@ function initialAnswers(questions: PublicQuestion[]): AnswerState[] {
 }
 
 function canProceed(q: PublicQuestion, a: AnswerState): boolean {
-  if (q.type === "multi_choice") return Array.isArray(a) && a.length > 0;
+  if (q.type === "multi_choice") {
+    return Array.isArray(a) && a.length > 0;
+  }
   return typeof a === "string";
 }
 
 function normalize(a: AnswerState): SubmittedAnswer {
-  if (Array.isArray(a)) return a.length === 0 ? null : a;
+  if (Array.isArray(a)) {
+    return a.length === 0 ? null : a;
+  }
   return a;
 }
 
 export default function RoundRunner({ questions }: Props) {
   const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<AnswerState[]>(() => initialAnswers(questions));
+  const [answers, setAnswers] = useState<AnswerState[]>(() =>
+    initialAnswers(questions),
+  );
   const [phase, setPhase] = useState<Phase>({ kind: "answering" });
   const groupNameBase = useId();
 
@@ -51,7 +60,9 @@ export default function RoundRunner({ questions }: Props) {
         body: JSON.stringify({
           question_ids: questions.map((q) => q.id),
           answers: answers.map(normalize),
-          displayed_choice_ids: questions.map((q) => q.choices.map((c) => c.id)),
+          displayed_choice_ids: questions.map((q) =>
+            q.choices.map((c) => c.id),
+          ),
         }),
       });
       if (!res.ok) {
@@ -71,8 +82,12 @@ export default function RoundRunner({ questions }: Props) {
   if (questions.length === 0) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-        <h1 className="mb-3 text-2xl font-bold">아직 시드 문제가 비어있어 😅</h1>
-        <p className="text-zinc-600">`content/questions/`에 `.yaml` 추가하고 다시 와줘.</p>
+        <h1 className="mb-3 text-2xl font-bold">
+          아직 시드 문제가 비어있어 😅
+        </h1>
+        <p className="text-zinc-600">
+          `content/questions/`에 `.yaml` 추가하고 다시 와줘.
+        </p>
       </main>
     );
   }
@@ -80,7 +95,9 @@ export default function RoundRunner({ questions }: Props) {
   if (phase.kind === "submitting") {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-        <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">친구가 채점 중…</p>
+        <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">
+          친구가 채점 중…
+        </p>
         <h1 className="text-2xl font-bold">잠깐만, 답 맞춰볼게</h1>
       </main>
     );
@@ -132,7 +149,9 @@ export default function RoundRunner({ questions }: Props) {
   }
 
   function isChoiceSelected(choiceId: string): boolean {
-    if (Array.isArray(selected)) return selected.includes(choiceId);
+    if (Array.isArray(selected)) {
+      return selected.includes(choiceId);
+    }
     return selected === choiceId;
   }
 
@@ -239,7 +258,11 @@ export default function RoundRunner({ questions }: Props) {
                     }`}
                   >
                     {isSelected &&
-                      (isMulti ? "✓" : <span className="h-2 w-2 rounded-full bg-white" />)}
+                      (isMulti ? (
+                        "✓"
+                      ) : (
+                        <span className="h-2 w-2 rounded-full bg-white" />
+                      ))}
                   </span>
                   {choice.text_html ? (
                     <span

@@ -11,11 +11,18 @@ interface Props {
   data: QuizSubmitResponse;
 }
 
-type FeedbackStatus = "loading" | "streaming" | "done" | "error" | "unavailable";
+type FeedbackStatus =
+  | "loading"
+  | "streaming"
+  | "done"
+  | "error"
+  | "unavailable";
 type ShareStatus = "idle" | "creating" | "error";
 
 function matches(target: string | string[] | null, id: string): boolean {
-  if (target === null) return false;
+  if (target === null) {
+    return false;
+  }
   return Array.isArray(target) ? target.includes(id) : target === id;
 }
 
@@ -23,7 +30,8 @@ export default function Result({ data }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("loading");
+  const [feedbackStatus, setFeedbackStatus] =
+    useState<FeedbackStatus>("loading");
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
   const overallPct = Math.round((data.total_correct / data.total) * 100);
 
@@ -31,10 +39,13 @@ export default function Result({ data }: Props) {
   // state — including "error" / "unavailable", where we'll fall back to a
   // stub message so a transient Anthropic outage doesn't block the core
   // share flow.
-  const canShare = feedbackStatus !== "loading" && feedbackStatus !== "streaming";
+  const canShare =
+    feedbackStatus !== "loading" && feedbackStatus !== "streaming";
 
   async function handleShare() {
-    if (!canShare || shareStatus === "creating") return;
+    if (!canShare || shareStatus === "creating") {
+      return;
+    }
     setShareStatus("creating");
     try {
       const res = await fetch("/api/share", {
@@ -46,7 +57,9 @@ export default function Result({ data }: Props) {
           // If feedback failed/unavailable, send a stub so the share endpoint
           // (which requires non-empty feedback) accepts it. Hard-cap to the
           // server's 2000-char schema limit so a chatty model can't 400.
-          feedback: (feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)").slice(0, 2000),
+          feedback: (
+            feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)"
+          ).slice(0, 2000),
         }),
       });
       if (!res.ok) {
@@ -81,27 +94,39 @@ export default function Result({ data }: Props) {
           signal: abort.signal,
         });
         if (res.status === 503) {
-          if (!ignore) setFeedbackStatus("unavailable");
+          if (!ignore) {
+            setFeedbackStatus("unavailable");
+          }
           return;
         }
-        if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
-        if (!ignore) setFeedbackStatus("streaming");
+        if (!res.ok || !res.body) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        if (!ignore) {
+          setFeedbackStatus("streaming");
+        }
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         while (true) {
           const { done, value } = await reader.read();
-          if (done || ignore) break;
+          if (done || ignore) {
+            break;
+          }
           setFeedback((prev) => prev + decoder.decode(value, { stream: true }));
         }
         // Flush any byte sequence that was held back on a UTF-8 boundary —
         // Korean characters are 3 bytes, easy to bisect across chunks.
         if (!ignore) {
           const tail = decoder.decode();
-          if (tail) setFeedback((prev) => prev + tail);
+          if (tail) {
+            setFeedback((prev) => prev + tail);
+          }
           setFeedbackStatus("done");
         }
       } catch (err) {
-        if (ignore || (err as { name?: string }).name === "AbortError") return;
+        if (ignore || (err as { name?: string }).name === "AbortError") {
+          return;
+        }
         setFeedbackStatus("error");
       }
     })();
@@ -115,7 +140,9 @@ export default function Result({ data }: Props) {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
       <section className="mb-8 text-center">
-        <p className="mb-2 text-sm font-medium tracking-wide text-rose-500">오늘의 진단</p>
+        <p className="mb-2 text-sm font-medium tracking-wide text-rose-500">
+          오늘의 진단
+        </p>
         <h1 className="mb-2 text-4xl leading-tight font-bold tracking-tight">
           <span className="mr-2">{data.emoji}</span>
           {data.result_type}
@@ -134,8 +161,11 @@ export default function Result({ data }: Props) {
           {data.vibe.blurb}
         </p>
         <p className="text-2xl font-semibold tabular-nums text-zinc-900">
-          {data.total_correct} <span className="text-zinc-400">/</span> {data.total}
-          <span className="ml-2 text-base font-medium text-zinc-500">({overallPct}%)</span>
+          {data.total_correct} <span className="text-zinc-400">/</span>{" "}
+          {data.total}
+          <span className="ml-2 text-base font-medium text-zinc-500">
+            ({overallPct}%)
+          </span>
         </p>
       </section>
 
@@ -143,10 +173,14 @@ export default function Result({ data }: Props) {
         <div className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
           <span>친구의 한마디</span>
           {feedbackStatus === "loading" && (
-            <span className="animate-pulse text-zinc-400 normal-case">생각 중…</span>
+            <span className="animate-pulse text-zinc-400 normal-case">
+              생각 중…
+            </span>
           )}
           {feedbackStatus === "streaming" && (
-            <span className="animate-pulse text-zinc-400 normal-case">타이핑 중…</span>
+            <span className="animate-pulse text-zinc-400 normal-case">
+              타이핑 중…
+            </span>
           )}
         </div>
         {feedbackStatus === "error" && (
@@ -156,9 +190,10 @@ export default function Result({ data }: Props) {
         )}
         {feedbackStatus === "unavailable" && (
           <p className="text-sm text-zinc-500">
-            (개발자에게: <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code>를
-            <code className="ml-1 rounded bg-zinc-100 px-1">.env.local</code>에 넣으면 친구가
-            깨어나요)
+            (개발자에게:{" "}
+            <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code>
+            를<code className="ml-1 rounded bg-zinc-100 px-1">.env.local</code>
+            에 넣으면 친구가 깨어나요)
           </p>
         )}
         {feedback && (
@@ -175,9 +210,15 @@ export default function Result({ data }: Props) {
         <h2 className="mb-3 text-sm font-semibold text-zinc-500">카테고리별</h2>
         <ul className="flex flex-col gap-3">
           {(
-            Object.entries(data.category_scores) as [Category, { correct: number; total: number }][]
+            Object.entries(data.category_scores) as [
+              Category,
+              { correct: number; total: number },
+            ][]
           ).map(([cat, score]) => {
-            const pct = score.total === 0 ? 0 : Math.round((score.correct / score.total) * 100);
+            const pct =
+              score.total === 0
+                ? 0
+                : Math.round((score.correct / score.total) * 100);
             const isStrong = data.strengths.includes(cat);
             const isWeak = data.weaknesses.includes(cat);
             return (
@@ -213,7 +254,10 @@ export default function Result({ data }: Props) {
         {open && (
           <ol id="result-questions" className="flex flex-col gap-4">
             {data.per_question.map((q, i) => (
-              <li key={q.id} className="rounded-2xl border border-zinc-200 bg-white p-4">
+              <li
+                key={q.id}
+                className="rounded-2xl border border-zinc-200 bg-white p-4"
+              >
                 <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wider text-zinc-400">
                   <span>
                     {i + 1}. {q.category}
@@ -267,17 +311,23 @@ export default function Result({ data }: Props) {
                               : "border-zinc-200 text-zinc-600"
                         }`}
                       >
-                        <span className="mr-2">{isCorrect ? "✓" : isYours ? "✗" : "·"}</span>
+                        <span className="mr-2">
+                          {isCorrect ? "✓" : isYours ? "✗" : "·"}
+                        </span>
                         {choice.text_html ? (
                           <span
                             // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
-                            dangerouslySetInnerHTML={{ __html: choice.text_html }}
+                            dangerouslySetInnerHTML={{
+                              __html: choice.text_html,
+                            }}
                           />
                         ) : (
                           <span>{choice.text}</span>
                         )}
                         {isYours && !isCorrect && (
-                          <span className="ml-2 text-xs text-rose-500">(내 답)</span>
+                          <span className="ml-2 text-xs text-rose-500">
+                            (내 답)
+                          </span>
                         )}
                       </li>
                     );

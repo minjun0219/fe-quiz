@@ -41,8 +41,14 @@ const PERSONALITY_KO: Record<Personality, string> = {
   specialist: "편식형",
 };
 
-export function buildFeedbackUserPrompt({ diagnosis, graded }: BuildFeedbackUserInput): string {
-  const pct = graded.total === 0 ? 0 : Math.round((graded.total_correct / graded.total) * 100);
+export function buildFeedbackUserPrompt({
+  diagnosis,
+  graded,
+}: BuildFeedbackUserInput): string {
+  const pct =
+    graded.total === 0
+      ? 0
+      : Math.round((graded.total_correct / graded.total) * 100);
 
   const lines: string[] = [];
   lines.push(
@@ -50,17 +56,22 @@ export function buildFeedbackUserPrompt({ diagnosis, graded }: BuildFeedbackUser
   );
   lines.push(`전반 분위기: ${diagnosis.vibe.label}`);
   if (diagnosis.strengths.length > 0) {
-    lines.push(`강점: ${diagnosis.strengths.map((c) => CATEGORY_SHORT_LABEL[c]).join(", ")}`);
+    lines.push(
+      `강점: ${diagnosis.strengths.map((c) => CATEGORY_SHORT_LABEL[c]).join(", ")}`,
+    );
   }
   if (diagnosis.weaknesses.length > 0) {
-    lines.push(`약점: ${diagnosis.weaknesses.map((c) => CATEGORY_SHORT_LABEL[c]).join(", ")}`);
+    lines.push(
+      `약점: ${diagnosis.weaknesses.map((c) => CATEGORY_SHORT_LABEL[c]).join(", ")}`,
+    );
   }
   lines.push("");
   lines.push("푼 문제:");
 
   graded.per_question.forEach((q, i) => {
     const mark = q.is_correct ? "✓ 정답" : "✗ 오답";
-    const textOf = (id: string) => q.choices.find((c) => c.id === id)?.text ?? id;
+    const textOf = (id: string) =>
+      q.choices.find((c) => c.id === id)?.text ?? id;
     const yourLabel =
       q.your_answer === null
         ? "선택 없음"

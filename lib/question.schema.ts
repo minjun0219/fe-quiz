@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { CATEGORY_IDS, type Category as CategoryId, getIdPrefix } from "./categories";
+import {
+  CATEGORY_IDS,
+  type Category as CategoryId,
+  getIdPrefix,
+} from "./categories";
 
 /**
  * Category enum derived from `lib/categories.ts`. Adding a new category there
@@ -113,7 +117,8 @@ export const QuestionSchema = z
         ctx.addIssue({
           code: "custom",
           path: ["answer"],
-          message: "all choices marked correct — multi_choice must have at least one wrong choice",
+          message:
+            "all choices marked correct — multi_choice must have at least one wrong choice",
         });
       }
     }
@@ -137,7 +142,10 @@ export type PublicChoice = Choice & {
   text_html?: string;
 };
 
-export type PublicQuestion = Omit<Question, "answer" | "explanation" | "choices"> & {
+export type PublicQuestion = Omit<
+  Question,
+  "answer" | "explanation" | "choices"
+> & {
   choices: PublicChoice[];
   question_html?: string;
   code_html?: string;
