@@ -5,9 +5,9 @@ type: single_choice
 question: |
   다음 코드에서 타입 `H`로 추론되는 값은?
 code: |
-  type Event = 'click' | 'hover'
+  type EvtName = 'click' | 'hover'
   type Handler<E extends string> = `on${Capitalize<E>}`
-  type H = Handler<Event>
+  type H = Handler<EvtName>
 choices:
   - id: a
     text: "`'click' | 'hover'`"
