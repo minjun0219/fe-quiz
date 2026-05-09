@@ -1,0 +1,23 @@
+id: html-003
+category: html
+difficulty: easy
+type: single_choice
+question: |
+  페이지의 **주요 콘텐츠 영역**(보통 페이지당 하나)을 감싸는 가장 적절한 시맨틱 태그는?
+choices:
+  - id: a
+    text: "<section>"
+  - id: b
+    text: "<article>"
+  - id: c
+    text: "<main>"
+  - id: d
+    text: "<div role=\"content\">"
+answer: c
+explanation: |
+  `<main>`은 문서의 **유일한 주요 콘텐츠**를 감싸는 랜드마크 — 한 페이지에 한 번만 가시 상태로 존재해야 해.
+  - `<section>`: 의미 있는 묶음(주제별 섹션). 보통 헤딩과 함께 써.
+  - `<article>`: 자기 완결적 콘텐츠 단위(블로그 포스트, 댓글, 카드 등). 떼어내도 의미가 통하는지가 기준.
+  - `<div>`+role: ARIA로 흉내 낼 수 있지만, 시맨틱 태그가 있으면 그걸 우선.
+  스크린 리더는 랜드마크 키로 `<main>`으로 점프할 수 있어 — 시맨틱 태그가 곧 접근성 인프라야.
+tags: [ semantics, landmarks, a11y ]

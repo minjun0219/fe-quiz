@@ -1,0 +1,40 @@
+id: ts-002
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  `area(shape)` 호출이 컴파일 통과하고 모든 케이스에서 올바른 결과를 내려면, 어느 구현이 적절해?
+code: |
+  type Shape =
+    | { kind: 'circle'; r: number }
+    | { kind: 'square'; s: number }
+choices:
+  - id: a
+    text: |
+      function area(shape: Shape) {
+        return Math.PI * shape.r ** 2
+      }
+  - id: b
+    text: |
+      function area(shape: Shape) {
+        if (shape.kind === 'circle') return Math.PI * shape.r ** 2
+        return shape.s ** 2
+      }
+  - id: c
+    text: |
+      function area(shape: Shape) {
+        return shape.r ? Math.PI * shape.r ** 2 : shape.s ** 2
+      }
+  - id: d
+    text: |
+      function area(shape: Shape) {
+        return (shape as any).r ? Math.PI * (shape as any).r ** 2 : (shape as any).s ** 2
+      }
+answer: b
+explanation: |
+  `kind` 같은 공통 리터럴 필드가 있는 union(=discriminated union)은 그 필드를 비교하면 컴파일러가 자동으로 분기 안에서 타입을 좁혀줘.
+  - a: `square` 분기에서 `r`이 없어 컴파일 에러.
+  - c: `shape.r` 직접 접근은 union 단계에서 차단(둘 다 가지지 않음).
+  - d: `as any`로 검사 회피 — 런타임 동작은 우연히 맞지만 타입 안전성 잃음.
+  - b: 정석 — `kind` 좁히기로 양쪽 모두 안전하게 다룸.
+tags: [ types, discriminated-union, narrowing ]

@@ -1,0 +1,29 @@
+id: html-005
+category: html
+difficulty: medium
+type: single_choice
+question: |
+  뷰포트 너비가 800px일 때, 브라우저가 로드하는 이미지는?
+code: |
+  <picture>
+    <source media="(max-width: 600px)" srcset="small.jpg" />
+    <source media="(max-width: 1200px)" srcset="medium.jpg" />
+    <img src="large.jpg" alt="" />
+  </picture>
+choices:
+  - id: a
+    text: small.jpg
+  - id: b
+    text: medium.jpg
+  - id: c
+    text: large.jpg
+  - id: d
+    text: small.jpg과 medium.jpg 둘 다
+answer: b
+explanation: |
+  `<picture>`는 자식 `<source>`들을 **위에서 아래 순서**로 평가해 첫 번째로 매칭되는 것을 사용해. 매칭 안 되면 폴백인 `<img>`를 사용.
+  뷰포트 800px:
+  - `(max-width: 600px)` → 800 > 600이라 불일치, 통과.
+  - `(max-width: 1200px)` → 800 ≤ 1200이라 매칭 → `medium.jpg` 선택.
+  `<img>`는 매칭 실패 시 폴백 + alt·기본 width/height 등 표시 정보의 baseline. 미디어 매칭 외에 화면 밀도 대응이 필요하면 `srcset="x.jpg 1x, x@2x.jpg 2x"`나 `sizes` 속성을 함께 써.
+tags: [ images, picture, srcset, responsive ]

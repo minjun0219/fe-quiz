@@ -1,0 +1,41 @@
+id: html-007
+category: html
+difficulty: easy
+type: single_choice
+question: |
+  체크박스에 라벨을 **연결**한 사례로 옳지 않은 것은?
+code: |
+  <!-- A -->
+  <label for="agree">동의</label>
+  <input id="agree" type="checkbox" />
+
+  <!-- B -->
+  <label>
+    <input type="checkbox" />
+    동의
+  </label>
+
+  <!-- C -->
+  <input id="agree" type="checkbox" aria-labelledby="agree-text" />
+  <span id="agree-text">동의</span>
+
+  <!-- D -->
+  <input type="checkbox" />
+  <span>동의</span>
+choices:
+  - id: a
+    text: A — `<label for>`와 input의 `id`가 매칭되어 연결됨
+  - id: b
+    text: B — `<label>`이 input을 감싸 암묵적으로 연결됨
+  - id: c
+    text: C — aria-labelledby로 외부 텍스트를 라벨로 지정
+  - id: d
+    text: D — span을 옆에 두면 시각적으로 라벨처럼 보이므로 연결된 것으로 간주
+answer: d
+explanation: |
+  d만 잘못된 연결이야 — 시각적으로 옆에 있어도 보조 기술은 그 둘을 묶어 인식하지 못해.
+  - A: `for="agree"` ↔ `id="agree"` 매칭 — 가장 명시적·표준적인 방법.
+  - B: `<label>`이 입력을 자식으로 감싸면 암묵 연결. 단순한 폼에 적합.
+  - C: ARIA `aria-labelledby`는 텍스트 노드의 id를 가리켜 라벨 역할을 부여. label을 보일 수 없을 때나 복합 라벨이 필요할 때 사용.
+  연결된 라벨은 (1) 스크린 리더가 읽어주고 (2) 라벨 클릭으로 input 활성화 — 클릭 영역도 넓어져 모바일 UX에 도움 돼.
+tags: [ a11y, forms, label, aria ]

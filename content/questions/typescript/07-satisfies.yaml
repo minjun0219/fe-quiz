@@ -1,0 +1,32 @@
+id: ts-007
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  세 변수의 동작 차이로 옳은 것은?
+code: |
+  type Config = Record<'dev' | 'prod', string>
+
+  const a: Config = { dev: 'http://localhost', prod: 'https://api.example.com' }
+  const b           = { dev: 'http://localhost', prod: 'https://api.example.com' }
+  const c           = { dev: 'http://localhost', prod: 'https://api.example.com' } satisfies Config
+choices:
+  - id: a
+    text: |
+      a, b, c 모두 동일 — `satisfies`는 단순히 `: Config`의 다른 표기일 뿐
+  - id: b
+    text: |
+      `c.dev`만 리터럴 타입(`'http://localhost'`)으로 좁혀지고, Config 모양도 검증돼
+  - id: c
+    text: |
+      `satisfies`는 런타임 검증 — 빌드 시점엔 무시됨
+  - id: d
+    text: |
+      a만 검증되고 b, c는 모양 검사가 안 돼
+answer: b
+explanation: |
+  - `a: Config` — 타입 어노테이션은 값 타입을 `Config`(=`Record<..., string>`)로 **넓혀버려서** `a.dev`는 `string`.
+  - `b` — 어노테이션이 없어 좁은 리터럴은 유지되지만 Config 모양 검사가 빠져 오타 같은 실수를 못 잡음.
+  - `c ... satisfies Config` — Config 모양은 컴파일러가 검증하면서도 추론된 좁은 타입(예: `c.dev: 'http://localhost'`)은 그대로 유지. TS 4.9+ 기능.
+  설정 객체에서 키 누락은 막고 값 리터럴은 살리고 싶을 때 `satisfies`가 적격이야.
+tags: [ types, satisfies, literal-types, ts49 ]

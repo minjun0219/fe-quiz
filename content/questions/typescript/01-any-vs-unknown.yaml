@@ -1,0 +1,28 @@
+id: ts-001
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  `any`와 `unknown`의 차이는?
+code: |
+  function f(x: any) {
+    x.toUpperCase()    // ①
+  }
+  function g(x: unknown) {
+    x.toUpperCase()    // ②
+  }
+choices:
+  - id: a
+    text: ①, ② 모두 컴파일 통과 — 둘은 사실상 같은 타입
+  - id: b
+    text: ①은 통과, ②는 컴파일 에러 — `unknown`은 좁히기 전에 사용 불가
+  - id: c
+    text: ①은 에러, ②는 통과 — `any`는 더 엄격한 최상위 타입
+  - id: d
+    text: ①, ② 모두 컴파일 에러 — 둘 다 사용 전 검사 필요
+answer: b
+explanation: |
+  `any`는 타입 검사를 끄는 탈출구라 무엇이든 통과시켜.
+  `unknown`은 "모든 값"을 표현하는 안전한 최상위 타입 — 사용하려면 `typeof x === 'string'`, `x instanceof ...` 같은 가드로 좁혀야 해.
+  외부 입력(JSON 파싱, 라이브러리 경계)을 받을 때 `any` 대신 `unknown`을 쓰면 컴파일러가 좁히기를 강제해 안전해져.
+tags: [ types, any, unknown, narrowing ]
