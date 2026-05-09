@@ -16,8 +16,8 @@ code: |
   </label>
 
   <!-- C -->
-  <input id="agree" type="checkbox" aria-labelledby="agree-text" />
-  <span id="agree-text">동의</span>
+  <input id="terms" type="checkbox" aria-labelledby="terms-text" />
+  <span id="terms-text">동의</span>
 
   <!-- D -->
   <input type="checkbox" />

@@ -3,7 +3,7 @@ category: typescript
 difficulty: medium
 type: multi_choice
 question: |
-  `readonly number[]` 타입에서 **컴파일 에러**가 나는 호출을 모두 골라봐.
+  `readonly number[]` 타입에서 **컴파일 에러**가 나는 사용을 모두 골라봐.
 code: |
   function takeReadonly(xs: readonly number[]) {
     // xs.???
