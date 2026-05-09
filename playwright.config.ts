@@ -22,7 +22,7 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    stdout: "ignore",
+    stdout: process.env.CI ? "pipe" : "ignore",
     stderr: "pipe",
   },
 });
