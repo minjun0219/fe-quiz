@@ -1,0 +1,25 @@
+id: html-010
+category: html
+difficulty: easy
+type: single_choice
+question: |
+  다음 마크업의 동작 설명으로 가장 정확한 것은?
+code: |
+  <details>
+    <summary>FAQ</summary>
+    내용...
+  </details>
+choices:
+  - id: a
+    text: JS 없이도 클릭/Enter로 펼침·접힘이 토글되며, 첫 자식이 `<summary>`라면 그 텍스트가 토글 라벨이 된다. 기본 닫힘 상태이며 `open` 속성으로 펼친 상태로 시작 가능
+  - id: b
+    text: "`<details>`는 표시만 담당하고 토글 동작은 별도 JS가 필요하다"
+  - id: c
+    text: "`<summary>`는 화면에 보이지 않고 a11y 트리에만 노출된다"
+  - id: d
+    text: "`<details open>`을 쓰면 모든 형제 details가 함께 열린다"
+answer: a
+explanation: |
+  `<details>`/`<summary>`는 브라우저가 토글 동작을 기본 제공하는 disclosure 위젯이라 JS가 필요 없어. 시각/스크린리더 모두 "펼쳐짐/접힘" 상태를 알려 줘서 a11y 측면에서도 접근하기 좋아.
+  처음부터 펼쳐 두려면 `<details open>`처럼 `open` 속성을 추가하면 되고, 다른 details와 자동으로 연동되진 않아. 같은 그룹에서 하나만 열리게 하려면 JS로 직접 제어해야 해.
+tags: [ details, summary, disclosure ]

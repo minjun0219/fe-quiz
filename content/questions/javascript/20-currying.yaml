@@ -1,0 +1,32 @@
+id: js-020
+category: javascript
+difficulty: hard
+type: single_choice
+question: |
+  다음 `curry` 구현으로 감싼 `add3`을 호출했을 때 콘솔 출력 순서는?
+code: |
+  const curry = (fn) =>
+    function curried(...args) {
+      return args.length >= fn.length
+        ? fn(...args)
+        : (...rest) => curried(...args, ...rest)
+    }
+  const add3 = curry((a, b, c) => a + b + c)
+  console.log(add3(1)(2)(3))
+  console.log(add3(1, 2)(3))
+  console.log(add3(1)(2, 3))
+choices:
+  - id: a
+    text: "`6`, `6`, `6` — 인자가 `fn.length`(=3)에 도달하면 호출되고 부족하면 부분 적용 함수가 반환된다"
+  - id: b
+    text: "`6`, `NaN`, `NaN` — 그룹 호출(`a, b, c`)만 동작한다"
+  - id: c
+    text: "`TypeError` — 가변 인자 호출은 지원되지 않는다"
+  - id: d
+    text: "`1`, `2`, `3` — 매 호출이 마지막 인자만 반환한다"
+answer: a
+explanation: |
+  `curried`는 누적 인자 길이가 원본 함수의 인자 개수(`fn.length`)에 도달하면 `fn(...args)`로 즉시 호출하고, 부족하면 남은 인자를 받는 함수를 반환해.
+  그래서 `add3(1)(2)(3)`, `add3(1, 2)(3)`, `add3(1)(2, 3)` 모두 누적 인자가 3개에 도달한 시점에 동일한 `1 + 2 + 3 = 6`을 반환해.
+  주의: `fn.length`는 "필수 인자"만 세고 default value/rest 파라미터는 제외해서, default가 있는 함수에 그대로 적용하면 호출 시점이 어긋날 수 있어.
+tags: [ functional, currying, closure ]

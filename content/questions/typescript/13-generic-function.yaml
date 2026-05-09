@@ -1,0 +1,31 @@
+id: ts-013
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  다음 코드에서 (1), (2), (3)의 추론 타입으로 가장 정확한 것은?
+code: |
+  function first<T>(arr: T[]): T | undefined {
+    return arr[0]
+  }
+
+  const a = first([1, 2, 3])         // (1)
+  const b = first(['a', 'b'])        // (2)
+  const c = first<boolean>([true])   // (3)
+choices:
+  - id: a
+    text: "모두 `unknown | undefined`"
+  - id: b
+    text: "`number | undefined`, `string | undefined`, `boolean | undefined`"
+  - id: c
+    text: "모두 `any | undefined`"
+  - id: d
+    text: "`number[]`, `string[]`, `boolean[]`"
+answer: b
+explanation: |
+  제네릭 `T`는 인자 리터럴의 원소 타입으로 구체화돼.
+  - (1) `[1, 2, 3]` → `T = number`, 반환 `number | undefined`.
+  - (2) `['a', 'b']` → `T = string`.
+  - (3) `<boolean>`으로 명시적 구체화 → `T = boolean`.
+  제네릭 함수는 "호출 시점에서만 속성이 결정되는 함수"라 다양한 타입을 하나의 구현으로 재사용할 수 있게 해 줘.
+tags: [ generics, inference ]

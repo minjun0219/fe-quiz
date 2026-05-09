@@ -1,0 +1,23 @@
+id: react-017
+category: react
+difficulty: easy
+type: single_choice
+question: |
+  커스텀 훅 이름을 `use`로 시작해야 하는 이유로 가장 적절한 것은?
+choices:
+  - id: a
+    text: 단순한 컨벤션일 뿐 동작상 차이는 없다
+  - id: b
+    text: |
+      ESLint 플러그인 `react-hooks/rules-of-hooks`와 커뮤니티 컨벤션이
+      "이 함수는 훅을 호출한다"고 판단하는 기준이라, 이름이 다르면
+      정적 분석이 훅 규칙 위반을 잡아내지 못한다
+  - id: c
+    text: "`use`로 시작해야 React가 자동으로 메모이즈해 준다"
+  - id: d
+    text: "`use` prefix가 있어야 JSX를 반환할 수 있는 컴포넌트로 인식된다"
+answer: b
+explanation: |
+  React 런타임은 함수 이름을 검사해 훅 규칙을 적용하는 게 아니야 — 호출 순서/디스패처 기반으로 동작해. 다만 `react-hooks/rules-of-hooks` ESLint 플러그인이 "대문자 컴포넌트 / `use`로 시작하는 훅" 패턴으로 검사 대상을 골라 내. 이름이 다르면 그 안에서 `useState` 같은 훅을 조건부로 호출해도 정적 분석이 위반을 놓쳐 버그가 런타임까지 새 나가.
+  자동 메모이즈(c)나 컴포넌트 인식(d)은 React의 실제 동작과 무관해. 결론은 "린트와 커뮤니티 컨벤션이 prefix를 기준으로 검사하니, 안전하게 검사받으려면 따르자"야.
+tags: [ hooks, custom-hook, naming, lint ]

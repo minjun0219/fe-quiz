@@ -1,0 +1,29 @@
+id: css-020
+category: css
+difficulty: hard
+type: single_choice
+question: |
+  다음 CSS에서 `<a>`의 최종 `color`는?
+code: |
+  @layer reset, base, theme;
+
+  @layer reset { a { color: black; } }
+  @layer base  { a { color: red;   } }
+  @layer theme { a { color: blue;  } }
+
+  a { color: green; }
+choices:
+  - id: a
+    text: "`black` — reset 레이어가 가장 먼저 선언돼서 우선이다"
+  - id: b
+    text: "`blue` — 가장 마지막 레이어가 우선이다"
+  - id: c
+    text: "`green` — 어느 레이어에도 속하지 않은 일반 규칙은 모든 레이어보다 우선이다"
+  - id: d
+    text: "`red` — base 레이어가 평균적으로 가장 흔히 적용된다"
+answer: c
+explanation: |
+  Cascade Layers의 우선순위는 "unlayered > layered"가 핵심이야. layer에 속하지 않은 일반 규칙은 어떤 layer 안의 규칙보다도 강해.
+  layer끼리 비교할 때는 "나중에 등록된 layer가 우선". 첫 줄 `@layer reset, base, theme;`가 등록 순서를 정하므로 theme(blue) > base(red) > reset(black)이지만, 일반 규칙 `green`이 그 위를 덮어버려.
+  순서 의존을 줄이려고 디자인 시스템·리셋·서드파티 CSS를 layer로 격리하면, 페이지 단의 일반 CSS가 안전하게 덮어쓸 수 있게 돼서 specificity 전쟁이 줄어들어.
+tags: [ cascade, layer, specificity ]

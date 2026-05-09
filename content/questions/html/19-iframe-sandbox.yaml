@@ -1,0 +1,26 @@
+id: html-019
+category: html
+difficulty: hard
+type: single_choice
+question: |
+  다음 두 iframe 설정의 의미와 두 번째 설정의 위험으로 가장 정확한 것은?
+code: |
+  <iframe src="ad.html" sandbox></iframe>
+  <iframe src="x.html"
+          sandbox="allow-scripts allow-same-origin">
+  </iframe>
+choices:
+  - id: a
+    text: 첫 번째는 모든 능력을 차단(스크립트·폼·팝업 등 전부 안 됨), 두 번째는 스크립트와 same-origin 자격을 둘 다 허용해 iframe이 부모 origin의 쿠키/스토리지에 접근하면서 임의 스크립트를 실행할 수 있어 사실상 sandbox를 무력화한다
+  - id: b
+    text: 두 번째는 보안 강도를 더 높인 설정이라 권장된다
+  - id: c
+    text: "`sandbox` 속성 없이도 같은 결과다"
+  - id: d
+    text: "`allow-scripts`만 있으면 안전하지 않으므로 `allow-same-origin`을 추가해야 한다"
+answer: a
+explanation: |
+  빈 `sandbox` 속성은 iframe의 모든 능력을 제한하는 최대 보수적 설정. 스크립트 실행·폼 제출·팝업·동일 출처 접근·top-level 네비게이션 등이 모두 막혀.
+  `allow-scripts allow-same-origin`을 함께 두면 iframe이 서브트리에서 자신을 부모 origin으로 간주해 쿠키/로컬스토리지·DOM에 접근하면서 임의 코드를 실행할 수 있게 돼 — 제삼자 콘텐츠를 이런 조합으로 임베딩하면 sandbox를 건 의미가 사라져.
+  제삼자 콘텐츠를 실으려면 동일 출처 권한을 사용하지 않거나 `allow-same-origin` 없이 쓰는 게 기본 원칙이야.
+tags: [ iframe, sandbox, security ]

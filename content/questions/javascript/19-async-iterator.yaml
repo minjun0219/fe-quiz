@@ -1,0 +1,33 @@
+id: js-019
+category: javascript
+difficulty: hard
+type: single_choice
+question: |
+  다음 코드의 출력 순서는?
+code: |
+  async function* gen() {
+    yield 1
+    yield Promise.resolve(2)
+    yield 3
+  }
+  ;(async () => {
+    for await (const v of gen()) {
+      console.log(v)
+    }
+    console.log('done')
+  })()
+choices:
+  - id: a
+    text: "`1`, `[object Promise]`, `3`, `done`"
+  - id: b
+    text: "`1`, `2`, `3`, `done` — `for await...of`가 yield된 Promise를 자동 await해 풀어준다"
+  - id: c
+    text: "`1`, `3`, `2`, `done` — Promise는 마이크로태스크로 미뤄져 마지막에 처리된다"
+  - id: d
+    text: "TypeError — async generator는 Promise를 yield할 수 없다"
+answer: b
+explanation: |
+  async generator는 각 `yield`마다 `{ value, done }`을 감싼 Promise를 돌려주는 async iterator를 반환해. `for await...of` 루프는 그 Promise를 await로 풀고, 만약 `value`가 또 Promise라면 추가로 한 번 더 await해서 실제 값을 변수에 바인딩해 줘.
+  그래서 `Promise.resolve(2)`가 yield돼도 루프 본문에선 이미 풀린 `2`가 보이고, 출력은 `1`, `2`, `3`, `done` 순서가 돼.
+  HTTP 스트리밍, 파일 청크 읽기처럼 "비동기로 도착하는 시퀀스"를 다룰 때 자연스럽게 쓸 수 있어.
+tags: [ async-iterator, generator, for-await ]

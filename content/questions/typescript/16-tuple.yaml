@@ -1,0 +1,28 @@
+id: ts-016
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  다음 코드의 타입 검사를 다루는 설명으로 가장 정확한 것은? (`noUncheckedIndexedAccess`가 OFF인 기본 상태)
+code: |
+  const a: [string, number] = ['x', 1]
+  const b: string[] = ['a', 'b']
+
+  a[0].toUpperCase()  // (1)
+  a[1].toFixed()      // (2)
+  a[2]                // (3)
+  b[10].toUpperCase() // (4)
+choices:
+  - id: a
+    text: 모두 정상 통과한다
+  - id: b
+    text: 튜플은 길이/위치별 타입이 고정돼 (1)·(2)는 각 자리에 맞는 메서드로 추론되고 (3)은 범위 밖 인덱스라 에러, 일반 배열 `b[10]`은 기본 추론이 `string`이라 (4)는 컴파일 통과(런타임은 undefined로 깨질 수 있음)
+  - id: c
+    text: 튜플은 길이를 강제하지 않고 모두 `string | number`로 추론된다
+  - id: d
+    text: "`noUncheckedIndexedAccess` 없이는 (3), (4) 모두 컴파일 에러"
+answer: b
+explanation: |
+  튜플은 길이와 각 인덱스의 타입이 고정돼. `a[0]`는 `string`, `a[1]`은 `number`로 좁혀져 정확한 메서드가 제공돼. `a[2]`는 튜플 속성을 벗어난 접근이라 에러.
+  반면 일반 배열 `string[]`의 인덱스 접근은 기본으로 `string`으로 추론돼(undefined 가능성을 무시). 범위를 벗어나도 컴파일은 통과하고 런타임에 `undefined.toUpperCase()`로 깨질 수 있어. `noUncheckedIndexedAccess: true`를 켜면 `string | undefined`로 추론돼 이런 버그를 정적으로 잡아.
+tags: [ tuple, array, indexed-access ]
