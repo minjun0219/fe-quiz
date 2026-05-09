@@ -27,9 +27,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # pnpm 버전은 package.json `packageManager`가 단일 소스. 둘 다 지정 시
+      # action-setup@v4가 ERR_PNPM_BAD_PM_VERSION으로 거부.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
