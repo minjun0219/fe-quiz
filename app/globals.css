@@ -36,8 +36,9 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Plain monospace code block — wrapper <div> paints the dark background;
- * the inner <pre><code> just needs to inherit colors and wrap long lines. */
+/* Plain monospace code block — wrapper <div> paints the dark background +
+ * `overflow-x-auto`; the inner <pre><code> keeps the browser default
+ * `white-space: pre` so long lines scroll horizontally instead of wrapping. */
 .quiz-code-block pre,
 .quiz-code-block code {
   background-color: transparent;
@@ -47,8 +48,6 @@ body {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
 }
 
 /* Inline `backtick code` in explanation paragraphs. */
