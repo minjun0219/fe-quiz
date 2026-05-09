@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
 import { GradingError, gradeRound } from "@/lib/grading";
 import { getQuestionMap } from "@/lib/questions";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { ShareCreateRequest, type ShareCreateResponse } from "@/lib/share.schema";
 import { createShare } from "@/lib/share-store";
 
@@ -12,7 +13,12 @@ function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 }
 
-export async function POST(request: Request): Promise<NextResponse> {
+export async function POST(request: Request): Promise<Response> {
+  // Share INSERT는 DB row 폭증 + 가짜 슬러그 양산 위험. 분당 10개 이상은
+  // 정상 사용자 흐름이 아님 (한 라운드 풀이 + 공유에 분 단위가 걸림).
+  const limited = await checkRateLimit(request, { prefix: "share", tokens: 10, windowSec: 60 });
+  if (limited) return limited;
+
   let body: unknown;
   try {
     body = await request.json();
