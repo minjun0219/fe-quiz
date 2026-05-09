@@ -36,7 +36,7 @@ body {
   font-size: inherit;
   line-height: inherit;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Inline `backtick code` in explanation paragraphs. */
