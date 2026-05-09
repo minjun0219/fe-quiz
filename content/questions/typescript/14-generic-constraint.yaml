@@ -1,0 +1,29 @@
+id: ts-014
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  다음 코드에서 (1)과 (2)의 결과로 가장 정확한 것은?
+code: |
+  function get<T, K extends keyof T>(obj: T, key: K): T[K] {
+    return obj[key]
+  }
+
+  const u = { name: 'jun', age: 30 }
+  const x = get(u, 'name')    // (1)
+  const y = get(u, 'email')   // (2)
+choices:
+  - id: a
+    text: (1) `string` 추론, (2)는 컴파일 에러 — `'email'`이 `keyof typeof u`에 없으므로
+  - id: b
+    text: 둘 다 `any`로 추론된다
+  - id: c
+    text: (1) `unknown`, (2) `any`
+  - id: d
+    text: 둘 다 컴파일 에러 — `K extends keyof T`는 키를 좀히지 못한다
+answer: a
+explanation: |
+  `K extends keyof T` 제약은 `K`가 `T`의 실제 키 중 하나임을 컴파일 타임에 강제해 주고, 동시에 리턴 타입 `T[K]`도 키에 따라 정확하게 추론돼.
+  그래서 `get(u, 'name')`은 `string`(`u.name`의 타입)으로 좋혀지고, `get(u, 'email')`은 `'email'`이 `keyof typeof u`( =`'name' | 'age'`)에 없어 인자 단계에서 막혀.
+  런타임 안전 액세서 제구에 광범위하게 쓰이는 패턴이야.
+tags: [ generics, constraints, keyof ]
