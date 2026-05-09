@@ -13,9 +13,16 @@ import { createShare } from "@/lib/share-store";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-// 운영 폴백. share URL은 클라이언트가 자동 복사해서 친구에게 보내므로,
-// 신원이 검증된 도메인이 아니면 절대로 응답에 박혀선 안 된다.
-const PROD_FALLBACK = "https://fe-quiz.minjun.dev";
+// Vercel이 모든 배포의 빌드/런타임 env에 자동으로 채워주는 운영 도메인.
+// 코드에 도메인을 박을 필요 없이 프로젝트 설정만으로 운영 URL이 따라옴.
+const PROD_HOST = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+
+// share URL은 클라이언트가 자동 복사해서 친구에게 보내므로, 신원이 검증된
+// 도메인이 아니면 절대로 응답에 박혀선 안 된다. Host 헤더 누락/스푸핑 등
+// 화이트리스트를 못 통과한 케이스에 대비한 안전 기본값.
+const PROD_FALLBACK = PROD_HOST
+  ? `https://${PROD_HOST}`
+  : "http://localhost:3000";
 
 const ALLOWED_PROTOS = new Set(["http", "https"]);
 
@@ -44,7 +51,7 @@ function isLoopbackHost(host: string): boolean {
 function isAllowedHost(host: string): boolean {
   // 포트 분리. IPv6는 [::1]:3000 형태라 마지막 ':' 기준만 자르면 됨.
   const hostname = host.replace(/:\d+$/, "");
-  if (hostname === "fe-quiz.minjun.dev") {
+  if (PROD_HOST && hostname === PROD_HOST) {
     return true;
   }
   if (hostname.endsWith(".vercel.app")) {
@@ -61,14 +68,9 @@ function isAllowedHost(host: string): boolean {
   return false;
 }
 
-// 1순위: 명시적 env override (admin이 통제하므로 그대로 신뢰).
-// 2순위: 프록시 헤더 — 콤마 다중값/화이트리스트 검증 통과 시에만.
-// 3순위: 운영 도메인 하드코딩 폴백.
+// 1순위: 프록시 헤더 — 콤마 다중값/화이트리스트 검증 통과 시에만.
+// 2순위: PROD_FALLBACK (VERCEL_PROJECT_PRODUCTION_URL 또는 localhost).
 function siteUrl(request: Request): string {
-  const override = process.env.NEXT_PUBLIC_SITE_URL;
-  if (override) {
-    return override;
-  }
   const host = firstHeaderValue(
     request.headers.get("x-forwarded-host") ?? request.headers.get("host"),
   );
