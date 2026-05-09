@@ -1,0 +1,24 @@
+id: css-017
+category: css
+difficulty: medium
+type: single_choice
+question: |
+  다음 두 셀렉터의 specificity 차이로 가장 정확한 것은?
+code: |
+  :is(h1, h2, h3) .title { color: red; }
+  :where(h1, h2, h3) .title { color: blue; }
+choices:
+  - id: a
+    text: "`:is()`는 인자 중 가장 높은 specificity를 본문에 더하고, `:where()`는 항상 0이라 specificity에 기여하지 않는다. 따라서 첫 줄이 우선해 `red`가 적용된다"
+  - id: b
+    text: 둘은 동일하게 인자 specificity를 더한다
+  - id: c
+    text: "`:where()`가 인자 중 가장 높은 specificity를 가지고 `:is()`가 0이다"
+  - id: d
+    text: 둘 다 specificity 0이며 위치 순서로만 결정된다
+answer: a
+explanation: |
+  `:is(...)`의 specificity는 "인자 중 가장 높은 셀렉터의 specificity"가 본문에 더해져. 그래서 `:is(h1, h2, h3) .title`은 사실상 `h1 .title` 수준의 가중치를 가져.
+  `:where(...)`는 항상 0이라 같은 셀렉터를 묶을 수 있게 해 주면서도 specificity에는 영향이 없어. 사용자 스타일·디자인 시스템 베이스에서 "덮어쓰기 쉬운" 규칙을 만들 때 자주 써.
+  결과적으로 첫 줄이 더 강해 `red`가 이겨. 둘이 동작 면에서는 같지만 specificity가 다르다는 게 핵심.
+tags: [ selectors, specificity, is, where ]
