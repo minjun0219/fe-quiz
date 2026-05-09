@@ -22,10 +22,13 @@ function getLimiter(prefix: string, tokens: number, windowSec: number): Ratelimi
   const key = `${prefix}:${tokens}:${windowSec}`;
   const cached = limiterCache.get(key);
   if (cached) return cached;
+  // prefix에 tokens/window까지 포함시켜 Redis에 박는다. 같은 logical
+  // prefix(예: "share")라도 토큰/윈도우를 바꾸면 키가 달라져 옛날 카운터를
+  // 그대로 이어받지 않음. 튜닝 시 의도치 않은 잔여 상태 충돌 방지.
   const limiter = new Ratelimit({
     redis: r,
     limiter: Ratelimit.slidingWindow(tokens, `${windowSec} s`),
-    prefix,
+    prefix: key,
     analytics: false,
   });
   limiterCache.set(key, limiter);
