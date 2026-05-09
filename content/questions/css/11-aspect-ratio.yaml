@@ -6,13 +6,13 @@ question: |
   `<img>`나 `<div>`에 가로:세로 16:9 비율을 유지시키려면 가장 간결한 방법은?
 choices:
   - id: a
-    text: "aspect-ratio: 16 / 9 한 줄로 지정한다."
+    text: "`aspect-ratio: 16 / 9` 한 줄로 지정한다."
   - id: b
-    text: "padding-top: 56.25% 트릭과 absolute positioned 자식을 쓴다."
+    text: "`padding-top: 56.25%` 트릭과 absolute positioned 자식을 쓴다."
   - id: c
-    text: JS에서 `resize` 이벤트로 height = width * 9 / 16 을 매번 계산한다.
+    text: "JS에서 `resize` 이벤트로 `height = width * 9 / 16`을 매번 계산한다."
   - id: d
-    text: "object-fit: cover만 지정하면 자동으로 비율이 잡힌다."
+    text: "`object-fit: cover`만 지정하면 자동으로 비율이 잡힌다."
 answer: a
 explanation: |
   `aspect-ratio: 16 / 9`는 박스의 한쪽 치수만 정해져도 나머지를 비율대로 자동 결정해. 예전에는 padding 트릭(`padding-top: 56.25%`)이 표준이었지만, 이젠 모던 브라우저(2021+)에서 `aspect-ratio` 한 줄이면 충분해.

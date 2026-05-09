@@ -11,13 +11,13 @@ code: |
   nums.forEach(n => n * 100)
 choices:
   - id: a
-    text: "[2, 4, 6, 8]"
+    text: "`[2, 4, 6, 8]`"
   - id: b
-    text: "[1, 2, 3, 4]"
+    text: "`[1, 2, 3, 4]`"
   - id: c
-    text: "[2, 4]"
+    text: "`[2, 4]`"
   - id: d
-    text: "[100, 200, 300, 400]"
+    text: "`[100, 200, 300, 400]`"
 answer: b
 explanation: |
   `map`/`filter`는 새 배열을 반환하지, 원본을 건드리지 않아.

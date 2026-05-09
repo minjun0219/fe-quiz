@@ -6,17 +6,13 @@ question: |
   반응형 페이지의 `<head>`에 들어가야 할 viewport 메타 태그로 가장 적절한 것은?
 choices:
   - id: a
-    text: |
-      <meta name="viewport" content="width=1024" />
+    text: '`<meta name="viewport" content="width=1024" />`'
   - id: b
-    text: |
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
+    text: '`<meta name="viewport" content="width=device-width, initial-scale=1" />`'
   - id: c
-    text: |
-      <meta name="viewport" content="user-scalable=no" />
+    text: '`<meta name="viewport" content="user-scalable=no" />`'
   - id: d
-    text: |
-      viewport 메타는 데스크톱 전용이라 모바일 페이지엔 넣지 않는 게 맞음
+    text: "viewport 메타는 데스크톱 전용이라 모바일 페이지엔 넣지 않는 게 맞음"
 answer: b
 explanation: |
   `width=device-width`는 가상 뷰포트 너비를 **디바이스의 CSS 픽셀 너비**에 맞추라는 뜻 — 미디어 쿼리(`@media (max-width: ...)`)가 의도한 대로 동작하기 위한 전제야.

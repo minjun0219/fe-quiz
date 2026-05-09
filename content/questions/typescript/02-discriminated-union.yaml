@@ -11,25 +11,33 @@ code: |
 choices:
   - id: a
     text: |
+      ```ts
       function area(shape: Shape) {
         return Math.PI * shape.r ** 2
       }
+      ```
   - id: b
     text: |
+      ```ts
       function area(shape: Shape) {
         if (shape.kind === 'circle') return Math.PI * shape.r ** 2
         return shape.s ** 2
       }
+      ```
   - id: c
     text: |
+      ```ts
       function area(shape: Shape) {
         return shape.r ? Math.PI * shape.r ** 2 : shape.s ** 2
       }
+      ```
   - id: d
     text: |
+      ```ts
       function area(shape: Shape) {
         return (shape as any).r ? Math.PI * (shape as any).r ** 2 : (shape as any).s ** 2
       }
+      ```
 answer: b
 explanation: |
   `kind` 같은 공통 리터럴 필드가 있는 union(=discriminated union)은 그 필드를 비교하면 컴파일러가 자동으로 분기 안에서 타입을 좁혀줘.
