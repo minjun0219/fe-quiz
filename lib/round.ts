@@ -20,7 +20,7 @@ export async function publicView(q: Question): Promise<PublicQuestion> {
     ...rest,
     choices: renderedChoices,
     question_html: highlightInlineBackticks(q.question),
-    ...(code ? { code, code_html: await highlightCode(code, q.category) } : {}),
+    ...(code !== undefined ? { code, code_html: await highlightCode(code, q.category) } : {}),
   };
 }
 

@@ -274,7 +274,7 @@ export default function Result({ data }: Props) {
                             dangerouslySetInnerHTML={{ __html: choice.text_html }}
                           />
                         ) : (
-                          choice.text
+                          <span>{choice.text}</span>
                         )}
                         {isYours && !isCorrect && (
                           <span className="ml-2 text-xs text-rose-500">(내 답)</span>
