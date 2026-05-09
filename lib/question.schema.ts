@@ -128,10 +128,17 @@ export type Question = z.infer<typeof QuestionSchema>;
  * Lives here (not in `lib/round.ts`) so client components can `import type`
  * this without crossing a `server-only` module boundary.
  *
- * `code_html` is server-rendered Shiki output for `code`; clients render it
- * via `dangerouslySetInnerHTML` and fall back to the raw `code` string if
- * absent.
+ * `code_html` is server-rendered Shiki output for `code`; `question_html` and
+ * each choice's `text_html` are HTML-escaped strings with single-backtick
+ * runs wrapped in `<code class="inline-code">`. Clients render via
+ * `dangerouslySetInnerHTML` and fall back to the raw text when absent.
  */
-export type PublicQuestion = Omit<Question, "answer" | "explanation"> & {
+export type PublicChoice = Choice & {
+  text_html?: string;
+};
+
+export type PublicQuestion = Omit<Question, "answer" | "explanation" | "choices"> & {
+  choices: PublicChoice[];
+  question_html?: string;
   code_html?: string;
 };

@@ -228,9 +228,17 @@ export default function Result({ data }: Props) {
                     {q.is_correct ? "정답" : "오답"}
                   </span>
                 </div>
-                <p className="mb-3 whitespace-pre-line text-base leading-relaxed text-zinc-900">
-                  {q.question}
-                </p>
+                {q.question_html ? (
+                  <p
+                    className="mb-3 whitespace-pre-line text-base leading-relaxed text-zinc-900"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                    dangerouslySetInnerHTML={{ __html: q.question_html }}
+                  />
+                ) : (
+                  <p className="mb-3 whitespace-pre-line text-base leading-relaxed text-zinc-900">
+                    {q.question}
+                  </p>
+                )}
                 {q.code_html ? (
                   <div
                     className="quiz-code-block mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100"
@@ -260,7 +268,14 @@ export default function Result({ data }: Props) {
                         }`}
                       >
                         <span className="mr-2">{isCorrect ? "✓" : isYours ? "✗" : "·"}</span>
-                        {choice.text}
+                        {choice.text_html ? (
+                          <span
+                            // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                            dangerouslySetInnerHTML={{ __html: choice.text_html }}
+                          />
+                        ) : (
+                          choice.text
+                        )}
                         {isYours && !isCorrect && (
                           <span className="ml-2 text-xs text-rose-500">(내 답)</span>
                         )}

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Category, Choice, QuestionType } from "./question.schema";
+import type { Category, PublicChoice, QuestionType } from "./question.schema";
 
 /**
  * Per-question submitted answer:
@@ -64,10 +64,13 @@ export interface QuizQuestionResult {
   category: Category;
   type: QuestionType;
   question: string;
+  /** Server-rendered HTML for `question` with inline backtick spans. */
+  question_html?: string;
   code?: string;
   /** Server-rendered Shiki HTML for `code`. */
   code_html?: string;
-  choices: Choice[];
+  /** Choices include optional `text_html` with inline backtick spans applied. */
+  choices: PublicChoice[];
   your_answer: SubmittedAnswer;
   correct_answer: string | string[];
   is_correct: boolean;
