@@ -126,14 +126,17 @@ function levelMixChecks() {
     totalByDiff[q.difficulty]++;
   }
 
+  const DIFFS = ["easy", "medium", "hard"] as const;
+
   for (const level of LEVELS) {
-    // Lower bound: when global pool ≥ mix quota, the picker must hit it
-    // exactly (no fallback fires); otherwise the bound is the pool size.
-    const minBy: Record<Difficulty, number> = {
-      easy: Math.min(level.mix.easy, totalByDiff.easy),
-      medium: Math.min(level.mix.medium, totalByDiff.medium),
-      hard: Math.min(level.mix.hard, totalByDiff.hard),
-    };
+    // Whether every difficulty's pool can satisfy the level's quota. When
+    // this holds, no fallback fires and `got[d]` must hit `mix[d]` exactly
+    // for every d. When some pool is short, the deficit is redirected onto
+    // adjacent difficulties, so a sufficient bucket can legitimately receive
+    // overflow — we fall back to a lower bound there.
+    const allPoolsSufficient = DIFFS.every(
+      (d) => totalByDiff[d] >= level.mix[d],
+    );
 
     for (let trial = 0; trial < TRIALS; trial++) {
       const round = pickByLevel(level.id, ROUND_SIZE, getPool);
@@ -154,16 +157,26 @@ function levelMixChecks() {
         got[q.difficulty]++;
       }
 
-      for (const d of ["easy", "medium", "hard"] as const) {
-        if (got[d] < minBy[d]) {
-          fail(
-            `level=${level.id} trial ${trial}: ${d} got ${got[d]}, expected ≥ ${minBy[d]} (mix=${level.mix[d]}, pool=${totalByDiff[d]})`,
-          );
+      for (const d of DIFFS) {
+        const want = level.mix[d];
+        if (allPoolsSufficient) {
+          if (got[d] !== want) {
+            fail(
+              `level=${level.id} trial ${trial}: ${d} got ${got[d]}, expected exactly ${want} (pool=${totalByDiff[d]})`,
+            );
+          }
+        } else {
+          const minExpected = Math.min(want, totalByDiff[d]);
+          if (got[d] < minExpected) {
+            fail(
+              `level=${level.id} trial ${trial}: ${d} got ${got[d]}, expected ≥ ${minExpected} (mix=${want}, pool=${totalByDiff[d]})`,
+            );
+          }
         }
       }
     }
     pass(
-      `level mix [${level.id}]: ${TRIALS} trials, mix=${JSON.stringify(level.mix)}, lower bound=${JSON.stringify(minBy)}`,
+      `level mix [${level.id}]: ${TRIALS} trials, mix=${JSON.stringify(level.mix)}, exact=${allPoolsSufficient}`,
     );
   }
 }

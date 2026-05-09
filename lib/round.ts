@@ -50,8 +50,9 @@ export async function publicView(q: Question): Promise<PublicQuestion> {
  * pool by category on each call (O(N) over the frozen pool, fine at current
  * seed sizes). Adding new categories to the registry needs no changes here.
  *
- * `level` defaults to `DEFAULT_LEVEL` ("normal") so existing call sites stay
- * working; the route passes the user's selection from `?level=...`.
+ * `level` selects the easy/medium/hard mix; `count` is an upper cap that
+ * trims the result if smaller than the mix sum (lets tests probe clamping
+ * without overriding `ROUND_SIZE` globally).
  */
 export async function pickRoundQuestions(
   count: number = ROUND_SIZE,

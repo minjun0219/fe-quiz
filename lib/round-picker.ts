@@ -120,6 +120,13 @@ export function pickStratified(
  * Difficulty-aware picker. Honors the level's easy/medium/hard mix as the
  * primary constraint, with category coverage as best-effort.
  *
+ * Round size is fundamentally determined by the level's mix
+ * (`mix.easy + mix.medium + mix.hard`, currently always `ROUND_SIZE`).
+ * `roundSize` here is an **upper cap only** — pass a smaller value to
+ * truncate the result (used by tests to probe clamping/edge cases). Passing
+ * a value larger than the mix sum will not magically grow the round; that's
+ * a level definition concern, not a picker concern.
+ *
  * Algorithm:
  *   1. Split each category's pool into easy/medium/hard buckets (pre-shuffled).
  *   2. For each difficulty in scarcity order (hard → medium → easy), spread
@@ -128,8 +135,9 @@ export function pickStratified(
  *   3. If a difficulty bucket runs short (e.g., HTML has zero hard), fill
  *      the remainder from adjacent difficulties — hard-short pulls medium
  *      then easy; easy-short pulls medium then hard. This keeps the round
- *      at exactly `roundSize` even when the global pool is uneven.
- *   4. Final shuffle so difficulties interleave in display order.
+ *      at the mix sum even when the global pool is uneven.
+ *   4. Final shuffle so difficulties interleave; trim to `roundSize` if
+ *      smaller than the mix sum.
  *
  * Per-category coverage is *not* guaranteed under heavy filtering (a pure-
  * hard quota can leave HTML out entirely), but with the current mixes the

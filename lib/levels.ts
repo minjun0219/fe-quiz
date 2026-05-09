@@ -51,7 +51,7 @@ export function getLevel(id: Level): LevelEntry {
 }
 
 export function isLevel(s: unknown): s is Level {
-  return typeof s === "string" && s in BY_ID;
+  return typeof s === "string" && Object.hasOwn(BY_ID, s);
 }
 
 /** Coerce arbitrary input (e.g., URL search params) to a valid level. */
