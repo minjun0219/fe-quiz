@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { findResultType } from "@/lib/diagnosis";
+import { buildTypeCode, computePersonality, resolveResultHero } from "@/lib/diagnosis";
 import { getShareById } from "@/lib/share-store";
 
 export const size = { width: 1200, height: 630 };
@@ -64,9 +64,12 @@ export default async function Image({ params }: Props) {
     );
   }
 
-  const bucket = findResultType(share.result_type);
+  const hero = resolveResultHero(share.result_type);
   const total = share.question_ids.length;
   const totalCorrect = Math.round((share.score * total) / 100);
+  const typeCode = hero.persona
+    ? buildTypeCode(computePersonality(share.category_scores), hero.persona.id)
+    : null;
 
   return new ImageResponse(
     <div
@@ -101,7 +104,7 @@ export default async function Image({ params }: Props) {
         }}
       >
         <div style={{ display: "flex", fontSize: 200, lineHeight: 1, marginBottom: 24 }}>
-          {bucket.emoji}
+          {hero.emoji}
         </div>
         <div
           style={{
@@ -113,8 +116,21 @@ export default async function Image({ params }: Props) {
             letterSpacing: -2,
           }}
         >
-          {share.result_type}
+          {hero.name}
         </div>
+        {typeCode && (
+          <div
+            style={{
+              display: "flex",
+              fontSize: 36,
+              color: "#52525b",
+              marginBottom: 16,
+              letterSpacing: 1,
+            }}
+          >
+            {typeCode}
+          </div>
+        )}
         <div style={{ display: "flex", fontSize: 56, color: "#3f3f46" }}>
           {totalCorrect} / {total} · {share.score}%
         </div>

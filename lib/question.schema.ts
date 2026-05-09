@@ -1,19 +1,18 @@
 import { z } from "zod";
+import { CATEGORY_IDS, type Category as CategoryId, getIdPrefix } from "./categories";
 
-export const Category = z.enum(["javascript", "react", "css"]);
-export type Category = z.infer<typeof Category>;
+/**
+ * Category enum derived from `lib/categories.ts`. Adding a new category there
+ * (e.g., TypeScript, HTML) automatically widens this enum — no edit here.
+ */
+export const Category = z.enum(CATEGORY_IDS);
+export type Category = CategoryId;
 
 export const Difficulty = z.enum(["easy", "medium", "hard"]);
 export type Difficulty = z.infer<typeof Difficulty>;
 
 export const QuestionType = z.enum(["single_choice", "multi_choice"]);
 export type QuestionType = z.infer<typeof QuestionType>;
-
-const ID_PREFIX: Record<Category, string> = {
-  javascript: "js",
-  react: "react",
-  css: "css",
-};
 
 export const ChoiceSchema = z.object({
   id: z
@@ -50,7 +49,7 @@ const MultiChoice = Base.extend({
 export const QuestionSchema = z
   .discriminatedUnion("type", [SingleChoice, MultiChoice])
   .superRefine((q, ctx) => {
-    const expected = ID_PREFIX[q.category];
+    const expected = getIdPrefix(q.category);
     if (!q.id.startsWith(`${expected}-`)) {
       ctx.addIssue({
         code: "custom",

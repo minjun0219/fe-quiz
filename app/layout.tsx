@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | FE 퀴즈",
   },
   description:
-    "5문제 3분. 친구처럼 가볍게 풀고, AI가 친구처럼 피드백 주는 한국어 프론트엔드 미니퀴즈.",
+    "10문제 5분. 친구처럼 가볍게 풀고, AI가 친구처럼 피드백 주는 한국어 프론트엔드 미니퀴즈.",
   openGraph: {
     title: "FE 퀴즈",
     description: "친구처럼 퀴즈 내고 친구처럼 피드백하는 프론트엔드 미니게임",

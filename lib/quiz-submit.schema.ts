@@ -78,11 +78,43 @@ export interface CategoryScore {
   total: number;
 }
 
-/** Diagnosis output piece. */
+/**
+ * Personality axis. Computed from the spread of per-category accuracies:
+ *   - `balanced`   — flat across categories (low stddev)
+ *   - `specialist` — strong in some, weak in others (high stddev)
+ *
+ * Category-independent so adding categories doesn't grow this enum.
+ */
+export type Personality = "balanced" | "specialist";
+
+/**
+ * Lightweight 4-bucket overall vibe (the v1 system, kept as a secondary
+ * line under the main persona hero). `null` slot is not used at runtime,
+ * but bucket labels stay strings so future tweaks don't ripple through
+ * the schema.
+ */
+export interface Vibe {
+  label: string;
+  emoji: string;
+  blurb: string;
+}
+
+/**
+ * Diagnosis output. Hybrid: a category-driven persona (`result_type` /
+ * `emoji` / `blurb`) plus a category-independent personality axis
+ * (`personality` / `type_code`), with the legacy 4-level mood as `vibe`.
+ *
+ * `dominant_category` is `null` only in pathological inputs (no scored
+ * categories); the route ensures at least one is scored on a real round.
+ */
 export interface Diagnosis {
   result_type: string;
   emoji: string;
   blurb: string;
+  personality: Personality;
+  dominant_category: Category | null;
+  type_code: string;
+  vibe: Vibe;
   strengths: Category[];
   weaknesses: Category[];
 }

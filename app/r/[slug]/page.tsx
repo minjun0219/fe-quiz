@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
-import { findResultType, STRONG_THRESHOLD, WEAK_THRESHOLD } from "@/lib/diagnosis";
+import {
+  buildTypeCode,
+  computePersonality,
+  resolveResultHero,
+  STRONG_THRESHOLD,
+  WEAK_THRESHOLD,
+} from "@/lib/diagnosis";
 import type { Category } from "@/lib/question.schema";
 import { getShareById } from "@/lib/share-store";
 
@@ -18,9 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!share) {
     return { title: "결과를 못 찾았어 — FE 퀴즈" };
   }
-  const bucket = findResultType(share.result_type);
-  const title = `${bucket.emoji} ${share.result_type} (${share.score}점) — FE 퀴즈`;
-  const description = `${bucket.blurb} 너도 같은 5문제 풀어봐.`;
+  const hero = resolveResultHero(share.result_type);
+  const total = share.question_ids.length;
+  const title = `${hero.emoji} ${hero.name} (${share.score}점) — FE 퀴즈`;
+  const description = `${hero.blurb} 너도 같은 ${total}문제 풀어봐.`;
   return {
     title,
     description,
@@ -37,19 +44,34 @@ export default async function SharePage({ params }: Props) {
   const share = await getShareById(slug);
   if (!share) notFound();
 
-  const bucket = findResultType(share.result_type);
+  const hero = resolveResultHero(share.result_type);
   const total = share.question_ids.length;
   const totalCorrect = Math.round((share.score * total) / 100);
+  // Show the type-code chip only for new persona-backed shares; legacy rows
+  // (whose `result_type` matches a v1 vibe label) don't carry enough info to
+  // pick a meaningful dominant category.
+  const personality = hero.persona ? computePersonality(share.category_scores) : null;
+  const typeCode = hero.persona ? buildTypeCode(personality ?? "balanced", hero.persona.id) : null;
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
       <section className="mb-8 text-center">
         <p className="mb-2 text-sm font-medium tracking-wide text-rose-500">친구의 진단</p>
-        <h1 className="mb-3 text-4xl leading-tight font-bold tracking-tight">
-          <span className="mr-2">{bucket.emoji}</span>
-          {share.result_type}
+        <h1 className="mb-2 text-4xl leading-tight font-bold tracking-tight">
+          <span className="mr-2">{hero.emoji}</span>
+          {hero.name}
         </h1>
-        <p className="mb-6 text-base text-zinc-600">{bucket.blurb}</p>
+        {typeCode && (
+          <p className="mb-3">
+            <span className="inline-block rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold tracking-wider text-zinc-700 tabular-nums">
+              {typeCode}
+            </span>
+            <span className="ml-2 text-xs text-zinc-500">
+              {personality === "balanced" ? "균형형" : "편식형"}
+            </span>
+          </p>
+        )}
+        <p className="mb-6 text-base text-zinc-600">{hero.blurb}</p>
         <p className="text-2xl font-semibold tabular-nums text-zinc-900">
           {totalCorrect} <span className="text-zinc-400">/</span> {total}
           <span className="ml-2 text-base font-medium text-zinc-500">({share.score}%)</span>
