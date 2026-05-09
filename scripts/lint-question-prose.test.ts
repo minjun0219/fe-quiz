@@ -242,4 +242,93 @@ describe("lintQuestionProse", () => {
     );
     expect(lintQuestionProse(root)).toEqual([]);
   });
+
+  it("does NOT flag Korean prose that uses => as 'implies/then'", () => {
+    writeQuestion(
+      "react",
+      "15-arrow-prose.yaml",
+      [
+        "id: react-015",
+        "explanation: |",
+        "  버튼 클릭 => 모달 열림 => 본문 스크롤 잠금이 순서대로 일어난다.",
+        "",
+      ].join("\n"),
+    );
+    expect(lintQuestionProse(root)).toEqual([]);
+  });
+
+  it("flags real arrow functions (parens or single ident before =>)", () => {
+    writeQuestion(
+      "javascript",
+      "16-arrow-fn.yaml",
+      [
+        "id: js-016",
+        "choices:",
+        "  - id: a",
+        '    text: "x => x * 2"',
+        "  - id: b",
+        '    text: "(props, ref) => null"',
+        "",
+      ].join("\n"),
+    );
+    expect(lintQuestionProse(root).length).toBe(2);
+  });
+
+  it("does NOT flag English abbreviations like 'e.g. (...)' or 'i.e. (...)'", () => {
+    writeQuestion(
+      "react",
+      "17-abbrev.yaml",
+      [
+        "id: react-017",
+        "explanation: |",
+        "  드물게 e.g. (legacy refs) 같은 패턴이 나온다. i.e. (older code)에서.",
+        "",
+      ].join("\n"),
+    );
+    expect(lintQuestionProse(root)).toEqual([]);
+  });
+
+  it("does NOT flag a Korean note ending with semicolon", () => {
+    writeQuestion(
+      "css",
+      "18-note.yaml",
+      [
+        "id: css-018",
+        "explanation: |",
+        "  note: 이건 CSS 룰이 아니라 일반 메모일 뿐;",
+        "",
+      ].join("\n"),
+    );
+    expect(lintQuestionProse(root)).toEqual([]);
+  });
+
+  it("flags multi-declaration CSS shorthand answers", () => {
+    writeQuestion(
+      "css",
+      "19-css-multi.yaml",
+      [
+        "id: css-019",
+        "choices:",
+        "  - id: a",
+        '    text: "flex-grow: 1; flex-shrink: 1; flex-basis: 0%"',
+        "",
+      ].join("\n"),
+    );
+    expect(lintQuestionProse(root).length).toBe(1);
+  });
+
+  it("ignores a trailing YAML comment after a value", () => {
+    writeQuestion(
+      "typescript",
+      "20-trailing-comment.yaml",
+      [
+        "id: ts-020",
+        "choices:",
+        "  - id: a",
+        '    text: "`useState`" # 정답',
+        "",
+      ].join("\n"),
+    );
+    expect(lintQuestionProse(root)).toEqual([]);
+  });
 });

@@ -84,7 +84,12 @@ function extractFieldValues(source: string): ExtractedValue[] {
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
-    const m = line.match(/^(\s*)(?:- \s*)?([a-zA-Z_]+):\s*(.*?)\s*$/);
+    // Trailing ` # comment` (with leading space) is dropped so the value
+    // capture stays clean. The leading space is required so values like
+    // `"#fff"` (CSS hex) and `` `#fff` `` aren't truncated mid-token.
+    const m = line.match(
+      /^(\s*)(?:- \s*)?([a-zA-Z_]+):\s*(.*?)\s*(?:\s+#.*)?$/,
+    );
     if (!m) {
       i++;
       continue;
@@ -180,21 +185,33 @@ function stripWrappedSpans(text: string): string {
 }
 
 const CODE_PATTERNS: { name: string; re: RegExp }[] = [
-  { name: "arrow function (=>)", re: /=>/ },
+  // Korean prose uses `=>` to mean "implies/then", so requiring an arg list
+  // (parens or a single bare identifier) immediately before keeps prose like
+  // "A 클릭 => B 발생" out of the hits.
+  {
+    name: "arrow function (=>)",
+    re: /(?:\([^)\n]*\)|[A-Za-z_$][\w$]*)\s*=>/,
+  },
   {
     name: "function/return/const/let/var keyword",
     re: /\b(?:function|return|const|let|var)\s+[A-Za-z_$]/,
   },
   { name: "strict equality (===/!==)", re: /===|!==/ },
   { name: "template literal interpolation (${)", re: /\$\{/ },
+  // The negative lookahead `(?!\.)` rejects abbreviations like `e.g. (`
+  // and `i.e. (` where the second segment is itself followed by a period.
+  // Real method calls (`xs.push(`, `Math.PI(`, `Node.js(`) still match.
   {
     name: "method call (ident.ident(...))",
-    re: /[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*\s*\(/,
+    re: /[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*(?!\.)\s*\(/,
   },
   { name: "JSX-like tag", re: /<\/?[A-Za-z][\w-]*[\s/>]/ },
+  // Require ≥2 `prop: value;` declarations so a single Korean line like
+  // `참고: 이렇다;` doesn't trigger. Real CSS shorthand answers in this
+  // codebase always have multiple declarations.
   {
-    name: "CSS shorthand (prop: value;)",
-    re: /(?:^|\s)[a-z][a-z-]+\s*:\s*[^;\n]+;/,
+    name: "CSS shorthand (prop: value; prop: value)",
+    re: /[a-z][a-z-]+\s*:\s*[^;\n]+;\s*[a-z][a-z-]+\s*:\s*[^;\n]+/,
   },
   { name: "TS type literal answer", re: /^\s*\{[^}\n]*:[^}\n]*\}\s*$/m },
   {
