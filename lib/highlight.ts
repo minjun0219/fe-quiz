@@ -85,11 +85,13 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => HTML_ESCAPES[c]);
 }
 
-// Single-line **bold** runs. Inner content is non-empty and may not span a
-// newline or contain a literal `*` (so `****` and `**a*b**` pass through
-// untouched). Applied AFTER HTML escaping — `*` is not escaped, so the
-// asterisk positions are preserved and the inner text is already safe.
-const BOLD_RE = /\*\*([^*\n]+?)\*\*/g;
+// Single-line **bold** runs. Inner content starts and ends with non-whitespace
+// (CommonMark-style flanking rule), can't span a newline, and can't contain a
+// literal `*` — so `** 2 ** 3` (TS exponent operators with surrounding spaces),
+// `****`, and `**a*b**` all pass through untouched. Applied AFTER HTML escaping
+// — `*` is not escaped, so the asterisk positions are preserved and the inner
+// text is already safe.
+const BOLD_RE = /\*\*(\S(?:[^*\n]*?\S)?)\*\*/g;
 
 function escapeAndFormat(s: string): string {
   return escapeHtml(s).replace(BOLD_RE, "<strong>$1</strong>");

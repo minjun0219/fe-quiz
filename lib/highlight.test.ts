@@ -51,6 +51,19 @@ describe("renderQuizMarkdown — inline pass", () => {
     expect(await renderQuizMarkdown("a * b ** c", "javascript")).toBe("a * b ** c");
     expect(await renderQuizMarkdown("****", "javascript")).toBe("****");
   });
+
+  it("doesn't bold-wrap exponent operators with surrounding spaces", async () => {
+    // TS option text from the shape-area question — the `**` are exponent
+    // operators, not bold delimiters, so the inner spans must stay literal.
+    const src = "return shape.r ? Math.PI * shape.r ** 2 : shape.s ** 2";
+    expect(await renderQuizMarkdown(src, "typescript")).toBe(
+      "return shape.r ? Math.PI * shape.r ** 2 : shape.s ** 2",
+    );
+  });
+
+  it("matches single-character bold like **a**", async () => {
+    expect(await renderQuizMarkdown("**a** rest", "javascript")).toBe("<strong>a</strong> rest");
+  });
 });
 
 describe("renderQuizMarkdown — fenced blocks", () => {
