@@ -161,7 +161,10 @@ export default async function Image({ params }: Props) {
           style={{
             display: "flex",
             fontSize: 48,
-            fontWeight: 600,
+            // Match the only loaded Pretendard weight (700). Result page uses
+            // semibold (600) but adding a second weight just for one line
+            // doubles the font payload — visual delta vs. 700 is negligible.
+            fontWeight: 700,
             color: "#18181b",
             lineHeight: 1.2,
             fontVariantNumeric: "tabular-nums",
