@@ -13,8 +13,26 @@ import { createShare } from "@/lib/share-store";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function siteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+// 1순위: 명시적 env override.
+// 2순위: 프록시 헤더(Vercel은 x-forwarded-* 세팅) → 커스텀 도메인/프리뷰/로컬
+//        모두 자동으로 맞는 값을 만들어줘서 NEXT_PUBLIC_SITE_URL 미설정 시
+//        share URL이 localhost:3000으로 새지 않는다.
+function siteUrl(request: Request): string {
+  const override = process.env.NEXT_PUBLIC_SITE_URL;
+  if (override) {
+    return override;
+  }
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!host) {
+    return "http://localhost:3000";
+  }
+  const proto =
+    request.headers.get("x-forwarded-proto") ??
+    (host.startsWith("localhost") || host.startsWith("127.")
+      ? "http"
+      : "https");
+  return `${proto}://${host}`;
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -86,7 +104,7 @@ export async function POST(request: Request): Promise<Response> {
   // "https://x.com/" doesn't yield "https://x.com//r/abc".
   const response: ShareCreateResponse = {
     slug,
-    url: new URL(`/r/${slug}`, siteUrl()).toString(),
+    url: new URL(`/r/${slug}`, siteUrl(request)).toString(),
   };
   return NextResponse.json(response);
 }

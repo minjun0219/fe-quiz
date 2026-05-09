@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+// metadataBase는 빌드타임에 결정되는 정적 값이라 request 헤더에서 못 끌어옴.
+// env가 없으면 운영 도메인을 쓰는 게 OG 이미지/canonical 깨짐을 막는 가장
+// 안전한 폴백. 로컬 dev에선 NEXT_PUBLIC_SITE_URL=http://localhost:3000을
+// .env.local에 두면 override 가능.
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://fe-quiz.minjun.dev";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
