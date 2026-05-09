@@ -23,3 +23,26 @@ body {
   color: var(--color-fg);
   font-family: var(--font-sans);
 }
+
+/* Wrapper div paints background/padding via Tailwind; flatten Shiki's <pre>
+ * so tokens render against our color and inherit the wrapper's font sizing.
+ * (highlightCode strips Shiki's inline `background-color` + `color` styles.) */
+.quiz-code-block .shiki,
+.quiz-code-block .shiki code {
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Inline `backtick code` in explanation paragraphs. */
+.inline-code {
+  font-family: var(--font-mono);
+  background: rgb(244 244 245); /* zinc-100 */
+  color: rgb(24 24 27); /* zinc-900 */
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
