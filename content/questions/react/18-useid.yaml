@@ -3,7 +3,7 @@ category: react
 difficulty: easy
 type: single_choice
 question: |
-  `useId()` 훅의 주용도로 가장 적절한 것은?
+  `useId()` 훅의 주요 용도로 가장 적절한 것은?
 code: |
   function Field() {
     const id = useId()
@@ -25,7 +25,7 @@ choices:
     text: "컴포넌트가 리렌더될 때마다 새 ID로 갱신되어 캠페인 추적 ID로 쓰기 좋다"
 answer: a
 explanation: |
-  `useId`는 트리 위치 기반으로 결정적인 ID를 만들어 돌려줘. 마운트 이후쫐도 같은 값을 유지해서 (d 틀림), 주로 label/input, aria-describedby, headlessui 같은 a11y 패턴에 써.
+  `useId`는 트리 위치 기반으로 결정적인 ID를 만들어 돌려줘. 마운트 이후에도 같은 값을 유지해서 (d 틀림), 주로 label/input, aria-describedby, headlessui 같은 a11y 패턴에 써.
   제일 중요한 건 서버와 클라이언트에서 **같은 ID**가 나와 hydration 불일치를 막는 거야. 직접 카운터나 `Math.random()`은 그 보장이 없으니 피해야 해.
   PK나 캠페인 식별자처럼 전역 고유성이 필요하면 `crypto.randomUUID()`나 서버 생성 ID를 따로 써야 해.
 tags: [ hooks, useId, a11y, ssr ]
