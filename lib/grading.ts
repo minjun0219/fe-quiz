@@ -70,15 +70,19 @@ export async function gradeRound(
     const orderedChoices = displayedOrder
       ? reorderChoices(q.choices, displayedOrder, id)
       : q.choices;
+    const renderedChoices = opts.withHtml
+      ? orderedChoices.map((c) => ({ ...c, text_html: highlightInlineBackticks(c.text) }))
+      : orderedChoices;
 
     per_question.push({
       id: q.id,
       category: q.category,
       type: q.type,
       question: q.question,
+      question_html: opts.withHtml ? highlightInlineBackticks(q.question) : undefined,
       code: q.code,
       code_html: codeHtmls?.[i],
-      choices: orderedChoices,
+      choices: renderedChoices,
       your_answer: yours,
       correct_answer: q.answer,
       is_correct,

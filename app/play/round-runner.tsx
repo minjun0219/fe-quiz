@@ -173,9 +173,17 @@ export default function RoundRunner({ questions }: Props) {
       </div>
 
       <fieldset className="contents">
-        <legend className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed">
-          {current.question}
-        </legend>
+        {current.question_html ? (
+          <legend
+            className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+            dangerouslySetInnerHTML={{ __html: current.question_html }}
+          />
+        ) : (
+          <legend className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed">
+            {current.question}
+          </legend>
+        )}
 
         {current.code_html ? (
           <div
@@ -233,7 +241,15 @@ export default function RoundRunner({ questions }: Props) {
                     {isSelected &&
                       (isMulti ? "✓" : <span className="h-2 w-2 rounded-full bg-white" />)}
                   </span>
-                  <span className="flex-1">{choice.text}</span>
+                  {choice.text_html ? (
+                    <span
+                      className="flex-1"
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                      dangerouslySetInnerHTML={{ __html: choice.text_html }}
+                    />
+                  ) : (
+                    <span className="flex-1">{choice.text}</span>
+                  )}
                 </label>
               </li>
             );
