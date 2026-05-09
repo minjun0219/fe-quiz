@@ -26,7 +26,7 @@ choices:
 answer: b
 explanation: |
   - `a: Config` — 타입 어노테이션은 값 타입을 `Config`(=`Record<..., string>`)로 **넓혀버려서** `a.dev`는 `string`.
-  - `b` — 어노테이션이 없어 좁은 리터럴은 유지되지만 Config 모양 검사가 빠져 오타 같은 실수를 못 잡음.
-  - `c ... satisfies Config` — Config 모양은 컴파일러가 검증하면서도 추론된 좁은 타입(예: `c.dev: 'http://localhost'`)은 그대로 유지. TS 4.9+ 기능.
+  - `b` — 어노테이션이 없어 좁은 리터럴은 유지되지만 `Config` 모양 검사가 빠져 오타 같은 실수를 못 잡음.
+  - `c ... satisfies Config` — `Config` 모양은 컴파일러가 검증하면서도 추론된 좁은 타입(예: `c.dev: 'http://localhost'`)은 그대로 유지. TS 4.9+ 기능.
   설정 객체에서 키 누락은 막고 값 리터럴은 살리고 싶을 때 `satisfies`가 적격이야.
 tags: [ types, satisfies, literal-types, ts49 ]

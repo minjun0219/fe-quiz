@@ -19,7 +19,7 @@ choices:
   - id: c
     text: "{ email?: string; role: 'admin' | 'guest' }"
   - id: d
-    text: "Omit 와 동일한 결과 — User에서 'id'와 'name'을 제거"
+    text: "`Omit`와 동일한 결과 — `User`에서 `'id'`와 `'name'`을 제거"
 answer: a
 explanation: |
   `Pick<T, K>`는 `T`에서 키 `K`만 골라낸 새 타입을 만들어. 선택적(`?`) 여부와 값 타입은 원본 그대로 유지돼.
