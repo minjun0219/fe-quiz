@@ -5,6 +5,10 @@ import { getQuestionMap } from "@/lib/questions";
 import { QuizSubmitRequest, type QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 import { checkRateLimit } from "@/lib/rate-limit";
 
+// gradeRound({ withHtml: true }) → Shiki(WASM) 하이라이팅. WASM은 Edge runtime
+// 호환이 케이스에 따라 깨지므로 안전하게 nodejs로 고정. /api/share, /feedback과
+// 일관성 있게.
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<Response> {
