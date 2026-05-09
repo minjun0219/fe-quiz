@@ -295,9 +295,9 @@ export default function Result({ data }: Props) {
                   })}
                 </ul>
                 {q.explanation_html ? (
-                  <p
+                  <div
                     className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; renderer only injects inline-code wrappers + Shiki output for our own fenced blocks.
                     dangerouslySetInnerHTML={{ __html: q.explanation_html }}
                   />
                 ) : (

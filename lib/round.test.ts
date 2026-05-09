@@ -20,7 +20,7 @@ vi.mock("./questions", () => {
 // `lib/highlight` does Shiki WASM load, which we don't want in unit tests.
 vi.mock("./highlight", () => ({
   highlightCode: async (code: string) => `<pre>${code}</pre>`,
-  highlightInlineBackticks: async (s: string) => s,
+  renderQuizMarkdown: async (s: string) => s,
 }));
 
 import type { Question } from "./question.schema";

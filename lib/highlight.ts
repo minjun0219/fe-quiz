@@ -5,11 +5,24 @@ import type { Category } from "./question.schema";
 
 const THEME = "github-dark-default";
 
-const CATEGORY_TO_LANG: Record<Category, "javascript" | "tsx" | "css" | "typescript" | "html"> = {
+type ShikiLang = "javascript" | "tsx" | "css" | "typescript" | "html";
+
+const CATEGORY_TO_LANG: Record<Category, ShikiLang> = {
   javascript: "javascript",
   react: "tsx",
   css: "css",
   typescript: "typescript",
+  html: "html",
+};
+
+const FENCE_LANG_ALIASES: Record<string, ShikiLang> = {
+  js: "javascript",
+  javascript: "javascript",
+  jsx: "tsx",
+  tsx: "tsx",
+  ts: "typescript",
+  typescript: "typescript",
+  css: "css",
   html: "html",
 };
 
@@ -32,26 +45,32 @@ function getHighlighter(): Promise<HighlighterCore> {
   return highlighterPromise;
 }
 
-export async function highlightCode(code: string, category: Category): Promise<string> {
+// Shiki sets `background-color` + `color` inline on the wrapper <pre>; our
+// wrapper <div> paints the background, and letting Shiki keep its own would
+// double up (and force !important overrides). Token <span>s keep their inline
+// color.
+const SHIKI_TRANSFORMERS = [
+  {
+    pre(node: { properties: { style?: unknown } }) {
+      node.properties.style = undefined;
+    },
+    code(node: { properties: { style?: unknown } }) {
+      node.properties.style = undefined;
+    },
+  },
+];
+
+async function shikiToHtml(code: string, lang: ShikiLang): Promise<string> {
   const highlighter = await getHighlighter();
   return highlighter.codeToHtml(code, {
-    lang: CATEGORY_TO_LANG[category],
+    lang,
     theme: THEME,
-    transformers: [
-      {
-        // Shiki sets `background-color` + `color` inline on the wrapper <pre>;
-        // our wrapper <div> already paints the background via Tailwind, and
-        // letting Shiki keep its own would double up (and force !important
-        // overrides). Token <span>s keep their inline color.
-        pre(node) {
-          delete node.properties.style;
-        },
-        code(node) {
-          delete node.properties.style;
-        },
-      },
-    ],
+    transformers: SHIKI_TRANSFORMERS,
   });
+}
+
+export async function highlightCode(code: string, category: Category): Promise<string> {
+  return shikiToHtml(code, CATEGORY_TO_LANG[category]);
 }
 
 const HTML_ESCAPES: Record<string, string> = {
@@ -77,19 +96,16 @@ function escapeAndFormat(s: string): string {
 }
 
 /**
- * Render a single line/paragraph of inline markdown to HTML.
+ * Inline pass: renders a non-fenced text segment to HTML.
  *
  * Wraps `` `...` `` runs in <code class="inline-code"> — single-line only,
  * a backtick followed by a newline before its closer is treated as literal.
- * Multi-backtick runs (`` ``` `` fence openers, `` `` ``-delimited spans)
- * are passed through literally so fenced blocks in explanations don't get
- * mangled into empty <code> tags. Outside backtick spans, `**bold**` runs
- * are wrapped in <strong>.
- *
- * Everything outside wrapped spans is HTML-escaped; backtick-wrapped inner
- * text is escaped but not bold-processed (so code stays literal).
+ * Multi-backtick runs (`` ``` `` openers without a matching close) pass
+ * through literally so a malformed fence doesn't get mangled into an empty
+ * <code> tag. Outside backtick spans, `**bold**` runs are wrapped in
+ * <strong>; everything else is HTML-escaped.
  */
-export function highlightInlineBackticks(text: string): string {
+function renderInlineSegment(text: string): string {
   let out = "";
   let i = 0;
   while (i < text.length) {
@@ -105,7 +121,8 @@ export function highlightInlineBackticks(text: string): string {
     const openLen = runEnd - tick;
 
     if (openLen !== 1) {
-      // ``` / `` etc — emit literally; do not pair-match.
+      // ``` / `` etc — emit literally; do not pair-match. Closed fences are
+      // already extracted by `renderQuizMarkdown` before this pass runs.
       out += "`".repeat(openLen);
       i = runEnd;
       continue;
@@ -139,4 +156,61 @@ export function highlightInlineBackticks(text: string): string {
     i = closeStart + 1;
   }
   return out;
+}
+
+// Fenced code block: ```<lang>\n<code>\n``` — non-greedy across newlines.
+// Allows the opener/closer to be indented (YAML `|` block scalars sometimes
+// leave residual indent inside content). The captured code retains its own
+// indentation; Shiki preserves it.
+const FENCE_RE = /```([a-zA-Z0-9_+-]*)\n([\s\S]*?)\n[ \t]*```/g;
+
+// Shared with the React result/explanation card so styling stays consistent.
+// `quiz-code-block` triggers the Shiki <pre> reset in globals.css.
+const FENCE_WRAPPER_CLASS =
+  "quiz-code-block my-3 rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100";
+
+/**
+ * Render a quiz text field (question / option text / explanation) to HTML.
+ *
+ * - Triple-backtick fenced blocks → Shiki, wrapped in a styled <div>. The
+ *   info-string (e.g. ```js, ```tsx) picks the language; if absent or
+ *   unsupported, the question's `category` provides the fallback lang.
+ * - Single-backtick spans → <code class="inline-code">.
+ * - `**bold**` → <strong>.
+ * - Everything else is HTML-escaped.
+ *
+ * Async because Shiki's WASM-backed highlighter is async; callers already
+ * thread `await` for the question's main `code` field, so this fits the
+ * same pipeline.
+ */
+export async function renderQuizMarkdown(text: string, category: Category): Promise<string> {
+  type Fence = { start: number; end: number; lang: ShikiLang; code: string };
+  const fences: Fence[] = [];
+  for (const m of text.matchAll(FENCE_RE)) {
+    if (m.index === undefined) continue;
+    const langTag = (m[1] || "").toLowerCase();
+    const lang = FENCE_LANG_ALIASES[langTag] ?? CATEGORY_TO_LANG[category];
+    fences.push({
+      start: m.index,
+      end: m.index + m[0].length,
+      lang,
+      code: m[2],
+    });
+  }
+  const fenceHtmls = await Promise.all(fences.map((f) => shikiToHtml(f.code, f.lang)));
+
+  const parts: string[] = [];
+  let cursor = 0;
+  for (let i = 0; i < fences.length; i++) {
+    const f = fences[i];
+    if (f.start > cursor) {
+      parts.push(renderInlineSegment(text.slice(cursor, f.start)));
+    }
+    parts.push(`<div class="${FENCE_WRAPPER_CLASS}">${fenceHtmls[i]}</div>`);
+    cursor = f.end;
+  }
+  if (cursor < text.length) {
+    parts.push(renderInlineSegment(text.slice(cursor)));
+  }
+  return parts.join("");
 }

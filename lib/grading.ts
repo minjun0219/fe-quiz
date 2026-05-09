@@ -1,4 +1,4 @@
-import { highlightCode, highlightInlineBackticks } from "./highlight";
+import { highlightCode, renderQuizMarkdown } from "./highlight";
 import type { Category, Question } from "./question.schema";
 import type {
   CategoryScore,
@@ -40,11 +40,17 @@ export async function gradeRound(
   // needs Shiki/inline-code HTML. /api/quiz/feedback (LLM prompt) and
   // /api/share (id+score storage) never read these fields, so skipping the
   // WASM cold-start + per-question codeToHtml saves real latency.
-  const codeHtmls = opts.withHtml
+  const htmlBundle = opts.withHtml
     ? await Promise.all(
-        questions.map((q) =>
-          q.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined),
-        ),
+        questions.map(async (q) => {
+          const [codeHtml, questionHtml, explanationHtml, choiceHtmls] = await Promise.all([
+            q.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined),
+            renderQuizMarkdown(q.question, q.category),
+            renderQuizMarkdown(q.explanation, q.category),
+            Promise.all(q.choices.map((c) => renderQuizMarkdown(c.text, q.category))),
+          ]);
+          return { codeHtml, questionHtml, explanationHtml, choiceHtmls };
+        }),
       )
     : null;
 
@@ -70,8 +76,14 @@ export async function gradeRound(
     const orderedChoices = displayedOrder
       ? reorderChoices(q.choices, displayedOrder, id)
       : q.choices;
-    const renderedChoices = opts.withHtml
-      ? orderedChoices.map((c) => ({ ...c, text_html: highlightInlineBackticks(c.text) }))
+    // `renderQuizMarkdown` was called on the question's choices in source
+    // order; remap each rendered HTML by id so the displayed-order array we
+    // emit is consistent with shuffled UI order.
+    const choiceHtmlById = htmlBundle
+      ? new Map(q.choices.map((c, idx) => [c.id, htmlBundle[i].choiceHtmls[idx]]))
+      : null;
+    const renderedChoices = htmlBundle
+      ? orderedChoices.map((c) => ({ ...c, text_html: choiceHtmlById?.get(c.id) }))
       : orderedChoices;
 
     per_question.push({
@@ -79,15 +91,15 @@ export async function gradeRound(
       category: q.category,
       type: q.type,
       question: q.question,
-      question_html: opts.withHtml ? highlightInlineBackticks(q.question) : undefined,
+      question_html: htmlBundle?.[i].questionHtml,
       code: q.code,
-      code_html: codeHtmls?.[i],
+      code_html: htmlBundle?.[i].codeHtml,
       choices: renderedChoices,
       your_answer: yours,
       correct_answer: q.answer,
       is_correct,
       explanation: q.explanation,
-      explanation_html: opts.withHtml ? highlightInlineBackticks(q.explanation) : undefined,
+      explanation_html: htmlBundle?.[i].explanationHtml,
     });
   }
 
