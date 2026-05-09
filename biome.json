@@ -6,13 +6,21 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.json", "**/*.css"]
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.mjs",
+      "**/*.json",
+      "**/*.css"
+    ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100
+    "lineWidth": 80
   },
   "javascript": {
     "formatter": {
@@ -28,13 +36,40 @@
       "tailwindDirectives": true
     }
   },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "style": {
-        "useImportType": "warn"
+        "useImportType": "error",
+        "useBlockStatements": "error"
+      },
+      "correctness": {
+        "noUnusedImports": "error"
+      },
+      "suspicious": {
+        "noConsole": "error"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["scripts/**", "**/*.config.*", "**/*.test.*", "**/*.spec.*"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ]
 }

@@ -9,13 +9,17 @@ describe("highlightCode (plain monospace, no Shiki — see #30)", () => {
   });
 
   it("preserves whitespace verbatim", async () => {
-    expect(await highlightCode("  a\n  b", "javascript")).toBe("<pre><code>  a\n  b</code></pre>");
+    expect(await highlightCode("  a\n  b", "javascript")).toBe(
+      "<pre><code>  a\n  b</code></pre>",
+    );
   });
 });
 
 describe("renderQuizMarkdown — inline pass", () => {
   it("HTML-escapes plain text", async () => {
-    expect(await renderQuizMarkdown("a < b & c > d", "javascript")).toBe("a &lt; b &amp; c &gt; d");
+    expect(await renderQuizMarkdown("a < b & c > d", "javascript")).toBe(
+      "a &lt; b &amp; c &gt; d",
+    );
   });
 
   it("wraps single-backtick spans in inline-code and escapes inner text", async () => {
@@ -31,15 +35,20 @@ describe("renderQuizMarkdown — inline pass", () => {
   });
 
   it("handles bold mixed with inline code", async () => {
-    expect(await renderQuizMarkdown("`<button>`을 써야 하는 이유로 **맞는 것**을", "html")).toBe(
+    expect(
+      await renderQuizMarkdown(
+        "`<button>`을 써야 하는 이유로 **맞는 것**을",
+        "html",
+      ),
+    ).toBe(
       '<code class="inline-code">&lt;button&gt;</code>을 써야 하는 이유로 <strong>맞는 것</strong>을',
     );
   });
 
   it("does not bold-format inside backtick code", async () => {
-    expect(await renderQuizMarkdown("`**not bold**` outside", "javascript")).toBe(
-      '<code class="inline-code">**not bold**</code> outside',
-    );
+    expect(
+      await renderQuizMarkdown("`**not bold**` outside", "javascript"),
+    ).toBe('<code class="inline-code">**not bold**</code> outside');
   });
 
   it("does not match bold across newlines", async () => {
@@ -47,7 +56,9 @@ describe("renderQuizMarkdown — inline pass", () => {
   });
 
   it("leaves stray asterisks alone", async () => {
-    expect(await renderQuizMarkdown("a * b ** c", "javascript")).toBe("a * b ** c");
+    expect(await renderQuizMarkdown("a * b ** c", "javascript")).toBe(
+      "a * b ** c",
+    );
     expect(await renderQuizMarkdown("****", "javascript")).toBe("****");
   });
 
@@ -61,13 +72,18 @@ describe("renderQuizMarkdown — inline pass", () => {
   });
 
   it("matches single-character bold like **a**", async () => {
-    expect(await renderQuizMarkdown("**a** rest", "javascript")).toBe("<strong>a</strong> rest");
+    expect(await renderQuizMarkdown("**a** rest", "javascript")).toBe(
+      "<strong>a</strong> rest",
+    );
   });
 });
 
 describe("renderQuizMarkdown — fenced blocks", () => {
   it("emits an escaped pre/code block wrapped in the dark code-block div", async () => {
-    const html = await renderQuizMarkdown("intro\n```js\nconst x = 1\n```\nouttro", "javascript");
+    const html = await renderQuizMarkdown(
+      "intro\n```js\nconst x = 1\n```\nouttro",
+      "javascript",
+    );
     expect(html).toMatch(/^intro\n<div class="quiz-code-block /);
     expect(html).toContain("<pre><code>const x = 1</code></pre>");
     expect(html).toMatch(/<\/div>\nouttro$/);
@@ -75,11 +91,16 @@ describe("renderQuizMarkdown — fenced blocks", () => {
 
   it("escapes HTML inside fenced code", async () => {
     const html = await renderQuizMarkdown("```html\n<div>&</div>\n```", "html");
-    expect(html).toContain("<pre><code>&lt;div&gt;&amp;&lt;/div&gt;</code></pre>");
+    expect(html).toContain(
+      "<pre><code>&lt;div&gt;&amp;&lt;/div&gt;</code></pre>",
+    );
   });
 
   it("ignores info-string and language fallback (no highlighting in this build)", async () => {
-    const html = await renderQuizMarkdown("```rust\nfn main() {}\n```", "javascript");
+    const html = await renderQuizMarkdown(
+      "```rust\nfn main() {}\n```",
+      "javascript",
+    );
     expect(html).toContain("<pre><code>fn main() {}</code></pre>");
   });
 
@@ -95,12 +116,17 @@ describe("renderQuizMarkdown — fenced blocks", () => {
   });
 
   it("does not bold-format inside fenced code", async () => {
-    const html = await renderQuizMarkdown("```js\n// **not bold**\n```", "javascript");
+    const html = await renderQuizMarkdown(
+      "```js\n// **not bold**\n```",
+      "javascript",
+    );
     expect(html).toContain("// **not bold**");
     expect(html).not.toContain("<strong>");
   });
 
   it("treats an unclosed triple-backtick as literal text", async () => {
-    expect(await renderQuizMarkdown("```js\nconst x = 1", "javascript")).toBe("```js\nconst x = 1");
+    expect(await renderQuizMarkdown("```js\nconst x = 1", "javascript")).toBe(
+      "```js\nconst x = 1",
+    );
   });
 });

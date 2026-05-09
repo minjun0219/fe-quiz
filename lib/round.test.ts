@@ -8,7 +8,8 @@ vi.mock("./questions", () => {
   return {
     getAllQuestions: () => pool,
     // biome-ignore lint/suspicious/noExplicitAny: category-typed in real code
-    getQuestionsByCategory: (cat: any) => pool.filter((q) => q.category === cat),
+    getQuestionsByCategory: (cat: any) =>
+      pool.filter((q) => q.category === cat),
     getQuestionMap: () => new Map(pool.map((q) => [q.id, q])),
     // biome-ignore lint/suspicious/noExplicitAny: test seeder
     __setPool: (p: any[]) => {
@@ -28,7 +29,12 @@ vi.mock("./highlight", () => ({
 
 import type { Question } from "./question.schema";
 import * as questionsMod from "./questions";
-import { pickRoundQuestions, pickRoundQuestionsByIds, publicView, ROUND_SIZE } from "./round";
+import {
+  pickRoundQuestions,
+  pickRoundQuestionsByIds,
+  publicView,
+  ROUND_SIZE,
+} from "./round";
 
 function single(id: string): Question {
   return {

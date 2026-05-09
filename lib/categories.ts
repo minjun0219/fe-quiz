@@ -77,7 +77,10 @@ export type CategoryEntry = (typeof CATEGORIES)[number];
 export type Persona = CategoryEntry["persona"];
 
 /** Tuple of ids for `z.enum(...)`. Preserves literal union via the `as` cast. */
-export const CATEGORY_IDS = CATEGORIES.map((c) => c.id) as [Category, ...Category[]];
+export const CATEGORY_IDS = CATEGORIES.map((c) => c.id) as [
+  Category,
+  ...Category[],
+];
 
 const BY_ID: Record<Category, CategoryEntry> = Object.fromEntries(
   CATEGORIES.map((c) => [c.id, c]),
