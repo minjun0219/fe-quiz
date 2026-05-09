@@ -94,16 +94,56 @@ describe("lintQuestionProse", () => {
     expect(lintQuestionProse(root)).toEqual([]);
   });
 
-  it("honors `# fmt: off-prose` opt-out marker on the preceding line", () => {
-    writeQuestion(
-      "typescript",
-      "05-optout.yaml",
+  it("honors `# fmt: off-prose` above the choice item (covers `- id:` + `text:`)", () => {
+    // Without the marker, `xs.push(4)` triggers the method-call heuristic.
+    // With the marker placed above the list-item header, the linter must
+    // walk past `- id: a` to find it.
+    const body = (withMarker: boolean) =>
       [
         "id: ts-005",
         "choices:",
-        "  # fmt: off-prose",
+        ...(withMarker ? ["  # fmt: off-prose"] : []),
         "  - id: a",
-        '    text: "함수(function) 호출 자체를 막는다"',
+        '    text: "xs.push(4) 동작에 대한 산문 설명이지만 코드 토큰을 포함"',
+        "",
+      ].join("\n");
+
+    writeQuestion("typescript", "05-no-marker.yaml", body(false));
+    expect(lintQuestionProse(root).length).toBe(1);
+
+    rmSync(root, { recursive: true, force: true });
+    root = mkdtempSync(join(tmpdir(), "lint-prose-"));
+    writeQuestion("typescript", "05-with-marker.yaml", body(true));
+    expect(lintQuestionProse(root)).toEqual([]);
+  });
+
+  it("honors `# fmt: off-prose` directly above the field key", () => {
+    writeQuestion(
+      "typescript",
+      "05b-key-marker.yaml",
+      [
+        "id: ts-005b",
+        "choices:",
+        "  - id: a",
+        "    # fmt: off-prose",
+        '    text: "xs.map(x => x * 2)는 산문 안에서 나오는 코드 토큰"',
+        "",
+      ].join("\n"),
+    );
+    expect(lintQuestionProse(root)).toEqual([]);
+  });
+
+  it("honors `# fmt: off-prose` for a block-scalar field", () => {
+    writeQuestion(
+      "typescript",
+      "05c-block-marker.yaml",
+      [
+        "id: ts-005c",
+        "choices:",
+        "  - id: a",
+        "    # fmt: off-prose",
+        "    text: |",
+        "      여러 줄에 걸친 산문이지만 그 안에 xs.push(4) 같은 코드 토큰이 등장",
         "",
       ].join("\n"),
     );

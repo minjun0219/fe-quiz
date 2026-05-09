@@ -34,7 +34,10 @@ type Field = (typeof FIELD_KEYS)[number];
 
 type ExtractedValue = {
   field: Field;
-  startLine: number;
+  // Line where the field declaration starts (`text: …` / `text: |`). Used for
+  // both opt-out lookup and hit reporting so authors land on the line they
+  // need to edit.
+  keyLine: number;
   text: string;
 };
 
@@ -126,7 +129,7 @@ function extractFieldValues(source: string): ExtractedValue[] {
       }
       out.push({
         field,
-        startLine: blockStart + 1,
+        keyLine: i + 1,
         text: collected.join("\n").replace(/\n+$/, ""),
       });
       i = j;
@@ -140,7 +143,7 @@ function extractFieldValues(source: string): ExtractedValue[] {
 
     out.push({
       field,
-      startLine: i + 1,
+      keyLine: i + 1,
       text: unquoteScalar(rest),
     });
     i++;
@@ -150,22 +153,58 @@ function extractFieldValues(source: string): ExtractedValue[] {
 }
 
 /**
- * Find the line just above `targetLine` (1-indexed) that introduced a YAML key
- * at the same or shallower indentation. The opt-out marker must sit on a line
- * directly preceding that key.
+ * Find a `# fmt: off-prose` marker for the field declared on `keyLine`
+ * (1-indexed). The marker may sit:
+ *   - directly above the field key (`text:` / `question:` / `explanation:`),
+ *   - above the choice item (`- id: …`) so it covers all of that item's
+ *     fields, or
+ *   - separated from the key by an empty line.
+ *
+ * Walks upward past YAML wrapper lines (key-value pairs like `id: a`,
+ * list-item headers like `- id: a`) until it either lands on the marker
+ * or hits a non-wrapper line. Capped at a small number of hops so a
+ * marker far up the file can't accidentally apply.
  */
-function hasOptOut(source: string, targetLine: number): boolean {
+function hasOptOut(source: string, keyLine: number): boolean {
   const lines = source.split("\n");
-  // Walk upward from the line introducing the key.
-  let cursor = targetLine - 2;
-  while (cursor >= 0) {
-    const cur = lines[cursor];
-    const trimmed = cur.trim();
+  let cursor = keyLine - 2;
+  let hops = 0;
+  const MAX_HOPS = 4;
+  while (cursor >= 0 && hops <= MAX_HOPS) {
+    const trimmed = lines[cursor].trim();
     if (trimmed === "") {
       cursor--;
       continue;
     }
-    return trimmed === OFF_MARKER;
+    if (trimmed === OFF_MARKER) {
+      return true;
+    }
+    if (isYamlWrapperLine(trimmed)) {
+      cursor--;
+      hops++;
+      continue;
+    }
+    return false;
+  }
+  return false;
+}
+
+function isYamlWrapperLine(trimmed: string): boolean {
+  // Block-scalar opener: `text: |`, `text: >-`, etc.
+  if (/^[a-zA-Z_][\w-]*:\s*[|>][-+]?\s*$/.test(trimmed)) {
+    return true;
+  }
+  // `- id: a` list-item with key.
+  if (/^-\s+[a-zA-Z_][\w-]*:\s*\S/.test(trimmed)) {
+    return true;
+  }
+  // Plain `key: value` (e.g. `id: a`, `category: react`).
+  if (/^[a-zA-Z_][\w-]*:\s*\S/.test(trimmed)) {
+    return true;
+  }
+  // Bare dash line introducing a sequence item on its own.
+  if (trimmed === "-") {
+    return true;
   }
   return false;
 }
@@ -244,7 +283,7 @@ function lintFile(absPath: string, relPath: string): LintHit[] {
   const hits: LintHit[] = [];
 
   for (const v of values) {
-    if (hasOptOut(source, v.startLine)) {
+    if (hasOptOut(source, v.keyLine)) {
       continue;
     }
     const stripped = stripWrappedSpans(v.text);
@@ -254,7 +293,7 @@ function lintFile(absPath: string, relPath: string): LintHit[] {
     }
     hits.push({
       file: relPath,
-      line: v.startLine,
+      line: v.keyLine,
       field: v.field,
       reason,
       excerpt: v.text.length > 80 ? `${v.text.slice(0, 77)}...` : v.text,
