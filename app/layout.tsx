@@ -2,11 +2,20 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 // metadataBase는 빌드타임에 결정되는 정적 값이라 request 헤더에서 못 끌어옴.
-// env가 없으면 운영 도메인을 쓰는 게 OG 이미지/canonical 깨짐을 막는 가장
-// 안전한 폴백. 로컬 dev에선 NEXT_PUBLIC_SITE_URL=http://localhost:3000을
-// .env.local에 두면 override 가능.
+// 우선순위:
+//  1) NEXT_PUBLIC_SITE_URL (명시 override)
+//  2) Vercel 프리뷰 배포라면 VERCEL_URL (deployment-specific) → OG/canonical이
+//     그 프리뷰 자체를 가리키게 해서 메타 카드 테스트가 정확해진다.
+//     주의: 프로덕션에선 VERCEL_URL도 *.vercel.app으로 채워지므로 의도한
+//     커스텀 도메인이 안 잡힘 → VERCEL_ENV로 preview일 때만 적용.
+//  3) 운영 커스텀 도메인 하드코딩 폴백.
+// 로컬 dev에선 NEXT_PUBLIC_SITE_URL=http://localhost:3000을 .env.local에
+// 두면 override 가능.
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://fe-quiz.minjun.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "https://fe-quiz.minjun.dev");
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

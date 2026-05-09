@@ -29,7 +29,9 @@ function siteUrl(request: Request): string {
   }
   const proto =
     request.headers.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") || host.startsWith("127.")
+    (host.startsWith("localhost") ||
+    host.startsWith("127.0.0.1") ||
+    host.startsWith("[::1]")
       ? "http"
       : "https");
   return `${proto}://${host}`;
