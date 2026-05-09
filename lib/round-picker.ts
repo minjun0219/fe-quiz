@@ -88,10 +88,13 @@ export function pickStratified(
     return shuffle(picked).slice(0, safeCount);
   }
 
-  const need = safeCount - picked.length;
-  if (need > 0 && remainder.length > 0) {
-    const fill = shuffle(remainder).slice(0, need);
-    for (const q of fill) {
+  // Iterate-and-skip rather than `slice(0, need)`: if the remainder ever
+  // shares an id with `picked` (cross-category overlap, registry drift),
+  // slicing first could leave the round short. Iterating until full keeps
+  // the `seen` guard meaningful.
+  if (picked.length < safeCount && remainder.length > 0) {
+    for (const q of shuffle(remainder)) {
+      if (picked.length >= safeCount) break;
       if (!seen.has(q.id)) {
         picked.push(q);
         seen.add(q.id);
