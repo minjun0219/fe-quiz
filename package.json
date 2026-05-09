@@ -31,13 +31,15 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "supabase": "^2.98.2",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "sharp"
+      "sharp",
+      "supabase"
     ]
   }
 }
