@@ -60,7 +60,7 @@ interface RateLimitOptions {
  * IP 기반 rate limit. fail-open:
  *
  * - Upstash env 미설정 → 통과 (로컬 dev / Upstash 연결 전 환경)
- * - limiter 호출 자체 실패 → 통과 + console.warn (Upstash 장애 시 우리 사이트가
+ * - limiter 호출 자체 실패 → 통과 + logger.warn (Upstash 장애 시 우리 사이트가
  *   같이 죽지 않게)
  *
  * 보안용 가드가 아니라 비용/스팸 보호용이라 가용성을 우선시. 진짜 보안 통제는
