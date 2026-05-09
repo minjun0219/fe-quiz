@@ -19,4 +19,9 @@
 drop policy if exists "anon can insert shares" on public.shares;
 drop policy if exists "anon can select shares" on public.shares;
 
-revoke select, insert on public.shares from anon;
+-- `revoke all` (현재 부여한 select/insert뿐 아니라 update/delete/truncate/
+-- references/trigger 모두). belt-and-suspenders: Supabase 콘솔에서
+-- "Automatically expose new tables"가 다시 켜지거나 누군가 수기로 GRANT를
+-- 추가해도 다음 마이그레이션 적용 시점에 다시 잠긴다. authenticated 역할도
+-- 같이 회수 — v2에서 auth 도입할 때 정책 없이 권한만 새로 들어오는 상황 방어.
+revoke all on public.shares from anon, authenticated;
