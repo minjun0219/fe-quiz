@@ -1,0 +1,36 @@
+id: ts-020
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  아래 (A)와 (B) 방식의 차이로 가장 정확한 설명은?
+code: |
+  function isStr(v: unknown): v is string {
+    return typeof v === 'string'
+  }
+
+  // (A)
+  function lenA(v: unknown) {
+    return (v as string).length
+  }
+
+  // (B)
+  function lenB(v: unknown) {
+    if (isStr(v)) return v.length
+    return 0
+  }
+choices:
+  - id: a
+    text: 둘 다 동일한 안전성을 가진다
+  - id: b
+    text: (A)는 컴파일러를 속이는 단언이라 런타임에 잘못된 타입이 들어와도 통과해 되버린다. (B)는 `v is string` 술어를 가진 타입 가드로 실제 검사 후에만 좋혀서 안전하다
+  - id: c
+    text: (A)는 컴파일 에러, (B)는 통과
+  - id: d
+    text: (B)는 `as`보다 성능이 느려서 비추된다
+answer: b
+explanation: |
+  `as`는 "내가 더 잘 앜"하고 컴파일러에게 대신 말해주는 단언이라, 의도와 다른 값이 들어와도 그대로 통과돼 런타임 버그를 낳기 쉬워.
+  타입 가드 함수(`v is string`)는 **실제 검사 로직**과 **타입 좋힇 정보**를 한 곳에 묶어 둔 안전한 패턴. `Array.isArray`·`Number.isFinite` 처럼 표준 인터페이스도 타입 가드로 정의돼 있어.
+  `as`는 외부 경계(JSON 파싱, 타손 API)에서 "이미 검증되었음"이 분명한 경우에만 조심스럽게 쓰는 게 좋아.
+tags: [ type-guard, as, narrowing ]

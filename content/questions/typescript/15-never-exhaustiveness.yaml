@@ -1,0 +1,36 @@
+id: ts-015
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  아래 `default` 분기에서 `const _exhaustive: never = shape`를 둘 이유로 가장 정확한 것은?
+code: |
+  type Shape =
+    | { kind: 'circle'; r: number }
+    | { kind: 'square'; s: number }
+
+  function area(shape: Shape) {
+    switch (shape.kind) {
+      case 'circle': return Math.PI * shape.r ** 2
+      case 'square': return shape.s ** 2
+      default: {
+        const _exhaustive: never = shape
+        return _exhaustive
+      }
+    }
+  }
+choices:
+  - id: a
+    text: "`Shape`에 새 종류(예: `'triangle'`)가 추가될 때 컴파일 단계에서 에러를 돌려 빠트린 분기를 알려 주기 위함 — default가 런타임에 실행되지 않으리라는 정적 보장"
+  - id: b
+    text: "`never`는 런타임에 throw를 의미하므로 자동으로 예외를 던진다"
+  - id: c
+    text: TypeScript가 패턴 매칭 키워드로 `never`를 강제한다
+  - id: d
+    text: "`default`에 `never` 없이는 함수 반환 타입이 `void`가 된다"
+answer: a
+explanation: |
+  결정적 동작은 이래. switch가 모든 `kind`를 다뤄 주면 default 위치에서 `shape`의 좌혀진 타입은 `never`가 돼서 `never`에 대입 OK.
+  나중에 `Shape`에 `'triangle'`이 추가되면 default 위치에서의 타입이 `{ kind: 'triangle'; … }`가 되고, 그 타입은 `never`에 대입되지 않아 컴파일 에러를 터뜨려. 다시 말해 "완전성(exhaustiveness)을 의존하는 다른 코드도 읽혀 뜰 수 있게" 해 주는 패턴이야.
+  `never`는 "도달 불가능"이라는 타입일 뿐 런타임 throw와는 관련이 없고(b 틀림), 키워드도 아니야(c 틀림).
+tags: [ never, exhaustiveness, discriminated-union ]

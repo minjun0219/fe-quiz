@@ -1,0 +1,28 @@
+id: ts-017
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  다음 코드의 (1) 위치에서 발생하는 결과로 가장 정확한 것은?
+code: |
+  type ReadonlyAll<T> = { readonly [K in keyof T]: T[K] }
+
+  type User = { id: number; name: string }
+  type R = ReadonlyAll<User>
+
+  const u: R = { id: 1, name: 'jun' }
+  u.id = 2  // (1)
+choices:
+  - id: a
+    text: 정상 동작 — 매핑 타입은 동작에 영향을 주지 않음
+  - id: b
+    text: 컴파일 에러 — `R`은 모든 키가 readonly라 `id` 재할당이 불가. 빌트인 `Readonly<T>`도 같은 방식으로 정의됨
+  - id: c
+    text: 런타임에 TypeError가 던져진다
+  - id: d
+    text: 다른 키는 자동으로 readonly가 되지 않으므로 통과한다
+answer: b
+explanation: |
+  매핑 타입 `{ readonly [K in keyof T]: T[K] }`은 `T`의 각 키를 순회하며 모든 멤버에 `readonly`를 붙여. 그래서 `R = ReadonlyAll<User>`는 `id`와 `name` 모두 readonly가 돼 재할당 시 컴파일 에러.
+  명세에 있는 `Readonly<T>`, `Partial<T>`, `Required<T>`, `Pick<T, K>` 등도 대부분 동일한 매핑 타입으로 정의돼 있어. `+/-` 수정자로 readonly/optional을 붙이고 벗기고 제어할 수 있고, `as` 절로 키 이름도 재매핑 가능(`Capitalize` 등을 활용).
+tags: [ mapped-type, readonly, utility-types ]
