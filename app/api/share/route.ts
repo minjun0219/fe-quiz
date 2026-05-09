@@ -71,7 +71,11 @@ export async function POST(request: Request): Promise<Response> {
       result_type: diagnosis.result_type,
       feedback: parsed.data.feedback,
     });
-  } catch (_err) {
+  } catch (err) {
+    // Log full detail server-side; never echo DB / internal messages to the
+    // client — they can leak schema info or auth state.
+    // biome-ignore lint/suspicious/noConsole: 서버 측 에러 로그
+    console.error("[/api/share] createShare failed:", err);
     return NextResponse.json(
       { error: "failed to create share" },
       { status: 500 },

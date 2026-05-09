@@ -94,7 +94,9 @@ export async function checkRateLimit(
         },
       },
     );
-  } catch (_err) {
+  } catch (err) {
+    // biome-ignore lint/suspicious/noConsole: 서버 측 운영 경고 (fail-open 추적)
+    console.warn("[rate-limit] limiter check failed, failing open:", err);
     return null;
   }
 }

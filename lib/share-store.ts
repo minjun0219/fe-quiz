@@ -93,6 +93,11 @@ export const getShareById = cache(
 
     const parsed = ShareRowSchema.safeParse(data);
     if (!parsed.success) {
+      // biome-ignore lint/suspicious/noConsole: 서버 측 데이터 정합성 경고
+      console.error(
+        `[share-store] row ${id} failed schema validation:`,
+        parsed.error.issues,
+      );
       return null;
     }
     return parsed.data;
