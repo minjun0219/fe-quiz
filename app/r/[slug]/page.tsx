@@ -63,32 +63,34 @@ export default async function SharePage({ params }: Props) {
         </h1>
         {typeCode && (
           <p className="mb-3">
-            <span className="inline-block rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold tracking-wider text-zinc-700 tabular-nums">
+            <span className="inline-block rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold tracking-wider text-zinc-700 tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
               {typeCode}
             </span>
-            <span className="ml-2 text-xs text-zinc-500">
+            <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
               {personality === "balanced" ? "균형형" : "편식형"}
             </span>
           </p>
         )}
-        <p className="mb-6 text-base text-zinc-600">{hero.blurb}</p>
-        <p className="text-2xl font-semibold tabular-nums text-zinc-900">
-          {totalCorrect} <span className="text-zinc-400">/</span> {total}
-          <span className="ml-2 text-base font-medium text-zinc-500">({share.score}%)</span>
+        <p className="mb-6 text-base text-zinc-600 dark:text-zinc-300">{hero.blurb}</p>
+        <p className="text-2xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+          {totalCorrect} <span className="text-zinc-400 dark:text-zinc-600">/</span> {total}
+          <span className="ml-2 text-base font-medium text-zinc-500 dark:text-zinc-400">
+            ({share.score}%)
+          </span>
         </p>
       </section>
 
-      <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5">
+      <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5 dark:border-rose-900/30 dark:bg-rose-500/5">
         <div className="mb-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
           친구의 한마디
         </div>
-        <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800">
+        <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800 dark:text-zinc-100">
           {share.feedback}
         </p>
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-500">카테고리별</h2>
+        <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">카테고리별</h2>
         <ul className="flex flex-col gap-3">
           {(
             Object.entries(share.category_scores) as [
@@ -102,16 +104,16 @@ export default async function SharePage({ params }: Props) {
             const isWeak = acc < WEAK_THRESHOLD;
             return (
               <li key={cat} className="flex items-center gap-3">
-                <span className="w-24 shrink-0 text-sm font-medium text-zinc-700">
+                <span className="w-24 shrink-0 text-sm font-medium text-zinc-700 dark:text-zinc-200">
                   {CATEGORY_DISPLAY_LABEL[cat]}
                 </span>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-200">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                   <div
                     className={`h-full transition-all ${isStrong ? "bg-emerald-500" : isWeak ? "bg-rose-500" : "bg-amber-500"}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="w-16 shrink-0 text-right text-sm tabular-nums text-zinc-600">
+                <span className="w-16 shrink-0 text-right text-sm tabular-nums text-zinc-600 dark:text-zinc-400">
                   {score.correct}/{score.total}
                 </span>
               </li>
@@ -123,13 +125,13 @@ export default async function SharePage({ params }: Props) {
       <div className="mt-auto flex flex-col gap-3">
         <Link
           href={`/play?from=${slug}`}
-          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition hover:bg-zinc-800 active:scale-[0.99]"
+          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition hover:bg-zinc-800 active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           나도 같은 문제 풀어보기 →
         </Link>
         <Link
           href="/play"
-          className="inline-flex h-12 w-full items-center justify-center rounded-full text-sm font-medium text-zinc-500 hover:text-zinc-700"
+          className="inline-flex h-12 w-full items-center justify-center rounded-full text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           다른 라운드 풀어보기
         </Link>

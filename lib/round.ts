@@ -1,5 +1,5 @@
 import "server-only";
-import { highlightCode, highlightInlineBackticks } from "./highlight";
+import { highlightCode, renderQuizMarkdown } from "./highlight";
 import type { PublicChoice, PublicQuestion, Question } from "./question.schema";
 import { getQuestionMap, getQuestionsByCategory } from "./questions";
 import { pickStratified, ROUND_SIZE, shuffle } from "./round-picker";
@@ -12,15 +12,23 @@ export {
 
 export async function publicView(q: Question): Promise<PublicQuestion> {
   const { answer: _answer, explanation: _explanation, choices, code, ...rest } = q;
-  const renderedChoices: PublicChoice[] = choices.map((c) => ({
-    ...c,
-    text_html: highlightInlineBackticks(c.text),
-  }));
+  const [renderedChoices, question_html, code_html] = await Promise.all([
+    Promise.all(
+      choices.map(
+        async (c): Promise<PublicChoice> => ({
+          ...c,
+          text_html: await renderQuizMarkdown(c.text, q.category),
+        }),
+      ),
+    ),
+    renderQuizMarkdown(q.question, q.category),
+    code !== undefined ? highlightCode(code, q.category) : Promise.resolve(undefined),
+  ]);
   return {
     ...rest,
     choices: renderedChoices,
-    question_html: highlightInlineBackticks(q.question),
-    ...(code !== undefined ? { code, code_html: await highlightCode(code, q.category) } : {}),
+    question_html,
+    ...(code !== undefined ? { code, code_html } : {}),
   };
 }
 

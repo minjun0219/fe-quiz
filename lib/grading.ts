@@ -1,4 +1,4 @@
-import { highlightCode, highlightInlineBackticks } from "./highlight";
+import { highlightCode, renderQuizMarkdown } from "./highlight";
 import type { Category, Question } from "./question.schema";
 import type {
   CategoryScore,
@@ -28,23 +28,30 @@ export async function gradeRound(
   lookup: (id: string) => Question | undefined,
   opts: { withHtml?: boolean } = {},
 ): Promise<GradedRound> {
-  // Resolve all ids upfront so an unknown id 400s before we pay any Shiki
-  // cost, and so the per-question loop doesn't repeat the lookup.
+  // Resolve all ids upfront so an unknown id 400s before we run any HTML
+  // render passes, and so the per-question loop doesn't repeat the lookup.
   const questions: Question[] = req.question_ids.map((id) => {
     const q = lookup(id);
     if (!q) throw new GradingError(`unknown question_id "${id}"`);
     return q;
   });
 
-  // Highlighting is opt-in: only the submit route renders the result UI and
-  // needs Shiki/inline-code HTML. /api/quiz/feedback (LLM prompt) and
-  // /api/share (id+score storage) never read these fields, so skipping the
-  // WASM cold-start + per-question codeToHtml saves real latency.
-  const codeHtmls = opts.withHtml
+  // HTML rendering is opt-in: only the submit route renders the result UI
+  // and needs the `*_html` bundle (escaped <pre><code>, inline-code spans,
+  // <strong>). /api/quiz/feedback (LLM prompt) and /api/share (id+score
+  // storage) never read these fields, so skipping the per-question render
+  // pass cuts a chunk of string work + 4 awaits per question off the path.
+  const htmlBundle = opts.withHtml
     ? await Promise.all(
-        questions.map((q) =>
-          q.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined),
-        ),
+        questions.map(async (q) => {
+          const [codeHtml, questionHtml, explanationHtml, choiceHtmls] = await Promise.all([
+            q.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined),
+            renderQuizMarkdown(q.question, q.category),
+            renderQuizMarkdown(q.explanation, q.category),
+            Promise.all(q.choices.map((c) => renderQuizMarkdown(c.text, q.category))),
+          ]);
+          return { codeHtml, questionHtml, explanationHtml, choiceHtmls };
+        }),
       )
     : null;
 
@@ -70,8 +77,14 @@ export async function gradeRound(
     const orderedChoices = displayedOrder
       ? reorderChoices(q.choices, displayedOrder, id)
       : q.choices;
-    const renderedChoices = opts.withHtml
-      ? orderedChoices.map((c) => ({ ...c, text_html: highlightInlineBackticks(c.text) }))
+    // `renderQuizMarkdown` was called on the question's choices in source
+    // order; remap each rendered HTML by id so the displayed-order array we
+    // emit is consistent with shuffled UI order.
+    const choiceHtmlById = htmlBundle
+      ? new Map(q.choices.map((c, idx) => [c.id, htmlBundle[i].choiceHtmls[idx]]))
+      : null;
+    const renderedChoices = htmlBundle
+      ? orderedChoices.map((c) => ({ ...c, text_html: choiceHtmlById?.get(c.id) }))
       : orderedChoices;
 
     per_question.push({
@@ -79,15 +92,15 @@ export async function gradeRound(
       category: q.category,
       type: q.type,
       question: q.question,
-      question_html: opts.withHtml ? highlightInlineBackticks(q.question) : undefined,
+      question_html: htmlBundle?.[i].questionHtml,
       code: q.code,
-      code_html: codeHtmls?.[i],
+      code_html: htmlBundle?.[i].codeHtml,
       choices: renderedChoices,
       your_answer: yours,
       correct_answer: q.answer,
       is_correct,
       explanation: q.explanation,
-      explanation_html: opts.withHtml ? highlightInlineBackticks(q.explanation) : undefined,
+      explanation_html: htmlBundle?.[i].explanationHtml,
     });
   }
 
