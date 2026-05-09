@@ -10,9 +10,11 @@
     "start": "next start",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "check": "biome check . && pnpm questions:check && pnpm round:check",
+    "check": "biome check . && pnpm questions:check && pnpm round:check && pnpm test",
     "questions:check": "tsx scripts/check-questions.ts",
-    "round:check": "tsx scripts/check-round.ts"
+    "round:check": "tsx scripts/check-round.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.1",
@@ -35,7 +37,8 @@
     "supabase": "^2.98.2",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
