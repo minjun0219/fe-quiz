@@ -14,8 +14,9 @@ export {
  * choices shuffled.
  *
  * Server-only — wires the pure stratified picker (`lib/round-picker.ts`) up
- * to the cached `getQuestionsByCategory` map. Adding new categories to the
- * registry needs no changes here.
+ * to `getQuestionsByCategory`, which filters the cached `getAllQuestions()`
+ * pool by category on each call (O(N) over the frozen pool, fine at current
+ * seed sizes). Adding new categories to the registry needs no changes here.
  */
 export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
   const picked = pickStratified(count, getQuestionsByCategory);

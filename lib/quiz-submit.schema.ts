@@ -89,9 +89,7 @@ export type Personality = "balanced" | "specialist";
 
 /**
  * Lightweight 4-bucket overall vibe (the v1 system, kept as a secondary
- * line under the main persona hero). `null` slot is not used at runtime,
- * but bucket labels stay strings so future tweaks don't ripple through
- * the schema.
+ * line under the main persona hero).
  */
 export interface Vibe {
   label: string;

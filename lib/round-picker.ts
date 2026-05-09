@@ -45,10 +45,14 @@ export function shuffle<T>(input: readonly T[]): T[] {
  * pool getter, so this stays decoupled from the fs loader (the route reuses
  * a server-cached map; the test script feeds it a freshly loaded pool).
  *
- * Every active category contributes at least `effectiveMinPerCategory(...)`
- * questions (or all it has, if smaller), then the rest is randomly filled
- * from the global remainder. Final list is reshuffled so categories
- * interleave instead of clumping.
+ * Guarantee: when `N * effectiveMinPerCategory(...) <= roundSize`, every
+ * active category contributes at least that many (or all it has, if its
+ * pool is smaller); the rest is randomly filled from the global remainder.
+ * In the pathological case where the registry is so large that even one
+ * question per category would exceed `roundSize` (`N > roundSize`), the
+ * picker over-allocates to the per-cat floor of 1 and then trims to
+ * `roundSize`, so some categories may end up with 0 in that round.
+ * Final list is reshuffled so categories interleave instead of clumping.
  *
  * Designed to scale with `CATEGORIES`: adding a new category in
  * `lib/categories.ts` automatically participates in the stratification with
