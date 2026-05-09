@@ -1,8 +1,9 @@
 import "server-only";
 import { highlightCode, renderQuizMarkdown } from "./highlight";
+import { DEFAULT_LEVEL, type Level } from "./levels";
 import type { PublicChoice, PublicQuestion, Question } from "./question.schema";
 import { getQuestionMap, getQuestionsByCategory } from "./questions";
-import { pickStratified, ROUND_SIZE, shuffle } from "./round-picker";
+import { pickByLevel, ROUND_SIZE, shuffle } from "./round-picker";
 
 export {
   effectiveMinPerCategory,
@@ -44,15 +45,20 @@ export async function publicView(q: Question): Promise<PublicQuestion> {
  * Pick a round from the live filesystem-loaded pool, return public view with
  * choices shuffled.
  *
- * Server-only — wires the pure stratified picker (`lib/round-picker.ts`) up
+ * Server-only — wires the pure level-aware picker (`lib/round-picker.ts`) up
  * to `getQuestionsByCategory`, which filters the cached `getAllQuestions()`
  * pool by category on each call (O(N) over the frozen pool, fine at current
  * seed sizes). Adding new categories to the registry needs no changes here.
+ *
+ * `level` selects the easy/medium/hard mix; `count` is an upper cap that
+ * trims the result if smaller than the mix sum (lets tests probe clamping
+ * without overriding `ROUND_SIZE` globally).
  */
 export async function pickRoundQuestions(
-  count = ROUND_SIZE,
+  count: number = ROUND_SIZE,
+  level: Level = DEFAULT_LEVEL,
 ): Promise<PublicQuestion[]> {
-  const picked = pickStratified(count, getQuestionsByCategory);
+  const picked = pickByLevel(level, count, getQuestionsByCategory);
   const views = await Promise.all(picked.map(publicView));
   return views.map((q) => ({ ...q, choices: shuffle(q.choices) }));
 }
