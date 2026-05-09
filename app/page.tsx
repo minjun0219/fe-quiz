@@ -23,7 +23,9 @@ export default function Home() {
         >
           지금 풀어보기 →
         </Link>
-        <p className="mt-6 text-xs text-zinc-400 dark:text-zinc-500">JS · React · CSS / 약 5분</p>
+        <p className="mt-6 text-xs text-zinc-400 dark:text-zinc-500">
+          JS · React · CSS / 약 5분
+        </p>
       </div>
       <SiteCredit />
     </main>

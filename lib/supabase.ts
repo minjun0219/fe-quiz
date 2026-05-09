@@ -18,7 +18,9 @@ let cached: SupabaseClient<Database> | null = null;
  * surfaces accidental client imports as a build-time error.
  */
 export function getSupabase(): SupabaseClient<Database> {
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
 
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;

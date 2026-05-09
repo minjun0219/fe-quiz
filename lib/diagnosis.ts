@@ -1,6 +1,16 @@
-import { CATEGORY_IDS, type CategoryEntry, findPersonaByName, getPersona } from "./categories";
+import {
+  CATEGORY_IDS,
+  type CategoryEntry,
+  findPersonaByName,
+  getPersona,
+} from "./categories";
 import type { Category } from "./question.schema";
-import type { CategoryScore, Diagnosis, Personality, Vibe } from "./quiz-submit.schema";
+import type {
+  CategoryScore,
+  Diagnosis,
+  Personality,
+  Vibe,
+} from "./quiz-submit.schema";
 
 interface DiagnosisInput {
   total_correct: number;
@@ -70,7 +80,9 @@ const FALLBACK_VIBE: VibeBucket = {
 };
 
 function pickVibe(overallAccuracy: number): VibeBucket {
-  return VIBE_BUCKETS.find((b) => overallAccuracy >= b.min_accuracy) ?? FALLBACK_VIBE;
+  return (
+    VIBE_BUCKETS.find((b) => overallAccuracy >= b.min_accuracy) ?? FALLBACK_VIBE
+  );
 }
 
 /**
@@ -111,7 +123,12 @@ export function resolveResultHero(stored_result_type: string): ResolvedHero {
 
   const vibe = findVibe(stored_result_type);
   if (vibe) {
-    return { name: vibe.label, emoji: vibe.emoji, blurb: vibe.blurb, persona: null };
+    return {
+      name: vibe.label,
+      emoji: vibe.emoji,
+      blurb: vibe.blurb,
+      persona: null,
+    };
   }
 
   return {
@@ -135,11 +152,18 @@ export function resolveResultHero(stored_result_type: string): ResolvedHero {
 export function pickDominantCategory(
   category_scores: Partial<Record<Category, CategoryScore>>,
 ): Category | null {
-  let best: { cat: Category; acc: number; correct: number; order: number } | null = null;
+  let best: {
+    cat: Category;
+    acc: number;
+    correct: number;
+    order: number;
+  } | null = null;
   for (let i = 0; i < CATEGORY_IDS.length; i++) {
     const cat = CATEGORY_IDS[i];
     const s = category_scores[cat];
-    if (!s || s.total === 0) continue;
+    if (!s || s.total === 0) {
+      continue;
+    }
     const acc = s.correct / s.total;
     if (
       best === null ||
@@ -162,11 +186,16 @@ export function computePersonality(
 ): Personality {
   const accuracies: number[] = [];
   for (const s of Object.values(category_scores) as CategoryScore[]) {
-    if (s && s.total > 0) accuracies.push(s.correct / s.total);
+    if (s && s.total > 0) {
+      accuracies.push(s.correct / s.total);
+    }
   }
-  if (accuracies.length < 2) return "balanced";
+  if (accuracies.length < 2) {
+    return "balanced";
+  }
   const mean = accuracies.reduce((a, b) => a + b, 0) / accuracies.length;
-  const variance = accuracies.reduce((sum, x) => sum + (x - mean) ** 2, 0) / accuracies.length;
+  const variance =
+    accuracies.reduce((sum, x) => sum + (x - mean) ** 2, 0) / accuracies.length;
   const stddev = Math.sqrt(variance);
   return stddev < BALANCED_STDDEV_THRESHOLD ? "balanced" : "specialist";
 }
@@ -175,7 +204,10 @@ export function computePersonality(
  * Type code used as a shareable, OG-image-friendly tag.
  * Format: `${B|S}-${persona.code}` — e.g., `B-JS`, `S-React`, `B-CSS`.
  */
-export function buildTypeCode(personality: Personality, dominant: Category | null): string {
+export function buildTypeCode(
+  personality: Personality,
+  dominant: Category | null,
+): string {
   const prefix = personality === "balanced" ? "B" : "S";
   const suffix = dominant ? getPersona(dominant).code : "??";
   return `${prefix}-${suffix}`;
@@ -206,11 +238,19 @@ export function diagnose(input: DiagnosisInput): Diagnosis {
 
   const strengths: Category[] = [];
   const weaknesses: Category[] = [];
-  for (const [cat, s] of Object.entries(input.category_scores) as [Category, CategoryScore][]) {
-    if (!s || s.total === 0) continue;
+  for (const [cat, s] of Object.entries(input.category_scores) as [
+    Category,
+    CategoryScore,
+  ][]) {
+    if (!s || s.total === 0) {
+      continue;
+    }
     const acc = s.correct / s.total;
-    if (acc >= STRONG_THRESHOLD) strengths.push(cat);
-    else if (acc < WEAK_THRESHOLD) weaknesses.push(cat);
+    if (acc >= STRONG_THRESHOLD) {
+      strengths.push(cat);
+    } else if (acc < WEAK_THRESHOLD) {
+      weaknesses.push(cat);
+    }
   }
 
   return {
@@ -220,7 +260,11 @@ export function diagnose(input: DiagnosisInput): Diagnosis {
     personality,
     dominant_category: dominant,
     type_code,
-    vibe: { label: vibeBucket.label, emoji: vibeBucket.emoji, blurb: vibeBucket.blurb },
+    vibe: {
+      label: vibeBucket.label,
+      emoji: vibeBucket.emoji,
+      blurb: vibeBucket.blurb,
+    },
     strengths,
     weaknesses,
   };

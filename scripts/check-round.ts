@@ -22,7 +22,11 @@ import {
 import { loadAllQuestions } from "../lib/load-questions";
 import type { Category, Question } from "../lib/question.schema";
 import type { CategoryScore } from "../lib/quiz-submit.schema";
-import { effectiveMinPerCategory, pickStratified, ROUND_SIZE } from "../lib/round-picker";
+import {
+  effectiveMinPerCategory,
+  pickStratified,
+  ROUND_SIZE,
+} from "../lib/round-picker";
 
 const TRIALS = 1000;
 const ROOT = join(process.cwd(), "content/questions");
@@ -38,10 +42,14 @@ function pass(msg: string) {
 
 function buildPoolByCategory(all: Question[]): Map<Category, Question[]> {
   const out = new Map<Category, Question[]>();
-  for (const c of CATEGORIES) out.set(c.id, []);
+  for (const c of CATEGORIES) {
+    out.set(c.id, []);
+  }
   for (const q of all) {
     const bucket = out.get(q.category);
-    if (bucket) bucket.push(q);
+    if (bucket) {
+      bucket.push(q);
+    }
   }
   return out;
 }
@@ -64,7 +72,9 @@ function roundChecks() {
     const round = pickStratified(ROUND_SIZE, getPool);
 
     if (round.length !== expectedSize) {
-      fail(`trial ${trial}: expected ${expectedSize} questions, got ${round.length}`);
+      fail(
+        `trial ${trial}: expected ${expectedSize} questions, got ${round.length}`,
+      );
     }
 
     const seen = new Set<string>();
@@ -82,12 +92,16 @@ function roundChecks() {
         const got = perCatCount.get(cat.id) ?? 0;
         const cap = Math.min(minPerCat, getPool(cat.id).length);
         if (got < cap) {
-          fail(`trial ${trial}: category "${cat.id}" got ${got}, expected ≥ ${cap}`);
+          fail(
+            `trial ${trial}: category "${cat.id}" got ${got}, expected ≥ ${cap}`,
+          );
         }
       }
     }
   }
-  pass(`round picker: ${TRIALS} trials, size=${expectedSize}, min/cat=${minPerCat} (N=${N})`);
+  pass(
+    `round picker: ${TRIALS} trials, size=${expectedSize}, min/cat=${minPerCat} (N=${N})`,
+  );
 }
 
 function diagnosisChecks() {
@@ -100,7 +114,9 @@ function diagnosisChecks() {
   const first = pickDominantCategory(tied);
   for (let i = 0; i < 50; i++) {
     const again = pickDominantCategory(tied);
-    if (again !== first) fail(`tie-break non-deterministic: ${first} vs ${again}`);
+    if (again !== first) {
+      fail(`tie-break non-deterministic: ${first} vs ${again}`);
+    }
   }
   pass(`diagnose: deterministic tie-break (got ${first} for 4/5 across cats)`);
 
@@ -110,12 +126,16 @@ function diagnosisChecks() {
     react: { correct: 4, total: 8 }, // 50%, more correct
   };
   const winner = pickDominantCategory(correctCountTie);
-  if (winner !== "react") fail(`expected react to win on correct count, got ${winner}`);
+  if (winner !== "react") {
+    fail(`expected react to win on correct count, got ${winner}`);
+  }
   pass("diagnose: higher `correct` wins equal-accuracy tie");
 
   // Single-category attempts → balanced.
   const onlyJs = computePersonality({ javascript: { correct: 3, total: 5 } });
-  if (onlyJs !== "balanced") fail(`expected balanced for single-cat, got ${onlyJs}`);
+  if (onlyJs !== "balanced") {
+    fail(`expected balanced for single-cat, got ${onlyJs}`);
+  }
   pass("diagnose: single-category attempts default to balanced");
 
   // Flat 60/60/60 → balanced (stddev 0 < threshold).
@@ -124,7 +144,9 @@ function diagnosisChecks() {
     react: { correct: 3, total: 5 },
     css: { correct: 3, total: 5 },
   });
-  if (flat !== "balanced") fail(`expected balanced for flat, got ${flat}`);
+  if (flat !== "balanced") {
+    fail(`expected balanced for flat, got ${flat}`);
+  }
 
   // Lopsided 100/40/20 → specialist (stddev ≈ 0.33 > threshold).
   const lopsided = computePersonality({
@@ -132,12 +154,18 @@ function diagnosisChecks() {
     react: { correct: 2, total: 5 },
     css: { correct: 1, total: 5 },
   });
-  if (lopsided !== "specialist") fail(`expected specialist for lopsided, got ${lopsided}`);
-  pass(`diagnose: stddev threshold ${BALANCED_STDDEV_THRESHOLD} separates flat vs lopsided`);
+  if (lopsided !== "specialist") {
+    fail(`expected specialist for lopsided, got ${lopsided}`);
+  }
+  pass(
+    `diagnose: stddev threshold ${BALANCED_STDDEV_THRESHOLD} separates flat vs lopsided`,
+  );
 
   // Type code format.
   const code = buildTypeCode("balanced", "javascript");
-  if (!/^[BS]-[A-Za-z]+$/.test(code)) fail(`bad type_code format: ${code}`);
+  if (!/^[BS]-[A-Za-z]+$/.test(code)) {
+    fail(`bad type_code format: ${code}`);
+  }
   pass(`diagnose: type_code format (e.g., ${code})`);
 
   // Full diagnose smoke: 8/10 on JS, 4/5 on React/CSS.
@@ -150,25 +178,39 @@ function diagnosisChecks() {
       css: { correct: 4, total: 5 },
     },
   });
-  if (d.dominant_category === null) fail("expected a dominant category");
-  if (d.type_code.split("-")[0] !== (d.personality === "balanced" ? "B" : "S")) {
+  if (d.dominant_category === null) {
+    fail("expected a dominant category");
+  }
+  if (
+    d.type_code.split("-")[0] !== (d.personality === "balanced" ? "B" : "S")
+  ) {
     fail(`type_code prefix mismatch: ${d.type_code} vs ${d.personality}`);
   }
-  if (!d.vibe.label) fail("vibe label missing");
+  if (!d.vibe.label) {
+    fail("vibe label missing");
+  }
   pass(
     `diagnose: full path returns ${d.result_type} ${d.type_code} (${d.personality}) · vibe=${d.vibe.label}`,
   );
 
   // Legacy fallback resolution.
   const legacy = resolveResultHero("프론트엔드 마스터");
-  if (legacy.persona !== null) fail("legacy vibe label must not match a persona");
-  if (legacy.emoji !== "🏆") fail(`legacy emoji mismatch: ${legacy.emoji}`);
+  if (legacy.persona !== null) {
+    fail("legacy vibe label must not match a persona");
+  }
+  if (legacy.emoji !== "🏆") {
+    fail(`legacy emoji mismatch: ${legacy.emoji}`);
+  }
   pass("diagnose: legacy share row falls back to v1 vibe bucket");
 
   // New persona resolution.
   const fresh = resolveResultHero("JS 사냥꾼");
-  if (fresh.persona === null) fail("expected persona match for new share row");
-  pass(`diagnose: new share row resolves to persona ${fresh.persona?.persona.name}`);
+  if (fresh.persona === null) {
+    fail("expected persona match for new share row");
+  }
+  pass(
+    `diagnose: new share row resolves to persona ${fresh.persona?.persona.name}`,
+  );
 }
 
 try {

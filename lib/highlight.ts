@@ -23,7 +23,10 @@ function plainCodeBlock(code: string): string {
 
 // `category` was the Shiki language key; kept on the signature so callers
 // don't need to change when/if highlighting comes back via #30.
-export async function highlightCode(code: string, _category: Category): Promise<string> {
+export async function highlightCode(
+  code: string,
+  _category: Category,
+): Promise<string> {
   return plainCodeBlock(code);
 }
 
@@ -61,7 +64,9 @@ function renderInlineSegment(text: string): string {
     out += escapeAndFormat(text.slice(i, tick));
 
     let runEnd = tick;
-    while (runEnd < text.length && text[runEnd] === "`") runEnd++;
+    while (runEnd < text.length && text[runEnd] === "`") {
+      runEnd++;
+    }
     const openLen = runEnd - tick;
 
     if (openLen !== 1) {
@@ -82,7 +87,9 @@ function renderInlineSegment(text: string): string {
         continue;
       }
       let k = scan;
-      while (k < text.length && text[k] === "`") k++;
+      while (k < text.length && text[k] === "`") {
+        k++;
+      }
       if (k - scan === 1) {
         closeStart = scan;
         break;
@@ -126,17 +133,24 @@ const FENCE_WRAPPER_CLASS =
  * pipeline used by the rest of the render path; if highlighting (#30) comes
  * back, the signature already accommodates an async highlighter.
  */
-export async function renderQuizMarkdown(text: string, _category: Category): Promise<string> {
+export async function renderQuizMarkdown(
+  text: string,
+  _category: Category,
+): Promise<string> {
   const parts: string[] = [];
   let cursor = 0;
   for (const m of text.matchAll(FENCE_RE)) {
-    if (m.index === undefined) continue;
+    if (m.index === undefined) {
+      continue;
+    }
     const start = m.index;
     const end = start + m[0].length;
     if (start > cursor) {
       parts.push(renderInlineSegment(text.slice(cursor, start)));
     }
-    parts.push(`<div class="${FENCE_WRAPPER_CLASS}">${plainCodeBlock(m[2])}</div>`);
+    parts.push(
+      `<div class="${FENCE_WRAPPER_CLASS}">${plainCodeBlock(m[2])}</div>`,
+    );
     cursor = end;
   }
   if (cursor < text.length) {

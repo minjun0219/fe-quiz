@@ -26,7 +26,9 @@ export const QuizSubmitRequest = z
   .object({
     question_ids: z.array(z.string().min(1)).min(1).max(20),
     answers: z.array(SubmittedAnswer).min(1).max(20),
-    displayed_choice_ids: z.array(z.array(z.string().min(1)).min(2).max(6)).optional(),
+    displayed_choice_ids: z
+      .array(z.array(z.string().min(1)).min(2).max(6))
+      .optional(),
   })
   .superRefine((req, ctx) => {
     if (req.answers.length !== req.question_ids.length) {
@@ -36,7 +38,10 @@ export const QuizSubmitRequest = z
         message: `answers.length (${req.answers.length}) must equal question_ids.length (${req.question_ids.length})`,
       });
     }
-    if (req.displayed_choice_ids && req.displayed_choice_ids.length !== req.question_ids.length) {
+    if (
+      req.displayed_choice_ids &&
+      req.displayed_choice_ids.length !== req.question_ids.length
+    ) {
       ctx.addIssue({
         code: "custom",
         path: ["displayed_choice_ids"],

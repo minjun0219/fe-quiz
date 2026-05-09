@@ -40,7 +40,10 @@ function lookup(qs: Question[]): (id: string) => Question | undefined {
 describe("gradeRound — single_choice", () => {
   it("correct answer is_correct=true, total_correct increments", async () => {
     const q = single("js-1", ["a", "b", "c"], "b");
-    const r = await gradeRound({ question_ids: ["js-1"], answers: ["b"] }, lookup([q]));
+    const r = await gradeRound(
+      { question_ids: ["js-1"], answers: ["b"] },
+      lookup([q]),
+    );
     expect(r.total).toBe(1);
     expect(r.total_correct).toBe(1);
     expect(r.per_question[0].is_correct).toBe(true);
@@ -48,14 +51,20 @@ describe("gradeRound — single_choice", () => {
 
   it("wrong answer is_correct=false", async () => {
     const q = single("js-1", ["a", "b", "c"], "b");
-    const r = await gradeRound({ question_ids: ["js-1"], answers: ["a"] }, lookup([q]));
+    const r = await gradeRound(
+      { question_ids: ["js-1"], answers: ["a"] },
+      lookup([q]),
+    );
     expect(r.total_correct).toBe(0);
     expect(r.per_question[0].is_correct).toBe(false);
   });
 
   it("null (skipped) counts as incorrect", async () => {
     const q = single("js-1", ["a", "b"], "a");
-    const r = await gradeRound({ question_ids: ["js-1"], answers: [null] }, lookup([q]));
+    const r = await gradeRound(
+      { question_ids: ["js-1"], answers: [null] },
+      lookup([q]),
+    );
     expect(r.total_correct).toBe(0);
     expect(r.per_question[0].is_correct).toBe(false);
   });
@@ -78,25 +87,37 @@ describe("gradeRound — single_choice", () => {
 describe("gradeRound — multi_choice", () => {
   it("exact match counts as correct", async () => {
     const q = multi("react-1", ["a", "b", "c", "d"], ["a", "c"]);
-    const r = await gradeRound({ question_ids: ["react-1"], answers: [["a", "c"]] }, lookup([q]));
+    const r = await gradeRound(
+      { question_ids: ["react-1"], answers: [["a", "c"]] },
+      lookup([q]),
+    );
     expect(r.per_question[0].is_correct).toBe(true);
   });
 
   it("partial match (subset) is incorrect", async () => {
     const q = multi("react-1", ["a", "b", "c"], ["a", "c"]);
-    const r = await gradeRound({ question_ids: ["react-1"], answers: [["a"]] }, lookup([q]));
+    const r = await gradeRound(
+      { question_ids: ["react-1"], answers: [["a"]] },
+      lookup([q]),
+    );
     expect(r.per_question[0].is_correct).toBe(false);
   });
 
   it("superset (extra wrong pick) is incorrect", async () => {
     const q = multi("react-1", ["a", "b", "c"], ["a"]);
-    const r = await gradeRound({ question_ids: ["react-1"], answers: [["a", "b"]] }, lookup([q]));
+    const r = await gradeRound(
+      { question_ids: ["react-1"], answers: [["a", "b"]] },
+      lookup([q]),
+    );
     expect(r.per_question[0].is_correct).toBe(false);
   });
 
   it("order-independent (set equality)", async () => {
     const q = multi("react-1", ["a", "b", "c"], ["a", "c"]);
-    const r = await gradeRound({ question_ids: ["react-1"], answers: [["c", "a"]] }, lookup([q]));
+    const r = await gradeRound(
+      { question_ids: ["react-1"], answers: [["c", "a"]] },
+      lookup([q]),
+    );
     expect(r.per_question[0].is_correct).toBe(true);
   });
 
@@ -110,7 +131,10 @@ describe("gradeRound — multi_choice", () => {
   it("duplicate ids in submission → GradingError", async () => {
     const q = multi("react-1", ["a", "b"], ["a"]);
     await expect(
-      gradeRound({ question_ids: ["react-1"], answers: [["a", "a"]] }, lookup([q])),
+      gradeRound(
+        { question_ids: ["react-1"], answers: [["a", "a"]] },
+        lookup([q]),
+      ),
     ).rejects.toBeInstanceOf(GradingError);
   });
 });
@@ -119,7 +143,10 @@ describe("gradeRound — aggregation", () => {
   it("category_scores aggregates per category, mixed correct/wrong", async () => {
     const q1 = single("js-1", ["a", "b"], "a");
     const q2 = multi("react-1", ["a", "b"], ["a"]);
-    const q3 = { ...single("css-1", ["a", "b"], "a"), category: "css" } as Question;
+    const q3 = {
+      ...single("css-1", ["a", "b"], "a"),
+      category: "css",
+    } as Question;
     const r = await gradeRound(
       {
         question_ids: ["js-1", "react-1", "css-1"],
