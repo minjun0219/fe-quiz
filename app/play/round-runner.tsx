@@ -179,13 +179,13 @@ export default function RoundRunner({ questions }: Props) {
 
         {current.code_html ? (
           <div
-            className="quiz-code-block mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100"
+            className="quiz-code-block mb-6 rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki output of our own YAML seed; no user input.
             dangerouslySetInnerHTML={{ __html: current.code_html }}
           />
         ) : (
           current.code && (
-            <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
+            <pre className="mb-6 whitespace-pre-wrap break-words rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
               <code>{current.code}</code>
             </pre>
           )

@@ -233,13 +233,13 @@ export default function Result({ data }: Props) {
                 </p>
                 {q.code_html ? (
                   <div
-                    className="quiz-code-block mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100"
+                    className="quiz-code-block mb-3 rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100"
                     // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki output of our own YAML seed; no user input.
                     dangerouslySetInnerHTML={{ __html: q.code_html }}
                   />
                 ) : (
                   q.code && (
-                    <pre className="mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100">
+                    <pre className="mb-3 whitespace-pre-wrap break-words rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100">
                       <code>{q.code}</code>
                     </pre>
                   )
