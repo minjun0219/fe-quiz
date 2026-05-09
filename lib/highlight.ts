@@ -65,7 +65,10 @@ function escapeHtml(s: string): string {
 /**
  * Wrap `` `...` `` runs in <code class="inline-code">. Single-line only —
  * a backtick followed by a newline before its closer is treated as literal.
- * Everything outside the runs is HTML-escaped; matched inner text is too.
+ * Multi-backtick runs (`` ``` `` fence openers, `` `` ``-delimited spans)
+ * are passed through literally so fenced blocks in explanations don't get
+ * mangled into empty <code> tags.
+ * Everything outside wrapped spans is HTML-escaped; matched inner text is too.
  */
 export function highlightInlineBackticks(text: string): string {
   let out = "";
@@ -76,16 +79,45 @@ export function highlightInlineBackticks(text: string): string {
       out += escapeHtml(text.slice(i));
       break;
     }
-    const end = text.indexOf("`", tick + 1);
-    const newlineBefore = text.indexOf("\n", tick + 1);
-    if (end === -1 || (newlineBefore !== -1 && newlineBefore < end)) {
-      out += escapeHtml(text.slice(i, tick + 1));
-      i = tick + 1;
+    out += escapeHtml(text.slice(i, tick));
+
+    let runEnd = tick;
+    while (runEnd < text.length && text[runEnd] === "`") runEnd++;
+    const openLen = runEnd - tick;
+
+    if (openLen !== 1) {
+      // ``` / `` etc — emit literally; do not pair-match.
+      out += "`".repeat(openLen);
+      i = runEnd;
       continue;
     }
-    out += escapeHtml(text.slice(i, tick));
-    out += `<code class="inline-code">${escapeHtml(text.slice(tick + 1, end))}</code>`;
-    i = end + 1;
+
+    // Single-backtick opener: look for a single-backtick closer on the same
+    // line. Skip past any multi-backtick runs encountered in between.
+    let scan = runEnd;
+    let closeStart = -1;
+    while (scan < text.length && text[scan] !== "\n") {
+      if (text[scan] !== "`") {
+        scan++;
+        continue;
+      }
+      let k = scan;
+      while (k < text.length && text[k] === "`") k++;
+      if (k - scan === 1) {
+        closeStart = scan;
+        break;
+      }
+      scan = k;
+    }
+
+    if (closeStart === -1) {
+      out += "`";
+      i = runEnd;
+      continue;
+    }
+
+    out += `<code class="inline-code">${escapeHtml(text.slice(runEnd, closeStart))}</code>`;
+    i = closeStart + 1;
   }
   return out;
 }

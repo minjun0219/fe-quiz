@@ -28,9 +28,13 @@ export async function gradeRound(
   lookup: (id: string) => Question | undefined,
   opts: { withHtml?: boolean } = {},
 ): Promise<GradedRound> {
-  const per_question: QuizQuestionResult[] = [];
-  const category_scores: Partial<Record<Category, CategoryScore>> = {};
-  let total_correct = 0;
+  // Resolve all ids upfront so an unknown id 400s before we pay any Shiki
+  // cost, and so the per-question loop doesn't repeat the lookup.
+  const questions: Question[] = req.question_ids.map((id) => {
+    const q = lookup(id);
+    if (!q) throw new GradingError(`unknown question_id "${id}"`);
+    return q;
+  });
 
   // Highlighting is opt-in: only the submit route renders the result UI and
   // needs Shiki/inline-code HTML. /api/quiz/feedback (LLM prompt) and
@@ -38,20 +42,20 @@ export async function gradeRound(
   // WASM cold-start + per-question codeToHtml saves real latency.
   const codeHtmls = opts.withHtml
     ? await Promise.all(
-        req.question_ids.map((id) => {
-          const q = lookup(id);
-          return q?.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined);
-        }),
+        questions.map((q) =>
+          q.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined),
+        ),
       )
     : null;
 
-  for (let i = 0; i < req.question_ids.length; i++) {
-    const id = req.question_ids[i];
+  const per_question: QuizQuestionResult[] = [];
+  const category_scores: Partial<Record<Category, CategoryScore>> = {};
+  let total_correct = 0;
+
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
+    const id = q.id;
     const yours = req.answers[i];
-    const q = lookup(id);
-    if (!q) {
-      throw new GradingError(`unknown question_id "${id}"`);
-    }
 
     const choiceIds = new Set(q.choices.map((c) => c.id));
     const is_correct = checkAnswer(q, yours, choiceIds, id);
