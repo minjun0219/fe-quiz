@@ -1,0 +1,21 @@
+id: html-020
+category: html
+difficulty: hard
+type: single_choice
+question: |
+  `autocomplete`와 `inputmode` 속성의 역할 차이로 가장 정확한 것은?
+choices:
+  - id: a
+    text: 둘은 동일한 속성의 별칭이다
+  - id: b
+    text: "`autocomplete`(예: `email`, `cc-number`, `one-time-code`)는 브라우저/패스워드 매니저가 입력의 의미를 이해해 자동완성·자동입력에 활용하는 용도이고, `inputmode`(예: `numeric`, `decimal`, `tel`)는 모바일 가상 키보드의 모양을 결정한다. 둘은 별개라 함께 쓰기도 한다"
+  - id: c
+    text: "`inputmode`는 검증 규칙을 강제해 사용자가 다른 형식을 입력할 수 없다"
+  - id: d
+    text: "`autocomplete=\"off\"`이면 브라우저가 자동으로 `inputmode=\"none\"`을 적용한다"
+answer: b
+explanation: |
+  둘은 관심사가 달라. `autocomplete`는 "이 칸에 들어갈 의미"를 알려 주는 메타데이터라 브라우저/패스워드 매니저가 이메일·이름·추소·카드번호·OTP 등을 적절한 칸에 자동 채워주는 데 활용돼.
+  `inputmode`는 "키보드를 어떤 모양으로 띄워달라"는 힌트만을 주고, 입력 검증은 하지 않아. 예를 들어 OTP 입력이라면 `autocomplete="one-time-code" inputmode="numeric"`처럼 둘을 함께 주는 패턴이 일반적이야.
+  `autocomplete="off"`는 브라우저에 자동입력 힌트를 끌 뿐 키보드 모양에는 영향이 없고, 브라우저가 무시하는 케이스도 많아.
+tags: [ forms, autocomplete, inputmode ]

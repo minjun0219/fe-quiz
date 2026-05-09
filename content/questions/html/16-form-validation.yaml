@@ -1,0 +1,26 @@
+id: html-016
+category: html
+difficulty: medium
+type: single_choice
+question: |
+  다음 마크업의 폼 검증 동작과 한계로 가장 정확한 것은?
+code: |
+  <form>
+    <input type="email" required pattern=".+@example\.com">
+    <button>제출</button>
+  </form>
+choices:
+  - id: a
+    text: 클라이언트에서 비어 있거나 패턴이 맞지 않으면 브라우저가 기본 메시지로 제출을 막고 `:invalid` 의사 클래스로 스타일도 줄 수 있지만, 검증은 우회 가능하므로 서버 검증을 반드시 동반해야 한다
+  - id: b
+    text: HTML 검증을 통과하면 서버 검증은 생략해도 안전하다
+  - id: c
+    text: "`pattern`은 모든 input 타입에서 필수적으로 동작한다"
+  - id: d
+    text: "`required`는 JS로 폼을 제출할 때만 동작한다"
+answer: a
+explanation: |
+  HTML 내장 검증(`required`, `pattern`, `min`/`max`, `step` 등)은 사용자 경험을 종이는 "1차 방어"로 쓰기 좋아 — 조기 피드백과 `:invalid`·`:user-invalid` 스타일까지 공으로 얻어.
+  하지만 사용자가 DevTools로 novalidate를 곴거나 직접 fetch로 요청을 보내면 우회할 수 있으니 결국 **서버 검증**이 최종 안전망. 둘을 함께 장착하는 게 이상적이야.
+  `pattern`은 `text`/`search`/`url`/`tel`/`email`/`password`에서 동작하고 `number`·`date` 등엔 적용되지 않아. `required`는 제출 함께 자동으로 검증되고 JS 제출은 `form.requestSubmit()` / `form.checkValidity()`로 같은 흐름을 따라.
+tags: [ forms, validation, a11y ]

@@ -1,0 +1,23 @@
+id: html-017
+category: html
+difficulty: medium
+type: multi_choice
+question: |
+  페이지를 카카오톡·슬랙 같은 서비스에서 공유할 때 미리보기 카드가 잘 나오도록 Open Graph 메타 태그 중 **권장되는 것**을 모두 고르면?
+choices:
+  - id: a
+    text: "`<meta property=\"og:title\" content=\"...\">`"
+  - id: b
+    text: "`<meta property=\"og:description\" content=\"...\">`"
+  - id: c
+    text: "`<meta property=\"og:image\" content=\"...\">`"
+  - id: d
+    text: "`<meta property=\"og:url\" content=\"...\">`"
+  - id: e
+    text: "`<meta property=\"og:keywords\" content=\"...\">`"
+answer: [ a, b, c, d ]
+explanation: |
+  Open Graph 명세에서 잘 알려진 핵심 태그는 `og:title`, `og:description`, `og:image`, `og:url`, `og:type` 등이야. 대부분의 도메인 크롤러가 이 태그들을 읽어서 카드 UI를 그려 줘.
+  `og:keywords`는 OG 명세에 존재하지 않아 적용되지 않고, 일반 `<meta name="keywords">`도 현대 검색 엔진이 사실상 무시해 실효가 없어 — 키워드는 타이틀·본문·설명에 녹이는 게 더 효과적이야.
+  추가로 트위터/X 카드는 `twitter:card`, `twitter:image`를 따로 둘 수 있는데 대부분 OG를 폴백으로 공유해서 주렬은 OG에 두는 게 효율적이야.
+tags: [ meta, open-graph, seo ]
