@@ -50,3 +50,7 @@ pnpm dev
 
 지금은 시드 콘텐츠(JS/React/CSS 각 10문제)를 채우는 단계예요.
 구조에 변경이 필요한 PR은 먼저 이슈로 논의 부탁드립니다.
+
+문제 작성 시 코드 스니펫 표기(백틱·펜스) 컨벤션은
+[`docs/CONTENT_STYLE.md`](./docs/CONTENT_STYLE.md) 참고. `pnpm questions:check`가
+이 컨벤션을 빌드 타임에 강제해요.
