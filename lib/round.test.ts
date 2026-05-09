@@ -17,7 +17,10 @@ vi.mock("./questions", () => {
   };
 });
 
-// `lib/highlight` does Shiki WASM load, which we don't want in unit tests.
+// Stub the renderer so these tests stay focused on round-picker / publicView
+// shape, not on HTML output. The real `lib/highlight` is pure-string work
+// now (no WASM), but mocking still keeps the assertions resilient to future
+// renderer tweaks (e.g. wrapping classes, escaping rules).
 vi.mock("./highlight", () => ({
   highlightCode: async (code: string) => `<pre>${code}</pre>`,
   renderQuizMarkdown: async (s: string) => s,

@@ -28,18 +28,19 @@ export async function gradeRound(
   lookup: (id: string) => Question | undefined,
   opts: { withHtml?: boolean } = {},
 ): Promise<GradedRound> {
-  // Resolve all ids upfront so an unknown id 400s before we pay any Shiki
-  // cost, and so the per-question loop doesn't repeat the lookup.
+  // Resolve all ids upfront so an unknown id 400s before we run any HTML
+  // render passes, and so the per-question loop doesn't repeat the lookup.
   const questions: Question[] = req.question_ids.map((id) => {
     const q = lookup(id);
     if (!q) throw new GradingError(`unknown question_id "${id}"`);
     return q;
   });
 
-  // Highlighting is opt-in: only the submit route renders the result UI and
-  // needs Shiki/inline-code HTML. /api/quiz/feedback (LLM prompt) and
-  // /api/share (id+score storage) never read these fields, so skipping the
-  // WASM cold-start + per-question codeToHtml saves real latency.
+  // HTML rendering is opt-in: only the submit route renders the result UI
+  // and needs the `*_html` bundle (escaped <pre><code>, inline-code spans,
+  // <strong>). /api/quiz/feedback (LLM prompt) and /api/share (id+score
+  // storage) never read these fields, so skipping the per-question render
+  // pass cuts a chunk of string work + 4 awaits per question off the path.
   const htmlBundle = opts.withHtml
     ? await Promise.all(
         questions.map(async (q) => {

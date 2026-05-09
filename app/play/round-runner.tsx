@@ -178,7 +178,7 @@ export default function RoundRunner({ questions }: Props) {
         {current.question_html ? (
           <legend
             className="mt-6 mb-4 text-xl font-semibold leading-relaxed"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: server-rendered by `renderQuizMarkdown` from our own YAML seed (no user input); only inline-code spans, <strong>, and HTML-escaped <pre><code> from fenced blocks are injected.
             dangerouslySetInnerHTML={{ __html: current.question_html }}
           />
         ) : (
@@ -190,7 +190,7 @@ export default function RoundRunner({ questions }: Props) {
         {current.code_html ? (
           <div
             className="quiz-code-block mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki output of our own YAML seed; no user input.
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
             dangerouslySetInnerHTML={{ __html: current.code_html }}
           />
         ) : (
@@ -246,7 +246,7 @@ export default function RoundRunner({ questions }: Props) {
                   {choice.text_html ? (
                     <span
                       className="flex-1"
-                      // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: server-rendered by `renderQuizMarkdown` from our own YAML seed (no user input); only inline-code spans, <strong>, and HTML-escaped <pre><code> from fenced blocks are injected.
                       dangerouslySetInnerHTML={{ __html: choice.text_html }}
                     />
                   ) : (
