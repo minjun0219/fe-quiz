@@ -5,24 +5,32 @@ import type { NextConfig } from "next";
  * us-assets/us 호스트로 그대로 흘려보낸다. ad-blocker가 `*.posthog.com`을
  * 막아도 자체 도메인이라 통과 — 세션 리플레이/이벤트 캡처가 끊기지 않음.
  *
- * - `/ingest/static/*` → assets (recorder.js, surveys 등 정적 파일)
- * - `/ingest/*` → 이벤트/decide/replay
- * - 마지막 `/ingest/decide` 매칭이 빠지면 `/decide`만 유실되므로 명시.
+ * 호스트는 빌드 타임에 `NEXT_PUBLIC_POSTHOG_HOST`에서 파생. PostHog Cloud
+ * 패턴(`{region}.i.posthog.com` → `{region}-assets.i.posthog.com`)을 가정.
+ * 자체 호스팅이면 두 변수 모두 별도 env로 잡거나 이 파일을 직접 수정 필요.
  */
+const POSTHOG_HOST = (
+  process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com"
+).replace(/\/$/, "");
+const POSTHOG_ASSETS_HOST = POSTHOG_HOST.replace(
+  /^(https?:\/\/)([a-z]+)\.i\.posthog\.com$/,
+  "$1$2-assets.i.posthog.com",
+);
+
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
         source: "/ingest/static/:path*",
-        destination: "https://us-assets.i.posthog.com/static/:path*",
+        destination: `${POSTHOG_ASSETS_HOST}/static/:path*`,
       },
       {
         source: "/ingest/:path*",
-        destination: "https://us.i.posthog.com/:path*",
+        destination: `${POSTHOG_HOST}/:path*`,
       },
       {
         source: "/ingest/decide",
-        destination: "https://us.i.posthog.com/decide",
+        destination: `${POSTHOG_HOST}/decide`,
       },
     ];
   },

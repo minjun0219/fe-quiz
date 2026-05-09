@@ -37,6 +37,9 @@ export const onRequestError: Instrumentation.onRequestError = async (
     route_type: context.routeType,
     router_kind: context.routerKind,
   });
+  // 서버리스에서 invocation이 즉시 종료되면 펜딩 이벤트가 유실됨.
+  // captureException은 큐에 적재만 하므로 명시적으로 flush.
+  await posthog.flush();
 };
 
 /**

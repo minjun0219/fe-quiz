@@ -10,6 +10,7 @@ import { useEffect } from "react";
  */
 export default function GlobalError({
   error,
+  reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
@@ -22,8 +23,15 @@ export default function GlobalError({
 
   return (
     <html lang="ko">
-      <body>
+      <body className="flex flex-col items-center justify-center min-h-screen gap-4">
         <NextError statusCode={0} />
+        <button
+          type="button"
+          onClick={() => reset()}
+          className="rounded-md border border-current px-4 py-2 text-sm font-medium"
+        >
+          다시 시도
+        </button>
       </body>
     </html>
   );

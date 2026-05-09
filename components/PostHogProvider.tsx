@@ -12,8 +12,9 @@ import { Suspense, useEffect } from "react";
  * - `/ingest`로 reverse proxy되므로 ad-blocker에 막히지 않음 (next.config.ts).
  * - 익명 가입 없는 제품이라 identified_only로 설정해 봇/무지성 방문이
  *   사용자 카운트를 부풀리지 않도록 함.
- * - 세션 리플레이는 모든 입력값을 마스킹(default-safe). 보고 싶은 요소가
- *   생기면 `data-ph-no-mask` 속성을 붙여 opt-out.
+ * - 세션 리플레이: form 입력은 전부 마스킹(`maskAllInputs`), 텍스트는 기본
+ *   노출이고 민감한 영역에 `data-ph-mask` 속성을 붙여 opt-in 마스킹. 이 앱은
+ *   퀴즈 콘텐츠가 본질적으로 공개 텍스트라 default-mask는 디버깅만 어렵게 함.
  */
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -34,11 +35,6 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       session_recording: {
         maskAllInputs: true,
         maskTextSelector: "[data-ph-mask]",
-      },
-      loaded: (ph) => {
-        if (process.env.NODE_ENV === "development") {
-          ph.debug(false);
-        }
       },
     });
   }, []);

@@ -60,17 +60,24 @@ function forwardToPostHog(args: unknown[], level: number): void {
       return;
     }
 
-    // pino 호출 패턴은 두 가지: logger.error("msg") 또는
-    // logger.error({ err, ...ctx }, "msg"). 첫 인자가 객체면 그게 컨텍스트.
+    // pino 호출 패턴은 세 가지:
+    //   logger.error("msg")
+    //   logger.error({ err, ...ctx }, "msg")
+    //   logger.error(err)            ← 첫 인자가 Error 인스턴스
+    // 마지막 케이스는 isCtx 판정이 true라 ctx.err를 못 찾고 stack을 잃었었음.
     const first = args[0];
-    const isCtx = typeof first === "object" && first !== null;
+    const isError = first instanceof Error;
+    const isCtx = !isError && typeof first === "object" && first !== null;
     const ctx = (isCtx ? (first as Record<string, unknown>) : {}) as {
       err?: unknown;
     };
-    const message = (isCtx ? args[1] : args[0]) as string | undefined;
+    const message = (isCtx || isError ? args[1] : args[0]) as
+      | string
+      | undefined;
 
-    const error =
-      ctx.err instanceof Error
+    const error = isError
+      ? first
+      : ctx.err instanceof Error
         ? ctx.err
         : new Error(message ?? "log.error without message");
     posthog.captureException(error, undefined, {
