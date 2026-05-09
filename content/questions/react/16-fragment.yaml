@@ -23,7 +23,7 @@ choices:
     text: "리스트 렌더링 시 `key`를 자동으로 부여해 경고를 제거한다"
 answer: a
 explanation: |
-  Fragment(`<>...</>`)는 그룹화만 해 주고 DOM에 추가 노드를 남기지 않아. 테이블/리스트처럼 불필요한 wrapper가 레이아웃을 깨거나 CSS 선택자를 꿬 때 유용해.
-  `<div>`로 감싸는 것과 달리 DOM 노드가 늘지 않고, key가 필요한 케이스엔 `<React.Fragment key={...}>` 남아 쓸 수 있어.
+  Fragment(`<>...</>`)는 그룹화만 해 주고 DOM에 추가 노드를 남기지 않아. 테이블/리스트처럼 불필요한 wrapper가 레이아웃을 깨거나 CSS 선택자를 꼬이게 할 때 유용해.
+  `<div>`로 감싸는 것과 달리 DOM 노드가 늘지 않고, key가 필요한 케이스엔 `<React.Fragment key={...}>`로 풀어 쓸 수 있어.
   GPU나 key 자동 부여 같은 동작은 Fragment의 실제 역할이 아니야.
 tags: [ fragment, jsx, dom ]

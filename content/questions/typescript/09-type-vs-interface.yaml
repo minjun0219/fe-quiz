@@ -12,11 +12,11 @@ choices:
   - id: c
     text: "`type`은 컴파일 후 런타임에 남고 `interface`는 사라진다"
   - id: d
-    text: 두 키워드는 완전히 동일해 아무건 써도 차이가 없다
+    text: 두 키워드는 완전히 동일해 아무거나 써도 차이가 없다
 answer: a
 explanation: |
   `type`과 `interface`는 객체 형태·함수 타입·제네릭 등 대부분의 케이스에서 교체 가능해. 주요 차이:
   - `interface`는 같은 이름으로 재선언하면 멤버가 병합될 수 있어(declaration merging). 라이브러리를 확장할 때 유용.
   - `type`은 유니온(`A | B`), 인터섹션(`A & B`), 기본 타입 별칭(`type Id = string`), 튜플, 조건부·매핑 타입 등 `interface`가 못 다루는 영역까지 표현.
-  둘 다 컴파일 후 사라지니 런타임 조건은 구분 근거가 아니야. "공개 API·클래스 계악엔 interface, 나머지엔 type"이 대체적인 관습이야.
+  둘 다 컴파일 후 사라지니 런타임 조건은 구분 근거가 아니야. "공개 API·클래스 계약엔 interface, 나머지엔 type"이 대체적인 관습이야.
 tags: [ types, interface, type-alias ]

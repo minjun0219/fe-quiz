@@ -20,10 +20,10 @@ choices:
   - id: c
     text: (1) `unknown`, (2) `any`
   - id: d
-    text: 둘 다 컴파일 에러 — `K extends keyof T`는 키를 좀히지 못한다
+    text: 둘 다 컴파일 에러 — `K extends keyof T`는 키를 좁히지 못한다
 answer: a
 explanation: |
   `K extends keyof T` 제약은 `K`가 `T`의 실제 키 중 하나임을 컴파일 타임에 강제해 주고, 동시에 리턴 타입 `T[K]`도 키에 따라 정확하게 추론돼.
-  그래서 `get(u, 'name')`은 `string`(`u.name`의 타입)으로 좋혀지고, `get(u, 'email')`은 `'email'`이 `keyof typeof u`( =`'name' | 'age'`)에 없어 인자 단계에서 막혀.
-  런타임 안전 액세서 제구에 광범위하게 쓰이는 패턴이야.
+  그래서 `get(u, 'name')`은 `string`(`u.name`의 타입)으로 좁혀지고, `get(u, 'email')`은 `'email'`이 `keyof typeof u`( =`'name' | 'age'`)에 없어 인자 단계에서 막혀.
+  런타임 안전한 접근 패턴에 광범위하게 쓰이는 패턴이야.
 tags: [ generics, constraints, keyof ]
