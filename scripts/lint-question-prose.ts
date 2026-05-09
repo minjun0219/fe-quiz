@@ -1,0 +1,275 @@
+/**
+ * Raw-text linter for `content/questions/**\/*.yaml`.
+ *
+ * Why a separate pass (not the Zod schema in `lib/question.schema.ts`):
+ *   1) the YAML parser strips comments, but we need them for the
+ *      `# fmt: off-prose` opt-out marker;
+ *   2) `loadAllQuestions` is reused at request time in `lib/round.ts` — the
+ *      loader stays pure; this lint runs only from `scripts/check-questions.ts`.
+ *
+ * Heuristic: in `question:` / `choices[].text` / `explanation:` values, strip
+ * everything already wrapped in inline backticks or fenced ``` blocks, then
+ * flag the remainder if it still looks like code. False-positives are silenced
+ * with `# fmt: off-prose` on the line directly above the offending field.
+ *
+ * See `docs/CONTENT_STYLE.md` for the convention this enforces.
+ */
+
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+export type LintHit = {
+  file: string;
+  line: number;
+  field: string;
+  reason: string;
+  excerpt: string;
+};
+
+const OFF_MARKER = "# fmt: off-prose";
+
+const FIELD_KEYS = ["question", "explanation", "text"] as const;
+
+type Field = (typeof FIELD_KEYS)[number];
+
+type ExtractedValue = {
+  field: Field;
+  startLine: number;
+  text: string;
+};
+
+function indentOf(line: string): number {
+  let n = 0;
+  while (n < line.length && line[n] === " ") {
+    n++;
+  }
+  return n;
+}
+
+function unquoteScalar(raw: string): string {
+  if (raw.length >= 2) {
+    const first = raw[0];
+    const last = raw[raw.length - 1];
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+      const inner = raw.slice(1, -1);
+      if (first === '"') {
+        return inner.replace(/\\(["\\nrt])/g, (_, c) => {
+          if (c === "n") {
+            return "\n";
+          }
+          if (c === "r") {
+            return "\r";
+          }
+          if (c === "t") {
+            return "\t";
+          }
+          return c;
+        });
+      }
+      return inner;
+    }
+  }
+  return raw;
+}
+
+/**
+ * Walk a YAML file and yield each (field, value) pair we care about. Handles
+ * both inline `key: "..."` and block-scalar `key: |` forms. Comments and other
+ * keys are skipped.
+ */
+function extractFieldValues(source: string): ExtractedValue[] {
+  const lines = source.split("\n");
+  const out: ExtractedValue[] = [];
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const m = line.match(/^(\s*)(?:- \s*)?([a-zA-Z_]+):\s*(.*?)\s*$/);
+    if (!m) {
+      i++;
+      continue;
+    }
+    const [, , key, rest] = m;
+    if (!FIELD_KEYS.includes(key as Field)) {
+      i++;
+      continue;
+    }
+    const field = key as Field;
+    const keyIndent = indentOf(line);
+
+    if (rest === "|" || rest === ">" || rest === "|-" || rest === ">-") {
+      // Block scalar: collect indented continuation lines.
+      const blockStart = i + 1;
+      const childIndent =
+        blockStart < lines.length && lines[blockStart].length > 0
+          ? indentOf(lines[blockStart])
+          : keyIndent + 2;
+      const collected: string[] = [];
+      let j = blockStart;
+      while (j < lines.length) {
+        const cur = lines[j];
+        if (cur.trim() === "") {
+          collected.push("");
+          j++;
+          continue;
+        }
+        if (indentOf(cur) < childIndent) {
+          break;
+        }
+        collected.push(cur.slice(childIndent));
+        j++;
+      }
+      out.push({
+        field,
+        startLine: blockStart + 1,
+        text: collected.join("\n").replace(/\n+$/, ""),
+      });
+      i = j;
+      continue;
+    }
+
+    if (rest.length === 0) {
+      i++;
+      continue;
+    }
+
+    out.push({
+      field,
+      startLine: i + 1,
+      text: unquoteScalar(rest),
+    });
+    i++;
+  }
+
+  return out;
+}
+
+/**
+ * Find the line just above `targetLine` (1-indexed) that introduced a YAML key
+ * at the same or shallower indentation. The opt-out marker must sit on a line
+ * directly preceding that key.
+ */
+function hasOptOut(source: string, targetLine: number): boolean {
+  const lines = source.split("\n");
+  // Walk upward from the line introducing the key.
+  let cursor = targetLine - 2;
+  while (cursor >= 0) {
+    const cur = lines[cursor];
+    const trimmed = cur.trim();
+    if (trimmed === "") {
+      cursor--;
+      continue;
+    }
+    return trimmed === OFF_MARKER;
+  }
+  return false;
+}
+
+/**
+ * Strip text spans that are already wrapped in inline single-backticks or
+ * fenced ``` blocks. What remains is what the heuristic gets to inspect.
+ */
+function stripWrappedSpans(text: string): string {
+  // Remove fenced blocks first (greedy across lines, non-greedy body).
+  const fenceStripped = text.replace(
+    /```[a-zA-Z0-9_+-]*\n[\s\S]*?\n[ \t]*```/g,
+    " ",
+  );
+  // Then inline single-backtick spans on a single line.
+  return fenceStripped.replace(/`[^`\n]+`/g, " ");
+}
+
+const CODE_PATTERNS: { name: string; re: RegExp }[] = [
+  { name: "arrow function (=>)", re: /=>/ },
+  {
+    name: "function/return/const/let/var keyword",
+    re: /\b(?:function|return|const|let|var)\s+[A-Za-z_$]/,
+  },
+  { name: "strict equality (===/!==)", re: /===|!==/ },
+  { name: "template literal interpolation (${)", re: /\$\{/ },
+  {
+    name: "method call (ident.ident(...))",
+    re: /[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*\s*\(/,
+  },
+  { name: "JSX-like tag", re: /<\/?[A-Za-z][\w-]*[\s/>]/ },
+  {
+    name: "CSS shorthand (prop: value;)",
+    re: /(?:^|\s)[a-z][a-z-]+\s*:\s*[^;\n]+;/,
+  },
+  { name: "TS type literal answer", re: /^\s*\{[^}\n]*:[^}\n]*\}\s*$/m },
+  {
+    name: "bare TS type-keyword answer",
+    re: /^(?:any|never|void|unknown|string|number|boolean|null|undefined)$/,
+  },
+  { name: "array literal answer", re: /^\s*\[[^\]\n]*\]\s*$/m },
+  {
+    name: "TS string literal union",
+    re: /^\s*['"][^'"\n]+['"](?:\s*\|\s*['"][^'"\n]+['"])+\s*$/m,
+  },
+];
+
+function detectCodeShape(stripped: string): string | null {
+  const trimmed = stripped.trim();
+  if (trimmed.length === 0) {
+    return null;
+  }
+  for (const { name, re } of CODE_PATTERNS) {
+    if (re.test(trimmed)) {
+      return name;
+    }
+  }
+  return null;
+}
+
+function lintFile(absPath: string, relPath: string): LintHit[] {
+  const source = readFileSync(absPath, "utf8");
+  const values = extractFieldValues(source);
+  const hits: LintHit[] = [];
+
+  for (const v of values) {
+    if (hasOptOut(source, v.startLine)) {
+      continue;
+    }
+    const stripped = stripWrappedSpans(v.text);
+    const reason = detectCodeShape(stripped);
+    if (!reason) {
+      continue;
+    }
+    hits.push({
+      file: relPath,
+      line: v.startLine,
+      field: v.field,
+      reason,
+      excerpt: v.text.length > 80 ? `${v.text.slice(0, 77)}...` : v.text,
+    });
+  }
+  return hits;
+}
+
+export function lintQuestionProse(rootDir: string): LintHit[] {
+  const hits: LintHit[] = [];
+  const categories = readdirSync(rootDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+
+  for (const category of categories) {
+    const dir = join(rootDir, category);
+    const entries = readdirSync(dir, { withFileTypes: true }).filter(
+      (e) => e.isFile() && e.name.endsWith(".yaml"),
+    );
+    for (const entry of entries) {
+      const relPath = `${category}/${entry.name}`;
+      hits.push(...lintFile(join(dir, entry.name), relPath));
+    }
+  }
+  return hits;
+}
+
+export function formatHits(hits: LintHit[]): string {
+  return hits
+    .map(
+      (h) =>
+        `  ${h.file}:${h.line}  [${h.field}] ${h.reason}\n    "${h.excerpt.replace(/\n/g, "\\n")}"`,
+    )
+    .join("\n");
+}
