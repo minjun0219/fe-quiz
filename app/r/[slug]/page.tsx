@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ContributeNote } from "@/components/credits";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import {
   buildTypeCode,
@@ -134,6 +135,7 @@ export default async function SharePage({ params }: Props) {
           다른 라운드 풀어보기
         </Link>
       </div>
+      <ContributeNote />
     </main>
   );
 }
