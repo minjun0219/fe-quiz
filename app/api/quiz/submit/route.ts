@@ -29,7 +29,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   let graded: Awaited<ReturnType<typeof gradeRound>>;
   try {
-    graded = await gradeRound(parsed.data, (id) => lookup.get(id));
+    graded = await gradeRound(parsed.data, (id) => lookup.get(id), { withHtml: true });
   } catch (err) {
     if (err instanceof GradingError) {
       return NextResponse.json({ error: err.message }, { status: 400 });

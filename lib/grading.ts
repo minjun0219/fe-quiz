@@ -26,18 +26,24 @@ export interface GradedRound {
 export async function gradeRound(
   req: QuizSubmitRequest,
   lookup: (id: string) => Question | undefined,
+  opts: { withHtml?: boolean } = {},
 ): Promise<GradedRound> {
   const per_question: QuizQuestionResult[] = [];
   const category_scores: Partial<Record<Category, CategoryScore>> = {};
   let total_correct = 0;
 
-  // Pre-compute Shiki HTML in parallel; per-question loop below stays sync.
-  const codeHtmls = await Promise.all(
-    req.question_ids.map((id) => {
-      const q = lookup(id);
-      return q?.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined);
-    }),
-  );
+  // Highlighting is opt-in: only the submit route renders the result UI and
+  // needs Shiki/inline-code HTML. /api/quiz/feedback (LLM prompt) and
+  // /api/share (id+score storage) never read these fields, so skipping the
+  // WASM cold-start + per-question codeToHtml saves real latency.
+  const codeHtmls = opts.withHtml
+    ? await Promise.all(
+        req.question_ids.map((id) => {
+          const q = lookup(id);
+          return q?.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined);
+        }),
+      )
+    : null;
 
   for (let i = 0; i < req.question_ids.length; i++) {
     const id = req.question_ids[i];
@@ -67,13 +73,13 @@ export async function gradeRound(
       type: q.type,
       question: q.question,
       code: q.code,
-      code_html: codeHtmls[i],
+      code_html: codeHtmls?.[i],
       choices: orderedChoices,
       your_answer: yours,
       correct_answer: q.answer,
       is_correct,
       explanation: q.explanation,
-      explanation_html: highlightInlineBackticks(q.explanation),
+      explanation_html: opts.withHtml ? highlightInlineBackticks(q.explanation) : undefined,
     });
   }
 
