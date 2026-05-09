@@ -1,3 +1,4 @@
+import { highlightCode, highlightInlineBackticks } from "./highlight";
 import type { Category, Question } from "./question.schema";
 import type {
   CategoryScore,
@@ -22,13 +23,21 @@ export interface GradedRound {
  * question's `type` here (single_choice → string|null, multi_choice →
  * string[]|null) so a mismatch surfaces as a 400 instead of silent miss.
  */
-export function gradeRound(
+export async function gradeRound(
   req: QuizSubmitRequest,
   lookup: (id: string) => Question | undefined,
-): GradedRound {
+): Promise<GradedRound> {
   const per_question: QuizQuestionResult[] = [];
   const category_scores: Partial<Record<Category, CategoryScore>> = {};
   let total_correct = 0;
+
+  // Pre-compute Shiki HTML in parallel; per-question loop below stays sync.
+  const codeHtmls = await Promise.all(
+    req.question_ids.map((id) => {
+      const q = lookup(id);
+      return q?.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined);
+    }),
+  );
 
   for (let i = 0; i < req.question_ids.length; i++) {
     const id = req.question_ids[i];
@@ -58,11 +67,13 @@ export function gradeRound(
       type: q.type,
       question: q.question,
       code: q.code,
+      code_html: codeHtmls[i],
       choices: orderedChoices,
       your_answer: yours,
       correct_answer: q.answer,
       is_correct,
       explanation: q.explanation,
+      explanation_html: highlightInlineBackticks(q.explanation),
     });
   }
 

@@ -34,9 +34,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const lookup = getQuestionMap();
-  let graded: ReturnType<typeof gradeRound>;
+  let graded: Awaited<ReturnType<typeof gradeRound>>;
   try {
-    graded = gradeRound(parsed.data, (id) => lookup.get(id));
+    graded = await gradeRound(parsed.data, (id) => lookup.get(id));
   } catch (err) {
     if (err instanceof GradingError) {
       return NextResponse.json({ error: err.message }, { status: 400 });

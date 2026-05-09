@@ -30,9 +30,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   // Server re-grades from question_ids + answers — never trust a client-supplied score.
   const lookup = getQuestionMap();
-  let graded: ReturnType<typeof gradeRound>;
+  let graded: Awaited<ReturnType<typeof gradeRound>>;
   try {
-    graded = gradeRound(
+    graded = await gradeRound(
       { question_ids: parsed.data.question_ids, answers: parsed.data.answers },
       (id) => lookup.get(id),
     );

@@ -1,13 +1,15 @@
 import "server-only";
+import { highlightCode } from "./highlight";
 import type { PublicQuestion, Question } from "./question.schema";
 import { getAllQuestions, getQuestionMap } from "./questions";
 
 /** Number of questions per round. Falls back to pool size when seed < target. */
 export const ROUND_SIZE = 5;
 
-export function publicView(q: Question): PublicQuestion {
+export async function publicView(q: Question): Promise<PublicQuestion> {
   const { answer: _answer, explanation: _explanation, ...rest } = q;
-  return rest;
+  if (!rest.code) return rest;
+  return { ...rest, code_html: await highlightCode(rest.code, rest.category) };
 }
 
 /** Fisher–Yates. Returns a fresh array without mutating input. */
@@ -28,13 +30,12 @@ function shuffle<T>(input: readonly T[]): T[] {
  * (e.g., a query param later) can't accidentally trigger surprising slice
  * semantics like `slice(0, -1)`.
  */
-export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
+export async function pickRoundQuestions(count = ROUND_SIZE): Promise<PublicQuestion[]> {
   const safeCount = Math.max(0, Math.floor(count));
   const all = getAllQuestions();
-  return shuffle(all)
-    .slice(0, Math.min(safeCount, all.length))
-    .map(publicView)
-    .map((q) => ({ ...q, choices: shuffle(q.choices) }));
+  const picked = shuffle(all).slice(0, Math.min(safeCount, all.length));
+  const views = await Promise.all(picked.map(publicView));
+  return views.map((q) => ({ ...q, choices: shuffle(q.choices) }));
 }
 
 /**
@@ -45,12 +46,12 @@ export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
  * Unknown IDs are silently dropped (a question may have been retired between
  * the original round and the friend's replay).
  */
-export function pickRoundQuestionsByIds(ids: readonly string[]): PublicQuestion[] {
+export async function pickRoundQuestionsByIds(ids: readonly string[]): Promise<PublicQuestion[]> {
   const map = getQuestionMap();
-  const out: PublicQuestion[] = [];
+  const found: Question[] = [];
   for (const id of ids) {
     const q = map.get(id);
-    if (q) out.push(publicView(q));
+    if (q) found.push(q);
   }
-  return out;
+  return Promise.all(found.map(publicView));
 }

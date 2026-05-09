@@ -65,11 +65,15 @@ export interface QuizQuestionResult {
   type: QuestionType;
   question: string;
   code?: string;
+  /** Server-rendered Shiki HTML for `code`. */
+  code_html?: string;
   choices: Choice[];
   your_answer: SubmittedAnswer;
   correct_answer: string | string[];
   is_correct: boolean;
   explanation: string;
+  /** Server-rendered HTML for `explanation` with inline backtick spans. */
+  explanation_html?: string;
 }
 
 /** Per-category aggregate. */
