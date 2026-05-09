@@ -7,6 +7,8 @@ vi.mock("./questions", () => {
   let pool: any[] = [];
   return {
     getAllQuestions: () => pool,
+    // biome-ignore lint/suspicious/noExplicitAny: category-typed in real code
+    getQuestionsByCategory: (cat: any) => pool.filter((q) => q.category === cat),
     getQuestionMap: () => new Map(pool.map((q) => [q.id, q])),
     // biome-ignore lint/suspicious/noExplicitAny: test seeder
     __setPool: (p: any[]) => {
@@ -69,9 +71,9 @@ describe("pickRoundQuestions", () => {
 
   it("default count is ROUND_SIZE; falls back to pool size when smaller", async () => {
     const round = await pickRoundQuestions();
-    // pool has 3, ROUND_SIZE=5 → 3 returned (no padding)
+    // pool has 3 (all js), ROUND_SIZE=10 → 3 returned (no padding)
     expect(round).toHaveLength(3);
-    expect(ROUND_SIZE).toBe(5);
+    expect(ROUND_SIZE).toBe(10);
   });
 
   it("count clamps to non-negative integer", async () => {
