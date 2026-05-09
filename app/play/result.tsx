@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ContributeNote } from "@/components/credits";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import type { Category } from "@/lib/question.schema";
@@ -18,7 +17,8 @@ type FeedbackStatus =
   | "done"
   | "error"
   | "unavailable";
-type ShareStatus = "idle" | "creating" | "error";
+type ShareStatus = "idle" | "creating" | "ready" | "error";
+type CopyStatus = "idle" | "copied";
 
 function matches(target: string | string[] | null, id: string): boolean {
   if (target === null) {
@@ -27,13 +27,30 @@ function matches(target: string | string[] | null, id: string): boolean {
   return Array.isArray(target) ? target.includes(id) : target === id;
 }
 
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    /* fallthrough — caller falls back to manual select-all */
+  }
+  return false;
+}
+
 export default function Result({ data }: Props) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [feedbackStatus, setFeedbackStatus] =
     useState<FeedbackStatus>("loading");
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
+  // navigator.share availability is detected after mount so SSR / non-secure
+  // contexts don't render a button that does nothing.
+  const [canNativeShare, setCanNativeShare] = useState(false);
+  const copyResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const overallPct = Math.round((data.total_correct / data.total) * 100);
 
   // Share is enabled once the feedback flow has settled in any terminal
@@ -43,8 +60,30 @@ export default function Result({ data }: Props) {
   const canShare =
     feedbackStatus !== "loading" && feedbackStatus !== "streaming";
 
+  useEffect(() => {
+    setCanNativeShare(
+      typeof navigator !== "undefined" && typeof navigator.share === "function",
+    );
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetRef.current) {
+        clearTimeout(copyResetRef.current);
+      }
+    };
+  }, []);
+
+  function flashCopiedFeedback() {
+    setCopyStatus("copied");
+    if (copyResetRef.current) {
+      clearTimeout(copyResetRef.current);
+    }
+    copyResetRef.current = setTimeout(() => setCopyStatus("idle"), 1500);
+  }
+
   async function handleShare() {
-    if (!canShare || shareStatus === "creating") {
+    if (!canShare || shareStatus === "creating" || shareStatus === "ready") {
       return;
     }
     setShareStatus("creating");
@@ -67,9 +106,51 @@ export default function Result({ data }: Props) {
         throw new Error(`HTTP ${res.status}`);
       }
       const body = (await res.json()) as ShareCreateResponse;
-      router.push(`/r/${body.slug}`);
+      setShareUrl(body.url);
+      setShareStatus("ready");
+      const ok = await copyToClipboard(body.url);
+      if (ok) {
+        flashCopiedFeedback();
+      }
     } catch {
       setShareStatus("error");
+    }
+  }
+
+  async function handleCopyClick() {
+    if (!shareUrl) {
+      return;
+    }
+    const ok = await copyToClipboard(shareUrl);
+    if (ok) {
+      flashCopiedFeedback();
+    }
+  }
+
+  async function handleNativeShare() {
+    if (!shareUrl || !canNativeShare) {
+      return;
+    }
+    try {
+      await navigator.share({
+        title: `${data.emoji} ${data.result_type}`,
+        text: `내 프론트엔드 진단 결과: ${data.result_type} (${data.total_correct}/${data.total})`,
+        url: shareUrl,
+      });
+    } catch (err) {
+      // AbortError는 DOMException이라 환경에 따라 `instanceof Error`가 false일
+      // 수 있고, err가 null/undefined로 들어오는 경우도 있다 — 양쪽 다 안전하게.
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        (err as { name?: unknown }).name === "AbortError"
+      ) {
+        return;
+      }
+      const ok = await copyToClipboard(shareUrl);
+      if (ok) {
+        flashCopiedFeedback();
+      }
     }
   }
 
@@ -77,9 +158,18 @@ export default function Result({ data }: Props) {
     // Reset on every dep change so a new round (different `data`) gets a
     // fresh stream instead of accumulating on top of the previous one. The
     // `ignore` flag guards against StrictMode double-invoke + late updates
-    // from a stale effect.
+    // from a stale effect. Share state도 함께 reset — 안 하면 새 라운드
+    // 결과 페이지에서 이전 라운드의 공유 패널/URL이 그대로 남아 다시 공유를
+    // 만들 수 없게 된다.
     setFeedback("");
     setFeedbackStatus("loading");
+    setShareStatus("idle");
+    setShareUrl(null);
+    setCopyStatus("idle");
+    if (copyResetRef.current) {
+      clearTimeout(copyResetRef.current);
+      copyResetRef.current = null;
+    }
     let ignore = false;
     const abort = new AbortController();
 
@@ -362,18 +452,103 @@ export default function Result({ data }: Props) {
       </section>
 
       <div className="mt-auto flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={handleShare}
-          disabled={!canShare || shareStatus === "creating"}
-          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:enabled:hover:bg-zinc-200"
-        >
-          {shareStatus === "creating"
-            ? "공유 만드는 중…"
-            : !canShare
-              ? "친구의 한마디 기다리는 중…"
-              : "친구한테 보내기 →"}
-        </button>
+        {shareStatus === "ready" && shareUrl ? (
+          <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+            <p className="text-xs font-semibold tracking-wider uppercase">
+              <span
+                className={
+                  copyStatus === "copied"
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-zinc-500 dark:text-zinc-400"
+                }
+              >
+                {copyStatus === "copied"
+                  ? "복사됐어! 친구한테 붙여넣어 봐"
+                  : "공유 링크"}
+              </span>
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                readOnly
+                value={shareUrl}
+                onFocus={(e) => e.target.select()}
+                className="min-w-0 flex-1 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:focus:ring-zinc-600"
+                aria-label="공유 링크"
+              />
+              {canNativeShare && (
+                <button
+                  type="button"
+                  onClick={handleNativeShare}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-white transition hover:bg-zinc-800 active:scale-[0.97] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  aria-label="공유하기"
+                  title="공유하기"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 16V4" />
+                    <path d="m7 9 5-5 5 5" />
+                    <path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+                  </svg>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleCopyClick}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-300 text-zinc-700 transition hover:bg-zinc-100 active:scale-[0.97] dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                aria-label="링크 복사"
+                title="링크 복사"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <rect x="9" y="9" width="11" height="11" rx="2" />
+                  <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+                </svg>
+              </button>
+            </div>
+            <a
+              href={shareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="self-start text-xs text-zinc-500 underline-offset-2 hover:text-zinc-700 hover:underline dark:text-zinc-400 dark:hover:text-zinc-200"
+            >
+              친구가 보는 화면 미리보기 ↗
+            </a>
+            <span className="sr-only" aria-live="polite">
+              {copyStatus === "copied" ? "링크가 복사됐어요" : ""}
+            </span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleShare}
+            disabled={!canShare || shareStatus === "creating"}
+            className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:enabled:hover:bg-zinc-200"
+          >
+            {shareStatus === "creating"
+              ? "공유 만드는 중…"
+              : !canShare
+                ? "친구의 한마디 기다리는 중…"
+                : "친구한테 보내기 →"}
+          </button>
+        )}
         {shareStatus === "error" && (
           <p className="text-center text-sm text-rose-500">
             공유 만들기에 실패했어. 잠시 후 다시 눌러봐.
