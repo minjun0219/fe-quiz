@@ -7,13 +7,13 @@ export default function Home() {
         친구가 내는 프론트엔드 퀴즈
       </p>
       <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-        5문제만 풀어봐.
+        10문제만 풀어봐.
         <br />
         얼마나 알고 있는지.
       </h1>
       <p className="mb-10 max-w-md text-base leading-relaxed text-zinc-600">
         면접 압박 없이, 단톡방에서 친구 던지듯.
-        <br />다 풀면 AI가 친구처럼 피드백 줘.
+        <br />다 풀면 AI가 친구처럼 피드백 + MBTI식 결과 타입까지 알려줘.
       </p>
       <Link
         href="/play"
@@ -21,7 +21,7 @@ export default function Home() {
       >
         지금 풀어보기 →
       </Link>
-      <p className="mt-6 text-xs text-zinc-400">JS · React · CSS / 약 3분</p>
+      <p className="mt-6 text-xs text-zinc-400">JS · React · CSS / 약 5분</p>
     </main>
   );
 }

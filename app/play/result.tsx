@@ -116,11 +116,23 @@ export default function Result({ data }: Props) {
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
       <section className="mb-8 text-center">
         <p className="mb-2 text-sm font-medium tracking-wide text-rose-500">오늘의 진단</p>
-        <h1 className="mb-3 text-4xl leading-tight font-bold tracking-tight">
+        <h1 className="mb-2 text-4xl leading-tight font-bold tracking-tight">
           <span className="mr-2">{data.emoji}</span>
           {data.result_type}
         </h1>
-        <p className="mb-6 text-base text-zinc-600">{data.blurb}</p>
+        <p className="mb-3">
+          <span className="inline-block rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold tracking-wider text-zinc-700 tabular-nums">
+            {data.type_code}
+          </span>
+          <span className="ml-2 text-xs text-zinc-500">
+            {data.personality === "balanced" ? "균형형" : "편식형"}
+          </span>
+        </p>
+        <p className="mb-2 text-base text-zinc-600">{data.blurb}</p>
+        <p className="mb-6 text-sm text-zinc-500">
+          <span className="mr-1">{data.vibe.emoji}</span>
+          {data.vibe.blurb}
+        </p>
         <p className="text-2xl font-semibold tabular-nums text-zinc-900">
           {data.total_correct} <span className="text-zinc-400">/</span> {data.total}
           <span className="ml-2 text-base font-medium text-zinc-500">({overallPct}%)</span>
