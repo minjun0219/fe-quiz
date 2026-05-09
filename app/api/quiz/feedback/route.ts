@@ -1,11 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
 import {
   buildFeedbackUserPrompt,
   FEEDBACK_SYSTEM_PROMPT,
 } from "@/lib/feedback-prompt";
 import { GradingError, gradeRound } from "@/lib/grading";
+import { getPostHogServer } from "@/lib/posthog-server";
 import { getQuestionMap } from "@/lib/questions";
 import { QuizSubmitRequest } from "@/lib/quiz-submit.schema";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -18,6 +19,10 @@ export const runtime = "nodejs";
 const anthropic = new Anthropic();
 
 export async function POST(request: Request): Promise<Response> {
+  after(async () => {
+    await getPostHogServer()?.flush();
+  });
+
   // 피드백은 Anthropic 호출당 비용 직결 (Haiku 4.5, ~$0.003/req). 분당 5개로
   // 가장 타이트하게 가둠. 정상 사용자가 같은 라운드 결과를 분당 5번 이상 새로
   // 띄울 일은 없음 (한 라운드 한 번 streaming).

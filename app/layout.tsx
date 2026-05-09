@@ -1,4 +1,6 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
+import { PostHogProvider } from "@/components/PostHogProvider";
 import "./globals.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -46,7 +48,8 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-dvh flex flex-col font-sans bg-[--color-bg] text-[--color-fg]">
-        {children}
+        <PostHogProvider>{children}</PostHogProvider>
+        <Analytics />
       </body>
     </html>
   );
