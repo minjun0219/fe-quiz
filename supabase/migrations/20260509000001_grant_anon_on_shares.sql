@@ -9,5 +9,10 @@
 -- 0001 마이그레이션이 생성한 RLS 정책은 행 단위 가시성을 통제하지만, 그 전에
 -- role이 테이블 자체에 권한이 있어야 한다. INSERT/SELECT만 부여하고 UPDATE/DELETE는
 -- 정책 미생성 + GRANT 미부여 두 겹으로 차단 유지.
+--
+-- 의도적으로 `authenticated`는 부여하지 않는다. v1엔 auth 자체가 없고, 0001의
+-- RLS 정책도 `to anon` 한정이라 `authenticated`에 GRANT만 붙여도 정책 미일치로
+-- 차단됨 — 죽은 권한이 됨. 나중에 auth 도입 시 정책 + GRANT 한 묶음으로 추가.
 
-grant select, insert on public.shares to anon, authenticated;
+grant select, insert on public.shares to anon;
+
