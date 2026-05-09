@@ -2,6 +2,7 @@ import "server-only";
 import { nanoid } from "nanoid";
 import { cache } from "react";
 import type { GradedRound } from "./grading";
+import { logger } from "./logger";
 import { type ShareRow, ShareRowSchema } from "./share.schema";
 import { getSupabase } from "./supabase";
 
@@ -93,10 +94,9 @@ export const getShareById = cache(
 
     const parsed = ShareRowSchema.safeParse(data);
     if (!parsed.success) {
-      // biome-ignore lint/suspicious/noConsole: 서버 측 데이터 정합성 경고
-      console.error(
-        `[share-store] row ${id} failed schema validation:`,
-        parsed.error.issues,
+      logger.error(
+        { id, issues: parsed.error.issues },
+        "[share-store] row failed schema validation",
       );
       return null;
     }

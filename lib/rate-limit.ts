@@ -1,6 +1,7 @@
 import "server-only";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { logger } from "@/lib/logger";
 
 let redis: Redis | null = null;
 
@@ -95,8 +96,7 @@ export async function checkRateLimit(
       },
     );
   } catch (err) {
-    // biome-ignore lint/suspicious/noConsole: 서버 측 운영 경고 (fail-open 추적)
-    console.warn("[rate-limit] limiter check failed, failing open:", err);
+    logger.warn({ err }, "[rate-limit] limiter check failed, failing open");
     return null;
   }
 }

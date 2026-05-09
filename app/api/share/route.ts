@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
 import { GradingError, gradeRound } from "@/lib/grading";
+import { logger } from "@/lib/logger";
 import { getQuestionMap } from "@/lib/questions";
 import { checkRateLimit } from "@/lib/rate-limit";
 import {
@@ -74,8 +75,7 @@ export async function POST(request: Request): Promise<Response> {
   } catch (err) {
     // Log full detail server-side; never echo DB / internal messages to the
     // client — they can leak schema info or auth state.
-    // biome-ignore lint/suspicious/noConsole: 서버 측 에러 로그
-    console.error("[/api/share] createShare failed:", err);
+    logger.error({ err }, "[/api/share] createShare failed");
     return NextResponse.json(
       { error: "failed to create share" },
       { status: 500 },
