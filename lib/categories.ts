@@ -46,6 +46,30 @@ export const CATEGORIES = [
       blurb: "픽셀 1px도 그냥 안 넘어가, 디테일 장인이네.",
     },
   },
+  {
+    id: "typescript",
+    idPrefix: "ts",
+    display: "TypeScript",
+    short: "TS",
+    persona: {
+      code: "TS",
+      name: "타입 추론가",
+      emoji: "🔷",
+      blurb: "any 안 쓰고 제네릭으로 끝까지 좁혔네.",
+    },
+  },
+  {
+    id: "html",
+    idPrefix: "html",
+    display: "HTML",
+    short: "HTML",
+    persona: {
+      code: "HTML",
+      name: "시맨틱 빌더",
+      emoji: "🧱",
+      blurb: "div 떡칠 안 하고 시맨틱 태그 딱 골라 쓰네.",
+    },
+  },
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number]["id"];

@@ -5,10 +5,12 @@ import type { Category } from "./question.schema";
 
 const THEME = "github-dark-default";
 
-const CATEGORY_TO_LANG: Record<Category, "javascript" | "tsx" | "css"> = {
+const CATEGORY_TO_LANG: Record<Category, "javascript" | "tsx" | "css" | "typescript" | "html"> = {
   javascript: "javascript",
   react: "tsx",
   css: "css",
+  typescript: "typescript",
+  html: "html",
 };
 
 let highlighterPromise: Promise<HighlighterCore> | null = null;
@@ -21,6 +23,8 @@ function getHighlighter(): Promise<HighlighterCore> {
         import("shiki/langs/javascript.mjs"),
         import("shiki/langs/tsx.mjs"),
         import("shiki/langs/css.mjs"),
+        import("shiki/langs/typescript.mjs"),
+        import("shiki/langs/html.mjs"),
       ],
       engine: createOnigurumaEngine(import("shiki/wasm")),
     });
