@@ -109,7 +109,10 @@ export default async function Image({ params }: Props) {
         </div>
         <div
           style={{
-            display: "flex",
+            // Satori treats text-overflow:ellipsis more reliably with block
+            // than with flex; the rest of the hero is left-aligned so we
+            // skip textAlign:center and use width:100% to bound the clip.
+            display: "block",
             fontSize: 88,
             fontWeight: 700,
             lineHeight: 1.1,
@@ -120,7 +123,7 @@ export default async function Image({ params }: Props) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            maxWidth: "100%",
+            width: "100%",
           }}
         >
           {hero.name}
@@ -144,6 +147,7 @@ export default async function Image({ params }: Props) {
                 borderRadius: 9999,
                 padding: "8px 24px",
                 letterSpacing: 1,
+                fontVariantNumeric: "tabular-nums",
               }}
             >
               {typeCode}
@@ -153,7 +157,16 @@ export default async function Image({ params }: Props) {
             </div>
           </div>
         )}
-        <div style={{ display: "flex", fontSize: 48, color: "#3f3f46" }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 48,
+            fontWeight: 600,
+            color: "#18181b",
+            lineHeight: 1.2,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
           {totalCorrect} / {total} · {share.score}%
         </div>
       </div>
