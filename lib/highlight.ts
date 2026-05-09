@@ -1,77 +1,5 @@
 import "server-only";
-import { createHighlighterCore, type HighlighterCore } from "shiki/core";
-import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 import type { Category } from "./question.schema";
-
-const THEME = "github-dark-default";
-
-type ShikiLang = "javascript" | "tsx" | "css" | "typescript" | "html";
-
-const CATEGORY_TO_LANG: Record<Category, ShikiLang> = {
-  javascript: "javascript",
-  react: "tsx",
-  css: "css",
-  typescript: "typescript",
-  html: "html",
-};
-
-const FENCE_LANG_ALIASES: Record<string, ShikiLang> = {
-  js: "javascript",
-  javascript: "javascript",
-  jsx: "tsx",
-  tsx: "tsx",
-  ts: "typescript",
-  typescript: "typescript",
-  css: "css",
-  html: "html",
-};
-
-let highlighterPromise: Promise<HighlighterCore> | null = null;
-
-function getHighlighter(): Promise<HighlighterCore> {
-  if (!highlighterPromise) {
-    highlighterPromise = createHighlighterCore({
-      themes: [import("shiki/themes/github-dark-default.mjs")],
-      langs: [
-        import("shiki/langs/javascript.mjs"),
-        import("shiki/langs/tsx.mjs"),
-        import("shiki/langs/css.mjs"),
-        import("shiki/langs/typescript.mjs"),
-        import("shiki/langs/html.mjs"),
-      ],
-      engine: createOnigurumaEngine(import("shiki/wasm")),
-    });
-  }
-  return highlighterPromise;
-}
-
-// Shiki sets `background-color` + `color` inline on the wrapper <pre>; our
-// wrapper <div> paints the background, and letting Shiki keep its own would
-// double up (and force !important overrides). Token <span>s keep their inline
-// color.
-const SHIKI_TRANSFORMERS = [
-  {
-    pre(node: { properties: { style?: unknown } }) {
-      node.properties.style = undefined;
-    },
-    code(node: { properties: { style?: unknown } }) {
-      node.properties.style = undefined;
-    },
-  },
-];
-
-async function shikiToHtml(code: string, lang: ShikiLang): Promise<string> {
-  const highlighter = await getHighlighter();
-  return highlighter.codeToHtml(code, {
-    lang,
-    theme: THEME,
-    transformers: SHIKI_TRANSFORMERS,
-  });
-}
-
-export async function highlightCode(code: string, category: Category): Promise<string> {
-  return shikiToHtml(code, CATEGORY_TO_LANG[category]);
-}
 
 const HTML_ESCAPES: Record<string, string> = {
   "&": "&amp;",
@@ -83,6 +11,20 @@ const HTML_ESCAPES: Record<string, string> = {
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => HTML_ESCAPES[c]);
+}
+
+// Plain monospace block — no syntax coloring. The wrapping <div> in the JSX
+// caller paints the dark background + padding (see RoundRunner / Result), so
+// here we only need an HTML-escaped <pre><code>. Tracked as backlog #30 if we
+// want token-level highlighting back.
+function plainCodeBlock(code: string): string {
+  return `<pre><code>${escapeHtml(code)}</code></pre>`;
+}
+
+// `category` was the Shiki language key; kept on the signature so callers
+// don't need to change when/if highlighting comes back via #30.
+export async function highlightCode(code: string, _category: Category): Promise<string> {
+  return plainCodeBlock(code);
 }
 
 // Single-line **bold** runs. Inner content starts and ends with non-whitespace
@@ -161,55 +103,38 @@ function renderInlineSegment(text: string): string {
 }
 
 // Fenced code block: ```<lang>\n<code>\n``` — non-greedy across newlines.
-// Allows the opener/closer to be indented (YAML `|` block scalars sometimes
-// leave residual indent inside content). The captured code retains its own
-// indentation; Shiki preserves it.
+// The info-string is parsed but ignored (no syntax highlighting); see #30.
 const FENCE_RE = /```([a-zA-Z0-9_+-]*)\n([\s\S]*?)\n[ \t]*```/g;
 
 // Shared with the React result/explanation card so styling stays consistent.
-// `quiz-code-block` triggers the Shiki <pre> reset in globals.css.
 const FENCE_WRAPPER_CLASS =
   "quiz-code-block my-3 rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100";
 
 /**
  * Render a quiz text field (question / option text / explanation) to HTML.
  *
- * - Triple-backtick fenced blocks → Shiki, wrapped in a styled <div>. The
- *   info-string (e.g. ```js, ```tsx) picks the language; if absent or
- *   unsupported, the question's `category` provides the fallback lang.
+ * - Triple-backtick fenced blocks → escaped <pre><code> wrapped in a styled
+ *   dark <div>. Info-string is currently ignored (see backlog #30).
  * - Single-backtick spans → <code class="inline-code">.
  * - `**bold**` → <strong>.
  * - Everything else is HTML-escaped.
  *
- * Async because Shiki's WASM-backed highlighter is async; callers already
- * thread `await` for the question's main `code` field, so this fits the
- * same pipeline.
+ * Async (returns Promise) so callers can wire it into the same Promise.all
+ * pipeline used by the rest of the render path; if highlighting (#30) comes
+ * back, the signature already accommodates an async highlighter.
  */
-export async function renderQuizMarkdown(text: string, category: Category): Promise<string> {
-  type Fence = { start: number; end: number; lang: ShikiLang; code: string };
-  const fences: Fence[] = [];
-  for (const m of text.matchAll(FENCE_RE)) {
-    if (m.index === undefined) continue;
-    const langTag = (m[1] || "").toLowerCase();
-    const lang = FENCE_LANG_ALIASES[langTag] ?? CATEGORY_TO_LANG[category];
-    fences.push({
-      start: m.index,
-      end: m.index + m[0].length,
-      lang,
-      code: m[2],
-    });
-  }
-  const fenceHtmls = await Promise.all(fences.map((f) => shikiToHtml(f.code, f.lang)));
-
+export async function renderQuizMarkdown(text: string, _category: Category): Promise<string> {
   const parts: string[] = [];
   let cursor = 0;
-  for (let i = 0; i < fences.length; i++) {
-    const f = fences[i];
-    if (f.start > cursor) {
-      parts.push(renderInlineSegment(text.slice(cursor, f.start)));
+  for (const m of text.matchAll(FENCE_RE)) {
+    if (m.index === undefined) continue;
+    const start = m.index;
+    const end = start + m[0].length;
+    if (start > cursor) {
+      parts.push(renderInlineSegment(text.slice(cursor, start)));
     }
-    parts.push(`<div class="${FENCE_WRAPPER_CLASS}">${fenceHtmls[i]}</div>`);
-    cursor = f.end;
+    parts.push(`<div class="${FENCE_WRAPPER_CLASS}">${plainCodeBlock(m[2])}</div>`);
+    cursor = end;
   }
   if (cursor < text.length) {
     parts.push(renderInlineSegment(text.slice(cursor)));

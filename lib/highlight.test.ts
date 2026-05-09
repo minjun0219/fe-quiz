@@ -1,18 +1,17 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
+import { highlightCode, renderQuizMarkdown } from "./highlight";
 
-// Stub Shiki for the inline tests so they don't pay the WASM cold start.
-// Each test that needs to assert on fenced output sets its own mock instead.
-vi.mock("shiki/core", () => ({
-  createHighlighterCore: async () => ({
-    codeToHtml: (code: string, opts: { lang: string }) =>
-      `<pre><code data-lang="${opts.lang}">${code}</code></pre>`,
-  }),
-}));
-vi.mock("shiki/engine/oniguruma", () => ({
-  createOnigurumaEngine: async () => ({}),
-}));
+describe("highlightCode (plain monospace, no Shiki — see #30)", () => {
+  it("HTML-escapes the code and wraps in <pre><code>", async () => {
+    expect(await highlightCode("<div>{x && y}</div>", "javascript")).toBe(
+      "<pre><code>&lt;div&gt;{x &amp;&amp; y}&lt;/div&gt;</code></pre>",
+    );
+  });
 
-import { renderQuizMarkdown } from "./highlight";
+  it("preserves whitespace verbatim", async () => {
+    expect(await highlightCode("  a\n  b", "javascript")).toBe("<pre><code>  a\n  b</code></pre>");
+  });
+});
 
 describe("renderQuizMarkdown — inline pass", () => {
   it("HTML-escapes plain text", async () => {
@@ -67,24 +66,21 @@ describe("renderQuizMarkdown — inline pass", () => {
 });
 
 describe("renderQuizMarkdown — fenced blocks", () => {
-  it("highlights fenced ```js blocks with the tagged language", async () => {
+  it("emits an escaped pre/code block wrapped in the dark code-block div", async () => {
     const html = await renderQuizMarkdown("intro\n```js\nconst x = 1\n```\nouttro", "javascript");
-    expect(html).toContain('data-lang="javascript"');
-    expect(html).toContain("const x = 1");
     expect(html).toMatch(/^intro\n<div class="quiz-code-block /);
+    expect(html).toContain("<pre><code>const x = 1</code></pre>");
     expect(html).toMatch(/<\/div>\nouttro$/);
   });
 
-  it("falls back to category lang when info-string is missing", async () => {
-    const html = await renderQuizMarkdown("```\n.box { color: red }\n```", "css");
-    expect(html).toContain('data-lang="css"');
+  it("escapes HTML inside fenced code", async () => {
+    const html = await renderQuizMarkdown("```html\n<div>&</div>\n```", "html");
+    expect(html).toContain("<pre><code>&lt;div&gt;&amp;&lt;/div&gt;</code></pre>");
   });
 
-  it("falls back to category lang when info-string is unknown", async () => {
+  it("ignores info-string and language fallback (no highlighting in this build)", async () => {
     const html = await renderQuizMarkdown("```rust\nfn main() {}\n```", "javascript");
-    expect(html).toContain('data-lang="javascript"');
-    // Shiki gets called with the *fallback* lang, not the unknown info-string.
-    expect(html).toContain("fn main() {}");
+    expect(html).toContain("<pre><code>fn main() {}</code></pre>");
   });
 
   it("renders multiple fences and preserves surrounding inline markup", async () => {
@@ -93,8 +89,8 @@ describe("renderQuizMarkdown — fenced blocks", () => {
       "javascript",
     );
     expect(html).toContain("<strong>strong</strong>");
-    expect(html).toContain('data-lang="javascript"');
-    expect(html).toContain('data-lang="typescript"');
+    expect(html).toContain("<pre><code>let a</code></pre>");
+    expect(html).toContain("<pre><code>let b</code></pre>");
     expect(html).toContain('<code class="inline-code">code</code>');
   });
 
