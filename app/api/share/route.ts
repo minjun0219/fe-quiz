@@ -17,13 +17,6 @@ export const runtime = "nodejs";
 // 코드에 도메인을 박을 필요 없이 프로젝트 설정만으로 운영 URL이 따라옴.
 const PROD_HOST = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 
-// share URL은 클라이언트가 자동 복사해서 친구에게 보내므로, 신원이 검증된
-// 도메인이 아니면 절대로 응답에 박혀선 안 된다. Host 헤더 누락/스푸핑 등
-// 화이트리스트를 못 통과한 케이스에 대비한 안전 기본값.
-const PROD_FALLBACK = PROD_HOST
-  ? `https://${PROD_HOST}`
-  : "http://localhost:3000";
-
 const ALLOWED_PROTOS = new Set(["http", "https"]);
 
 // 프록시 체인이 길어지면 X-Forwarded-* 헤더는 "a.com, b.com"처럼 콤마로
@@ -68,14 +61,18 @@ function isAllowedHost(host: string): boolean {
   return false;
 }
 
-// 1순위: 프록시 헤더 — 콤마 다중값/화이트리스트 검증 통과 시에만.
-// 2순위: PROD_FALLBACK (VERCEL_PROJECT_PRODUCTION_URL 또는 localhost).
+// 우선순위:
+//  1) 프록시 헤더가 화이트리스트 통과 → 그 호스트로 빌드
+//  2) 통과 실패(헤더 누락/스푸핑 의심) AND Vercel이면 운영 도메인으로
+//     떨어뜨려 가짜 도메인 share URL 차단
+//  3) 비-Vercel(로컬 dev 등): 화이트리스트가 host=localhost를 이미 잡으니
+//     실제로 (2)·(3) 분기가 꼬일 일이 없음. 안전망으로 localhost.
 function siteUrl(request: Request): string {
   const host = firstHeaderValue(
     request.headers.get("x-forwarded-host") ?? request.headers.get("host"),
   );
   if (!host || !isAllowedHost(host)) {
-    return PROD_FALLBACK;
+    return PROD_HOST ? `https://${PROD_HOST}` : "http://localhost:3000";
   }
   const forwardedProto = firstHeaderValue(
     request.headers.get("x-forwarded-proto"),
