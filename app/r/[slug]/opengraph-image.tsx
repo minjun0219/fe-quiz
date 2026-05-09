@@ -1,5 +1,9 @@
 import { ImageResponse } from "next/og";
-import { buildTypeCode, computePersonality, resolveResultHero } from "@/lib/diagnosis";
+import {
+  buildTypeCode,
+  computePersonality,
+  resolveResultHero,
+} from "@/lib/diagnosis";
 import { getShareById } from "@/lib/share-store";
 
 export const size = { width: 1200, height: 630 };
@@ -19,7 +23,9 @@ function getFontData(): Promise<ArrayBuffer> {
   if (!fontPromise) {
     fontPromise = fetch(FONT_URL)
       .then((r) => {
-        if (!r.ok) throw new Error(`Pretendard font fetch failed: ${r.status}`);
+        if (!r.ok) {
+          throw new Error(`Pretendard font fetch failed: ${r.status}`);
+        }
         return r.arrayBuffer();
       })
       .catch((err) => {
@@ -67,8 +73,13 @@ export default async function Image({ params }: Props) {
   const hero = resolveResultHero(share.result_type);
   const total = share.question_ids.length;
   const totalCorrect = Math.round((share.score * total) / 100);
-  const personality = hero.persona ? computePersonality(share.category_scores) : null;
-  const typeCode = hero.persona && personality ? buildTypeCode(personality, hero.persona.id) : null;
+  const personality = hero.persona
+    ? computePersonality(share.category_scores)
+    : null;
+  const typeCode =
+    hero.persona && personality
+      ? buildTypeCode(personality, hero.persona.id)
+      : null;
 
   return new ImageResponse(
     <div
@@ -102,7 +113,14 @@ export default async function Image({ params }: Props) {
           justifyContent: "center",
         }}
       >
-        <div style={{ display: "flex", fontSize: 160, lineHeight: 1, marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 160,
+            lineHeight: 1,
+            marginBottom: 16,
+          }}
+        >
           {hero.emoji}
         </div>
         <div
@@ -150,7 +168,14 @@ export default async function Image({ params }: Props) {
             >
               {typeCode}
             </div>
-            <div style={{ display: "flex", fontSize: 32, color: "#71717a", marginLeft: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 32,
+                color: "#71717a",
+                marginLeft: 16,
+              }}
+            >
               {personality === "balanced" ? "균형형" : "편식형"}
             </div>
           </div>
@@ -171,7 +196,9 @@ export default async function Image({ params }: Props) {
           {totalCorrect} / {total} · {share.score}%
         </div>
       </div>
-      <div style={{ display: "flex", fontSize: 36, color: "#71717a" }}>친구야, 너도 풀어봐 →</div>
+      <div style={{ display: "flex", fontSize: 36, color: "#71717a" }}>
+        친구야, 너도 풀어봐 →
+      </div>
     </div>,
     { ...size, fonts, emoji: "twemoji" },
   );

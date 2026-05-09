@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ContributeNote } from "@/components/credits";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import {
   buildTypeCode,
@@ -42,7 +43,9 @@ export default async function SharePage({ params }: Props) {
   // would mask outages as "share not found", which is misleading. notFound()
   // is reserved for the real "row doesn't exist" case (`null`).
   const share = await getShareById(slug);
-  if (!share) notFound();
+  if (!share) {
+    notFound();
+  }
 
   const hero = resolveResultHero(share.result_type);
   const total = share.question_ids.length;
@@ -50,13 +53,19 @@ export default async function SharePage({ params }: Props) {
   // Show the type-code chip only for new persona-backed shares; legacy rows
   // (whose `result_type` matches a v1 vibe label) don't carry enough info to
   // pick a meaningful dominant category.
-  const personality = hero.persona ? computePersonality(share.category_scores) : null;
-  const typeCode = hero.persona ? buildTypeCode(personality ?? "balanced", hero.persona.id) : null;
+  const personality = hero.persona
+    ? computePersonality(share.category_scores)
+    : null;
+  const typeCode = hero.persona
+    ? buildTypeCode(personality ?? "balanced", hero.persona.id)
+    : null;
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
       <section className="mb-8 text-center">
-        <p className="mb-2 text-sm font-medium tracking-wide text-rose-500">친구의 진단</p>
+        <p className="mb-2 text-sm font-medium tracking-wide text-rose-500">
+          친구의 진단
+        </p>
         <h1 className="mb-2 text-4xl leading-tight font-bold tracking-tight">
           <span className="mr-2">{hero.emoji}</span>
           {hero.name}
@@ -71,9 +80,12 @@ export default async function SharePage({ params }: Props) {
             </span>
           </p>
         )}
-        <p className="mb-6 text-base text-zinc-600 dark:text-zinc-300">{hero.blurb}</p>
+        <p className="mb-6 text-base text-zinc-600 dark:text-zinc-300">
+          {hero.blurb}
+        </p>
         <p className="text-2xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
-          {totalCorrect} <span className="text-zinc-400 dark:text-zinc-600">/</span> {total}
+          {totalCorrect}{" "}
+          <span className="text-zinc-400 dark:text-zinc-600">/</span> {total}
           <span className="ml-2 text-base font-medium text-zinc-500 dark:text-zinc-400">
             ({share.score}%)
           </span>
@@ -90,7 +102,9 @@ export default async function SharePage({ params }: Props) {
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">카테고리별</h2>
+        <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+          카테고리별
+        </h2>
         <ul className="flex flex-col gap-3">
           {(
             Object.entries(share.category_scores) as [
@@ -135,6 +149,7 @@ export default async function SharePage({ params }: Props) {
         >
           다른 라운드 풀어보기
         </Link>
+        <ContributeNote />
       </div>
     </main>
   );

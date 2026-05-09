@@ -2,6 +2,7 @@ import "server-only";
 import { nanoid } from "nanoid";
 import { cache } from "react";
 import type { GradedRound } from "./grading";
+import { logger } from "./logger";
 import { type ShareRow, ShareRowSchema } from "./share.schema";
 import { getSupabase } from "./supabase";
 
@@ -32,7 +33,10 @@ export async function createShare({
 }: CreateShareInput): Promise<string> {
   // Clamp to the DB CHECK constraint range so any rounding edge case (or a
   // future caller passing a score > total) can't trip the constraint.
-  const rawScore = graded.total === 0 ? 0 : Math.round((graded.total_correct / graded.total) * 100);
+  const rawScore =
+    graded.total === 0
+      ? 0
+      : Math.round((graded.total_correct / graded.total) * 100);
   const score = Math.min(100, Math.max(0, rawScore));
 
   const insertRow = {
@@ -50,13 +54,17 @@ export async function createShare({
       .from("shares")
       .insert({ id: slug, ...insertRow });
 
-    if (!error) return slug;
+    if (!error) {
+      return slug;
+    }
     if (error.code !== PG_UNIQUE_VIOLATION) {
       throw new Error(`Failed to create share: ${error.message}`);
     }
     lastError = error.message;
   }
-  throw new Error(`Failed to create share after ${MAX_SLUG_RETRIES} slug retries: ${lastError}`);
+  throw new Error(
+    `Failed to create share after ${MAX_SLUG_RETRIES} slug retries: ${lastError}`,
+  );
 }
 
 /**
@@ -69,18 +77,29 @@ export async function createShare({
  * `generateMetadata` + page-component pair (both call this with the same
  * slug; without cache it would round-trip Supabase twice).
  */
-export const getShareById = cache(async (id: string): Promise<ShareRow | null> => {
-  const { data, error } = await getSupabase().from("shares").select("*").eq("id", id).maybeSingle();
+export const getShareById = cache(
+  async (id: string): Promise<ShareRow | null> => {
+    const { data, error } = await getSupabase()
+      .from("shares")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (error) {
-    throw new Error(`Failed to fetch share: ${error.message}`);
-  }
-  if (!data) return null;
+    if (error) {
+      throw new Error(`Failed to fetch share: ${error.message}`);
+    }
+    if (!data) {
+      return null;
+    }
 
-  const parsed = ShareRowSchema.safeParse(data);
-  if (!parsed.success) {
-    console.error(`[share-store] row ${id} failed schema validation:`, parsed.error.issues);
-    return null;
-  }
-  return parsed.data;
-});
+    const parsed = ShareRowSchema.safeParse(data);
+    if (!parsed.success) {
+      logger.error(
+        { id, issues: parsed.error.issues },
+        "[share-store] row failed schema validation",
+      );
+      return null;
+    }
+    return parsed.data;
+  },
+);

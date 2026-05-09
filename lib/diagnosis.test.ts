@@ -119,7 +119,9 @@ describe("pickDominantCategory tie-breaks", () => {
 
   it("returns null when no category has any attempts", () => {
     expect(pickDominantCategory({})).toBeNull();
-    expect(pickDominantCategory({ javascript: { correct: 0, total: 0 } })).toBeNull();
+    expect(
+      pickDominantCategory({ javascript: { correct: 0, total: 0 } }),
+    ).toBeNull();
   });
 });
 
@@ -143,7 +145,9 @@ describe("computePersonality (balanced ↔ specialist)", () => {
   });
 
   it("single category defaults to balanced (insufficient spread signal)", () => {
-    expect(computePersonality({ javascript: { correct: 5, total: 10 } })).toBe("balanced");
+    expect(computePersonality({ javascript: { correct: 5, total: 10 } })).toBe(
+      "balanced",
+    );
   });
 });
 

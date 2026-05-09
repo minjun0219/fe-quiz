@@ -1,7 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
-import { buildFeedbackUserPrompt, FEEDBACK_SYSTEM_PROMPT } from "@/lib/feedback-prompt";
+import {
+  buildFeedbackUserPrompt,
+  FEEDBACK_SYSTEM_PROMPT,
+} from "@/lib/feedback-prompt";
 import { GradingError, gradeRound } from "@/lib/grading";
 import { getQuestionMap } from "@/lib/questions";
 import { QuizSubmitRequest } from "@/lib/quiz-submit.schema";
@@ -18,8 +21,14 @@ export async function POST(request: Request): Promise<Response> {
   // 피드백은 Anthropic 호출당 비용 직결 (Haiku 4.5, ~$0.003/req). 분당 5개로
   // 가장 타이트하게 가둠. 정상 사용자가 같은 라운드 결과를 분당 5번 이상 새로
   // 띄울 일은 없음 (한 라운드 한 번 streaming).
-  const limited = await checkRateLimit(request, { prefix: "feedback", tokens: 5, windowSec: 60 });
-  if (limited) return limited;
+  const limited = await checkRateLimit(request, {
+    prefix: "feedback",
+    tokens: 5,
+    windowSec: 60,
+  });
+  if (limited) {
+    return limited;
+  }
 
   let body: unknown;
   try {
@@ -37,7 +46,10 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 503 });
+    return NextResponse.json(
+      { error: "ANTHROPIC_API_KEY not configured" },
+      { status: 503 },
+    );
   }
 
   const lookup = getQuestionMap();
@@ -74,7 +86,10 @@ export async function POST(request: Request): Promise<Response> {
     async start(controller) {
       try {
         for await (const event of sdkStream) {
-          if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+          if (
+            event.type === "content_block_delta" &&
+            event.delta.type === "text_delta"
+          ) {
             controller.enqueue(encoder.encode(event.delta.text));
           }
         }

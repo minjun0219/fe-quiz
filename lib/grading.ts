@@ -32,7 +32,9 @@ export async function gradeRound(
   // render passes, and so the per-question loop doesn't repeat the lookup.
   const questions: Question[] = req.question_ids.map((id) => {
     const q = lookup(id);
-    if (!q) throw new GradingError(`unknown question_id "${id}"`);
+    if (!q) {
+      throw new GradingError(`unknown question_id "${id}"`);
+    }
     return q;
   });
 
@@ -44,12 +46,17 @@ export async function gradeRound(
   const htmlBundle = opts.withHtml
     ? await Promise.all(
         questions.map(async (q) => {
-          const [codeHtml, questionHtml, explanationHtml, choiceHtmls] = await Promise.all([
-            q.code ? highlightCode(q.code, q.category) : Promise.resolve(undefined),
-            renderQuizMarkdown(q.question, q.category),
-            renderQuizMarkdown(q.explanation, q.category),
-            Promise.all(q.choices.map((c) => renderQuizMarkdown(c.text, q.category))),
-          ]);
+          const [codeHtml, questionHtml, explanationHtml, choiceHtmls] =
+            await Promise.all([
+              q.code
+                ? highlightCode(q.code, q.category)
+                : Promise.resolve(undefined),
+              renderQuizMarkdown(q.question, q.category),
+              renderQuizMarkdown(q.explanation, q.category),
+              Promise.all(
+                q.choices.map((c) => renderQuizMarkdown(c.text, q.category)),
+              ),
+            ]);
           return { codeHtml, questionHtml, explanationHtml, choiceHtmls };
         }),
       )
@@ -66,11 +73,15 @@ export async function gradeRound(
 
     const choiceIds = new Set(q.choices.map((c) => c.id));
     const is_correct = checkAnswer(q, yours, choiceIds, id);
-    if (is_correct) total_correct++;
+    if (is_correct) {
+      total_correct++;
+    }
 
     const bucket = category_scores[q.category] ?? { correct: 0, total: 0 };
     bucket.total++;
-    if (is_correct) bucket.correct++;
+    if (is_correct) {
+      bucket.correct++;
+    }
     category_scores[q.category] = bucket;
 
     const displayedOrder = req.displayed_choice_ids?.[i];
@@ -81,10 +92,15 @@ export async function gradeRound(
     // order; remap each rendered HTML by id so the displayed-order array we
     // emit is consistent with shuffled UI order.
     const choiceHtmlById = htmlBundle
-      ? new Map(q.choices.map((c, idx) => [c.id, htmlBundle[i].choiceHtmls[idx]]))
+      ? new Map(
+          q.choices.map((c, idx) => [c.id, htmlBundle[i].choiceHtmls[idx]]),
+        )
       : null;
     const renderedChoices = htmlBundle
-      ? orderedChoices.map((c) => ({ ...c, text_html: choiceHtmlById?.get(c.id) }))
+      ? orderedChoices.map((c) => ({
+          ...c,
+          text_html: choiceHtmlById?.get(c.id),
+        }))
       : orderedChoices;
 
     per_question.push({
@@ -118,34 +134,48 @@ function checkAnswer(
   choiceIds: Set<string>,
   qid: string,
 ): boolean {
-  if (yours === null) return false;
+  if (yours === null) {
+    return false;
+  }
 
   if (q.type === "single_choice") {
     if (typeof yours !== "string") {
-      throw new GradingError(`"${qid}" is single_choice; expected string answer`);
+      throw new GradingError(
+        `"${qid}" is single_choice; expected string answer`,
+      );
     }
     if (!choiceIds.has(yours)) {
-      throw new GradingError(`answer "${yours}" not a valid choice id for "${qid}"`);
+      throw new GradingError(
+        `answer "${yours}" not a valid choice id for "${qid}"`,
+      );
     }
     return yours === q.answer;
   }
 
   // multi_choice
   if (!Array.isArray(yours)) {
-    throw new GradingError(`"${qid}" is multi_choice; expected array of strings`);
+    throw new GradingError(
+      `"${qid}" is multi_choice; expected array of strings`,
+    );
   }
   for (const a of yours) {
     if (!choiceIds.has(a)) {
-      throw new GradingError(`answer "${a}" not a valid choice id for "${qid}"`);
+      throw new GradingError(
+        `answer "${a}" not a valid choice id for "${qid}"`,
+      );
     }
   }
   const yourSet = new Set(yours);
   if (yourSet.size !== yours.length) {
     throw new GradingError(`duplicate answer ids in submission for "${qid}"`);
   }
-  if (yourSet.size !== q.answer.length) return false;
+  if (yourSet.size !== q.answer.length) {
+    return false;
+  }
   for (const a of q.answer) {
-    if (!yourSet.has(a)) return false;
+    if (!yourSet.has(a)) {
+      return false;
+    }
   }
   return true;
 }
@@ -165,12 +195,16 @@ function reorderChoices(
   const seen = new Set<string>();
   for (const id of displayedOrder) {
     if (seen.has(id)) {
-      throw new GradingError(`duplicate displayed_choice_id "${id}" for "${qid}"`);
+      throw new GradingError(
+        `duplicate displayed_choice_id "${id}" for "${qid}"`,
+      );
     }
     seen.add(id);
     const c = byId.get(id);
     if (!c) {
-      throw new GradingError(`displayed_choice_id "${id}" not in choices for "${qid}"`);
+      throw new GradingError(
+        `displayed_choice_id "${id}" not in choices for "${qid}"`,
+      );
     }
     out.push(c);
   }

@@ -13,7 +13,9 @@ const ROOT = join(process.cwd(), "content/questions");
 
 try {
   const all = loadAllQuestions(ROOT);
-  console.log(`✓ ${all.length} question${all.length === 1 ? "" : "s"} validated`);
+  console.log(
+    `✓ ${all.length} question${all.length === 1 ? "" : "s"} validated`,
+  );
 } catch (err) {
   console.error("✗ Question validation failed:\n");
   console.error((err as Error).message);

@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
 import { GradingError, gradeRound } from "@/lib/grading";
+import { logger } from "@/lib/logger";
 import { getQuestionMap } from "@/lib/questions";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { ShareCreateRequest, type ShareCreateResponse } from "@/lib/share.schema";
+import {
+  ShareCreateRequest,
+  type ShareCreateResponse,
+} from "@/lib/share.schema";
 import { createShare } from "@/lib/share-store";
 
 export const dynamic = "force-dynamic";
@@ -16,8 +20,14 @@ function siteUrl(): string {
 export async function POST(request: Request): Promise<Response> {
   // Share INSERT는 DB row 폭증 + 가짜 슬러그 양산 위험. 분당 10개 이상은
   // 정상 사용자 흐름이 아님 (한 라운드 풀이 + 공유에 분 단위가 걸림).
-  const limited = await checkRateLimit(request, { prefix: "share", tokens: 10, windowSec: 60 });
-  if (limited) return limited;
+  const limited = await checkRateLimit(request, {
+    prefix: "share",
+    tokens: 10,
+    windowSec: 60,
+  });
+  if (limited) {
+    return limited;
+  }
 
   let body: unknown;
   try {
@@ -65,8 +75,11 @@ export async function POST(request: Request): Promise<Response> {
   } catch (err) {
     // Log full detail server-side; never echo DB / internal messages to the
     // client — they can leak schema info or auth state.
-    console.error("[/api/share] createShare failed:", err);
-    return NextResponse.json({ error: "failed to create share" }, { status: 500 });
+    logger.error({ err }, "[/api/share] createShare failed");
+    return NextResponse.json(
+      { error: "failed to create share" },
+      { status: 500 },
+    );
   }
 
   // `new URL(...)` normalizes trailing slashes etc. so a SITE_URL of

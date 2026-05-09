@@ -1,4 +1,8 @@
-import { pickRoundQuestions, pickRoundQuestionsByIds, ROUND_SIZE } from "@/lib/round";
+import {
+  pickRoundQuestions,
+  pickRoundQuestionsByIds,
+  ROUND_SIZE,
+} from "@/lib/round";
 import { getShareById } from "@/lib/share-store";
 import RoundRunner from "./round-runner";
 
@@ -29,9 +33,15 @@ export default async function PlayPage({ searchParams }: Props) {
 }
 
 async function resolveQuestions(from: string | undefined) {
-  if (!from) return pickRoundQuestions();
+  if (!from) {
+    return pickRoundQuestions();
+  }
   const share = await getShareById(from).catch(() => null);
-  if (!share) return pickRoundQuestions();
-  const replayed = await pickRoundQuestionsByIds(share.question_ids.slice(0, REPLAY_CAP));
+  if (!share) {
+    return pickRoundQuestions();
+  }
+  const replayed = await pickRoundQuestionsByIds(
+    share.question_ids.slice(0, REPLAY_CAP),
+  );
   return replayed.length > 0 ? replayed : pickRoundQuestions();
 }
