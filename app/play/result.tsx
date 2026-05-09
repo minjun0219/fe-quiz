@@ -319,8 +319,8 @@ export default function Result({ data }: Props) {
             공유 만들기에 실패했어. 잠시 후 다시 눌러봐.
           </p>
         )}
+        <ContributeNote />
       </div>
-      <ContributeNote />
     </main>
   );
 }

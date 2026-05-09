@@ -134,8 +134,8 @@ export default async function SharePage({ params }: Props) {
         >
           다른 라운드 풀어보기
         </Link>
+        <ContributeNote />
       </div>
-      <ContributeNote />
     </main>
   );
 }
