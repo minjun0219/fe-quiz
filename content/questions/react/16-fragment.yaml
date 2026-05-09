@@ -1,0 +1,29 @@
+id: react-016
+category: react
+difficulty: easy
+type: single_choice
+question: |
+  다음 컴포넌트에서 `<>...</>` (Fragment)를 쓰는 이유로 가장 적절한 것은?
+code: |
+  function List({ items }) {
+    return (
+      <>
+        {items.map(it => <li key={it}>{it}</li>)}
+      </>
+    )
+  }
+choices:
+  - id: a
+    text: "부모 DOM 노드를 추가하지 않고 여러 형제 요소를 반환할 수 있게 해 준다"
+  - id: b
+    text: "React 컴포넌트는 항상 단일 `<div>`로 감싸야 해서, Fragment가 그 `<div>` 역할을 대신하지만 결과 DOM에도 동등한 노드가 생성된다"
+  - id: c
+    text: "`<div>`보다 렌더링이 더 빠르도록 React가 GPU 가속을 적용한다"
+  - id: d
+    text: "리스트 렌더링 시 `key`를 자동으로 부여해 경고를 제거한다"
+answer: a
+explanation: |
+  Fragment(`<>...</>`)는 그룹화만 해 주고 DOM에 추가 노드를 남기지 않아. 테이블/리스트처럼 불필요한 wrapper가 레이아웃을 깨거나 CSS 선택자를 꿬 때 유용해.
+  `<div>`로 감싸는 것과 달리 DOM 노드가 늘지 않고, key가 필요한 케이스엔 `<React.Fragment key={...}>` 남아 쓸 수 있어.
+  GPU나 key 자동 부여 같은 동작은 Fragment의 실제 역할이 아니야.
+tags: [ fragment, jsx, dom ]

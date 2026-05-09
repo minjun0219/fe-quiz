@@ -1,0 +1,30 @@
+id: react-019
+category: react
+difficulty: medium
+type: single_choice
+question: |
+  모달을 `createPortal`로 `document.body` 아래에 마운트하는 이유로 가장 정확한 것은?
+code: |
+  import { createPortal } from 'react-dom'
+
+  function Modal({ children }) {
+    return createPortal(
+      <div className="modal">{children}</div>,
+      document.body,
+    )
+  }
+choices:
+  - id: a
+    text: "React 컴포넌트 트리(이벤트 버블링, context)는 그대로 부모를 따르지만 DOM 위치만 body로 옮겨 조상의 `overflow: hidden`이나 stacking context 영향을 회피한다"
+  - id: b
+    text: "portal로 옮긴 노드는 React 트리에서도 분리돼 부모 context를 받지 못한다"
+  - id: c
+    text: "성능상 body에 마운트하는 게 빨라 일반 컴포넌트보다 리렌더가 적다"
+  - id: d
+    text: "portal은 이벤트가 React 트리를 거치지 않고 DOM 트리만 따라간다"
+answer: a
+explanation: |
+  Portal의 핵심은 "DOM으로는 다른 곳에 그리고, React 입장에선 여전히 그 자리에 있는 처럼 동작"이야. 그래서 context를 그대로 구독하고 이벤트도 React 트리를 따라 버블링돼.
+  상위의 `overflow: hidden` / `transform`/`z-index` 때문에 모달/툴팁이 잘리거나 다른 요소 뒤에 숨는 일을 막을 때 포털이 제격이야.
+  b/d는 포털 동작과 정반대, c는 성능 주장이 근거가 없어.
+tags: [ portal, modal, dom, context ]
