@@ -66,13 +66,28 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => HTML_ESCAPES[c]);
 }
 
+// Single-line **bold** runs. Inner content is non-empty and may not span a
+// newline or contain a literal `*` (so `****` and `**a*b**` pass through
+// untouched). Applied AFTER HTML escaping — `*` is not escaped, so the
+// asterisk positions are preserved and the inner text is already safe.
+const BOLD_RE = /\*\*([^*\n]+?)\*\*/g;
+
+function escapeAndFormat(s: string): string {
+  return escapeHtml(s).replace(BOLD_RE, "<strong>$1</strong>");
+}
+
 /**
- * Wrap `` `...` `` runs in <code class="inline-code">. Single-line only —
+ * Render a single line/paragraph of inline markdown to HTML.
+ *
+ * Wraps `` `...` `` runs in <code class="inline-code"> — single-line only,
  * a backtick followed by a newline before its closer is treated as literal.
  * Multi-backtick runs (`` ``` `` fence openers, `` `` ``-delimited spans)
  * are passed through literally so fenced blocks in explanations don't get
- * mangled into empty <code> tags.
- * Everything outside wrapped spans is HTML-escaped; matched inner text is too.
+ * mangled into empty <code> tags. Outside backtick spans, `**bold**` runs
+ * are wrapped in <strong>.
+ *
+ * Everything outside wrapped spans is HTML-escaped; backtick-wrapped inner
+ * text is escaped but not bold-processed (so code stays literal).
  */
 export function highlightInlineBackticks(text: string): string {
   let out = "";
@@ -80,10 +95,10 @@ export function highlightInlineBackticks(text: string): string {
   while (i < text.length) {
     const tick = text.indexOf("`", i);
     if (tick === -1) {
-      out += escapeHtml(text.slice(i));
+      out += escapeAndFormat(text.slice(i));
       break;
     }
-    out += escapeHtml(text.slice(i, tick));
+    out += escapeAndFormat(text.slice(i, tick));
 
     let runEnd = tick;
     while (runEnd < text.length && text[runEnd] === "`") runEnd++;

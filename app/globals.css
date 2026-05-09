@@ -5,6 +5,18 @@
   --color-fg: #18181b;
   --color-accent: #f43f5e;
   --color-muted: #71717a;
+  --color-inline-code-bg: rgb(244 244 245); /* zinc-100 */
+  --color-inline-code-fg: rgb(24 24 27); /* zinc-900 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #09090b; /* zinc-950 */
+    --color-fg: #fafafa; /* zinc-50 */
+    --color-muted: #a1a1aa; /* zinc-400 */
+    --color-inline-code-bg: rgb(39 39 42); /* zinc-800 */
+    --color-inline-code-fg: rgb(228 228 231); /* zinc-200 */
+  }
 }
 
 @theme inline {
@@ -42,8 +54,8 @@ body {
 /* Inline `backtick code` in explanation paragraphs. */
 .inline-code {
   font-family: var(--font-mono);
-  background: rgb(244 244 245); /* zinc-100 */
-  color: rgb(24 24 27); /* zinc-900 */
+  background: var(--color-inline-code-bg);
+  color: var(--color-inline-code-fg);
   padding: 0.1em 0.35em;
   border-radius: 0.25rem;
   font-size: 0.9em;
