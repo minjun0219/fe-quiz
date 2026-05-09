@@ -68,9 +68,7 @@ export default async function Image({ params }: Props) {
   const total = share.question_ids.length;
   const totalCorrect = Math.round((share.score * total) / 100);
   const personality = hero.persona ? computePersonality(share.category_scores) : null;
-  const typeCode = hero.persona && personality
-    ? buildTypeCode(personality, hero.persona.id)
-    : null;
+  const typeCode = hero.persona && personality ? buildTypeCode(personality, hero.persona.id) : null;
 
   return new ImageResponse(
     <div
