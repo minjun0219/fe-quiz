@@ -28,10 +28,6 @@ const nextConfig: NextConfig = {
         source: "/ingest/:path*",
         destination: `${POSTHOG_HOST}/:path*`,
       },
-      {
-        source: "/ingest/decide",
-        destination: `${POSTHOG_HOST}/decide`,
-      },
     ];
   },
   // PostHog가 trailing slash로 흩어지지 않도록 명시 (rewrite와 만나면 308이 끼임).

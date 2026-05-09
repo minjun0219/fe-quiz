@@ -6,6 +6,17 @@ import { PostHogProvider as Provider } from "posthog-js/react";
 import { Suspense, useEffect } from "react";
 
 /**
+ * `ui_host`는 PostHog UI/툴바 도메인(`{region}.posthog.com`)이라 ingest 도메인
+ * (`{region}.i.posthog.com`)을 그대로 넣으면 안 됨. 같은 env에서 파생.
+ */
+const INGEST_HOST =
+  process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+const UI_HOST = INGEST_HOST.replace(
+  /^(https?:\/\/)([a-z]+)\.i\.posthog\.com\/?$/,
+  "$1$2.posthog.com",
+);
+
+/**
  * 클라이언트 PostHog 프로바이더.
  *
  * - 키 미설정 시 init을 건너뛰어 dev/CI에서 throw 없이 no-op.
@@ -28,7 +39,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 
     posthog.init(key, {
       api_host: "/ingest",
-      ui_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.posthog.com",
+      ui_host: UI_HOST,
       person_profiles: "identified_only",
       capture_pageview: false, // 라우트 변경 직접 감지 (아래 PageviewTracker)
       capture_pageleave: true,

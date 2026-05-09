@@ -26,3 +26,20 @@ export function getPostHogServer(): PostHog | null {
   });
   return globalForPosthog.__posthog;
 }
+
+/**
+ * `after()` 콜백에서 안전하게 부르도록 한 flush 래퍼. 네트워크/PostHog 장애로
+ * `flush()`가 reject되면 unhandled rejection이 떠서 invocation 로그가 더러워짐.
+ * 응답 이후 처리이므로 실패는 조용히 삼킨다.
+ */
+export async function flushPostHogServer(): Promise<void> {
+  const posthog = getPostHogServer();
+  if (!posthog) {
+    return;
+  }
+  try {
+    await posthog.flush();
+  } catch {
+    // intentionally silent — observability 장애가 invocation 로그를 더럽히면 안 됨.
+  }
+}

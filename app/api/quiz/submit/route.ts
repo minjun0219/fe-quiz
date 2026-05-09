@@ -1,7 +1,7 @@
 import { after, NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
 import { GradingError, gradeRound } from "@/lib/grading";
-import { getPostHogServer } from "@/lib/posthog-server";
+import { flushPostHogServer } from "@/lib/posthog-server";
 import { getQuestionMap } from "@/lib/questions";
 import {
   QuizSubmitRequest,
@@ -16,9 +16,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request): Promise<Response> {
-  after(async () => {
-    await getPostHogServer()?.flush();
-  });
+  after(flushPostHogServer);
 
   // Submit은 DB write도 외부 API도 없어 cheap하지만, /api/share + /feedback과
   // 결합한 봇 시나리오 막기 위해 느슨하게 제한. 정상 사용자는 분당 30 미만.
