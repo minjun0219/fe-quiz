@@ -6,7 +6,7 @@ question: |
   HTML5의 `inert` 속성을 모달 외부 영역에 적용하는 이유로 가장 정확한 것은?
 choices:
   - id: a
-    text: 그 영역이 시각적으로 숨겨져 보이지 않게 된다 (`display: none`과 같음)
+    text: "그 영역이 시각적으로 숨겨져 보이지 않게 된다 (`display: none`과 같음)"
   - id: b
     text: 클릭/포커스/탭 이동/스크린리더 탐색 등 모든 인터랙션이 차단돼 모달 외부와의 상호작용을 막는다. JS로 일일이 `tabindex="-1"`이나 `aria-hidden`을 다는 것보다 안전하다
   - id: c
