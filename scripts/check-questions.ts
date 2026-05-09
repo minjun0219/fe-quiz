@@ -31,8 +31,9 @@ try {
   }
 
   if (warnings.length > 0) {
+    const isOne = warnings.length === 1;
     console.warn(
-      `\n⚠ ${warnings.length} code line${warnings.length === 1 ? "" : "s"} exceed ${MAX_CODE_LINE_LEN} chars — 좁은 화면에서 줄바꿈이 어색할 수 있어. 가능하면 60~70자에서 끊자.`,
+      `\n⚠ ${warnings.length} code line${isOne ? "" : "s"} exceed${isOne ? "s" : ""} ${MAX_CODE_LINE_LEN} chars — 좁은 화면에서 줄바꿈이 어색할 수 있어. 가능하면 60~70자에서 끊자.`,
     );
     for (const w of warnings) console.warn(w);
   }
