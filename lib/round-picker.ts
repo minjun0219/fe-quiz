@@ -1,5 +1,5 @@
 import { CATEGORY_IDS, type Category } from "./categories";
-import type { PublicQuestion, Question } from "./question.schema";
+import type { Question } from "./question.schema";
 
 /** Number of questions per round. Falls back to pool size when seed < target. */
 export const ROUND_SIZE = 10;
@@ -23,11 +23,6 @@ export function effectiveMinPerCategory(roundSize: number, categoryCount: number
   if (categoryCount <= 0 || roundSize <= 0) return 0;
   if (categoryCount * TARGET_MIN_PER_CATEGORY <= roundSize) return TARGET_MIN_PER_CATEGORY;
   return Math.max(1, Math.floor(roundSize / categoryCount));
-}
-
-export function publicView(q: Question): PublicQuestion {
-  const { answer: _answer, explanation: _explanation, ...rest } = q;
-  return rest;
 }
 
 /** Fisher–Yates. Returns a fresh array without mutating input. */
@@ -58,8 +53,8 @@ export function shuffle<T>(input: readonly T[]): T[] {
  * `lib/categories.ts` automatically participates in the stratification with
  * no edits here.
  *
- * Returns the raw `Question[]` (not `PublicQuestion[]`); the caller decides
- * whether to apply `publicView` + choice-shuffle.
+ * Returns the raw `Question[]`; the caller decides whether to map through
+ * `publicView` (server-only — pulls in Shiki) and shuffle choices.
  */
 export function pickStratified(
   roundSize: number,

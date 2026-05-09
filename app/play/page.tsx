@@ -32,6 +32,6 @@ async function resolveQuestions(from: string | undefined) {
   if (!from) return pickRoundQuestions();
   const share = await getShareById(from).catch(() => null);
   if (!share) return pickRoundQuestions();
-  const replayed = pickRoundQuestionsByIds(share.question_ids.slice(0, REPLAY_CAP));
+  const replayed = await pickRoundQuestionsByIds(share.question_ids.slice(0, REPLAY_CAP));
   return replayed.length > 0 ? replayed : pickRoundQuestions();
 }

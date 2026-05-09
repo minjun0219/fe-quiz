@@ -1,13 +1,20 @@
 import "server-only";
-import type { PublicQuestion } from "./question.schema";
+import { highlightCode } from "./highlight";
+import type { PublicQuestion, Question } from "./question.schema";
 import { getQuestionMap, getQuestionsByCategory } from "./questions";
-import { pickStratified, publicView, ROUND_SIZE, shuffle } from "./round-picker";
+import { pickStratified, ROUND_SIZE, shuffle } from "./round-picker";
 
 export {
   effectiveMinPerCategory,
   ROUND_SIZE,
   TARGET_MIN_PER_CATEGORY,
 } from "./round-picker";
+
+export async function publicView(q: Question): Promise<PublicQuestion> {
+  const { answer: _answer, explanation: _explanation, ...rest } = q;
+  if (!rest.code) return rest;
+  return { ...rest, code_html: await highlightCode(rest.code, rest.category) };
+}
 
 /**
  * Pick a round from the live filesystem-loaded pool, return public view with
@@ -18,9 +25,10 @@ export {
  * pool by category on each call (O(N) over the frozen pool, fine at current
  * seed sizes). Adding new categories to the registry needs no changes here.
  */
-export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
+export async function pickRoundQuestions(count = ROUND_SIZE): Promise<PublicQuestion[]> {
   const picked = pickStratified(count, getQuestionsByCategory);
-  return picked.map(publicView).map((q) => ({ ...q, choices: shuffle(q.choices) }));
+  const views = await Promise.all(picked.map(publicView));
+  return views.map((q) => ({ ...q, choices: shuffle(q.choices) }));
 }
 
 /**
@@ -31,12 +39,12 @@ export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
  * Unknown IDs are silently dropped (a question may have been retired between
  * the original round and the friend's replay).
  */
-export function pickRoundQuestionsByIds(ids: readonly string[]): PublicQuestion[] {
+export async function pickRoundQuestionsByIds(ids: readonly string[]): Promise<PublicQuestion[]> {
   const map = getQuestionMap();
-  const out: PublicQuestion[] = [];
+  const found: Question[] = [];
   for (const id of ids) {
     const q = map.get(id);
-    if (q) out.push(publicView(q));
+    if (q) found.push(q);
   }
-  return out;
+  return Promise.all(found.map(publicView));
 }

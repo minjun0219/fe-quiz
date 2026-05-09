@@ -231,10 +231,18 @@ export default function Result({ data }: Props) {
                 <p className="mb-3 whitespace-pre-line text-base leading-relaxed text-zinc-900">
                   {q.question}
                 </p>
-                {q.code && (
-                  <pre className="mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100">
-                    <code>{q.code}</code>
-                  </pre>
+                {q.code_html ? (
+                  <div
+                    className="quiz-code-block mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki output of our own YAML seed; no user input.
+                    dangerouslySetInnerHTML={{ __html: q.code_html }}
+                  />
+                ) : (
+                  q.code && (
+                    <pre className="mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100">
+                      <code>{q.code}</code>
+                    </pre>
+                  )
                 )}
                 <ul className="mb-3 flex flex-col gap-1.5 text-sm">
                   {q.choices.map((choice) => {
@@ -260,9 +268,17 @@ export default function Result({ data }: Props) {
                     );
                   })}
                 </ul>
-                <p className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700">
-                  {q.explanation}
-                </p>
+                {q.explanation_html ? (
+                  <p
+                    className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                    dangerouslySetInnerHTML={{ __html: q.explanation_html }}
+                  />
+                ) : (
+                  <p className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700">
+                    {q.explanation}
+                  </p>
+                )}
               </li>
             ))}
           </ol>
