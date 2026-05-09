@@ -21,7 +21,9 @@ export default function Loading() {
       aria-busy="true"
       aria-live="polite"
     >
-      <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">친구가 문제 고르는 중…</p>
+      <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">
+        친구가 문제 고르는 중…
+      </p>
       <h1 className="text-2xl font-bold">잠깐만, 문제 가져올게</h1>
     </main>
   );
