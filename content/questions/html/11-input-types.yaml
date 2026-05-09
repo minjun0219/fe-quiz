@@ -1,0 +1,21 @@
+id: html-011
+category: html
+difficulty: easy
+type: single_choice
+question: |
+  모바일 브라우저에서 `<input type="email">` / `"tel"` / `"number"`를 일반 `"text"` 대신 쓰는 가장 큰 이유는?
+choices:
+  - id: a
+    text: 입력값이 자동으로 서버로 전송된다
+  - id: b
+    text: 타입에 맞는 가상 키보드(이메일은 `@` 키, 전화는 숫자패드, 숫자는 숫자키)가 떠 입력 UX가 좋아지고, 일부 타입(`email`/`number` 등)은 브라우저 기본 검증까지 함께 붙는다
+  - id: c
+    text: CSS로 자동 스타일링되며 그 외 차이는 없다
+  - id: d
+    text: 보안 강도가 강해져 XSS를 막아 준다
+answer: b
+explanation: |
+  타입을 알려 주면 모바일 브라우저가 입력에 어울리는 가상 키보드를 띄워 줘. `email`은 `@`/`.com` 키가 노출되고, `tel`/`number`는 숫자 패드, `url`은 `/` 키 등 입력 효율이 올라가.
+  기본 검증은 타입에 따라 달라. `email`은 `@` 포함 같은 형식 검증, `number`는 `min`/`max`/`step`이 동작해. 반면 `tel`은 형식이 나라마다 달라 사실상 키보드 힌트만 주고 별도 검증은 안 돼서, 정밀한 형식 검증이 필요하면 `pattern`을 같이 쓰는 게 안전해.
+  자동완성·`inputmode`·`autocomplete` 등 다른 속성과 결합하면 폼 전반의 UX가 더 좋아져. 보안과는 직접적인 관련이 없어 — XSS 방어는 별도 출력 인코딩이 담당해.
+tags: [ input, mobile, ux ]

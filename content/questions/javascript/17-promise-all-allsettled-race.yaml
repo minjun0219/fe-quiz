@@ -1,0 +1,28 @@
+id: js-017
+category: javascript
+difficulty: medium
+type: single_choice
+question: |
+  `Promise.all` / `Promise.allSettled` / `Promise.race`의 동작 차이로 가장 정확한 설명은?
+code: |
+  const tasks = [
+    Promise.resolve(1),
+    Promise.reject('X'),
+    Promise.resolve(3),
+  ]
+choices:
+  - id: a
+    text: "`Promise.all(tasks)`는 첫 reject 즉시 reject('X')로 끝나고, `Promise.allSettled(tasks)`는 3개 결과 객체 배열({status, value/reason})로 fulfill되며, `Promise.race(tasks)`는 가장 먼저 settle된 값으로 settle된다"
+  - id: b
+    text: "셋 다 첫 reject가 발생하면 전체가 reject된다"
+  - id: c
+    text: "`Promise.all`은 모든 결과를 기다린 뒤 reject('X')만 반환한다"
+  - id: d
+    text: "`Promise.race`는 가장 먼저 fulfill된 값만 받고 reject는 무시한다"
+answer: a
+explanation: |
+  - `Promise.all`은 모든 promise가 fulfill될 때까지 기다리지만 그 사이 하나라도 reject되면 즉시 reject를 전파해 종료(short-circuit).
+  - `Promise.allSettled`는 reject도 결과로 묶어 항상 fulfill되니, 일부 실패를 허용하면서 결과를 모아야 할 때 적합.
+  - `Promise.race`는 가장 먼저 settle(성공/실패 무관)된 promise의 결과로 settle돼서 timeout 패턴에 쓰기 좋아.
+  여기선 `tasks`가 모두 동기적으로 settle된 값이라 race는 첫 번째 `Promise.resolve(1)`로 fulfill돼.
+tags: [ promise, async, error-handling ]

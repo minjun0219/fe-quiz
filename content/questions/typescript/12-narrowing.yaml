@@ -1,0 +1,28 @@
+id: ts-012
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  다음 함수의 마지막 `return v.toFixed(2)` 위치에서 TS가 `v`를 추론한 타입은?
+code: |
+  function foo(v: string | number | null) {
+    if (v == null) return 'nil'
+    if (typeof v === 'string') return v.toUpperCase()
+    return v.toFixed(2)
+  }
+choices:
+  - id: a
+    text: "`string | number | null`"
+  - id: b
+    text: "`string`"
+  - id: c
+    text: "`number`"
+  - id: d
+    text: "`unknown`"
+answer: c
+explanation: |
+  TS의 control-flow analysis는 각 가드를 통과한 이후 남은 타입을 자동으로 좁혀.
+  - `v == null`은 `null`과 `undefined` 둘 다 true로 판정되어 둘 다 제거 → `string | number`.
+  - 그 다음 `typeof v === 'string'` 분기에서 string을 거르면 남은 흐름의 타입은 `number`.
+  이런 조기 종료 분기(`if (...) return`) 패턴을 활용하면 주된 흐름이 단순해져 가독성이 좋아져.
+tags: [ narrowing, typeof, control-flow ]

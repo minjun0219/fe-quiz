@@ -1,0 +1,29 @@
+id: react-020
+category: react
+difficulty: medium
+type: single_choice
+question: |
+  다음 코드에서 `useImperativeHandle`을 `forwardRef`와 함께 쓰는 이유로 가장 정확한 것은?
+code: |
+  const Input = forwardRef((props, ref) => {
+    const local = useRef(null)
+    useImperativeHandle(ref, () => ({
+      focus: () => local.current?.focus(),
+    }), [])
+    return <input ref={local} {...props} />
+  })
+choices:
+  - id: a
+    text: "부모에게 자식의 DOM 전체를 그대로 노출하는 대신, 외부에서 호출 가능한 명령형 API(`focus()` 등)만 선택적으로 노출하기 위해"
+  - id: b
+    text: "자식 내부 ref를 동기화하지 않아도 부모가 자동으로 DOM을 받게 되어서"
+  - id: c
+    text: "ref를 children prop으로 전달할 수 있게 해 주기 위해"
+  - id: d
+    text: "함수형 컴포넌트의 ref 전달 경고를 우회하려는 ESLint 트릭이다"
+answer: a
+explanation: |
+  `forwardRef`만 쓰면 부모가 자식의 DOM 노드 전체를 다룰 수 있게 돼—DOM의 구조가 구현 세부사항이라 그게 외부에 의존되면 리팩터링이 극도로 어려워져.
+  `useImperativeHandle`은 부모가 동일한 `ref`로 볼 객체를 내가 전달할 수 있게 해 줘. 일부 명령형 API(예: `focus`, `scrollIntoView`, `play`)만 노출하고 나머지는 감추는 패턴이 권장돼.
+  대부분의 React 코드는 선언적 prop으로 해결하는 게 좋고, `useImperativeHandle`은 양날의 검처럼 아껴서 써야 해.
+tags: [ refs, forwardRef, useImperativeHandle, encapsulation ]

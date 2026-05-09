@@ -18,16 +18,16 @@ function GithubMark({ className }: { className?: string }) {
 
 export function SiteCredit() {
   return (
-    <footer className="flex items-center justify-center gap-3 text-xs text-zinc-400">
+    <footer className="flex items-center justify-center gap-3 text-xs text-zinc-400 dark:text-zinc-500">
       <a
         href={SITE_URL}
         target="_blank"
         rel="noreferrer noopener"
-        className="transition hover:text-zinc-600"
+        className="transition hover:text-zinc-600 dark:hover:text-zinc-300"
       >
         by minjun.kim
       </a>
-      <span aria-hidden="true" className="text-zinc-300">
+      <span aria-hidden="true" className="text-zinc-300 dark:text-zinc-700">
         ·
       </span>
       <a
@@ -35,7 +35,7 @@ export function SiteCredit() {
         target="_blank"
         rel="noreferrer noopener"
         aria-label="GitHub 저장소"
-        className="transition hover:text-zinc-600"
+        className="transition hover:text-zinc-600 dark:hover:text-zinc-300"
       >
         <GithubMark className="h-4 w-4" />
       </a>
@@ -45,13 +45,13 @@ export function SiteCredit() {
 
 export function ContributeNote() {
   return (
-    <p className="mt-6 text-center text-xs text-zinc-400">
+    <p className="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-500">
       문제가 이상하거나 같이 만들고 싶으면{" "}
       <a
         href={REPO_URL}
         target="_blank"
         rel="noreferrer noopener"
-        className="inline-flex items-center gap-1 font-medium text-zinc-500 underline-offset-2 transition hover:text-zinc-700 hover:underline"
+        className="inline-flex items-center gap-1 font-medium text-zinc-500 underline-offset-2 transition hover:text-zinc-700 hover:underline dark:text-zinc-400 dark:hover:text-zinc-200"
       >
         <GithubMark className="h-3.5 w-3.5" />
         GitHub

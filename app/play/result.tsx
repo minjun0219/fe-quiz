@@ -122,48 +122,56 @@ export default function Result({ data }: Props) {
           {data.result_type}
         </h1>
         <p className="mb-3">
-          <span className="inline-block rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold tracking-wider text-zinc-700 tabular-nums">
+          <span className="inline-block rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold tracking-wider text-zinc-700 tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
             {data.type_code}
           </span>
-          <span className="ml-2 text-xs text-zinc-500">
+          <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
             {data.personality === "balanced" ? "균형형" : "편식형"}
           </span>
         </p>
-        <p className="mb-2 text-base text-zinc-600">{data.blurb}</p>
-        <p className="mb-6 text-sm text-zinc-500">
+        <p className="mb-2 text-base text-zinc-600 dark:text-zinc-300">{data.blurb}</p>
+        <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
           <span className="mr-1">{data.vibe.emoji}</span>
           {data.vibe.blurb}
         </p>
-        <p className="text-2xl font-semibold tabular-nums text-zinc-900">
-          {data.total_correct} <span className="text-zinc-400">/</span> {data.total}
-          <span className="ml-2 text-base font-medium text-zinc-500">({overallPct}%)</span>
+        <p className="text-2xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+          {data.total_correct} <span className="text-zinc-400 dark:text-zinc-600">/</span>{" "}
+          {data.total}
+          <span className="ml-2 text-base font-medium text-zinc-500 dark:text-zinc-400">
+            ({overallPct}%)
+          </span>
         </p>
       </section>
 
-      <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5">
+      <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5 dark:border-rose-900/30 dark:bg-rose-500/5">
         <div className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
           <span>친구의 한마디</span>
           {feedbackStatus === "loading" && (
-            <span className="animate-pulse text-zinc-400 normal-case">생각 중…</span>
+            <span className="animate-pulse text-zinc-400 normal-case dark:text-zinc-500">
+              생각 중…
+            </span>
           )}
           {feedbackStatus === "streaming" && (
-            <span className="animate-pulse text-zinc-400 normal-case">타이핑 중…</span>
+            <span className="animate-pulse text-zinc-400 normal-case dark:text-zinc-500">
+              타이핑 중…
+            </span>
           )}
         </div>
         {feedbackStatus === "error" && (
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             앗 친구가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
           </p>
         )}
         {feedbackStatus === "unavailable" && (
-          <p className="text-sm text-zinc-500">
-            (개발자에게: <code className="rounded bg-zinc-100 px-1">ANTHROPIC_API_KEY</code>를
-            <code className="ml-1 rounded bg-zinc-100 px-1">.env.local</code>에 넣으면 친구가
-            깨어나요)
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            (개발자에게:{" "}
+            <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">ANTHROPIC_API_KEY</code>를
+            <code className="ml-1 rounded bg-zinc-100 px-1 dark:bg-zinc-800">.env.local</code>에
+            넣으면 친구가 깨어나요)
           </p>
         )}
         {feedback && (
-          <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800">
+          <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800 dark:text-zinc-100">
             {feedback}
             {feedbackStatus === "streaming" && (
               <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-rose-400 align-middle" />
@@ -173,7 +181,7 @@ export default function Result({ data }: Props) {
       </section>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-500">카테고리별</h2>
+        <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">카테고리별</h2>
         <ul className="flex flex-col gap-3">
           {(
             Object.entries(data.category_scores) as [Category, { correct: number; total: number }][]
@@ -183,16 +191,16 @@ export default function Result({ data }: Props) {
             const isWeak = data.weaknesses.includes(cat);
             return (
               <li key={cat} className="flex items-center gap-3">
-                <span className="w-24 shrink-0 text-sm font-medium text-zinc-700">
+                <span className="w-24 shrink-0 text-sm font-medium text-zinc-700 dark:text-zinc-200">
                   {CATEGORY_DISPLAY_LABEL[cat]}
                 </span>
-                <div className="flex-1 overflow-hidden rounded-full bg-zinc-200 h-2">
+                <div className="flex-1 overflow-hidden rounded-full bg-zinc-200 h-2 dark:bg-zinc-800">
                   <div
                     className={`h-full transition-all ${isStrong ? "bg-emerald-500" : isWeak ? "bg-rose-500" : "bg-amber-500"}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="w-16 shrink-0 text-right text-sm tabular-nums text-zinc-600">
+                <span className="w-16 shrink-0 text-right text-sm tabular-nums text-zinc-600 dark:text-zinc-400">
                   {score.correct}/{score.total}
                 </span>
               </li>
@@ -207,22 +215,25 @@ export default function Result({ data }: Props) {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="result-questions"
-          className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-700"
+          className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           {open ? "▾" : "▸"} 문제 다시 보기
         </button>
         {open && (
           <ol id="result-questions" className="flex flex-col gap-4">
             {data.per_question.map((q, i) => (
-              <li key={q.id} className="rounded-2xl border border-zinc-200 bg-white p-4">
-                <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wider text-zinc-400">
+              <li
+                key={q.id}
+                className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
                   <span>
                     {i + 1}. {q.category}
                   </span>
                   <span
                     className={
                       q.is_correct
-                        ? "font-semibold text-emerald-600"
+                        ? "font-semibold text-emerald-600 dark:text-emerald-400"
                         : "font-semibold text-rose-500"
                     }
                   >
@@ -231,24 +242,24 @@ export default function Result({ data }: Props) {
                 </div>
                 {q.question_html ? (
                   <p
-                    className="mb-3 whitespace-pre-line text-base leading-relaxed text-zinc-900"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                    className="mb-3 text-base leading-relaxed text-zinc-900 dark:text-zinc-50"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: server-rendered by `renderQuizMarkdown` from our own YAML seed (no user input); only inline-code spans, <strong>, and HTML-escaped <pre><code> from fenced blocks are injected.
                     dangerouslySetInnerHTML={{ __html: q.question_html }}
                   />
                 ) : (
-                  <p className="mb-3 whitespace-pre-line text-base leading-relaxed text-zinc-900">
+                  <p className="mb-3 text-base leading-relaxed text-zinc-900 dark:text-zinc-50">
                     {q.question}
                   </p>
                 )}
                 {q.code_html ? (
                   <div
-                    className="quiz-code-block mb-3 rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki output of our own YAML seed; no user input.
+                    className="quiz-code-block mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
                     dangerouslySetInnerHTML={{ __html: q.code_html }}
                   />
                 ) : (
                   q.code && (
-                    <pre className="mb-3 whitespace-pre-wrap break-words rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100">
+                    <pre className="mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100">
                       <code>{q.code}</code>
                     </pre>
                   )
@@ -262,16 +273,16 @@ export default function Result({ data }: Props) {
                         key={`${q.id}::${choice.id}`}
                         className={`rounded-lg border px-3 py-2 ${
                           isCorrect
-                            ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                            ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-100"
                             : isYours
-                              ? "border-rose-300 bg-rose-50 text-rose-900"
-                              : "border-zinc-200 text-zinc-600"
+                              ? "border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-800 dark:bg-rose-500/10 dark:text-rose-100"
+                              : "border-zinc-200 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400"
                         }`}
                       >
                         <span className="mr-2">{isCorrect ? "✓" : isYours ? "✗" : "·"}</span>
                         {choice.text_html ? (
                           <span
-                            // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                            // biome-ignore lint/security/noDangerouslySetInnerHtml: server-rendered by `renderQuizMarkdown` from our own YAML seed (no user input); only inline-code spans, <strong>, and HTML-escaped <pre><code> from fenced blocks are injected.
                             dangerouslySetInnerHTML={{ __html: choice.text_html }}
                           />
                         ) : (
@@ -285,13 +296,13 @@ export default function Result({ data }: Props) {
                   })}
                 </ul>
                 {q.explanation_html ? (
-                  <p
-                    className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML-escaped server-side from our own YAML seed; only inline-code wrappers are injected.
+                  <div
+                    className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: server-rendered by `renderQuizMarkdown` from our own YAML seed (no user input); only inline-code spans, <strong>, and HTML-escaped <pre><code> from fenced blocks are injected.
                     dangerouslySetInnerHTML={{ __html: q.explanation_html }}
                   />
                 ) : (
-                  <p className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700">
+                  <p className="whitespace-pre-line rounded-xl bg-zinc-50 p-3 text-sm leading-relaxed text-zinc-700 dark:bg-zinc-950 dark:text-zinc-300">
                     {q.explanation}
                   </p>
                 )}
@@ -306,7 +317,7 @@ export default function Result({ data }: Props) {
           type="button"
           onClick={handleShare}
           disabled={!canShare || shareStatus === "creating"}
-          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99]"
+          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:enabled:hover:bg-zinc-200"
         >
           {shareStatus === "creating"
             ? "공유 만드는 중…"

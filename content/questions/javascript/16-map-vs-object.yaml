@@ -1,0 +1,28 @@
+id: js-016
+category: javascript
+difficulty: easy
+type: single_choice
+question: |
+  다음 코드의 출력은?
+code: |
+  const obj = {}
+  const map = new Map()
+  const a = { id: 1 }, b = { id: 2 }
+  obj[a] = 'A'; obj[b] = 'B'
+  map.set(a, 'A'); map.set(b, 'B')
+  console.log(Object.keys(obj).length, map.size)
+choices:
+  - id: a
+    text: "`1 2` — Object 키는 toString되어 둘 다 `\"[object Object]\"`로 충돌해 덮어쓰지만, Map은 객체 참조 자체를 키로 보존"
+  - id: b
+    text: "`2 2` — 둘 다 객체를 키로 그대로 보관한다"
+  - id: c
+    text: "`2 1` — Map이 toString을 사용하고 Object가 객체 참조를 보존한다"
+  - id: d
+    text: "`1 1` — 둘 다 마지막 값으로 덮어쓴다"
+answer: a
+explanation: |
+  Object의 키는 string/Symbol만 가능해서 객체를 키로 넣으면 `toString()`이 호출돼 `"[object Object]"`라는 같은 문자열이 돼. 그래서 `obj[a]`와 `obj[b]`가 같은 키를 덮어써 `Object.keys(obj).length`는 1.
+  반면 Map은 어떤 값(객체 포함)이든 그대로 키로 쓰고 참조 동등성으로 비교해서 a와 b가 별개의 키로 들어가 `map.size`는 2.
+  키 타입이 객체이거나 빈번하게 추가/삭제되는 동적 컬렉션엔 Map을 쓰는 게 안전해.
+tags: [ map, object, collections ]
