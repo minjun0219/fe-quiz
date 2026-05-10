@@ -10,15 +10,15 @@ code: |
   }
 choices:
   - id: a
-    text: "xs.map(x => x * 2)"
+    text: "`xs.map(x => x * 2)`"
   - id: b
-    text: "xs.push(4)"
+    text: "`xs.push(4)`"
   - id: c
-    text: "xs.length"
+    text: "`xs.length`"
   - id: d
-    text: "xs.sort()"
+    text: "`xs.sort()`"
   - id: e
-    text: "xs.slice(0, 2)"
+    text: "`xs.slice(0, 2)`"
 answer: [ b, d ]
 explanation: |
   `readonly T[]` (또는 `ReadonlyArray<T>`)는 **변경 메서드만** 차단해.

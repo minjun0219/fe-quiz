@@ -19,11 +19,13 @@ import {
   pickDominantCategory,
   resolveResultHero,
 } from "../lib/diagnosis";
+import { LEVELS } from "../lib/levels";
 import { loadAllQuestions } from "../lib/load-questions";
-import type { Category, Question } from "../lib/question.schema";
+import type { Category, Difficulty, Question } from "../lib/question.schema";
 import type { CategoryScore } from "../lib/quiz-submit.schema";
 import {
   effectiveMinPerCategory,
+  pickByLevel,
   pickStratified,
   ROUND_SIZE,
 } from "../lib/round-picker";
@@ -102,6 +104,81 @@ function roundChecks() {
   pass(
     `round picker: ${TRIALS} trials, size=${expectedSize}, min/cat=${minPerCat} (N=${N})`,
   );
+}
+
+function levelMixChecks() {
+  const all = loadAllQuestions(ROOT);
+  if (all.length === 0) {
+    pass("level mix: no questions seeded yet, skipping invariants");
+    return;
+  }
+
+  const poolByCat = buildPoolByCategory(all);
+  const getPool = (c: Category) => poolByCat.get(c) ?? [];
+  const expectedSize = Math.min(ROUND_SIZE, all.length);
+
+  const totalByDiff: Record<Difficulty, number> = {
+    easy: 0,
+    medium: 0,
+    hard: 0,
+  };
+  for (const q of all) {
+    totalByDiff[q.difficulty]++;
+  }
+
+  const DIFFS = ["easy", "medium", "hard"] as const;
+
+  for (const level of LEVELS) {
+    // Whether every difficulty's pool can satisfy the level's quota. When
+    // this holds, no fallback fires and `got[d]` must hit `mix[d]` exactly
+    // for every d. When some pool is short, the deficit is redirected onto
+    // adjacent difficulties, so a sufficient bucket can legitimately receive
+    // overflow — we fall back to a lower bound there.
+    const allPoolsSufficient = DIFFS.every(
+      (d) => totalByDiff[d] >= level.mix[d],
+    );
+
+    for (let trial = 0; trial < TRIALS; trial++) {
+      const round = pickByLevel(level.id, ROUND_SIZE, getPool);
+
+      if (round.length !== expectedSize) {
+        fail(
+          `level=${level.id} trial ${trial}: expected ${expectedSize} questions, got ${round.length}`,
+        );
+      }
+
+      const seen = new Set<string>();
+      const got: Record<Difficulty, number> = { easy: 0, medium: 0, hard: 0 };
+      for (const q of round) {
+        if (seen.has(q.id)) {
+          fail(`level=${level.id} trial ${trial}: duplicate id "${q.id}"`);
+        }
+        seen.add(q.id);
+        got[q.difficulty]++;
+      }
+
+      for (const d of DIFFS) {
+        const want = level.mix[d];
+        if (allPoolsSufficient) {
+          if (got[d] !== want) {
+            fail(
+              `level=${level.id} trial ${trial}: ${d} got ${got[d]}, expected exactly ${want} (pool=${totalByDiff[d]})`,
+            );
+          }
+        } else {
+          const minExpected = Math.min(want, totalByDiff[d]);
+          if (got[d] < minExpected) {
+            fail(
+              `level=${level.id} trial ${trial}: ${d} got ${got[d]}, expected ≥ ${minExpected} (mix=${want}, pool=${totalByDiff[d]})`,
+            );
+          }
+        }
+      }
+    }
+    pass(
+      `level mix [${level.id}]: ${TRIALS} trials, mix=${JSON.stringify(level.mix)}, exact=${allPoolsSufficient}`,
+    );
+  }
 }
 
 function diagnosisChecks() {
@@ -215,6 +292,7 @@ function diagnosisChecks() {
 
 try {
   roundChecks();
+  levelMixChecks();
   diagnosisChecks();
   console.log("\n✓ all round + diagnosis invariants pass");
 } catch (err) {

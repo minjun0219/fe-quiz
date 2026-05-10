@@ -11,13 +11,13 @@ code: |
   </label>
 choices:
   - id: a
-    text: "label > input:checked { background: yellow }"
+    text: "`label > input:checked { background: yellow }`"
   - id: b
-    text: "label:has(input:checked) { background: yellow }"
+    text: "`label:has(input:checked) { background: yellow }`"
   - id: c
-    text: "label:checked { background: yellow }"
+    text: "`label:checked { background: yellow }`"
   - id: d
-    text: "input:checked + label { background: yellow }"
+    text: "`input:checked + label { background: yellow }`"
 answer: b
 explanation: |
   `:has()`는 인자로 들어간 셀렉터에 매칭되는 자손/자식을 가진 **부모**를 선택할 수 있는 관계형 가상 클래스(2023년부터 모던 브라우저 전반 지원). `label:has(input:checked)`는 "체크된 input을 자식으로 가진 label" 자체를 잡으니 label에 스타일을 줄 수 있어.

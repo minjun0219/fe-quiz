@@ -6,13 +6,13 @@ question: |
   페이지의 **주요 콘텐츠 영역**(보통 페이지당 하나)을 감싸는 가장 적절한 시맨틱 태그는?
 choices:
   - id: a
-    text: "<section>"
+    text: "`<section>`"
   - id: b
-    text: "<article>"
+    text: "`<article>`"
   - id: c
-    text: "<main>"
+    text: "`<main>`"
   - id: d
-    text: "<div role=\"main\">"
+    text: "`<div role=\"main\">`"
 answer: c
 explanation: |
   `<main>`은 문서의 **유일한 주요 콘텐츠**를 감싸는 랜드마크 — 한 페이지에 한 번만 가시 상태로 존재해야 해.

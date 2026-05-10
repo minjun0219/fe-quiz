@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteCredit } from "@/components/credits";
+import { DEFAULT_LEVEL, LEVELS } from "@/lib/levels";
 
 export default function Home() {
   return (
@@ -17,14 +18,38 @@ export default function Home() {
           면접 압박 없이, 단톡방에서 친구 던지듯.
           <br />다 풀면 AI가 친구처럼 피드백 + MBTI식 결과 타입까지 알려줘.
         </p>
-        <Link
-          href="/play"
-          className="inline-flex h-14 items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition hover:bg-zinc-800 active:scale-[0.98] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-        >
-          지금 풀어보기 →
-        </Link>
-        <p className="mt-6 text-xs text-zinc-400 dark:text-zinc-500">
-          JS · React · CSS / 약 5분
+        <div className="mb-6 flex w-full max-w-md flex-col gap-3">
+          <p className="text-xs font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+            난이도 골라
+          </p>
+          {LEVELS.map((level) => {
+            const isDefault = level.id === DEFAULT_LEVEL;
+            return (
+              <Link
+                key={level.id}
+                href={`/play?level=${level.id}`}
+                className={
+                  isDefault
+                    ? "group flex h-16 items-center justify-between rounded-2xl bg-zinc-900 px-6 text-white shadow-md transition hover:bg-zinc-800 active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                    : "group flex h-16 items-center justify-between rounded-2xl border border-zinc-200 bg-white px-6 text-zinc-900 transition hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.99] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+                }
+              >
+                <span className="text-base font-semibold">{level.display}</span>
+                <span
+                  className={
+                    isDefault
+                      ? "text-sm text-zinc-300 dark:text-zinc-500"
+                      : "text-sm text-zinc-500 dark:text-zinc-400"
+                  }
+                >
+                  {level.blurb}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+        <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+          JS · React · CSS · TS · HTML / 약 5분
         </p>
       </div>
       <SiteCredit />

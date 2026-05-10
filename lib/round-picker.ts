@@ -1,5 +1,6 @@
 import { CATEGORY_IDS, type Category } from "./categories";
-import type { Question } from "./question.schema";
+import { getLevel, type Level } from "./levels";
+import type { Difficulty, Question } from "./question.schema";
 
 /** Number of questions per round. Falls back to pool size when seed < target. */
 export const ROUND_SIZE = 10;
@@ -113,4 +114,119 @@ export function pickStratified(
   }
 
   return shuffle(picked);
+}
+
+/**
+ * Difficulty-aware picker. Honors the level's easy/medium/hard mix as the
+ * primary constraint, with category coverage as best-effort.
+ *
+ * Round size is fundamentally determined by the level's mix
+ * (`mix.easy + mix.medium + mix.hard`, currently always `ROUND_SIZE`).
+ * `roundSize` here is an **upper cap only** — pass a smaller value to
+ * truncate the result (used by tests to probe clamping/edge cases). Passing
+ * a value larger than the mix sum will not magically grow the round; that's
+ * a level definition concern, not a picker concern.
+ *
+ * Algorithm:
+ *   1. Split each category's pool into easy/medium/hard buckets (pre-shuffled).
+ *   2. For each difficulty in scarcity order (hard → medium → easy), spread
+ *      its quota across categories round-robin, reshuffling category order
+ *      each pass so JS doesn't always lead.
+ *   3. If a difficulty bucket runs short (e.g., HTML has zero hard), fill
+ *      the remainder from adjacent difficulties — hard-short pulls medium
+ *      then easy; easy-short pulls medium then hard. This keeps the round
+ *      at the mix sum even when the global pool is uneven.
+ *   4. Final shuffle so difficulties interleave; trim to `roundSize` if
+ *      smaller than the mix sum.
+ *
+ * Per-category coverage is *not* guaranteed under heavy filtering (a pure-
+ * hard quota can leave HTML out entirely), but with the current mixes the
+ * round-robin distribution naturally lands ≥1 per category.
+ */
+export function pickByLevel(
+  level: Level,
+  roundSize: number,
+  getPool: (cat: Category) => readonly Question[],
+): Question[] {
+  const safeCount = Math.max(0, Math.floor(roundSize));
+  if (safeCount === 0) {
+    return [];
+  }
+
+  const mix = getLevel(level).mix;
+
+  const buckets = new Map<Category, Record<Difficulty, Question[]>>();
+  for (const cat of CATEGORY_IDS) {
+    const split: Record<Difficulty, Question[]> = {
+      easy: [],
+      medium: [],
+      hard: [],
+    };
+    for (const q of getPool(cat)) {
+      split[q.difficulty].push(q);
+    }
+    split.easy = shuffle(split.easy);
+    split.medium = shuffle(split.medium);
+    split.hard = shuffle(split.hard);
+    buckets.set(cat, split);
+  }
+
+  const picked: Question[] = [];
+  const seen = new Set<string>();
+
+  function takeFromDifficulty(diff: Difficulty, want: number): number {
+    if (want <= 0) {
+      return 0;
+    }
+    let taken = 0;
+    let progress = true;
+    while (taken < want && progress) {
+      progress = false;
+      for (const cat of shuffle(CATEGORY_IDS)) {
+        if (taken >= want) {
+          break;
+        }
+        const pool = buckets.get(cat)?.[diff];
+        if (!pool) {
+          continue;
+        }
+        const q = pool.shift();
+        if (q && !seen.has(q.id)) {
+          picked.push(q);
+          seen.add(q.id);
+          taken++;
+          progress = true;
+        }
+      }
+    }
+    return taken;
+  }
+
+  // Scarcity-first: hard buckets are smallest, satisfy them before medium
+  // grabs questions that hard could've used as fallback.
+  const order: Difficulty[] = ["hard", "medium", "easy"];
+  const shortfall: Record<Difficulty, number> = { easy: 0, medium: 0, hard: 0 };
+  for (const d of order) {
+    shortfall[d] = mix[d] - takeFromDifficulty(d, mix[d]);
+  }
+
+  // Fallback: closest neighbor first. A short hard quota borrows from medium
+  // (closer in challenge) before easy; a short easy borrows from medium
+  // before hard.
+  const fallback: Record<Difficulty, Difficulty[]> = {
+    hard: ["medium", "easy"],
+    medium: ["easy", "hard"],
+    easy: ["medium", "hard"],
+  };
+  for (const d of order) {
+    let need = shortfall[d];
+    for (const fb of fallback[d]) {
+      if (need <= 0) {
+        break;
+      }
+      need -= takeFromDifficulty(fb, need);
+    }
+  }
+
+  return shuffle(picked).slice(0, safeCount);
 }

@@ -108,3 +108,7 @@ tags: [event-loop, async]
 
 현재는 MVP 뼈대와 시드 콘텐츠 100문제가 들어간 상태입니다.
 새 카테고리/문제 형식/공유 구조처럼 UX나 데이터 구조에 영향을 주는 변경은 먼저 이슈로 논의 부탁드립니다.
+
+문제 작성 시 코드 스니펫 표기(백틱·펜스) 컨벤션은
+[`docs/CONTENT_STYLE.md`](./docs/CONTENT_STYLE.md) 참고. `pnpm questions:check`가
+이 컨벤션을 빌드 타임에 강제해요.
