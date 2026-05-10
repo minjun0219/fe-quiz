@@ -8,7 +8,7 @@ MBTI 검사처럼 결과 공유 바이럴이 핵심입니다.
 
 ## 현재 상태
 
-- 한 라운드 = 5문제 / 3-5분
+- 한 라운드 = 10문제 / 5분 내외 (`ROUND_SIZE = 10` in `lib/round-picker.ts`)
 - 가입 불필요. 결과 공유 시에만 `shares` 테이블에 저장
 - 카테고리 5개: JavaScript, React, CSS, TypeScript, HTML
 - 시드 문제 100개: 카테고리별 20개
@@ -18,7 +18,7 @@ MBTI 검사처럼 결과 공유 바이럴이 핵심입니다.
 - AI 피드백: Claude Haiku 4.5 스트리밍 응답
 - 공유: `/r/[slug]` 결과 페이지 + OG 이미지 + 같은 문제 순서로 다시 풀기 (공유 URL은 요청 헤더 + Vercel 운영 도메인 화이트리스트로 도출)
 - 보호 장치: Supabase secret key 기반 서버 접근, anon 직접 접근 차단, Upstash 기반 rate limit(선택)
-- 모니터링: PostHog(에러/이벤트) + Vercel Analytics(옵셔널, 키 미설정 시 모두 no-op)
+- 모니터링: PostHog(에러/이벤트, 키 미설정 시 서버·클라이언트 모두 no-op) + Vercel Analytics(컴포넌트 마운트로 활성, Vercel 배포에서만 데이터 수집)
 
 자세한 컨셉/스택/로드맵은 [`docs/ROADMAP.md`](./docs/ROADMAP.md) 참고.
 
@@ -42,7 +42,6 @@ pnpm dev
 
 | 변수 | 용도 | 로컬 필수 여부 |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | 공유 링크/OG 이미지 base URL | 권장 |
 | `SUPABASE_URL` | Supabase 프로젝트 URL | 공유 기능 사용 시 필수 |
 | `SUPABASE_SECRET_KEY` | 서버 전용 Supabase secret/service-role key | 공유 기능 사용 시 필수 |
 | `ANTHROPIC_API_KEY` | AI 피드백 생성 | 피드백 사용 시 필수 |
@@ -51,6 +50,8 @@ pnpm dev
 | `LOG_LEVEL` | pino 로그 레벨 | 선택 |
 | `NEXT_PUBLIC_POSTHOG_KEY` | PostHog project API key (write-only, 노출 OK) | 선택 |
 | `NEXT_PUBLIC_POSTHOG_HOST` | PostHog 리전 origin (기본 `https://us.i.posthog.com`) | 선택 |
+
+공유 링크와 메타/OG base URL은 별도 환경변수가 아니라 Vercel이 자동 주입하는 `VERCEL_URL`(메타데이터)·`VERCEL_PROJECT_PRODUCTION_URL`(공유 API) + 요청 헤더 화이트리스트로 도출됩니다. 로컬 dev에서는 `localhost:3000`이 폴백입니다.
 
 `SUPABASE_SECRET_KEY`, `ANTHROPIC_API_KEY`, `UPSTASH_*` 값은 절대 `NEXT_PUBLIC_` 접두사를 붙이지 말고 클라이언트에 노출하지 마세요.
 PostHog 키가 비어 있으면 서버/클라이언트 둘 다 no-op으로 떨어집니다.
