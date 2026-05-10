@@ -1,4 +1,6 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
+import { PostHogProvider } from "@/components/PostHogProvider";
 import "./globals.css";
 
 // metadataBase는 빌드타임에 결정되는 정적 값이라 request 헤더에서 못 끌어옴.
@@ -52,7 +54,8 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-dvh flex flex-col font-sans bg-[--color-bg] text-[--color-fg]">
-        {children}
+        <PostHogProvider>{children}</PostHogProvider>
+        <Analytics />
       </body>
     </html>
   );

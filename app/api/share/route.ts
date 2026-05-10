@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { diagnose } from "@/lib/diagnosis";
 import { GradingError, gradeRound } from "@/lib/grading";
 import { logger } from "@/lib/logger";
+import { flushPostHogServer } from "@/lib/posthog-server";
 import { getQuestionMap } from "@/lib/questions";
 import { checkRateLimit } from "@/lib/rate-limit";
 import {
@@ -87,6 +88,11 @@ function siteUrl(request: Request): string {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // 응답 후 PostHog 펜딩 이벤트 flush — 서버리스에서 lambda가 죽기 전 보장된
+  // 송신 경로. flushPostHogServer가 실패를 삼키므로 after 콜백에서 unhandled
+  // rejection 노이즈 없음.
+  after(flushPostHogServer);
+
   // Share INSERT는 DB row 폭증 + 가짜 슬러그 양산 위험. 분당 10개 이상은
   // 정상 사용자 흐름이 아님 (한 라운드 풀이 + 공유에 분 단위가 걸림).
   const limited = await checkRateLimit(request, {
