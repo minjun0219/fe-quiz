@@ -14,21 +14,23 @@ MBTI 검사처럼 결과 공유 바이럴이 핵심입니다.
 
 ## 현재 구현 상태
 
-- **라운드**: 5문제 랜덤 추출, 공유 링크에서 진입하면 같은 문제/같은 순서로 재생
+- **라운드**: 10문제 랜덤 추출 (`ROUND_SIZE = 10` in `lib/round-picker.ts`), 공유 링크에서 진입하면 같은 문제/같은 순서로 재생
+- **난이도**: 3단계(`intro`/`normal`/`challenge`) 선택. 카테고리별 풀이 부족하면 인접 난이도로 자동 대체. `lib/levels.ts`가 단일 출처
 - **카테고리**: JavaScript, React, CSS, TypeScript, HTML
 - **콘텐츠**: 카테고리별 20문제, 총 100문제 시드
 - **문제 형식**: `single_choice`, `multi_choice`
 - **채점**: 서버사이드 검증. 클라이언트 라운드 데이터에는 정답/해설 미포함
 - **결과**: 총점, 카테고리별 점수, 진단명/페르소나, 타입 코드
 - **AI 피드백**: `/api/quiz/feedback`에서 Claude Haiku 4.5 스트리밍 응답
-- **공유**: `/api/share`가 서버 재채점 후 `shares` row 생성, `/r/[slug]` 결과 페이지와 OG 이미지 제공
+- **공유**: `/api/share`가 서버 재채점 후 `shares` row 생성, `/r/[slug]` 결과 페이지와 OG 이미지 제공. 공유 URL은 요청 헤더(`x-forwarded-host`/`host`) + Vercel 운영 도메인 화이트리스트로 도출하며 그 외 호스트는 `VERCEL_PROJECT_PRODUCTION_URL` 또는 `localhost`로 폴백 (`app/api/share/route.ts`, #36)
 - **보안/남용 방지**: Supabase secret key 서버 접근, anon 직접 접근 차단, Upstash rate limit 선택 적용
+- **Observability**: PostHog 서버/클라이언트(키 미설정 시 양쪽 no-op) + Next.js `instrumentation.onRequestError`로 미처리 예외 캡처, `app/error.tsx`/`app/global-error.tsx`로 라우트 단 에러 바운더리, Vercel Analytics(루트 layout에서 `<Analytics />` 마운트로 활성, Vercel 배포에서만 데이터 수집)
 
 ## 핵심 설계 결정
 
 ### 컨셉
 
-- **한 라운드 = 5문제 / 3-5분** — 완결되는 단위
+- **한 라운드 = 10문제 / 5분 내외** — 완결되는 단위
 - **가입 불필요** — 익명으로 바로 시작, 결과 공유 시에만 데이터 저장
 - **친구 톤** — "이거 알아? ㅋㅋ" 단톡방 느낌. AI 피드백도 "오, 이건 좀 의외였네" 식으로 가볍게
 - **결과 = 진단** — MBTI 결과처럼 공유 가능한 페르소나/타입 코드 제공
@@ -52,6 +54,7 @@ MBTI 검사처럼 결과 공유 바이럴이 핵심입니다.
 - **AI**: Anthropic Claude Haiku 4.5 (`claude-haiku-4-5`) — 종합 피드백 전용
 - **Rate limit**: Upstash Redis (`@upstash/ratelimit`) — 미설정 시 fail-open
 - **Logging**: pino
+- **Analytics/Error monitoring**: PostHog (`posthog-js`/`posthog-node`, 키 미설정 시 양쪽 no-op) + `@vercel/analytics`(루트 layout에 `<Analytics />` 마운트로 활성, Vercel 배포에서만 동작)
 - **호스팅 가정**: Vercel
 - **OG 이미지**: `next/og` 기반 `/r/[slug]/opengraph-image`
 - **공유 ID**: `nanoid` 8자리
@@ -156,10 +159,10 @@ create index idx_shares_created on shares (created_at desc);
 3. `POST /api/share` → 서버가 다시 채점 → `shares` row 생성 → slug/url 반환
 4. 공유 링크: `https://domain/r/{slug}`
 5. 친구가 열면 `/r/{slug}`에서 결과 + 저장된 피드백 표시 (추가 AI 호출 없음)
-6. "나도 같은 문제 풀어보기" → `/play?from={slug}`에서 같은 5문제/같은 순서로 시작
+6. "나도 같은 문제 풀어보기" → `/play?from={slug}`에서 같은 10문제/같은 순서로 시작
 7. 친구 결과로 새 share 생성 → 루프
 
-**중요**: 같은 라운드를 친구가 풀 때 5문제 순서까지 동일해야 합니다.
+**중요**: 같은 라운드를 친구가 풀 때 10문제 순서까지 동일해야 합니다.
 점수 비교 의미를 살려야 바이럴이 작동합니다.
 
 ## 환경변수
@@ -168,15 +171,18 @@ create index idx_shares_created on shares (created_at desc);
 
 | 변수 | 용도 |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | 공유 URL/OG base |
 | `SUPABASE_URL` | Supabase 프로젝트 URL |
 | `SUPABASE_SECRET_KEY` | 서버 전용 secret/service-role key |
 | `ANTHROPIC_API_KEY` | Claude 피드백 호출 |
 | `UPSTASH_REDIS_REST_URL` | rate limit Redis REST URL |
 | `UPSTASH_REDIS_REST_TOKEN` | rate limit Redis REST token |
 | `LOG_LEVEL` | pino 로그 레벨 |
+| `NEXT_PUBLIC_POSTHOG_KEY` | PostHog project API key (write-only, 노출 OK) |
+| `NEXT_PUBLIC_POSTHOG_HOST` | PostHog 리전 origin (기본 `https://us.i.posthog.com`) |
 
 Upstash가 미설정되거나 장애가 나면 rate limit은 fail-open입니다. 비용/스팸 보호용이지 보안 경계가 아닙니다.
+PostHog 키도 미설정이면 서버/클라이언트 둘 다 no-op으로 떨어집니다.
+공유/메타 URL의 base는 별도 env가 아니라 Vercel이 자동 주입하는 `VERCEL_URL` / `VERCEL_PROJECT_PRODUCTION_URL` + 요청 헤더 화이트리스트로 도출됩니다.
 
 ## MVP 범위와 완료 상태
 
@@ -185,7 +191,7 @@ Upstash가 미설정되거나 장애가 나면 rate limit은 fail-open입니다.
 | 1 | Next.js 16 + TypeScript + Tailwind 프로젝트 초기화 + 로드맵 박제 | ✅ 완료 |
 | 2 | Supabase 연결 + `shares` 테이블 마이그레이션 + RLS | ✅ 완료 |
 | 3 | `content/questions/` YAML 스키마 + 빌드/검증 파이프라인 | ✅ 완료 |
-| 4 | `/play` 라운드 페이지 — 5문제 진행 UI | ✅ 완료 |
+| 4 | `/play` 라운드 페이지 — 10문제 진행 UI | ✅ 완료 |
 | 5 | 서버사이드 정답 검증 API (`/api/quiz/submit`) | ✅ 완료 |
 | 6 | 결과 진단 로직 (카테고리별 정확도 → 진단명/타입 코드) | ✅ 완료 |
 | 7 | AI 피드백 통합 (Haiku 4.5 스트리밍) | ✅ 완료 |
@@ -193,6 +199,8 @@ Upstash가 미설정되거나 장애가 나면 rate limit은 fail-open입니다.
 | 9 | Vercel OG 이미지 동적 생성 | ✅ 완료 |
 | 10 | 시드 콘텐츠 100문제 작성 | ✅ 완료 |
 | 11 | Upstash rate limit + secret-key 기반 Supabase 접근 강화 | ✅ 완료 |
+| 12 | 라운드 난이도 3단계 선택 (#25) | ✅ 완료 |
+| 13 | Observability — PostHog + Vercel Analytics + `onRequestError` (#38) | ✅ 완료 |
 
 ## v2 이후 후보 (지금은 만들지 말 것)
 
@@ -231,30 +239,38 @@ fe-quiz/
 │   ├── api/share                # 공유 생성
 │   ├── play/                    # 라운드 UI
 │   ├── r/[slug]/                # 공유 결과 + OG 이미지
+│   ├── error.tsx                # 라우트 에러 바운더리
+│   ├── global-error.tsx         # root layout 에러 바운더리
 │   ├── layout.tsx               # 한국어 메타 + Pretendard
 │   ├── page.tsx                 # 랜딩
 │   └── globals.css              # Tailwind v4 @theme
 ├── components/
+│   └── PostHogProvider.tsx      # 클라이언트 PostHog 부트스트랩
 ├── content/
 │   ├── LICENSE                  # CC BY-SA 4.0
 │   └── questions/               # YAML 시드 문제 100개
 ├── lib/                         # 도메인 로직
 │   ├── categories.ts            # 카테고리 단일 출처
 │   ├── question.schema.ts       # zod 질문 스키마
+│   ├── levels.ts                # 난이도 3단계 단일 출처
 │   ├── round.ts                 # 라운드 선택
 │   ├── grading.ts               # 채점
 │   ├── diagnosis.ts             # 진단/페르소나
 │   ├── feedback-prompt.ts       # LLM 프롬프트
 │   ├── share-store.ts           # shares 저장/조회
 │   ├── supabase.ts              # 서버 Supabase 클라이언트
-│   └── rate-limit.ts            # Upstash rate limit
+│   ├── rate-limit.ts            # Upstash rate limit
+│   ├── logger.ts                # pino 싱글턴
+│   └── posthog-server.ts        # 서버 PostHog 싱글턴
 ├── scripts/
 │   ├── check-questions.ts
 │   └── check-round.ts
 ├── supabase/
 │   └── migrations/
 ├── docs/
-│   └── ROADMAP.md
+│   ├── ROADMAP.md
+│   └── CONTENT_STYLE.md         # 코드 스니펫 표기 컨벤션
+├── instrumentation.ts           # Next.js 16 onRequestError → PostHog
 ├── .env.local.example
 ├── .mcp.json
 ├── .nvmrc                       # Node 22
