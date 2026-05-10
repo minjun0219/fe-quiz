@@ -9,13 +9,13 @@ code: |
   const b = ['x', 'y'] as const
 choices:
   - id: a
-    text: "a: string[],  b: readonly ['x', 'y']"
+    text: "`a: string[]`,  `b: readonly ['x', 'y']`"
   - id: b
-    text: "a: ['x', 'y'],  b: readonly ['x', 'y']"
+    text: "`a: ['x', 'y']`,  `b: readonly ['x', 'y']`"
   - id: c
-    text: "a: string[],  b: string[]"
+    text: "`a: string[]`,  `b: string[]`"
   - id: d
-    text: "a: readonly ['x', 'y'],  b: ['x', 'y']"
+    text: "`a: readonly ['x', 'y']`,  `b: ['x', 'y']`"
 answer: a
 explanation: |
   일반 `const` 배열 리터럴은 가변(mutable) 배열로 추론돼 `string[]`이 돼.

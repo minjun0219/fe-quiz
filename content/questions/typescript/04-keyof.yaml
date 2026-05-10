@@ -9,13 +9,13 @@ code: |
   type K = keyof User
 choices:
   - id: a
-    text: "'id' | 'name' | 'email'"
+    text: "`'id' | 'name' | 'email'`"
   - id: b
-    text: "number | string"
+    text: "`number | string`"
   - id: c
-    text: "{ id: number; name: string; email: string }"
+    text: "`{ id: number; name: string; email: string }`"
   - id: d
-    text: "string"
+    text: "`string`"
 answer: a
 explanation: |
   `keyof T`는 객체 타입 `T`의 **키 이름들의 union**을 만들어줘. 값 타입이 아니라 키 타입이라는 점이 핵심이야.

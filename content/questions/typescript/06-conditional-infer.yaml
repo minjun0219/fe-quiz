@@ -14,13 +14,13 @@ code: |
   type R = ReturnOf<typeof getUser>
 choices:
   - id: a
-    text: "{ id: number; name: string }"
+    text: "`{ id: number; name: string }`"
   - id: b
-    text: "() => { id: number; name: string }"
+    text: "`() => { id: number; name: string }`"
   - id: c
-    text: "any"
+    text: "`any`"
   - id: d
-    text: "never"
+    text: "`never`"
 answer: a
 explanation: |
   `infer U`는 조건부 타입 안에서 "여기에 들어가는 타입을 추론해서 `U`라는 이름으로 잡아줘"라는 의미야.

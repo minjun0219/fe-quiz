@@ -13,11 +13,11 @@ code: |
   }
 choices:
   - id: a
-    text: "{ id: number; name: string }"
+    text: "`{ id: number; name: string }`"
   - id: b
-    text: "{ id?: number; name?: string }"
+    text: "`{ id?: number; name?: string }`"
   - id: c
-    text: "{ email?: string; role: 'admin' | 'guest' }"
+    text: "`{ email?: string; role: 'admin' | 'guest' }`"
   - id: d
     text: "`Omit`와 동일한 결과 — `User`에서 `'id'`와 `'name'`을 제거"
 answer: a
