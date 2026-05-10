@@ -1,0 +1,19 @@
+id: perf-005
+category: performance
+difficulty: easy
+type: single_choice
+question: |
+  버튼 hover 시 살짝 위로 이동하는 애니메이션을 만들 때 성능 관점에서 더 선호되는 방식은?
+choices:
+  - id: a
+    text: '`position: relative`와 `top: -4px`를 변경한다.'
+  - id: b
+    text: '`transform: translateY(-4px)`를 사용한다.'
+  - id: c
+    text: '`margin-top: -4px`를 변경한다.'
+  - id: d
+    text: '`height`를 줄여서 위로 올라간 것처럼 보이게 한다.'
+answer: b
+explanation: |
+  동적인 시각 이동은 보통 `transform`이 더 유리해. `top`, `margin`, `height` 변경은 Layout/Reflow를 유발할 수 있지만 `transform`은 대체로 Composite 단계에서 처리되어 프레임 유지에 유리하다. 단, 문서 흐름 자체를 바꿔야 하면 position/layout 속성이 필요할 수 있어.
+tags: [ transform, composite, animation, reflow ]

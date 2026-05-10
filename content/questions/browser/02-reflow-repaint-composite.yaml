@@ -1,0 +1,19 @@
+id: browser-002
+category: browser
+difficulty: medium
+type: single_choice
+question: |
+  다음 중 레이아웃 재계산을 피하고 대체로 Composite 단계에서 처리되어 애니메이션에 유리한 CSS 속성 조합은?
+choices:
+  - id: a
+    text: '`top`, `left`'
+  - id: b
+    text: '`width`, `height`'
+  - id: c
+    text: '`transform`, `opacity`'
+  - id: d
+    text: '`margin`, `padding`'
+answer: c
+explanation: |
+  `transform`과 `opacity`는 보통 Layout/Reflow를 다시 만들지 않고 합성 단계에서 처리할 수 있어 애니메이션에 유리해. 반대로 `top`, `left`, `width`, `height`, `margin`, `padding`은 주변 요소의 배치 계산을 다시 유발할 수 있어.
+tags: [ rendering, reflow, repaint, composite, css ]

@@ -1,0 +1,19 @@
+id: next-005
+category: nextjs
+difficulty: easy
+type: single_choice
+question: |
+  Next.js Middleware를 쓰기 좋은 경우는?
+choices:
+  - id: a
+    text: 요청이 라우트에 도달하기 전에 인증 여부를 확인해 redirect하거나 rewrite한다.
+  - id: b
+    text: React 컴포넌트의 로컬 state를 저장한다.
+  - id: c
+    text: 이미지 압축 알고리즘을 직접 구현한다.
+  - id: d
+    text: 브라우저에서만 접근 가능한 DOM 크기를 측정한다.
+answer: a
+explanation: |
+  Middleware는 요청이 실제 라우트 처리에 들어가기 전 경로에서 실행되어 redirect, rewrite, 헤더 조정, 간단한 인증 분기 같은 작업에 적합해. 무거운 비즈니스 로직이나 DOM 측정처럼 브라우저 런타임이 필요한 작업에는 맞지 않는다.
+tags: [ middleware, redirect, rewrite, auth ]

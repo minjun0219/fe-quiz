@@ -1,0 +1,19 @@
+id: perf-003
+category: performance
+difficulty: medium
+type: multi_choice
+question: |
+  CLS를 줄이는 데 도움이 되는 방법을 모두 고르면?
+choices:
+  - id: a
+    text: 이미지와 광고 영역에 미리 `width`, `height` 또는 `aspect-ratio`를 지정한다.
+  - id: b
+    text: 웹 폰트 교체로 레이아웃이 흔들리지 않도록 폰트 로딩 전략을 조정한다.
+  - id: c
+    text: 첫 화면 위쪽에 동적으로 배너를 삽입할 때 기존 콘텐츠를 아래로 밀어도 예약 공간은 두지 않는다.
+  - id: d
+    text: 스켈레톤이나 placeholder로 늦게 도착하는 콘텐츠의 공간을 확보한다.
+answer: [a, b, d]
+explanation: |
+  CLS는 사용자가 예상하지 못한 레이아웃 이동을 측정해. 이미지/광고/비동기 콘텐츠 공간을 미리 잡고, 폰트 교체로 인한 크기 차이를 줄이면 도움이 된다. 반대로 예약 공간 없이 상단 콘텐츠를 끼워 넣으면 기존 요소가 밀려 CLS가 커질 수 있어.
+tags: [ cls, layout-shift, font-loading, image ]

@@ -1,0 +1,19 @@
+id: browser-003
+category: browser
+difficulty: medium
+type: single_choice
+question: |
+  `<link rel="preconnect">`, `<link rel="preload">`, `<link rel="prefetch">` 설명으로 맞는 것은?
+choices:
+  - id: a
+    text: '`preconnect`는 리소스 다운로드까지 완료하고, `preload`는 연결만 미리 만든다.'
+  - id: b
+    text: '`preload`는 현재 페이지에서 곧 필요한 리소스를 높은 우선순위로 가져오게 힌트를 준다.'
+  - id: c
+    text: '`prefetch`는 현재 렌더링에 필수인 CSS를 항상 가장 높은 우선순위로 가져온다.'
+  - id: d
+    text: 세 값은 모두 같은 동작이고 브라우저 호환성을 위해 이름만 다르다.
+answer: b
+explanation: |
+  `preconnect`는 DNS/TCP/TLS 연결을 미리 준비하고, `preload`는 현재 페이지에서 곧 쓸 특정 리소스를 우선 가져오게 해. `prefetch`는 다음 탐색에서 필요할 가능성이 있는 리소스를 낮은 우선순위로 미리 받아두는 용도야.
+tags: [ resource-hints, preconnect, preload, prefetch, html ]

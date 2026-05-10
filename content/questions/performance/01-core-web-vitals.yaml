@@ -1,0 +1,19 @@
+id: perf-001
+category: performance
+difficulty: easy
+type: single_choice
+question: |
+  Core Web Vitals의 대표 지표 조합으로 가장 알맞은 것은?
+choices:
+  - id: a
+    text: LCP, INP, CLS
+  - id: b
+    text: TTFB, FPS, CPU
+  - id: c
+    text: FOUT, FOIT, DNS
+  - id: d
+    text: DOM, CSSOM, VDOM
+answer: a
+explanation: |
+  현재 Core Web Vitals의 핵심은 LCP(주요 콘텐츠 표시), INP(상호작용 응답성), CLS(레이아웃 이동 안정성)야. TTFB나 FPS도 성능 분석에 중요하지만 Core Web Vitals 3대 지표 조합은 아니야.
+tags: [ core-web-vitals, lcp, inp, cls ]

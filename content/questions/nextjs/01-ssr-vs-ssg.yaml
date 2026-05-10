@@ -1,0 +1,19 @@
+id: next-001
+category: nextjs
+difficulty: easy
+type: single_choice
+question: |
+  Next.js에서 SSR과 SSG 선택 기준으로 가장 알맞은 것은?
+choices:
+  - id: a
+    text: SSR은 요청마다 최신 데이터가 필요할 때, SSG는 빌드 시점 결과를 재사용해도 되는 정적 콘텐츠에 적합하다.
+  - id: b
+    text: SSR은 항상 CDN 캐싱이 불가능하고, SSG는 사용자별 데이터를 안전하게 포함할 수 있다.
+  - id: c
+    text: SSG는 매 요청 서버에서 HTML을 만들고, SSR은 빌드 시 한 번만 만든다.
+  - id: d
+    text: 둘의 차이는 파일 확장자가 `.tsx`인지 `.jsx`인지뿐이다.
+answer: a
+explanation: |
+  SSR은 요청 시점에 HTML을 만들어 최신성이나 사용자별 처리가 필요한 화면에 적합하고, SSG는 빌드 시 생성한 결과를 빠르게 제공하는 정적 콘텐츠에 좋아. 실제 서비스에서는 캐시/ISR/동적 렌더링을 조합해 쓴다.
+tags: [ ssr, ssg, rendering ]

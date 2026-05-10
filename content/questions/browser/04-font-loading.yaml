@@ -1,0 +1,19 @@
+id: browser-004
+category: browser
+difficulty: easy
+type: single_choice
+question: |
+  웹 폰트 로딩에서 FOUT와 FOIT 설명으로 가장 알맞은 것은?
+choices:
+  - id: a
+    text: FOUT는 텍스트가 보이지 않는 현상, FOIT는 fallback 폰트가 먼저 보이는 현상이다.
+  - id: b
+    text: FOUT는 fallback 폰트가 먼저 보였다가 웹 폰트로 바뀌는 현상, FOIT는 폰트 로드 전 텍스트가 숨는 현상이다.
+  - id: c
+    text: 둘 다 이미지 lazy loading에서만 발생한다.
+  - id: d
+    text: '`font-display: swap`은 FOIT를 늘리기 위해 텍스트를 오래 숨긴다.'
+answer: b
+explanation: |
+  FOUT는 fallback 폰트로 먼저 보였다가 웹 폰트로 교체되는 현상이고, FOIT는 웹 폰트가 로드될 때까지 텍스트가 보이지 않는 현상이야. `font-display: swap`은 보통 텍스트를 빨리 보여줘 FOIT를 줄이는 쪽에 가깝다.
+tags: [ font-loading, fout, foit, font-display ]

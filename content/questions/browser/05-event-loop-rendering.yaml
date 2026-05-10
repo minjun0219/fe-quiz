@@ -1,0 +1,19 @@
+id: browser-005
+category: browser
+difficulty: hard
+type: single_choice
+question: |
+  브라우저 이벤트 루프에서 렌더링과 가장 가까운 설명은?
+choices:
+  - id: a
+    text: 매 Task가 끝나면 Microtask를 비운 뒤 브라우저가 필요하면 렌더링 단계를 수행한다.
+  - id: b
+    text: Microtask는 렌더링보다 항상 뒤에 실행된다.
+  - id: c
+    text: '`requestAnimationFrame` 콜백은 Paint가 끝난 뒤 다음 Task로 실행된다.'
+  - id: d
+    text: 긴 Task는 렌더링과 무관해서 프레임 드랍을 만들지 않는다.
+answer: a
+explanation: |
+  브라우저는 보통 Task를 하나 처리한 뒤 Microtask queue를 비우고, 렌더링이 필요하면 스타일/Layout/Paint 흐름을 진행해. 긴 Task가 메인 스레드를 오래 점유하면 이 렌더링 기회를 늦춰 프레임 드랍이 생길 수 있고, `requestAnimationFrame`은 다음 Paint 직전에 실행된다.
+tags: [ event-loop, rendering, microtask, requestAnimationFrame ]

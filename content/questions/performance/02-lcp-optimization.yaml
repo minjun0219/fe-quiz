@@ -1,0 +1,19 @@
+id: perf-002
+category: performance
+difficulty: medium
+type: single_choice
+question: |
+  LCP 개선에 가장 직접적으로 도움이 되는 선택은?
+choices:
+  - id: a
+    text: 첫 화면의 hero 이미지를 최적화하고 우선 로드한다.
+  - id: b
+    text: 보이지 않는 하단 이미지를 모두 eager loading한다.
+  - id: c
+    text: 클릭 핸들러 내부 로직을 모두 `setTimeout`으로 감싼다.
+  - id: d
+    text: 서버 응답과 무관하게 CSS 애니메이션만 늘린다.
+answer: a
+explanation: |
+  LCP는 viewport 안의 가장 큰 콘텐츠가 언제 보이는지가 핵심이라, 첫 화면 hero 이미지/텍스트의 서버 응답·리소스 크기·우선순위가 중요해. 이미지 포맷/크기 최적화, preload 또는 Next.js의 priority 같은 전략이 직접적으로 도움 된다.
+tags: [ lcp, image-optimization, preload ]
