@@ -148,8 +148,9 @@ create index idx_shares_created on shares (created_at desc);
 
 중요:
 
-- 서버 환경변수는 `SUPABASE_SECRET_KEY` 사용
-- `SUPABASE_SECRET_KEY`는 RLS를 우회하는 secret/service-role key이며 클라이언트 노출 금지
+- 서버 환경변수는 secret/service-role key 사용 — 운영은 `SUPABASE_SECRET_KEY`, 비-운영(preview/local/CI)은 `SUPABASE_DEV_SECRET_KEY`
+- 두 키 모두 RLS를 우회하므로 클라이언트 노출 금지
+- `lib/supabase.ts`가 `VERCEL_ENV === "production"` 여부로 두 프로젝트를 분기 (NODE_ENV X — `next start`가 로컬에서도 prod NODE_ENV를 세팅하기 때문)
 - `NEXT_PUBLIC_SUPABASE_*` 클라이언트 접근 모델이 아님
 
 ### 공유 바이럴 플로우
@@ -171,8 +172,10 @@ create index idx_shares_created on shares (created_at desc);
 
 | 변수 | 용도 |
 | --- | --- |
-| `SUPABASE_URL` | Supabase 프로젝트 URL |
-| `SUPABASE_SECRET_KEY` | 서버 전용 secret/service-role key |
+| `SUPABASE_URL` | 운영 Supabase 프로젝트 URL (`VERCEL_ENV=production` 전용) |
+| `SUPABASE_SECRET_KEY` | 운영 서버 전용 secret/service-role key |
+| `SUPABASE_DEV_URL` | 비-운영(preview/local/CI) Supabase 프로젝트 URL |
+| `SUPABASE_DEV_SECRET_KEY` | 비-운영 서버 전용 secret/service-role key |
 | `ANTHROPIC_API_KEY` | Claude 피드백 호출 |
 | `UPSTASH_REDIS_REST_URL` | rate limit Redis REST URL |
 | `UPSTASH_REDIS_REST_TOKEN` | rate limit Redis REST token |
@@ -280,14 +283,39 @@ fe-quiz/
 
 ## 마이그레이션 적용 방법
 
-`supabase/migrations/*.sql` 파일들은 자동 적용되지 않아요(GitHub 통합 미사용).
-새 마이그레이션이 추가되면:
+`supabase/migrations/*.sql`은 `.github/workflows/migrate.yml`이 `supabase db push`로
+자동 적용합니다(Supabase의 GitHub 통합은 미사용). 운영/비-운영 두 프로젝트가
+분리되어 있어서(`lib/supabase.ts`) 워크플로가 이벤트별로 분기:
 
-1. Supabase 대시보드 → SQL Editor 진입
-2. 해당 `.sql` 파일 내용 복사 → 붙여넣기 → Run
-3. 적용된 시점/파일명을 PR description에 기록
+- `pull_request` (PR 열림/푸시) → **dev 프로젝트**에 자동 적용
+- `push` to `main` (PR 머지 직후) → **prod 프로젝트**에 자동 적용
+- `workflow_dispatch` (수동) → **dev 프로젝트**에 적용 (prod 수동 실행은 의도적으로 금지)
 
-주의: `20260509000002_lock_down_shares_rls.sql` 적용 전에는 서버 환경변수 `SUPABASE_SECRET_KEY`가 준비되어 있어야 합니다. SQL만 먼저 적용하면 기존 publishable-key 기반 경로가 `permission denied`로 깨질 수 있습니다.
+순서를 보장하는 이유: dev 적용 → preview 검증 → main 머지 → prod 적용. prod-first
+경로를 두지 않으므로, preview가 옛 스키마를 읽어 머지 전 검증이 무력화되는 일이
+없습니다. 반대로 dev 적용을 건너뛰고 main에 머지해도 prod 적용은 안전 — 다만
+다음 PR의 preview는 이번 SQL이 dev에 들어와야 정상 동작.
+
+### PR 체크리스트 (마이그레이션 포함 PR 한정)
+
+- [ ] PR 푸시 후 Actions의 `Apply Supabase migrations` (apply 잡) **dev 적용** 성공 확인
+- [ ] preview 배포에서 관련 플로우 검증
+- [ ] (머지 후) Actions에서 **prod 적용** 성공 확인
+- [ ] 운영 도메인 smoke check (공유 1회 생성)
+
+### 필요한 GitHub Secrets
+
+| Secret                         | 용도                           |
+|--------------------------------|--------------------------------|
+| `SUPABASE_ACCESS_TOKEN`        | supabase CLI 인증 (계정 토큰)  |
+| `SUPABASE_PROJECT_REF`         | 운영 프로젝트 ref              |
+| `SUPABASE_DB_PASSWORD`         | 운영 DB 비밀번호               |
+| `SUPABASE_DEV_PROJECT_REF`     | 비-운영 프로젝트 ref           |
+| `SUPABASE_DEV_DB_PASSWORD`     | 비-운영 DB 비밀번호            |
+
+### 주의
+
+`20260509000002_lock_down_shares_rls.sql` 적용 전에는 해당 환경의 secret 키(운영=`SUPABASE_SECRET_KEY`, 비-운영=`SUPABASE_DEV_SECRET_KEY`)가 준비되어 있어야 합니다. SQL만 먼저 적용하면 기존 publishable-key 기반 경로가 `permission denied`로 깨질 수 있습니다.
 
 ## 목표
 

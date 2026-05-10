@@ -20,6 +20,20 @@ const PROD_HOST = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 
 const ALLOWED_PROTOS = new Set(["http", "https"]);
 
+// 헤더가 없거나 화이트리스트를 통과하지 못했을 때 쓸 호스트.
+// 운영(VERCEL_ENV=production)에서만 PROD_HOST로 떨어뜨린다. Preview에서
+// PROD_HOST로 폴백하면, 우리는 환경별로 Supabase 프로젝트가 분리돼 있어
+// (`lib/supabase.ts`) preview가 dev DB에 INSERT 한 row를 prod 도메인이
+// 가리키는 결과가 되고 그 페이지는 prod DB를 읽으므로 404가 난다.
+// Preview는 per-branch alias(`VERCEL_BRANCH_URL`)를 우선 — 같은 브랜치
+// 배포끼리는 안정적. 없으면 배포별 URL(`VERCEL_URL`)로.
+function fallbackHost(): string | null {
+  if (process.env.VERCEL_ENV === "production") {
+    return PROD_HOST ?? null;
+  }
+  return process.env.VERCEL_BRANCH_URL ?? process.env.VERCEL_URL ?? null;
+}
+
 // 프록시 체인이 길어지면 X-Forwarded-* 헤더는 "a.com, b.com"처럼 콤마로
 // 누적될 수 있다. 첫 번째 값만 trim해서 쓴다.
 function firstHeaderValue(raw: string | null): string | null {
@@ -64,8 +78,9 @@ function isAllowedHost(host: string): boolean {
 
 // 우선순위:
 //  1) 프록시 헤더가 화이트리스트 통과 → 그 호스트로 빌드
-//  2) 통과 실패(헤더 누락/스푸핑 의심) AND Vercel이면 운영 도메인으로
-//     떨어뜨려 가짜 도메인 share URL 차단
+//  2) 통과 실패(헤더 누락/스푸핑 의심) AND Vercel이면 환경별 안전 호스트로
+//     떨어뜨려 가짜 도메인 share URL 차단 (prod=PROD_HOST, preview=branch
+//     alias). preview→prod 폴백은 환경별 DB 분리와 충돌하므로 금지.
 //  3) 비-Vercel(로컬 dev 등): 화이트리스트가 host=localhost를 이미 잡으니
 //     실제로 (2)·(3) 분기가 꼬일 일이 없음. 안전망으로 localhost.
 function siteUrl(request: Request): string {
@@ -73,7 +88,8 @@ function siteUrl(request: Request): string {
     request.headers.get("x-forwarded-host") ?? request.headers.get("host"),
   );
   if (!host || !isAllowedHost(host)) {
-    return PROD_HOST ? `https://${PROD_HOST}` : "http://localhost:3000";
+    const fb = fallbackHost();
+    return fb ? `https://${fb}` : "http://localhost:3000";
   }
   const forwardedProto = firstHeaderValue(
     request.headers.get("x-forwarded-proto"),

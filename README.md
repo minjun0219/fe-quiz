@@ -42,8 +42,10 @@ pnpm dev
 
 | 변수 | 용도 | 로컬 필수 여부 |
 | --- | --- | --- |
-| `SUPABASE_URL` | Supabase 프로젝트 URL | 공유 기능 사용 시 필수 |
-| `SUPABASE_SECRET_KEY` | 서버 전용 Supabase secret/service-role key | 공유 기능 사용 시 필수 |
+| `SUPABASE_URL` | 운영 Supabase 프로젝트 URL (`VERCEL_ENV=production`에서만 사용) | 로컬 불필요 |
+| `SUPABASE_SECRET_KEY` | 운영 Supabase secret/service-role key (서버 전용) | 로컬 불필요 |
+| `SUPABASE_DEV_URL` | 비-운영(preview/local/CI) Supabase 프로젝트 URL | 공유 기능 사용 시 필수 |
+| `SUPABASE_DEV_SECRET_KEY` | 비-운영 Supabase secret/service-role key (서버 전용) | 공유 기능 사용 시 필수 |
 | `ANTHROPIC_API_KEY` | AI 피드백 생성 | 피드백 사용 시 필수 |
 | `UPSTASH_REDIS_REST_URL` | rate limit Redis REST URL | 선택 |
 | `UPSTASH_REDIS_REST_TOKEN` | rate limit Redis REST token | 선택 |
@@ -53,7 +55,9 @@ pnpm dev
 
 공유 링크와 메타/OG base URL은 별도 환경변수가 아니라 Vercel이 자동 주입하는 `VERCEL_URL`(메타데이터)·`VERCEL_PROJECT_PRODUCTION_URL`(공유 API) + 요청 헤더 화이트리스트로 도출됩니다. 로컬 dev에서는 `localhost:3000`이 폴백입니다.
 
-`SUPABASE_SECRET_KEY`, `ANTHROPIC_API_KEY`, `UPSTASH_*` 값은 절대 `NEXT_PUBLIC_` 접두사를 붙이지 말고 클라이언트에 노출하지 마세요.
+`SUPABASE_*_SECRET_KEY`, `ANTHROPIC_API_KEY`, `UPSTASH_*` 값은 절대 `NEXT_PUBLIC_` 접두사를 붙이지 말고 클라이언트에 노출하지 마세요.
+
+Supabase는 운영/비-운영 두 프로젝트로 분리됩니다. `lib/supabase.ts`가 `VERCEL_ENV`로 분기 — Vercel Production 스코프에는 `SUPABASE_URL`/`SUPABASE_SECRET_KEY`만, Preview·Development 스코프와 로컬 `.env.local`에는 `SUPABASE_DEV_URL`/`SUPABASE_DEV_SECRET_KEY`만 넣으세요. "All Environments" 스코프에 운영 키를 두면 preview 빌드가 prod DB를 건드릴 수 있습니다.
 PostHog 키가 비어 있으면 서버/클라이언트 둘 다 no-op으로 떨어집니다.
 
 ## 스크립트
