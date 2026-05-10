@@ -284,13 +284,36 @@ fe-quiz/
 ## 마이그레이션 적용 방법
 
 `supabase/migrations/*.sql` 파일들은 자동 적용되지 않아요(GitHub 통합 미사용).
-새 마이그레이션이 추가되면:
+운영/비-운영 두 프로젝트가 분리되어 있으므로(`lib/supabase.ts`) 같은 SQL을
+두 프로젝트에 적용하되, 시점을 **단계화**합니다.
 
-1. Supabase 대시보드 → SQL Editor 진입
-2. 해당 `.sql` 파일 내용 복사 → 붙여넣기 → Run
-3. 적용된 시점/파일명을 PR description에 기록
+### 워크플로우
 
-주의: `20260509000002_lock_down_shares_rls.sql` 적용 전에는 해당 환경의 secret 키(운영=`SUPABASE_SECRET_KEY`, 비-운영=`SUPABASE_DEV_SECRET_KEY`)가 준비되어 있어야 합니다. SQL만 먼저 적용하면 기존 publishable-key 기반 경로가 `permission denied`로 깨질 수 있습니다. 또한 두 Supabase 프로젝트가 분리되어 있으므로 같은 마이그레이션을 **두 프로젝트 모두에** 동일하게 적용해야 합니다 (운영에만 적용하고 dev에 누락하면 preview/local에서 스키마 불일치로 깨짐).
+PR이 마이그레이션을 추가하면:
+
+1. **PR 작성 시점 (= dev 적용)**
+   - Supabase 대시보드 → 비-운영(dev) 프로젝트 → SQL Editor → 해당 `.sql` 붙여넣기 → Run
+   - Vercel preview 배포에서 동작 확인 (공유 생성 → `/r/{slug}` 정상 동작)
+   - PR description에 dev 적용 시각/파일명 기록
+2. **PR이 main에 머지될 때 (= prod 적용)**
+   - Supabase 대시보드 → 운영(prod) 프로젝트 → SQL Editor → 같은 `.sql` 붙여넣기 → Run
+   - 운영 도메인에서 smoke check (공유 한 번 생성)
+   - merge commit / 머지된 PR에 prod 적용 시각 코멘트로 추가
+
+이 순서를 깨고 prod에 먼저 적용하지 말 것 — preview가 dev DB의 옛 스키마를
+계속 읽으므로 머지 전에 검증할 길이 사라집니다. 반대로 dev에만 적용하고
+머지 시 prod 적용을 누락하면 운영 코드가 새 SQL을 기대한 채 옛 스키마를
+때리게 되어 즉시 장애.
+
+### PR 체크리스트 (마이그레이션 포함 PR 한정)
+
+- [ ] dev 프로젝트에 SQL 적용 완료
+- [ ] preview 배포에서 관련 플로우 검증 완료
+- [ ] (머지 직후) prod 프로젝트에 SQL 적용 완료
+
+### 주의
+
+`20260509000002_lock_down_shares_rls.sql` 적용 전에는 해당 환경의 secret 키(운영=`SUPABASE_SECRET_KEY`, 비-운영=`SUPABASE_DEV_SECRET_KEY`)가 준비되어 있어야 합니다. SQL만 먼저 적용하면 기존 publishable-key 기반 경로가 `permission denied`로 깨질 수 있습니다.
 
 ## 목표
 
