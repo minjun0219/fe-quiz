@@ -148,8 +148,9 @@ create index idx_shares_created on shares (created_at desc);
 
 중요:
 
-- 서버 환경변수는 `SUPABASE_SECRET_KEY` 사용
-- `SUPABASE_SECRET_KEY`는 RLS를 우회하는 secret/service-role key이며 클라이언트 노출 금지
+- 서버 환경변수는 secret/service-role key 사용 — 운영은 `SUPABASE_SECRET_KEY`, 비-운영(preview/local/CI)은 `SUPABASE_DEV_SECRET_KEY`
+- 두 키 모두 RLS를 우회하므로 클라이언트 노출 금지
+- `lib/supabase.ts`가 `VERCEL_ENV === "production"` 여부로 두 프로젝트를 분기 (NODE_ENV X — `next start`가 로컬에서도 prod NODE_ENV를 세팅하기 때문)
 - `NEXT_PUBLIC_SUPABASE_*` 클라이언트 접근 모델이 아님
 
 ### 공유 바이럴 플로우
@@ -171,8 +172,10 @@ create index idx_shares_created on shares (created_at desc);
 
 | 변수 | 용도 |
 | --- | --- |
-| `SUPABASE_URL` | Supabase 프로젝트 URL |
-| `SUPABASE_SECRET_KEY` | 서버 전용 secret/service-role key |
+| `SUPABASE_URL` | 운영 Supabase 프로젝트 URL (`VERCEL_ENV=production` 전용) |
+| `SUPABASE_SECRET_KEY` | 운영 서버 전용 secret/service-role key |
+| `SUPABASE_DEV_URL` | 비-운영(preview/local/CI) Supabase 프로젝트 URL |
+| `SUPABASE_DEV_SECRET_KEY` | 비-운영 서버 전용 secret/service-role key |
 | `ANTHROPIC_API_KEY` | Claude 피드백 호출 |
 | `UPSTASH_REDIS_REST_URL` | rate limit Redis REST URL |
 | `UPSTASH_REDIS_REST_TOKEN` | rate limit Redis REST token |
@@ -287,7 +290,7 @@ fe-quiz/
 2. 해당 `.sql` 파일 내용 복사 → 붙여넣기 → Run
 3. 적용된 시점/파일명을 PR description에 기록
 
-주의: `20260509000002_lock_down_shares_rls.sql` 적용 전에는 서버 환경변수 `SUPABASE_SECRET_KEY`가 준비되어 있어야 합니다. SQL만 먼저 적용하면 기존 publishable-key 기반 경로가 `permission denied`로 깨질 수 있습니다.
+주의: `20260509000002_lock_down_shares_rls.sql` 적용 전에는 해당 환경의 secret 키(운영=`SUPABASE_SECRET_KEY`, 비-운영=`SUPABASE_DEV_SECRET_KEY`)가 준비되어 있어야 합니다. SQL만 먼저 적용하면 기존 publishable-key 기반 경로가 `permission denied`로 깨질 수 있습니다. 또한 두 Supabase 프로젝트가 분리되어 있으므로 같은 마이그레이션을 **두 프로젝트 모두에** 동일하게 적용해야 합니다 (운영에만 적용하고 dev에 누락하면 preview/local에서 스키마 불일치로 깨짐).
 
 ## 목표
 
