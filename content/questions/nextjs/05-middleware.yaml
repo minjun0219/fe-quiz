@@ -15,5 +15,6 @@ choices:
     text: 브라우저에서만 접근 가능한 DOM 크기를 측정한다.
 answer: a
 explanation: |
-  Middleware는 요청이 실제 라우트 처리에 들어가기 전 경로에서 실행되어 redirect, rewrite, 헤더 조정, 간단한 인증 분기 같은 작업에 적합해. 무거운 비즈니스 로직이나 DOM 측정처럼 브라우저 런타임이 필요한 작업에는 맞지 않는다.
+  Middleware는 사용자의 요청이 페이지나 API Route에 도달하기 전에 실행되는 얇은 계층이야. 그래서 로그인하지 않은 사용자를 `/login`으로 redirect하거나, A/B 테스트용 rewrite를 하거나, 요청/응답 헤더를 조정하는 작업에 잘 맞는다.
+  다만 Middleware는 모든 관련 요청 경로에서 실행될 수 있으므로 무거운 DB 작업이나 복잡한 비즈니스 로직을 넣으면 전체 응답 시간이 느려질 수 있어. DOM 크기 측정처럼 브라우저에서만 가능한 작업도 Middleware의 역할이 아니다.
 tags: [ middleware, redirect, rewrite, auth ]

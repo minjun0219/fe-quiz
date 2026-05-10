@@ -15,5 +15,6 @@ choices:
     text: '`margin`, `padding`'
 answer: c
 explanation: |
-  `transform`과 `opacity`는 보통 Layout/Reflow를 다시 만들지 않고 합성 단계에서 처리할 수 있어 애니메이션에 유리해. 반대로 `top`, `left`, `width`, `height`, `margin`, `padding`은 주변 요소의 배치 계산을 다시 유발할 수 있어.
+  `transform`과 `opacity`는 요소의 실제 문서 흐름을 바꾸지 않고 시각적 결과만 바꾸는 경우가 많아서, 브라우저가 Layout/Reflow를 다시 계산하지 않고 Composite 단계에서 처리할 수 있어.
+  반대로 `top`, `left`, `width`, `height`, `margin`, `padding`은 요소의 크기나 위치 계산에 영향을 줘 주변 요소까지 다시 배치해야 할 수 있다. 그래서 스크롤·드래그·hover처럼 자주 변하는 애니메이션에는 `transform` 기반 이동이 보통 더 안전해.
 tags: [ rendering, reflow, repaint, composite, css ]
