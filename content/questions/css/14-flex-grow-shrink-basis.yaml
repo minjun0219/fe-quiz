@@ -6,13 +6,13 @@ question: |
   `flex: 1` 단축 표기는 어떤 longhand 값으로 풀려?
 choices:
   - id: a
-    text: "flex-grow: 1; flex-shrink: 1; flex-basis: 0%"
+    text: "`flex-grow: 1; flex-shrink: 1; flex-basis: 0%`"
   - id: b
-    text: "flex-grow: 1; flex-shrink: 1; flex-basis: auto"
+    text: "`flex-grow: 1; flex-shrink: 1; flex-basis: auto`"
   - id: c
-    text: "flex-grow: 1; flex-shrink: 0; flex-basis: auto"
+    text: "`flex-grow: 1; flex-shrink: 0; flex-basis: auto`"
   - id: d
-    text: "flex-grow: 1; flex-shrink: 1; flex-basis: 100%"
+    text: "`flex-grow: 1; flex-shrink: 1; flex-basis: 100%`"
 answer: a
 explanation: |
   `flex: 1`은 `flex: 1 1 0%`와 동일하게 풀려. 핵심은 `flex-basis: 0%`라는 점이야. 기본 크기를 0으로 두고 남은 공간을 grow 비율대로 나눠 갖기 때문에, 자식들이 콘텐츠 크기와 무관하게 비율대로 균등 분배돼.

@@ -1,0 +1,44 @@
+name: Check
+
+# 모든 PR과 main push마다 lint/format/타입/시드 검증 + 프로덕션 빌드 시도.
+# Vercel preview는 빌드만 보장하지만 이 워크플로는 추가로 Biome 린트와
+# 시드 YAML zod 검증, 그리고 Vitest 단위 테스트를 회귀 차단으로 묶어둠.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# 같은 ref에 새 커밋이 들어오면 진행 중인 run 취소 — PR 빠른 iteration용.
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm 버전은 package.json의 `packageManager`에서 단일 소스로 관리.
+      # action-setup@v4는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint + types + seed validation
+        run: pnpm check
+
+      - name: Production build
+        run: pnpm build

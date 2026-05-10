@@ -6,13 +6,13 @@ question: |
   flex 컨테이너에서 자식 아이템을 main axis 양 끝에 붙이고, 사이사이는 균등 간격으로 배치하려면?
 choices:
   - id: a
-    text: "justify-content: space-between"
+    text: "`justify-content: space-between`"
   - id: b
-    text: "justify-content: space-around"
+    text: "`justify-content: space-around`"
   - id: c
-    text: "justify-content: space-evenly"
+    text: "`justify-content: space-evenly`"
   - id: d
-    text: "justify-content: stretch"
+    text: "`justify-content: stretch`"
 answer: a
 explanation: |
   - `space-between`: 양 끝 아이템이 컨테이너 가장자리에 딱 붙고, 사이 간격만 균등.

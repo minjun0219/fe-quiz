@@ -2,7 +2,10 @@
 
 import { useId, useState } from "react";
 import type { PublicQuestion } from "@/lib/question.schema";
-import type { QuizSubmitResponse, SubmittedAnswer } from "@/lib/quiz-submit.schema";
+import type {
+  QuizSubmitResponse,
+  SubmittedAnswer,
+} from "@/lib/quiz-submit.schema";
 import Result from "./result";
 
 interface Props {
@@ -27,18 +30,24 @@ function initialAnswers(questions: PublicQuestion[]): AnswerState[] {
 }
 
 function canProceed(q: PublicQuestion, a: AnswerState): boolean {
-  if (q.type === "multi_choice") return Array.isArray(a) && a.length > 0;
+  if (q.type === "multi_choice") {
+    return Array.isArray(a) && a.length > 0;
+  }
   return typeof a === "string";
 }
 
 function normalize(a: AnswerState): SubmittedAnswer {
-  if (Array.isArray(a)) return a.length === 0 ? null : a;
+  if (Array.isArray(a)) {
+    return a.length === 0 ? null : a;
+  }
   return a;
 }
 
 export default function RoundRunner({ questions }: Props) {
   const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<AnswerState[]>(() => initialAnswers(questions));
+  const [answers, setAnswers] = useState<AnswerState[]>(() =>
+    initialAnswers(questions),
+  );
   const [phase, setPhase] = useState<Phase>({ kind: "answering" });
   const groupNameBase = useId();
 
@@ -51,7 +60,9 @@ export default function RoundRunner({ questions }: Props) {
         body: JSON.stringify({
           question_ids: questions.map((q) => q.id),
           answers: answers.map(normalize),
-          displayed_choice_ids: questions.map((q) => q.choices.map((c) => c.id)),
+          displayed_choice_ids: questions.map((q) =>
+            q.choices.map((c) => c.id),
+          ),
         }),
       });
       if (!res.ok) {
@@ -71,8 +82,12 @@ export default function RoundRunner({ questions }: Props) {
   if (questions.length === 0) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-        <h1 className="mb-3 text-2xl font-bold">아직 시드 문제가 비어있어 😅</h1>
-        <p className="text-zinc-600">`content/questions/`에 `.yaml` 추가하고 다시 와줘.</p>
+        <h1 className="mb-3 text-2xl font-bold">
+          아직 시드 문제가 비어있어 😅
+        </h1>
+        <p className="text-zinc-600 dark:text-zinc-300">
+          `content/questions/`에 `.yaml` 추가하고 다시 와줘.
+        </p>
       </main>
     );
   }
@@ -80,7 +95,9 @@ export default function RoundRunner({ questions }: Props) {
   if (phase.kind === "submitting") {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-        <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">친구가 채점 중…</p>
+        <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">
+          친구가 채점 중…
+        </p>
         <h1 className="text-2xl font-bold">잠깐만, 답 맞춰볼게</h1>
       </main>
     );
@@ -90,11 +107,13 @@ export default function RoundRunner({ questions }: Props) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
         <h1 className="mb-3 text-2xl font-bold">앗, 채점이 안 됐어 😵</h1>
-        <p className="mb-6 max-w-md text-sm text-zinc-600">{phase.message}</p>
+        <p className="mb-6 max-w-md text-sm text-zinc-600 dark:text-zinc-300">
+          {phase.message}
+        </p>
         <button
           type="button"
           onClick={submit}
-          className="inline-flex h-12 items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-semibold text-white hover:bg-zinc-800"
+          className="inline-flex h-12 items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           다시 시도
         </button>
@@ -132,7 +151,9 @@ export default function RoundRunner({ questions }: Props) {
   }
 
   function isChoiceSelected(choiceId: string): boolean {
-    if (Array.isArray(selected)) return selected.includes(choiceId);
+    if (Array.isArray(selected)) {
+      return selected.includes(choiceId);
+    }
     return selected === choiceId;
   }
 
@@ -147,17 +168,17 @@ export default function RoundRunner({ questions }: Props) {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-8">
       <header className="mb-6 flex items-center justify-between text-sm">
-        <span className="font-medium tabular-nums text-zinc-500">
+        <span className="font-medium tabular-nums text-zinc-500 dark:text-zinc-400">
           {index + 1} / {questions.length}
         </span>
-        <span className="text-xs uppercase tracking-wider text-zinc-400">
+        <span className="text-xs uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
           {current.category} · {current.difficulty}
           {isMulti && <span className="ml-2 text-rose-500">· 복수 선택</span>}
         </span>
       </header>
 
       <div
-        className="mb-3 h-1 overflow-hidden rounded-full bg-zinc-200"
+        className="mb-3 h-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
         role="progressbar"
         aria-label="라운드 진행 상황"
         aria-valuenow={index + (proceed ? 1 : 0)}
@@ -173,18 +194,34 @@ export default function RoundRunner({ questions }: Props) {
       </div>
 
       <fieldset className="contents">
-        <legend className="mt-6 mb-4 whitespace-pre-line text-xl font-semibold leading-relaxed">
-          {current.question}
-        </legend>
+        {current.question_html ? (
+          <legend
+            className="mt-6 mb-4 text-xl font-semibold leading-relaxed"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: server-rendered by `renderQuizMarkdown` from our own YAML seed (no user input); only inline-code spans, <strong>, and HTML-escaped <pre><code> from fenced blocks are injected.
+            dangerouslySetInnerHTML={{ __html: current.question_html }}
+          />
+        ) : (
+          <legend className="mt-6 mb-4 text-xl font-semibold leading-relaxed">
+            {current.question}
+          </legend>
+        )}
 
-        {current.code && (
-          <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
-            <code>{current.code}</code>
-          </pre>
+        {current.code_html ? (
+          <div
+            className="quiz-code-block mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
+            dangerouslySetInnerHTML={{ __html: current.code_html }}
+          />
+        ) : (
+          current.code && (
+            <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
+              <code>{current.code}</code>
+            </pre>
+          )
         )}
 
         {isMulti && (
-          <p className="mb-3 text-xs font-medium text-zinc-500">
+          <p className="mb-3 text-xs font-medium text-zinc-500 dark:text-zinc-400">
             정답이 여러 개일 수 있어. 해당하는 걸 모두 골라줘.
           </p>
         )}
@@ -208,8 +245,8 @@ export default function RoundRunner({ questions }: Props) {
                   htmlFor={inputId}
                   className={`flex w-full cursor-pointer items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base transition active:scale-[0.99] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-rose-500 ${
                     isSelected
-                      ? "border-rose-500 bg-rose-50 text-zinc-900"
-                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+                      ? "border-rose-500 bg-rose-50 text-zinc-900 dark:bg-rose-500/10 dark:text-zinc-50"
+                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-700"
                   }`}
                 >
                   <span
@@ -219,13 +256,25 @@ export default function RoundRunner({ questions }: Props) {
                     } ${
                       isSelected
                         ? "border-rose-500 bg-rose-500 text-white"
-                        : "border-zinc-300 bg-white"
+                        : "border-zinc-300 bg-white dark:border-zinc-600 dark:bg-zinc-900"
                     }`}
                   >
                     {isSelected &&
-                      (isMulti ? "✓" : <span className="h-2 w-2 rounded-full bg-white" />)}
+                      (isMulti ? (
+                        "✓"
+                      ) : (
+                        <span className="h-2 w-2 rounded-full bg-white" />
+                      ))}
                   </span>
-                  <span className="flex-1">{choice.text}</span>
+                  {choice.text_html ? (
+                    <span
+                      className="flex-1"
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: server-rendered by `renderQuizMarkdown` from our own YAML seed (no user input); only inline-code spans, <strong>, and HTML-escaped <pre><code> from fenced blocks are injected.
+                      dangerouslySetInnerHTML={{ __html: choice.text_html }}
+                    />
+                  ) : (
+                    <span className="flex-1">{choice.text}</span>
+                  )}
                 </label>
               </li>
             );
@@ -238,7 +287,7 @@ export default function RoundRunner({ questions }: Props) {
           type="button"
           onClick={nextStep}
           disabled={!proceed}
-          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99]"
+          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:enabled:hover:bg-zinc-200"
         >
           {isLast ? "결과 보기" : "다음 →"}
         </button>

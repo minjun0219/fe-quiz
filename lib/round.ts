@@ -1,56 +1,86 @@
 import "server-only";
-import type { PublicQuestion, Question } from "./question.schema";
-import { getAllQuestions, getQuestionMap } from "./questions";
+import { highlightCode, renderQuizMarkdown } from "./highlight";
+import { DEFAULT_LEVEL, type Level } from "./levels";
+import type { PublicChoice, PublicQuestion, Question } from "./question.schema";
+import { getQuestionMap, getQuestionsByCategory } from "./questions";
+import { pickByLevel, ROUND_SIZE, shuffle } from "./round-picker";
 
-/** Number of questions per round. Falls back to pool size when seed < target. */
-export const ROUND_SIZE = 5;
+export {
+  effectiveMinPerCategory,
+  ROUND_SIZE,
+  TARGET_MIN_PER_CATEGORY,
+} from "./round-picker";
 
-export function publicView(q: Question): PublicQuestion {
-  const { answer: _answer, explanation: _explanation, ...rest } = q;
-  return rest;
-}
-
-/** Fisher–Yates. Returns a fresh array without mutating input. */
-function shuffle<T>(input: readonly T[]): T[] {
-  const out = input.slice();
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
+export async function publicView(q: Question): Promise<PublicQuestion> {
+  const {
+    answer: _answer,
+    explanation: _explanation,
+    choices,
+    code,
+    ...rest
+  } = q;
+  const [renderedChoices, question_html, code_html] = await Promise.all([
+    Promise.all(
+      choices.map(
+        async (c): Promise<PublicChoice> => ({
+          ...c,
+          text_html: await renderQuizMarkdown(c.text, q.category),
+        }),
+      ),
+    ),
+    renderQuizMarkdown(q.question, q.category),
+    code !== undefined
+      ? highlightCode(code, q.category)
+      : Promise.resolve(undefined),
+  ]);
+  return {
+    ...rest,
+    choices: renderedChoices,
+    question_html,
+    ...(code !== undefined ? { code, code_html } : {}),
+  };
 }
 
 /**
- * Pick `count` questions at random from the full pool, return public view.
- * If the pool is smaller than `count`, returns whatever exists (early seeding).
+ * Pick a round from the live filesystem-loaded pool, return public view with
+ * choices shuffled.
  *
- * `count` is clamped to a non-negative integer so a user-controlled value
- * (e.g., a query param later) can't accidentally trigger surprising slice
- * semantics like `slice(0, -1)`.
+ * Server-only — wires the pure level-aware picker (`lib/round-picker.ts`) up
+ * to `getQuestionsByCategory`, which filters the cached `getAllQuestions()`
+ * pool by category on each call (O(N) over the frozen pool, fine at current
+ * seed sizes). Adding new categories to the registry needs no changes here.
+ *
+ * `level` selects the easy/medium/hard mix; `count` is an upper cap that
+ * trims the result if smaller than the mix sum (lets tests probe clamping
+ * without overriding `ROUND_SIZE` globally).
  */
-export function pickRoundQuestions(count = ROUND_SIZE): PublicQuestion[] {
-  const safeCount = Math.max(0, Math.floor(count));
-  const all = getAllQuestions();
-  return shuffle(all)
-    .slice(0, Math.min(safeCount, all.length))
-    .map(publicView)
-    .map((q) => ({ ...q, choices: shuffle(q.choices) }));
+export async function pickRoundQuestions(
+  count: number = ROUND_SIZE,
+  level: Level = DEFAULT_LEVEL,
+): Promise<PublicQuestion[]> {
+  const picked = pickByLevel(level, count, getQuestionsByCategory);
+  const views = await Promise.all(picked.map(publicView));
+  return views.map((q) => ({ ...q, choices: shuffle(q.choices) }));
 }
 
 /**
  * Replay a round by exact ID list, preserving the original order. Used by the
- * share flow so a friend's "나도 풀어보기" gets the same 5 questions in the
+ * share flow so a friend's "나도 풀어보기" gets the same questions in the
  * same sequence — that's what makes score comparisons meaningful.
  *
  * Unknown IDs are silently dropped (a question may have been retired between
  * the original round and the friend's replay).
  */
-export function pickRoundQuestionsByIds(ids: readonly string[]): PublicQuestion[] {
+export async function pickRoundQuestionsByIds(
+  ids: readonly string[],
+): Promise<PublicQuestion[]> {
   const map = getQuestionMap();
-  const out: PublicQuestion[] = [];
+  const found: Question[] = [];
   for (const id of ids) {
     const q = map.get(id);
-    if (q) out.push(publicView(q));
+    if (q) {
+      found.push(q);
+    }
   }
-  return out;
+  return Promise.all(found.map(publicView));
 }

@@ -1,0 +1,26 @@
+id: html-013
+category: html
+difficulty: medium
+type: single_choice
+question: |
+  `aria-label`과 `aria-labelledby` 사용 차이로 가장 정확한 것은?
+code: |
+  <button aria-label="닫기">×</button>
+
+  <h2 id="dialog-title">설정</h2>
+  <div role="dialog" aria-labelledby="dialog-title">…</div>
+choices:
+  - id: a
+    text: "`aria-label`은 라벨 문자열을 직접 지정하고, `aria-labelledby`는 같은 페이지의 다른 요소 `id`를 가리켜 그 텍스트를 라벨로 빌려온다. 화면에 이미 보이는 라벨이 있다면 후자, 시각 라벨이 없다면 전자가 적합"
+  - id: b
+    text: 둘은 완전히 동일하게 동작하며 `aria-labelledby`는 deprecated
+  - id: c
+    text: "`aria-labelledby`는 한 요소만 가리킬 수 있고 `aria-label`은 여러 라벨을 지원한다"
+  - id: d
+    text: "`aria-label`은 화면에도 보이는 라벨을 함께 추가한다"
+answer: a
+explanation: |
+  - `aria-label`은 화면에 텍스트가 없는 컨트롤(아이콘 버튼 등)에 "이 요소의 이름은 X"라고 직접 알려 주는 속성.
+  - `aria-labelledby`는 같은 페이지 안 다른 요소(`id` 참조)의 텍스트를 라벨로 빌려와. 여러 id를 공백으로 나열하면 합쳐진 텍스트가 라벨이 돼.
+  화면에 보이는 라벨과 a11y 라벨이 어긋나면 사용자가 혼란스러우니, 이미 표시되는 텍스트가 있으면 `aria-labelledby`로 그것을 그대로 가리키는 편이 자연스러워.
+tags: [ a11y, aria, labels ]

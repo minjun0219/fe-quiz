@@ -1,19 +1,22 @@
 import { z } from "zod";
+import {
+  CATEGORY_IDS,
+  type Category as CategoryId,
+  getIdPrefix,
+} from "./categories";
 
-export const Category = z.enum(["javascript", "react", "css"]);
-export type Category = z.infer<typeof Category>;
+/**
+ * Category enum derived from `lib/categories.ts`. Adding a new category there
+ * (e.g., TypeScript, HTML) automatically widens this enum — no edit here.
+ */
+export const Category = z.enum(CATEGORY_IDS);
+export type Category = CategoryId;
 
 export const Difficulty = z.enum(["easy", "medium", "hard"]);
 export type Difficulty = z.infer<typeof Difficulty>;
 
 export const QuestionType = z.enum(["single_choice", "multi_choice"]);
 export type QuestionType = z.infer<typeof QuestionType>;
-
-const ID_PREFIX: Record<Category, string> = {
-  javascript: "js",
-  react: "react",
-  css: "css",
-};
 
 export const ChoiceSchema = z.object({
   id: z
@@ -50,7 +53,7 @@ const MultiChoice = Base.extend({
 export const QuestionSchema = z
   .discriminatedUnion("type", [SingleChoice, MultiChoice])
   .superRefine((q, ctx) => {
-    const expected = ID_PREFIX[q.category];
+    const expected = getIdPrefix(q.category);
     if (!q.id.startsWith(`${expected}-`)) {
       ctx.addIssue({
         code: "custom",
@@ -114,7 +117,8 @@ export const QuestionSchema = z
         ctx.addIssue({
           code: "custom",
           path: ["answer"],
-          message: "all choices marked correct — multi_choice must have at least one wrong choice",
+          message:
+            "all choices marked correct — multi_choice must have at least one wrong choice",
         });
       }
     }
@@ -128,5 +132,21 @@ export type Question = z.infer<typeof QuestionSchema>;
  *
  * Lives here (not in `lib/round.ts`) so client components can `import type`
  * this without crossing a `server-only` module boundary.
+ *
+ * `code_html` is server-rendered Shiki output for `code`; `question_html` and
+ * each choice's `text_html` are HTML-escaped strings with single-backtick
+ * runs wrapped in `<code class="inline-code">`. Clients render via
+ * `dangerouslySetInnerHTML` and fall back to the raw text when absent.
  */
-export type PublicQuestion = Omit<Question, "answer" | "explanation">;
+export type PublicChoice = Choice & {
+  text_html?: string;
+};
+
+export type PublicQuestion = Omit<
+  Question,
+  "answer" | "explanation" | "choices"
+> & {
+  choices: PublicChoice[];
+  question_html?: string;
+  code_html?: string;
+};

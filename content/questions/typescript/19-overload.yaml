@@ -1,0 +1,30 @@
+id: ts-019
+category: typescript
+difficulty: medium
+type: single_choice
+question: |
+  다음 함수 오버로드 선언에서 (1), (2), (3) 호출의 결과로 가장 정확한 것은?
+code: |
+  function fmt(x: string): string
+  function fmt(x: number): string
+  function fmt(x: string | number): string {
+    return String(x)
+  }
+
+  const a = fmt('hi')   // (1)
+  const b = fmt(42)     // (2)
+  const c = fmt(true)   // (3)
+choices:
+  - id: a
+    text: 모두 `any`로 추론
+  - id: b
+    text: (1)·(2)는 `string`, (3)은 컴파일 에러 — 외부에 공개된 오버로드에 boolean 시그니처가 없어 호출부에서 거부됨
+  - id: c
+    text: 모두 통과 — 구현 시그니처가 union을 받기 때문
+  - id: d
+    text: (3)은 `string`을 반환하며 정상 동작
+answer: b
+explanation: |
+  호출부가 참조하는 건 **외부에 공개된 오버로드 시그니처**이지 구현 시그니처가 아니야. 공개된 건 `(string) => string`과 `(number) => string` 둘뿐이라 boolean 인자 호출은 매칭되는 시그니처가 없어 에러.
+  구현 시그니처의 union은 함수 내부에서만 보이는 "어떤 호출도 받을 수 있도록 넉넉하게 잡은" 타입이야. 대부분의 케이스는 오버로드 대신 union을 인자로 받는 단일 시그니처가 더 간단하고 추론도 좋아.
+tags: [ overload, signature ]

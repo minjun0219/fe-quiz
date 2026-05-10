@@ -1,0 +1,26 @@
+id: css-016
+category: css
+difficulty: medium
+type: single_choice
+question: |
+  flex / grid 컨테이너에서 자식 사이 간격을 줄 때 `gap`을 쓰는 게 옛날의 `margin` 트릭보다 좋은 이유로 가장 적절한 것은?
+code: |
+  .a { display: flex; gap: 12px; }
+
+  /* 옛 방식 */
+  .b { display: flex; }
+  .b > * + * { margin-left: 12px; }
+choices:
+  - id: a
+    text: "`gap`은 flex/grid 컨테이너에서만 동작하므로 일반 인라인 요소엔 쓸 수 없다"
+  - id: b
+    text: 가장자리 자식에 불필요한 마진이 붙지 않고, 줄바꿈 시 행/열 간 간격이 자동 적용되며, 마진 collapse 같은 함정도 없다
+  - id: c
+    text: "`gap`은 부모의 padding을 자동으로 추가한다"
+  - id: d
+    text: "`gap`은 자식 너비에 비례한 가변 간격을 만든다"
+answer: b
+explanation: |
+  `gap`은 자식 "사이"의 간격만 만들기 때문에 양 끝 자식에 불필요한 마진이 붙지 않아 시각·계산 모두 깔끔해. flex가 줄바꿈하거나 grid처럼 2D 배치일 때도 행/열 간 간격이 한 번에 적용돼서 `> * + *` 류 트릭이 필요 없어.
+  `gap`은 flex/grid 외에 multi-column 레이아웃에서도 동작하지만 일반 block 흐름에서는 적용 안 돼. 모던 브라우저에서 flex `gap`은 2021년 전후로 안정 지원이라 새로 짜는 코드면 사실상 기본값으로 골라도 무방해.
+tags: [ flexbox, grid, gap, layout ]
