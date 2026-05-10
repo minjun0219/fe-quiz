@@ -34,9 +34,7 @@ export function getSupabase(): SupabaseClient<Database> {
   }
 
   const isProd = process.env.VERCEL_ENV === "production";
-  const url = isProd
-    ? process.env.SUPABASE_URL
-    : process.env.SUPABASE_DEV_URL;
+  const url = isProd ? process.env.SUPABASE_URL : process.env.SUPABASE_DEV_URL;
   const key = isProd
     ? process.env.SUPABASE_SECRET_KEY
     : process.env.SUPABASE_DEV_SECRET_KEY;
