@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CodeBlock } from "@/components/code-block";
 import { ContributeNote } from "@/components/credits";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import type { Category } from "@/lib/question.schema";
@@ -390,19 +391,13 @@ export default function Result({ data }: Props) {
                     {q.question}
                   </p>
                 )}
-                {q.code_html ? (
-                  <div
-                    className="quiz-code-block mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
-                    dangerouslySetInnerHTML={{ __html: q.code_html }}
-                  />
-                ) : (
-                  q.code && (
-                    <pre className="mb-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100">
-                      <code>{q.code}</code>
-                    </pre>
-                  )
-                )}
+                <CodeBlock
+                  code={q.code}
+                  codeHtml={q.code_html}
+                  size="xs"
+                  className="mb-3"
+                />
+
                 <ul className="mb-3 flex flex-col gap-1.5 text-sm">
                   {q.choices.map((choice) => {
                     const isCorrect = matches(q.correct_answer, choice.id);
