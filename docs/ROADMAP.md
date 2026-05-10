@@ -283,33 +283,35 @@ fe-quiz/
 
 ## 마이그레이션 적용 방법
 
-`supabase/migrations/*.sql` 파일들은 자동 적용되지 않아요(GitHub 통합 미사용).
-운영/비-운영 두 프로젝트가 분리되어 있으므로(`lib/supabase.ts`) 같은 SQL을
-두 프로젝트에 적용하되, 시점을 **단계화**합니다.
+`supabase/migrations/*.sql`은 `.github/workflows/migrate.yml`이 `supabase db push`로
+자동 적용합니다(Supabase의 GitHub 통합은 미사용). 운영/비-운영 두 프로젝트가
+분리되어 있어서(`lib/supabase.ts`) 워크플로가 이벤트별로 분기:
 
-### 워크플로우
+- `pull_request` (PR 열림/푸시) → **dev 프로젝트**에 자동 적용
+- `push` to `main` (PR 머지 직후) → **prod 프로젝트**에 자동 적용
+- `workflow_dispatch` (수동) → **dev 프로젝트**에 적용 (prod 수동 실행은 의도적으로 금지)
 
-PR이 마이그레이션을 추가하면:
-
-1. **PR 작성 시점 (= dev 적용)**
-   - Supabase 대시보드 → 비-운영(dev) 프로젝트 → SQL Editor → 해당 `.sql` 붙여넣기 → Run
-   - Vercel preview 배포에서 동작 확인 (공유 생성 → `/r/{slug}` 정상 동작)
-   - PR description에 dev 적용 시각/파일명 기록
-2. **PR이 main에 머지될 때 (= prod 적용)**
-   - Supabase 대시보드 → 운영(prod) 프로젝트 → SQL Editor → 같은 `.sql` 붙여넣기 → Run
-   - 운영 도메인에서 smoke check (공유 한 번 생성)
-   - merge commit / 머지된 PR에 prod 적용 시각 코멘트로 추가
-
-이 순서를 깨고 prod에 먼저 적용하지 말 것 — preview가 dev DB의 옛 스키마를
-계속 읽으므로 머지 전에 검증할 길이 사라집니다. 반대로 dev에만 적용하고
-머지 시 prod 적용을 누락하면 운영 코드가 새 SQL을 기대한 채 옛 스키마를
-때리게 되어 즉시 장애.
+순서를 보장하는 이유: dev 적용 → preview 검증 → main 머지 → prod 적용. prod-first
+경로를 두지 않으므로, preview가 옛 스키마를 읽어 머지 전 검증이 무력화되는 일이
+없습니다. 반대로 dev 적용을 건너뛰고 main에 머지해도 prod 적용은 안전 — 다만
+다음 PR의 preview는 이번 SQL이 dev에 들어와야 정상 동작.
 
 ### PR 체크리스트 (마이그레이션 포함 PR 한정)
 
-- [ ] dev 프로젝트에 SQL 적용 완료
-- [ ] preview 배포에서 관련 플로우 검증 완료
-- [ ] (머지 직후) prod 프로젝트에 SQL 적용 완료
+- [ ] PR 푸시 후 Actions의 `Apply Supabase migrations` (apply 잡) **dev 적용** 성공 확인
+- [ ] preview 배포에서 관련 플로우 검증
+- [ ] (머지 후) Actions에서 **prod 적용** 성공 확인
+- [ ] 운영 도메인 smoke check (공유 1회 생성)
+
+### 필요한 GitHub Secrets
+
+| Secret                         | 용도                           |
+|--------------------------------|--------------------------------|
+| `SUPABASE_ACCESS_TOKEN`        | supabase CLI 인증 (계정 토큰)  |
+| `SUPABASE_PROJECT_REF`         | 운영 프로젝트 ref              |
+| `SUPABASE_DB_PASSWORD`         | 운영 DB 비밀번호               |
+| `SUPABASE_DEV_PROJECT_REF`     | 비-운영 프로젝트 ref           |
+| `SUPABASE_DEV_DB_PASSWORD`     | 비-운영 DB 비밀번호            |
 
 ### 주의
 
