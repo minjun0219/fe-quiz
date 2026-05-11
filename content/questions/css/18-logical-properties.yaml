@@ -6,16 +6,16 @@ question: |
   `margin-inline: 16px`이 `margin-left: 16px; margin-right: 16px`와 차이가 있는 부분으로 가장 정확한 것은?
 choices:
   - id: a
-    text: 둘은 항상 동일하게 동작한다
+    text: 둘은 항상 동일하게 동작해요
   - id: b
-    text: "`margin-inline`은 글자 흐름(`writing-mode`/`direction`)에 따라 결정돼 LTR에선 좌/우, RTL에선 우/좌, 세로쓰기에선 위/아래에 적용돼 다국어/세로쓰기 레이아웃을 자동으로 따라간다"
+    text: "`margin-inline`은 글자 흐름(`writing-mode`/`direction`)에 따라 결정돼 LTR에선 좌/우, RTL에선 우/좌, 세로쓰기에선 위/아래에 적용돼 다국어/세로쓰기 레이아웃을 자동으로 따라가요"
   - id: c
-    text: "`margin-inline`은 inline-block 요소에만 적용된다"
+    text: "`margin-inline`은 inline-block 요소에만 적용돼요"
   - id: d
-    text: "`margin-inline`은 inline 방향으로만 영향을 주므로 부모의 콘텐츠 너비를 늘리지 못한다"
+    text: "`margin-inline`은 inline 방향으로만 영향을 주므로 부모의 콘텐츠 너비를 늘리지 못해요"
 answer: b
 explanation: |
-  CSS 로지컬 프로퍼티(`margin-inline`, `padding-block`, `inset-inline-start` 등)는 "left/right/top/bottom" 같은 물리 축 대신 "start/end"라는 흐름 축을 따라.
-  영어 같은 LTR에선 `margin-inline-start`가 `margin-left`와 같아 보이지만, 아랍어처럼 RTL이거나 세로쓰기(`writing-mode: vertical-rl`)에선 자동으로 의미에 맞는 축에 적용돼.
-  RTL을 지원하거나 일본어 세로쓰기 같은 케이스를 신경 쓰는 코드라면 처음부터 로지컬 프로퍼티를 기본값으로 쓰는 편이 유지보수가 편해.
+  CSS 로지컬 프로퍼티(`margin-inline`, `padding-block`, `inset-inline-start` 등)는 "left/right/top/bottom" 같은 물리 축 대신 "start/end"라는 흐름 축을 따라요.
+  영어 같은 LTR에선 `margin-inline-start`가 `margin-left`와 같아 보이지만, 아랍어처럼 RTL이거나 세로쓰기(`writing-mode: vertical-rl`)에선 자동으로 의미에 맞는 축에 적용돼요.
+  RTL을 지원하거나 일본어 세로쓰기 같은 케이스를 신경 쓰는 코드라면 처음부터 로지컬 프로퍼티를 기본값으로 쓰는 편이 유지보수가 편해요.
 tags: [ logical-properties, i18n, rtl ]

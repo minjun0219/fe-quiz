@@ -3,19 +3,19 @@ category: css
 difficulty: easy
 type: single_choice
 question: |
-  버튼에 hover하면 색이 부드럽게 변하다가, 마우스를 떼면 다시 부드럽게 원래 색으로 돌아오게 만들고 싶어. 가장 적절한 도구는?
+  버튼에 hover하면 색이 부드럽게 변하다가, 마우스를 떼면 다시 부드럽게 원래 색으로 돌아오게 만들고 싶어요. 가장 적절한 도구는 뭘까요?
 choices:
   - id: a
-    text: "`transition`으로 변환할 속성과 duration을 지정한다"
+    text: "`transition`으로 변환할 속성과 duration을 지정해요"
   - id: b
-    text: "`@keyframes`와 `animation`으로 from/to를 정의한다"
+    text: "`@keyframes`와 `animation`으로 from/to를 정의해요"
   - id: c
-    text: JS의 `setInterval`로 색상을 보간한다
+    text: JS의 `setInterval`로 색상을 보간해요
   - id: d
-    text: "`@keyframes`를 `infinite`로 무한 반복시킨다"
+    text: "`@keyframes`를 `infinite`로 무한 반복시켜요"
 answer: a
 explanation: |
-  상태 A ↔ 상태 B 사이의 보간이라면 `transition`이 정답. `:hover`로 색을 바꾸기만 하면 `transition: background-color 200ms`가 알아서 양방향 보간을 처리해줘.
-  `@keyframes` + `animation`은 여러 단계(0% → 50% → 100%)를 거치는 시퀀스나, 트리거 없이 자동 반복되는 효과에 어울려.
-  단순 hover 보간을 keyframes로 하면 코드만 길어지고 마우스 떠날 때 되돌리기를 따로 처리해야 해서 비효율적.
+  상태 A ↔ 상태 B 사이의 보간이라면 `transition`이 정답이에요. `:hover`로 색을 바꾸기만 하면 `transition: background-color 200ms`가 알아서 양방향 보간을 처리해 줘요.
+  `@keyframes` + `animation`은 여러 단계(0% → 50% → 100%)를 거치는 시퀀스나, 트리거 없이 자동 반복되는 효과에 어울려요.
+  단순 hover 보간을 keyframes로 하면 코드만 길어지고 마우스 떠날 때 되돌리기를 따로 처리해야 해서 비효율적이에요.
 tags: [ transition, animation, hover ]
