@@ -26,12 +26,15 @@ export default async function PlayPage({ searchParams }: Props) {
   // the share has been deleted, fall back to a random round rather than
   // 404'ing — friend should still get to play. `level` is ignored on replay
   // since the question set is fixed by the share row.
-  const questions = await resolveQuestions(from, toLevel(level));
+  const resolvedLevel = toLevel(level);
+  const questions = await resolveQuestions(from, resolvedLevel);
 
   // `key` ties RoundRunner's identity to the round so any future "다시 풀기"
   // path (or a remount on navigation) gives us clean state.
   const roundKey = questions.map((q) => q.id).join(",");
-  return <RoundRunner key={roundKey} questions={questions} />;
+  return (
+    <RoundRunner key={roundKey} questions={questions} level={resolvedLevel} />
+  );
 }
 
 async function resolveQuestions(

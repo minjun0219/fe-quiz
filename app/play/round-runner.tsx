@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
+import type { Level } from "@/lib/levels";
 import type { PublicQuestion } from "@/lib/question.schema";
 import type {
   QuizSubmitResponse,
@@ -11,6 +12,7 @@ import Result from "./result";
 
 interface Props {
   questions: PublicQuestion[];
+  level: Level;
 }
 
 type Phase =
@@ -44,7 +46,7 @@ function normalize(a: AnswerState): SubmittedAnswer {
   return a;
 }
 
-export default function RoundRunner({ questions }: Props) {
+export default function RoundRunner({ questions, level }: Props) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerState[]>(() =>
     initialAnswers(questions),
@@ -123,7 +125,7 @@ export default function RoundRunner({ questions }: Props) {
   }
 
   if (phase.kind === "done") {
-    return <Result data={phase.result} />;
+    return <Result data={phase.result} level={level} />;
   }
 
   const current = questions[index];

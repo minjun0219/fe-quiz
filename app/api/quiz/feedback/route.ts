@@ -71,7 +71,11 @@ export async function POST(request: Request): Promise<Response> {
     total: graded.total,
     category_scores: graded.category_scores,
   });
-  const userPrompt = buildFeedbackUserPrompt({ diagnosis, graded });
+  const userPrompt = buildFeedbackUserPrompt({
+    diagnosis,
+    graded,
+    level: parsed.data.level,
+  });
 
   // Stream Claude Haiku 4.5 output as plain text. The client reads byte chunks
   // off the response body and appends them to the UI as they arrive.
