@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LEVEL_IDS } from "./levels";
 import type { Category, PublicChoice, QuestionType } from "./question.schema";
 
 /**
@@ -29,6 +30,10 @@ export const QuizSubmitRequest = z
     displayed_choice_ids: z
       .array(z.array(z.string().min(1)).min(2).max(6))
       .optional(),
+    /** User-selected difficulty level. Used by the feedback prompt to
+     *  calibrate tone/expectations. Optional — `/api/quiz/submit` ignores it,
+     *  and older clients (or share replays) may omit it. */
+    level: z.enum(LEVEL_IDS).optional(),
   })
   .superRefine((req, ctx) => {
     if (req.answers.length !== req.question_ids.length) {

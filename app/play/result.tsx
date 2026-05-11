@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
 import { ContributeNote } from "@/components/credits";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
+import { renderFeedbackInline } from "@/lib/feedback-render";
+import type { Level } from "@/lib/levels";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 import type { ShareCreateResponse } from "@/lib/share.schema";
 
 interface Props {
   data: QuizSubmitResponse;
+  level: Level;
 }
 
 type FeedbackStatus =
@@ -40,7 +43,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
   return false;
 }
 
-export default function Result({ data }: Props) {
+export default function Result({ data, level }: Props) {
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [feedbackStatus, setFeedbackStatus] =
@@ -183,6 +186,7 @@ export default function Result({ data }: Props) {
           body: JSON.stringify({
             question_ids: data.per_question.map((q) => q.id),
             answers: data.per_question.map((q) => q.your_answer),
+            level,
           }),
           signal: abort.signal,
         });
@@ -228,7 +232,7 @@ export default function Result({ data }: Props) {
       ignore = true;
       abort.abort();
     };
-  }, [data]);
+  }, [data, level]);
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
@@ -304,7 +308,7 @@ export default function Result({ data }: Props) {
           ))}
         {feedback && (
           <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800 dark:text-zinc-100">
-            {feedback}
+            {renderFeedbackInline(feedback)}
             {feedbackStatus === "streaming" && (
               <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-rose-400 align-middle" />
             )}

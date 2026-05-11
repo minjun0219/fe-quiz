@@ -10,6 +10,7 @@ import {
   STRONG_THRESHOLD,
   WEAK_THRESHOLD,
 } from "@/lib/diagnosis";
+import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Category } from "@/lib/question.schema";
 import { getShareById } from "@/lib/share-store";
 
@@ -97,7 +98,7 @@ export default async function SharePage({ params }: Props) {
           🍘 누룽지의 한마디
         </div>
         <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800 dark:text-zinc-100">
-          {share.feedback}
+          {renderFeedbackInline(share.feedback)}
         </p>
       </section>
 
@@ -144,7 +145,7 @@ export default async function SharePage({ params }: Props) {
           나도 같은 문제 풀어보기 →
         </Link>
         <Link
-          href="/play"
+          href="/"
           className="inline-flex h-12 w-full items-center justify-center rounded-full text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           다른 라운드 풀어보기
