@@ -79,7 +79,8 @@ export const CATEGORIES = [
       code: "Browser",
       name: "브라우저 탐험가",
       emoji: "🌐",
-      blurb: "렌더링 파이프라인부터 캐시까지, 브라우저 속살을 잘 알고 계시네요.",
+      blurb:
+        "렌더링 파이프라인부터 캐시까지, 브라우저 속살을 잘 알고 계시네요.",
     },
   },
   {
