@@ -6,13 +6,13 @@ question: |
   `<link rel="preconnect">`, `<link rel="preload">`, `<link rel="prefetch">` 설명으로 맞는 것은?
 choices:
   - id: a
-    text: '`preconnect`는 리소스 다운로드까지 완료하고, `preload`는 연결만 미리 만든다.'
+    text: '`preconnect`는 리소스 다운로드까지 완료하고, `preload`는 연결만 미리 만들어요.'
   - id: b
-    text: '`preload`는 현재 페이지에서 곧 필요한 리소스를 높은 우선순위로 가져오게 힌트를 준다.'
+    text: '`preload`는 현재 페이지에서 곧 필요한 리소스를 높은 우선순위로 가져오게 힌트를 줘요.'
   - id: c
-    text: '`prefetch`는 현재 렌더링에 필수인 CSS를 항상 가장 높은 우선순위로 가져온다.'
+    text: '`prefetch`는 현재 렌더링에 필수인 CSS를 항상 가장 높은 우선순위로 가져와요.'
   - id: d
-    text: 세 값은 모두 같은 동작이고 브라우저 호환성을 위해 이름만 다르다.
+    text: 세 값은 모두 같은 동작이고 브라우저 호환성을 위해 이름만 달라요.
 answer: b
 explanation: |
   `preconnect`는 리소스를 다운로드하지 않고, 특정 origin에 대한 DNS 조회·TCP 연결·TLS 핸드셰이크 같은 연결 비용을 미리 치르게 해요. 외부 CDN이나 폰트 서버처럼 곧 요청할 도메인에 유용해요.

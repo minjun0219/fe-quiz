@@ -6,13 +6,13 @@ question: |
   웹 폰트 로딩에서 FOUT와 FOIT 설명으로 가장 알맞은 것은?
 choices:
   - id: a
-    text: FOUT는 텍스트가 보이지 않는 현상, FOIT는 fallback 폰트가 먼저 보이는 현상이다.
+    text: FOUT는 텍스트가 보이지 않는 현상, FOIT는 fallback 폰트가 먼저 보이는 현상이에요.
   - id: b
-    text: FOUT는 fallback 폰트가 먼저 보였다가 웹 폰트로 바뀌는 현상, FOIT는 폰트 로드 전 텍스트가 숨는 현상이다.
+    text: FOUT는 fallback 폰트가 먼저 보였다가 웹 폰트로 바뀌는 현상, FOIT는 폰트 로드 전 텍스트가 숨는 현상이에요.
   - id: c
-    text: 둘 다 이미지 lazy loading에서만 발생한다.
+    text: 둘 다 이미지 lazy loading에서만 발생해요.
   - id: d
-    text: '`font-display: swap`은 FOIT를 늘리기 위해 텍스트를 오래 숨긴다.'
+    text: '`font-display: swap`은 FOIT를 늘리기 위해 텍스트를 오래 숨겨요.'
 answer: b
 explanation: |
   FOUT는 Flash Of Unstyled Text로, 일단 시스템/fallback 폰트로 텍스트를 보여준 뒤 웹 폰트가 도착하면 교체되는 현상이에요. 사용자는 글을 빨리 볼 수 있지만 폰트 교체 순간 레이아웃이 살짝 흔들릴 수 있어요.

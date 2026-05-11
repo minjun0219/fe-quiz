@@ -6,13 +6,13 @@ question: |
   버튼 hover 시 살짝 위로 이동하는 애니메이션을 만들 때 성능 관점에서 더 선호되는 방식은?
 choices:
   - id: a
-    text: '`position: relative`와 `top: -4px`를 변경한다.'
+    text: '`position: relative`와 `top: -4px`를 변경해요.'
   - id: b
-    text: '`transform: translateY(-4px)`를 사용한다.'
+    text: '`transform: translateY(-4px)`를 사용해요.'
   - id: c
-    text: '`margin-top: -4px`를 변경한다.'
+    text: '`margin-top: -4px`를 변경해요.'
   - id: d
-    text: '`height`를 줄여서 위로 올라간 것처럼 보이게 한다.'
+    text: '`height`를 줄여서 위로 올라간 것처럼 보이게 해요.'
 answer: b
 explanation: |
   hover나 drag처럼 자주 변하는 시각적 이동은 `transform`이 보통 더 유리해요. `transform: translateY(...)`는 요소가 원래 차지하는 레이아웃 공간을 바꾸지 않고 합성 단계에서 처리될 가능성이 높아, 매 프레임 Layout을 다시 계산하는 비용을 줄일 수 있어요.

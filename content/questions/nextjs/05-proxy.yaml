@@ -6,13 +6,13 @@ question: |
   Next.js Proxy를 쓰기 좋은 경우는?
 choices:
   - id: a
-    text: 요청이 라우트에 도달하기 전에 인증 여부를 확인해 redirect하거나 rewrite한다.
+    text: 요청이 라우트에 도달하기 전에 인증 여부를 확인해 redirect하거나 rewrite해요.
   - id: b
-    text: React 컴포넌트의 로컬 state를 저장한다.
+    text: React 컴포넌트의 로컬 state를 저장해요.
   - id: c
-    text: 이미지 압축 알고리즘을 직접 구현한다.
+    text: 이미지 압축 알고리즘을 직접 구현해요.
   - id: d
-    text: 브라우저에서만 접근 가능한 DOM 크기를 측정한다.
+    text: 브라우저에서만 접근 가능한 DOM 크기를 측정해요.
 answer: a
 explanation: |
   Next.js 16 기준으로 예전 Middleware는 Proxy라는 파일 컨벤션으로 이름이 바뀌었고, 요청이 라우트에 도달하기 전에 실행되는 얇은 계층이라는 역할은 이어져요. 그래서 로그인하지 않은 사용자를 `/login`으로 redirect하거나, A/B 테스트용 rewrite를 하거나, 요청/응답 헤더를 조정하는 작업에 잘 맞아요.

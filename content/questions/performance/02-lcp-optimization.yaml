@@ -6,13 +6,13 @@ question: |
   LCP 개선에 가장 직접적으로 도움이 되는 선택은?
 choices:
   - id: a
-    text: 첫 화면의 hero 이미지를 최적화하고 우선 로드한다.
+    text: 첫 화면의 hero 이미지를 최적화하고 우선 로드해요.
   - id: b
-    text: 보이지 않는 하단 이미지를 모두 eager loading한다.
+    text: 보이지 않는 하단 이미지를 모두 eager loading해요.
   - id: c
-    text: 클릭 핸들러 내부 로직을 모두 `setTimeout`으로 감싼다.
+    text: 클릭 핸들러 내부 로직을 모두 `setTimeout`으로 감싸요.
   - id: d
-    text: 서버 응답과 무관하게 CSS 애니메이션만 늘린다.
+    text: 서버 응답과 무관하게 CSS 애니메이션만 늘려요.
 answer: a
 explanation: |
   LCP는 사용자가 처음 보는 viewport 안에서 가장 큰 이미지·텍스트 블록 같은 주요 콘텐츠가 언제 렌더링되는지를 측정해요. 따라서 첫 화면 hero 이미지가 크거나 늦게 다운로드되면 LCP가 바로 나빠질 수 있어요.
