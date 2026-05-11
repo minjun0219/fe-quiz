@@ -26,7 +26,7 @@ choices:
     text: "버튼: 3, console: clicked, n = 0"
 answer: a
 explanation: |
-  `setN(n + 1)`은 클로저로 잡힌 `n`(=0)을 사용해 매번 같은 값(1)을 예약. React는 같은 결과를 배치해서 한 번만 렌더하므로 화면엔 1.
-  `console.log`는 클릭 시점의 렌더 컨텍스트 안이라 그 시점의 `n`(=0)을 그대로 출력.
-  3까지 올리고 싶으면 함수형 업데이트 `setN(prev => prev + 1)`로 바꿔야 해.
+  `setN(n + 1)`은 클로저로 잡힌 `n`(=0)을 사용해 매번 같은 값(1)을 예약해요. React는 같은 결과를 배치해서 한 번만 렌더하니까 화면엔 1이 나와요.
+  `console.log`는 클릭 시점의 렌더 컨텍스트 안이라 그 시점의 `n`(=0)을 그대로 출력해요.
+  3까지 올리고 싶으면 함수형 업데이트 `setN(prev => prev + 1)`로 바꿔 주세요.
 tags: [ hooks, useState, closure, batching ]

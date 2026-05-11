@@ -14,16 +14,16 @@ code: |
   })
 choices:
   - id: a
-    text: "부모에게 자식의 DOM 전체를 그대로 노출하는 대신, 외부에서 호출 가능한 명령형 API(`focus()` 등)만 선택적으로 노출하기 위해"
+    text: "부모에게 자식의 DOM 전체를 그대로 노출하는 대신, 외부에서 호출 가능한 명령형 API(`focus()` 등)만 선택적으로 노출하기 위해서예요"
   - id: b
-    text: "자식 내부 ref를 동기화하지 않아도 부모가 자동으로 DOM을 받게 되어서"
+    text: "자식 내부 ref를 동기화하지 않아도 부모가 자동으로 DOM을 받게 돼서예요"
   - id: c
-    text: "ref를 children prop으로 전달할 수 있게 해 주기 위해"
+    text: "ref를 children prop으로 전달할 수 있게 해 주기 위해서예요"
   - id: d
-    text: "함수형 컴포넌트의 ref 전달 경고를 우회하려는 ESLint 트릭이다"
+    text: "함수형 컴포넌트의 ref 전달 경고를 우회하려는 ESLint 트릭이에요"
 answer: a
 explanation: |
-  `forwardRef`만 쓰면 부모가 자식의 DOM 노드 전체를 다룰 수 있게 돼—DOM의 구조가 구현 세부사항이라 그게 외부에 의존되면 리팩터링이 극도로 어려워져.
-  `useImperativeHandle`은 부모가 동일한 `ref`로 볼 객체를 내가 전달할 수 있게 해 줘. 일부 명령형 API(예: `focus`, `scrollIntoView`, `play`)만 노출하고 나머지는 감추는 패턴이 권장돼.
-  대부분의 React 코드는 선언적 prop으로 해결하는 게 좋고, `useImperativeHandle`은 양날의 검처럼 아껴서 써야 해.
+  `forwardRef`만 쓰면 부모가 자식의 DOM 노드 전체를 다룰 수 있게 돼요—DOM의 구조가 구현 세부사항이라 그게 외부에 의존되면 리팩터링이 극도로 어려워져요.
+  `useImperativeHandle`은 부모가 동일한 `ref`로 볼 객체를 내가 전달할 수 있게 해 줘요. 일부 명령형 API(예: `focus`, `scrollIntoView`, `play`)만 노출하고 나머지는 감추는 패턴이 권장돼요.
+  대부분의 React 코드는 선언적 prop으로 해결하는 게 좋고, `useImperativeHandle`은 양날의 검처럼 아껴서 써야 해요.
 tags: [ refs, forwardRef, useImperativeHandle, encapsulation ]

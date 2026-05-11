@@ -3,19 +3,19 @@ category: react
 difficulty: medium
 type: single_choice
 question: |
-  React 컴포넌트 안에서 타이머 ID처럼 렌더 사이에 유지되어야 하지만 값 변경만으로 리렌더링할 필요는 없는 값을 저장하려고 한다. 가장 적절한 선택은?
+  React 컴포넌트 안에서 타이머 ID처럼 렌더 사이에 유지돼야 하지만 값 변경만으로 리렌더링할 필요는 없는 값을 저장하려고 해요. 가장 적절한 선택은?
 choices:
   - id: a
-    text: "컴포넌트 함수 본문에 `let timerId`를 선언한다"
+    text: "컴포넌트 함수 본문에 `let timerId`를 선언해요"
   - id: b
-    text: "`useRef`로 `timerRef.current`에 저장한다"
+    text: "`useRef`로 `timerRef.current`에 저장해요"
   - id: c
-    text: "`useMemo`의 반환값에 타이머 ID를 저장하고 직접 수정한다"
+    text: "`useMemo`의 반환값에 타이머 ID를 저장하고 직접 수정해요"
   - id: d
-    text: "전역 변수에 타이머 ID를 저장해 모든 컴포넌트가 공유한다"
+    text: "전역 변수에 타이머 ID를 저장해서 모든 컴포넌트가 공유해요"
 answer: b
 explanation: |
-  `useRef`가 만든 객체는 렌더 사이에 같은 참조로 유지되고, `current`를 바꿔도 그 자체로 리렌더링을 트리거하지 않아. 그래서 `setTimeout`/`setInterval` ID, 이전 값, DOM 노드처럼 화면 출력 상태는 아니지만 컴포넌트 인스턴스에 붙어 있어야 하는 값을 보관하기 좋다.
-  컴포넌트 함수 본문의 `let` 변수는 렌더링이 다시 실행될 때마다 새로 만들어지므로 이전 렌더의 값을 안정적으로 보존하지 못한다. `useMemo`는 계산 결과 캐싱용이지 임의로 mutable 저장소처럼 쓰는 도구가 아니고, 전역 변수는 여러 컴포넌트 인스턴스가 값을 공유해 버려 cleanup이나 동시 렌더링 상황에서 버그를 만들기 쉽다.
-  다만 값 변경이 UI에 반영되어야 한다면 `useRef`가 아니라 `useState`를 써야 해. `useRef`는 “리렌더링 없는 저장소”이지 “화면 상태 관리”의 대체재가 아니다.
+  `useRef`가 만든 객체는 렌더 사이에 같은 참조로 유지되고, `current`를 바꿔도 그 자체로 리렌더링을 트리거하지 않아요. 그래서 `setTimeout`/`setInterval` ID, 이전 값, DOM 노드처럼 화면 출력 상태는 아니지만 컴포넌트 인스턴스에 붙어 있어야 하는 값을 보관하기 좋아요.
+  컴포넌트 함수 본문의 `let` 변수는 렌더링이 다시 실행될 때마다 새로 만들어지니까 이전 렌더의 값을 안정적으로 보존하지 못해요. `useMemo`는 계산 결과 캐싱용이지 임의로 mutable 저장소처럼 쓰는 도구가 아니고, 전역 변수는 여러 컴포넌트 인스턴스가 값을 공유해 버려서 cleanup이나 동시 렌더링 상황에서 버그를 만들기 쉬워요.
+  다만 값 변경이 UI에 반영돼야 한다면 `useRef`가 아니라 `useState`를 써야 해요. `useRef`는 “리렌더링 없는 저장소”이지 “화면 상태 관리”의 대체재가 아니에요.
 tags: [ useRef, render, state, timer ]

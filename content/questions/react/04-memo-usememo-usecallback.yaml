@@ -6,16 +6,16 @@ question: |
   React.memo, useMemo, useCallback에 대한 설명 중 **틀린** 것은?
 choices:
   - id: a
-    text: React.memo는 props가 얕게 같으면 자식 컴포넌트의 리렌더를 스킵한다
+    text: React.memo는 props가 얕게 같으면 자식 컴포넌트의 리렌더를 스킵해요
   - id: b
-    text: React.memo로 감싸면 컴포넌트 내부 state가 변해도 리렌더가 막힌다
+    text: React.memo로 감싸면 컴포넌트 내부 state가 변해도 리렌더가 막혀요
   - id: c
-    text: useMemo는 의존성이 같을 때 계산 결과(반환값)를 재사용한다
+    text: useMemo는 의존성이 같을 때 계산 결과(반환값)를 재사용해요
   - id: d
-    text: useCallback은 의존성이 같을 때 같은 함수 참조를 유지한다
+    text: useCallback은 의존성이 같을 때 같은 함수 참조를 유지해요
 answer: b
 explanation: |
-  `React.memo`는 **props 비교**로 리렌더를 스킵할 뿐, 자기 자신의 state나 사용 중인 context가 바뀌면 당연히 리렌더돼. "state까지 막아준다"는 건 흔한 오해.
-  `useMemo`는 값(반환값) 캐시, `useCallback`은 함수 참조 캐시라고 짝지어 외우면 헷갈리지 않아.
-  세 도구 모두 비교 비용/메모리를 쓰니까 진짜 필요한 자리에만 써야 해. 무지성으로 두르는 건 오히려 손해야.
+  `React.memo`는 **props 비교**로 리렌더를 스킵할 뿐, 자기 자신의 state나 사용 중인 context가 바뀌면 당연히 리렌더돼요. "state까지 막아준다"는 건 흔한 오해예요.
+  `useMemo`는 값(반환값) 캐시, `useCallback`은 함수 참조 캐시라고 짝지어 외워 두면 헷갈리지 않아요.
+  세 도구 모두 비교 비용/메모리를 쓰니까 진짜 필요한 자리에만 써야 해요. 무지성으로 두르는 건 오히려 손해예요.
 tags: [ memoization, memo, useMemo, useCallback ]

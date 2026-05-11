@@ -15,7 +15,7 @@ choices:
     text: "`componentDidMount`에서 동기적으로 `throw`된 에러"
 answer: c
 explanation: |
-  Error Boundary는 **렌더 단계, 생명주기, 생성자**에서 동기적으로 throw된 에러만 잡아. 트리 어디든 깊이 상관 없이 가장 가까운 boundary로 전파되긴 해.
-  못 잡는 대표 케이스 3가지: ① 이벤트 핸들러 ② 비동기 코드(setTimeout, Promise.then) ③ SSR. boundary가 잡기엔 호출 시점이 React 렌더 흐름 밖이거든.
-  이벤트 핸들러는 그냥 `try/catch`로 직접 처리하거나, 에러 상태를 state로 끌어올려 다음 렌더에서 throw해야 boundary가 잡을 수 있어.
+  Error Boundary는 **렌더 단계, 생명주기, 생성자**에서 동기적으로 throw된 에러만 잡아요. 트리 어디든 깊이 상관 없이 가장 가까운 boundary로 전파되긴 해요.
+  못 잡는 대표 케이스 3가지: ① 이벤트 핸들러 ② 비동기 코드(setTimeout, Promise.then) ③ SSR이에요. boundary가 잡기엔 호출 시점이 React 렌더 흐름 밖이거든요.
+  이벤트 핸들러는 `try/catch`로 직접 처리하거나, 에러 상태를 state로 끌어올려 다음 렌더에서 throw해야 boundary가 잡을 수 있어요.
 tags: [ error-boundary, error-handling ]
