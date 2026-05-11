@@ -28,7 +28,7 @@ export function CodeBlock({
 
   const wrapClass = wrap
     ? "whitespace-pre-wrap break-words [&_pre]:whitespace-pre-wrap [&_pre]:break-words"
-    : "overflow-x-auto [&_pre]:overflow-x-auto";
+    : "[&_pre]:overflow-x-auto [&_pre]:whitespace-pre [&_.quiz-code-block]:overflow-x-auto [&_.quiz-code-block]:whitespace-pre";
 
   return (
     <div
