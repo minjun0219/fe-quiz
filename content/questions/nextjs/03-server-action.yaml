@@ -15,6 +15,6 @@ choices:
     text: Server Component를 모두 Client Component로 바꾸는 기능이다.
 answer: a
 explanation: |
-  Server Actions는 서버에서 실행되는 함수를 form action이나 클라이언트 호출 흐름과 연결해 mutation을 처리할 수 있게 해준다. 예를 들어 게시글 작성, 좋아요, 설정 저장처럼 서버 데이터가 바뀌는 작업을 별도 API Route 없이 액션으로 표현할 수 있어.
-  서버에서 실행되므로 DB secret이나 서버 전용 SDK를 클라이언트 번들에 넣지 않아도 되는 장점이 있다. 다만 “서버에서 실행된다”는 이유만으로 안전해지는 건 아니고, 사용자 권한 확인·입력 검증·CSRF 같은 보안 고려는 액션 내부에서 명확히 처리해야 해.
+  Server Actions는 서버에서 실행되는 함수를 form action이나 클라이언트 호출 흐름과 연결해 mutation을 처리할 수 있게 해줘요. 예를 들어 게시글 작성, 좋아요, 설정 저장처럼 서버 데이터가 바뀌는 작업을 별도 API Route 없이 액션으로 표현할 수 있습니다.
+  서버에서 실행되므로 DB secret이나 서버 전용 SDK를 클라이언트 번들에 넣지 않아도 되는 장점이 있어요. 다만 “서버에서 실행된다”는 이유만으로 안전해지는 건 아니고, 사용자 권한 확인·입력 검증·CSRF 같은 보안 고려는 액션 내부에서 명확히 처리해야 합니다.
 tags: [ server-actions, mutation, app-router ]

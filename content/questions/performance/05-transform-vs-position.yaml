@@ -15,6 +15,6 @@ choices:
     text: '`height`를 줄여서 위로 올라간 것처럼 보이게 한다.'
 answer: b
 explanation: |
-  hover나 drag처럼 자주 변하는 시각적 이동은 `transform`이 보통 더 유리해. `transform: translateY(...)`는 요소가 원래 차지하는 레이아웃 공간을 바꾸지 않고 합성 단계에서 처리될 가능성이 높아, 매 프레임 Layout을 다시 계산하는 비용을 줄일 수 있어.
-  `top`, `margin`, `height` 같은 속성은 요소의 배치나 주변 흐름에 영향을 줄 수 있어 Reflow를 유발하기 쉽다. 다만 실제 문서 흐름 자체가 바뀌어야 하는 UI라면 `position`이나 레이아웃 속성을 써야 하므로, 성능과 의미를 함께 봐야 해.
+  hover나 drag처럼 자주 변하는 시각적 이동은 `transform`이 보통 더 유리해요. `transform: translateY(...)`는 요소가 원래 차지하는 레이아웃 공간을 바꾸지 않고 합성 단계에서 처리될 가능성이 높아, 매 프레임 Layout을 다시 계산하는 비용을 줄일 수 있습니다.
+  `top`, `margin`, `height` 같은 속성은 요소의 배치나 주변 흐름에 영향을 줄 수 있어 Reflow를 유발하기 쉽습니다. 다만 실제 문서 흐름 자체가 바뀌어야 하는 UI라면 `position`이나 레이아웃 속성을 써야 하므로, 성능과 의미를 함께 보는 게 좋아요.
 tags: [ transform, composite, animation, reflow ]

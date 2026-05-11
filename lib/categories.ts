@@ -79,7 +79,7 @@ export const CATEGORIES = [
       code: "Browser",
       name: "브라우저 탐험가",
       emoji: "🌐",
-      blurb: "렌더링 파이프라인부터 캐시까지, 브라우저 속살을 잘 아네.",
+      blurb: "렌더링 파이프라인부터 캐시까지, 브라우저 속살을 잘 알고 계시네요.",
     },
   },
   {
@@ -91,7 +91,7 @@ export const CATEGORIES = [
       code: "Perf",
       name: "성능 튜너",
       emoji: "⚡",
-      blurb: "프레임 드랍과 Core Web Vitals를 그냥 지나치지 않네.",
+      blurb: "프레임 드랍과 Core Web Vitals를 그냥 지나치지 않으시네요.",
     },
   },
   {
@@ -103,7 +103,7 @@ export const CATEGORIES = [
       code: "Next",
       name: "넥스트 항해사",
       emoji: "▲",
-      blurb: "라우터·캐시·렌더링 전략을 상황에 맞게 잘 고르네.",
+      blurb: "라우터·캐시·렌더링 전략을 상황에 맞게 잘 고르시네요.",
     },
   },
 ] as const;

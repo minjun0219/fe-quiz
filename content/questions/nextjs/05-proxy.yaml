@@ -15,6 +15,6 @@ choices:
     text: 브라우저에서만 접근 가능한 DOM 크기를 측정한다.
 answer: a
 explanation: |
-  Next.js 16 기준으로 예전 Middleware는 Proxy라는 파일 컨벤션으로 이름이 바뀌었고, 요청이 라우트에 도달하기 전에 실행되는 얇은 계층이라는 역할은 이어진다. 그래서 로그인하지 않은 사용자를 `/login`으로 redirect하거나, A/B 테스트용 rewrite를 하거나, 요청/응답 헤더를 조정하는 작업에 잘 맞는다.
-  다만 Proxy는 모든 관련 요청 경로에서 실행될 수 있으므로 무거운 DB 작업이나 복잡한 비즈니스 로직을 넣으면 전체 응답 시간이 느려질 수 있어. DOM 크기 측정처럼 브라우저에서만 가능한 작업도 Proxy의 역할이 아니다. 기존 자료에서 Middleware라고 부르는 경우가 있지만, 새 코드에서는 Proxy 용어와 `proxy.ts` 컨벤션을 우선으로 보는 게 좋다.
+  Next.js 16 기준으로 예전 Middleware는 Proxy라는 파일 컨벤션으로 이름이 바뀌었고, 요청이 라우트에 도달하기 전에 실행되는 얇은 계층이라는 역할은 이어집니다. 그래서 로그인하지 않은 사용자를 `/login`으로 redirect하거나, A/B 테스트용 rewrite를 하거나, 요청/응답 헤더를 조정하는 작업에 잘 맞아요.
+  다만 Proxy는 모든 관련 요청 경로에서 실행될 수 있으므로 무거운 DB 작업이나 복잡한 비즈니스 로직을 넣으면 전체 응답 시간이 느려질 수 있습니다. DOM 크기 측정처럼 브라우저에서만 가능한 작업도 Proxy의 역할이 아니에요. 기존 자료에서 Middleware라고 부르는 경우가 있지만, 새 코드에서는 Proxy 용어와 `proxy.ts` 컨벤션을 우선으로 보는 게 좋습니다.
 tags: [ proxy, middleware, redirect, rewrite, auth ]

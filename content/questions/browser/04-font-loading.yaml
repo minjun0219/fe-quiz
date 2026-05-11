@@ -15,6 +15,6 @@ choices:
     text: '`font-display: swap`은 FOIT를 늘리기 위해 텍스트를 오래 숨긴다.'
 answer: b
 explanation: |
-  FOUT는 Flash Of Unstyled Text로, 일단 시스템/fallback 폰트로 텍스트를 보여준 뒤 웹 폰트가 도착하면 교체되는 현상이야. 사용자는 글을 빨리 볼 수 있지만 폰트 교체 순간 레이아웃이 살짝 흔들릴 수 있어.
-  FOIT는 Flash Of Invisible Text로, 웹 폰트가 로드될 때까지 텍스트를 숨기는 현상이야. 브랜드 폰트 일관성은 좋아 보일 수 있지만 사용자가 빈 영역을 보게 될 수 있다. `font-display: swap`은 대체로 fallback을 먼저 보여줘 FOIT를 줄이는 선택이고, 필요하면 `preload`와 함께 폰트 로딩 지연을 줄일 수 있어.
+  FOUT는 Flash Of Unstyled Text로, 일단 시스템/fallback 폰트로 텍스트를 보여준 뒤 웹 폰트가 도착하면 교체되는 현상이에요. 사용자는 글을 빨리 볼 수 있지만 폰트 교체 순간 레이아웃이 살짝 흔들릴 수 있습니다.
+  FOIT는 Flash Of Invisible Text로, 웹 폰트가 로드될 때까지 텍스트를 숨기는 현상이에요. 브랜드 폰트 일관성은 좋아 보일 수 있지만 사용자가 빈 영역을 보게 될 수 있습니다. `font-display: swap`은 대체로 fallback을 먼저 보여줘 FOIT를 줄이는 선택이고, 필요하면 `preload`와 함께 폰트 로딩 지연을 줄일 수 있어요.
 tags: [ font-loading, fout, foit, font-display ]
