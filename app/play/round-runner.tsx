@@ -209,7 +209,7 @@ export default function RoundRunner({ questions }: Props) {
 
         <CodeBlock
           code={current.code}
-          codeHtml={current.code_html}
+          highlightedCodeHtml={current.code_html}
           size="sm"
           className="mb-6"
         />

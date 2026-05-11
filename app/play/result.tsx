@@ -393,7 +393,7 @@ export default function Result({ data }: Props) {
                 )}
                 <CodeBlock
                   code={q.code}
-                  codeHtml={q.code_html}
+                  highlightedCodeHtml={q.code_html}
                   size="xs"
                   className="mb-3"
                 />

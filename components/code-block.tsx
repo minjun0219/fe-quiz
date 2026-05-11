@@ -11,18 +11,25 @@ const SIZE_CLASSES: Record<Size, string> = {
 
 export function CodeBlock({
   code,
-  codeHtml,
+  highlightedCodeHtml,
   size = "sm",
   className = "",
 }: {
+  /** Plain code string; rendered as `<pre><code>{code}</code></pre>`. */
   code?: string;
-  codeHtml?: string;
+  /**
+   * Pre-rendered code HTML, expected to be exactly the shape produced by
+   * `highlightCode` in `lib/highlight.ts` (HTML-escaped `<pre><code>…</code></pre>`
+   * from the server-only YAML seed pipeline). Injected as-is via
+   * `dangerouslySetInnerHTML` — NEVER pass user-derived or external HTML.
+   */
+  highlightedCodeHtml?: string;
   size?: Size;
   className?: string;
 }) {
   const [wrap, setWrap] = useState(true);
 
-  if (!code && !codeHtml) {
+  if (!code && !highlightedCodeHtml) {
     return null;
   }
 
@@ -85,11 +92,11 @@ export function CodeBlock({
       <div
         className={`bg-zinc-900 font-mono leading-relaxed text-zinc-100 ring-1 ring-inset ring-white/5 ${SIZE_CLASSES[size]} ${modeClasses}`}
       >
-        {codeHtml ? (
+        {highlightedCodeHtml ? (
           <div
             className="quiz-code-block pr-8"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
-            dangerouslySetInnerHTML={{ __html: codeHtml }}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: prop is contracted to be `highlightCode` output (HTML-escaped <pre><code>) from server-only `lib/highlight.ts` — see `highlightedCodeHtml` JSDoc.
+            dangerouslySetInnerHTML={{ __html: highlightedCodeHtml }}
           />
         ) : (
           <pre className="pr-8">
