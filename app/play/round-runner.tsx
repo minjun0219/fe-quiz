@@ -158,16 +158,20 @@ export default function RoundRunner({ questions }: Props) {
     return selected === choiceId;
   }
 
+  function scrollToTop() {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "instant" : "smooth" });
+  }
+
   function nextStep() {
+    scrollToTop();
     if (isLast) {
       submit();
       return;
     }
     setIndex((i) => i + 1);
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    window.scrollTo({ top: 0, behavior: reduceMotion ? "instant" : "smooth" });
   }
 
   return (
