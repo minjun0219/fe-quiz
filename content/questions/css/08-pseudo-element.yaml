@@ -25,4 +25,6 @@ explanation: |
   `::before`/`::after`는 "이 요소의 앞/뒤에 가짜 자식을 만들어줘"라는 거라, **`content` 속성이 명시돼야 비로소 박스가 생성돼요**.
   값이 비어 있어도 좋으니 `content: ""`라고만 써 주면 다른 스타일이 살아나요. 가장 흔한 실수 중 하나랍니다.
   `background`는 단축 속성이라 `background-color`로 쓰지 않아도 색이 잘 적용되고, `::before`도 부모의 position과 무관하게 그릴 수 있어요.
+
+  참고: [MDN — `::before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before)
 tags: [ pseudo-element, before, after, content ]

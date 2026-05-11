@@ -19,4 +19,6 @@ explanation: |
   부모와 첫 자식의 인접한 마진은 **collapse**돼서 더 큰 쪽 하나로 합쳐지고, 그게 부모 바깥으로 빠져나간 것처럼 보이는 거예요 (parent-child margin collapse).
   부모를 **BFC**(Block Formatting Context)로 만들면 자식 마진이 BFC 경계를 못 넘어 부모 안에 갇혀요. 모던하게는 `display: flow-root`가 부수효과 없이 가장 깔끔하답니다.
   `padding-top` 교체는 마진과 의미가 달라 레이아웃이 어긋날 수 있고, `position: absolute`는 흐름 자체를 빼버려 다른 형제와 겹치는 부작용이 있어요.
+
+  참고: [MDN — margin](https://developer.mozilla.org/en-US/docs/Web/CSS/margin)
 tags: [ bfc, margin-collapse, layout, flow-root ]

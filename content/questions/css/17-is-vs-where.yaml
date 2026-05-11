@@ -21,4 +21,8 @@ explanation: |
   `:is(...)`의 specificity는 "인자 중 가장 높은 셀렉터의 specificity"가 본문에 더해져요. 그래서 `:is(h1, h2, h3) .title`은 사실상 `h1 .title` 수준의 가중치를 가져요.
   `:where(...)`는 항상 0이라 같은 셀렉터를 묶을 수 있게 해 주면서도 specificity에는 영향이 없어요. 사용자 스타일·디자인 시스템 베이스에서 "덮어쓰기 쉬운" 규칙을 만들 때 자주 써요.
   결과적으로 첫 줄이 더 강해 `red`가 이겨요. 둘이 동작 면에서는 같지만 specificity가 다르다는 게 핵심이에요.
+
+  참고:
+  - [MDN — `:is()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:is)
+  - [MDN — `:where()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:where)
 tags: [ selectors, specificity, is, where ]

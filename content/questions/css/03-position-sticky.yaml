@@ -19,4 +19,6 @@ explanation: |
   sticky는 두 모드 사이를 오가는 하이브리드예요. 스크롤이 임계값(`top: 0` 등)에 도달하기 전엔 평범한 `relative`처럼 흐름 안에 있고, 도달한 뒤엔 `fixed`처럼 화면에 붙어요.
   중요한 건 **부모(스크롤 컨테이너)를 벗어나지 못한다**는 점이에요. 부모가 화면 밖으로 빠져나가면 sticky 요소도 같이 밀려 사라져요.
   안 붙는다면 의심해 봐도 좋을 만한 부분: 부모에 `overflow: hidden`이 걸려 있거나, 부모 높이가 너무 작아서 sticky 영역이 즉시 끝나는 경우가 흔해요.
+
+  참고: [MDN — position](https://developer.mozilla.org/en-US/docs/Web/CSS/position)
 tags: [ position, sticky, scroll ]

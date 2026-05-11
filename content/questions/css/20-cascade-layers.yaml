@@ -26,4 +26,6 @@ explanation: |
   Cascade Layers의 우선순위는 "unlayered > layered"가 핵심이에요. layer에 속하지 않은 일반 규칙은 어떤 layer 안의 규칙보다도 강하답니다.
   layer끼리 비교할 때는 "나중에 등록된 layer가 우선"이에요. 첫 줄 `@layer reset, base, theme;`가 등록 순서를 정하므로 theme(blue) > base(red) > reset(black)이지만, 일반 규칙 `green`이 그 위를 덮어버려요.
   순서 의존을 줄이려고 디자인 시스템·리셋·서드파티 CSS를 layer로 격리하면, 페이지 단의 일반 CSS가 안전하게 덮어쓸 수 있게 돼서 specificity 전쟁이 줄어들어요.
+
+  참고: [MDN — `@layer`](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer)
 tags: [ cascade, layer, specificity ]

@@ -24,4 +24,6 @@ explanation: |
   `grid-template-columns: repeat(3, 1fr)`은 "3열, 각 열은 남은 공간을 1:1:1로 나눠 가져라"라는 뜻이에요.
   자식이 7개니까 자연스럽게 줄바꿈되어 3 + 3 + 1로 들어가서 행이 3개 만들어져요 (`grid-auto-rows`로 행이 자동 생성).
   마지막 행의 빈 2칸은 비어 있는 grid cell이고, 다음 자식이 추가되면 거기부터 채워져요.
+
+  참고: [MDN — grid-template-columns](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns)
 tags: [ grid, layout, repeat ]

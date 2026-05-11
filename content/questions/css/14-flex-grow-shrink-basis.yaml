@@ -17,4 +17,6 @@ answer: a
 explanation: |
   `flex: 1`은 `flex: 1 1 0%`와 동일하게 풀려요. 핵심은 `flex-basis: 0%`라는 점이에요. 기본 크기를 0으로 두고 남은 공간을 grow 비율대로 나눠 갖기 때문에, 자식들이 콘텐츠 크기와 무관하게 비율대로 균등 분배돼요.
   헷갈리는 게 `flex-basis: auto`인 경우인데요, 이건 콘텐츠/`width`를 먼저 반영한 뒤 남은 공간만 grow에 분배하므로, 콘텐츠 길이에 따라 너비가 달라져 균등 분배가 안 돼요. `flex: auto`(= 1 1 auto), `flex: none`(= 0 0 auto)도 같이 외워 두면 좋아요.
+
+  참고: [MDN — flex](https://developer.mozilla.org/en-US/docs/Web/CSS/flex)
 tags: [ flexbox, flex-shorthand, layout ]
