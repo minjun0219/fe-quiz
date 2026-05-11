@@ -154,8 +154,9 @@ export const QuestionSchema = z
 export type Question = z.infer<typeof QuestionSchema>;
 
 /**
- * Client-safe view of a question. The answer + explanation are intentionally
- * omitted so the correct answer never reaches the browser bundle.
+ * Client-safe view of a question. The answer, explanation, and references
+ * are intentionally omitted so the correct answer (and any topic hints from
+ * MDN/spec links) never reaches the browser bundle before grading.
  *
  * Lives here (not in `lib/round.ts`) so client components can `import type`
  * this without crossing a `server-only` module boundary.
@@ -171,7 +172,7 @@ export type PublicChoice = Choice & {
 
 export type PublicQuestion = Omit<
   Question,
-  "answer" | "explanation" | "choices"
+  "answer" | "explanation" | "choices" | "references"
 > & {
   choices: PublicChoice[];
   question_html?: string;
