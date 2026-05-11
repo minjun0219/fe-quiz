@@ -15,7 +15,12 @@ choices:
     text: Hot Reload 때문에 항상 두 번 실행됨
 answer: c
 explanation: |
-  StrictMode는 **개발 환경에서만** 컴포넌트를 한 번 더 마운트/언마운트해서 effect의 cleanup이 제대로 되는지 강제로 검사해줘.
-  그래서 cleanup이 없는 effect가 두 번 작동하면 서버 호출이 중복되거나 타이머가 두 개 도는 등 버그가 드러나는 거야. 그게 의도된 거.
-  프로덕션 빌드에서는 한 번만 실행되니 걱정 안 해도 돼. 두 번 도는 게 거슬리면 cleanup을 제대로 짜는 게 정답.
+  StrictMode는 **개발 환경에서만** 컴포넌트를 한 번 더 마운트/언마운트해서 effect의 cleanup이 제대로 되는지 강제로 검사해 줘요.
+  그래서 cleanup이 없는 effect가 두 번 작동하면 서버 호출이 중복되거나 타이머가 두 개 도는 등 버그가 드러나는 거예요. 그게 의도된 동작이에요.
+  프로덕션 빌드에서는 한 번만 실행되니 걱정하지 않아도 돼요. 두 번 도는 게 거슬리면 cleanup을 제대로 짜는 게 정답이에요.
+references:
+  - title: "React — StrictMode"
+    url: "https://ko.react.dev/reference/react/StrictMode"
+  - title: "React — Effect로 동기화하기"
+    url: "https://ko.react.dev/learn/synchronizing-with-effects"
 tags: [ strict-mode, useEffect, dev-mode ]

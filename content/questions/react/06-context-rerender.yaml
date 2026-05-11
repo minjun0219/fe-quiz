@@ -3,7 +3,7 @@ category: react
 difficulty: medium
 type: single_choice
 question: |
-  아래 코드에서 `count`가 바뀔 때마다 모든 `UserContext` consumer가 리렌더돼. 가장 적절한 해결책은?
+  아래 코드에서 `count`가 바뀔 때마다 모든 `UserContext` consumer가 리렌더돼요. 가장 적절한 해결책은?
 code: |
   function App() {
     const [count, setCount] = useState(0)
@@ -15,16 +15,21 @@ code: |
   }
 choices:
   - id: a
-    text: Provider 자체를 `React.memo`로 감싼다
+    text: Provider 자체를 `React.memo`로 감싸요
   - id: b
-    text: "`useCallback`으로 `value` 객체를 감싼다"
+    text: "`useCallback`으로 `value` 객체를 감싸요"
   - id: c
-    text: "`value`를 JSON 문자열로 변환해 넘긴다"
+    text: "`value`를 JSON 문자열로 변환해 넘겨요"
   - id: d
-    text: Provider의 `value` 객체를 `useMemo`로 감싸 의존성이 같을 때 같은 참조를 유지한다
+    text: Provider의 `value` 객체를 `useMemo`로 감싸 의존성이 같을 때 같은 참조를 유지해요
 answer: d
 explanation: |
-  매 렌더마다 `{ name: '하늘' }`이 **새 객체 리터럴**로 만들어져 참조가 바뀌니까, Context는 "값이 바뀌었네" 판단하고 모든 consumer를 리렌더해.
-  `useMemo(() => ({ name: '하늘' }), [])`로 감싸면 의존성이 바뀌지 않는 한 같은 참조를 유지해서 consumer가 안 흔들려.
-  `useCallback`은 함수 참조용이라 객체엔 안 맞고, `React.memo`는 Provider 자체의 props 비교라 도움이 안 돼.
+  매 렌더마다 `{ name: '하늘' }`이 **새 객체 리터럴**로 만들어져 참조가 바뀌니까, Context는 "값이 바뀌었네"라고 판단하고 모든 consumer를 리렌더해요.
+  `useMemo(() => ({ name: '하늘' }), [])`로 감싸면 의존성이 바뀌지 않는 한 같은 참조를 유지해서 consumer가 흔들리지 않아요.
+  `useCallback`은 함수 참조용이라 객체엔 맞지 않고, `React.memo`는 Provider 자체의 props 비교라 도움이 되지 않아요.
+references:
+  - title: "React — useContext"
+    url: "https://ko.react.dev/reference/react/useContext"
+  - title: "React — useMemo"
+    url: "https://ko.react.dev/reference/react/useMemo"
 tags: [ context, useMemo, rerender ]

@@ -27,10 +27,10 @@ choices:
     text: (가), (나), (다) 모두
 answer: d
 explanation: |
-  훅은 컴포넌트가 매 렌더에서 **항상 같은 순서, 같은 개수**로 호출돼야 해. `if`/`for`/조기 `return` 등으로 호출 여부가 바뀌는 위치에서 훅을 쓰면 안 돼.
-  - (가)는 `if (!userId)` 블록 안에서 `useState`를 호출해 명백한 위반.
-  - (나) `useFetch`와 (다) `useEffect`도 `if (!userId) return null` 뒤에 위치해 있어, `userId`가 falsy인 렌더와 truthy인 렌더에서 호출 여부가 달라져 같은 위반에 해당해.
-  올바른 패턴은 모든 훅을 컴포넌트 함수 최상단에서 호출하고, 분기는 그 뒤에 두는 거야:
+  훅은 컴포넌트가 매 렌더에서 **항상 같은 순서, 같은 개수**로 호출돼야 해요. `if`/`for`/조기 `return` 등으로 호출 여부가 바뀌는 위치에서 훅을 쓰면 안 돼요.
+  - (가)는 `if (!userId)` 블록 안에서 `useState`를 호출해서 명백한 위반이에요.
+  - (나) `useFetch`와 (다) `useEffect`도 `if (!userId) return null` 뒤에 위치해 있어서, `userId`가 falsy인 렌더와 truthy인 렌더에서 호출 여부가 달라져 같은 위반에 해당해요.
+  올바른 패턴은 모든 훅을 컴포넌트 함수 최상단에서 호출하고, 분기는 그 뒤에 두는 거예요:
   ```js
   function Profile({ userId }) {
     const [name, setName] = useState('')
@@ -40,5 +40,10 @@ explanation: |
     return <div>{data?.name}</div>
   }
   ```
-  ESLint 플러그인 `react-hooks/rules-of-hooks`를 켜 두면 이런 패턴을 자동으로 잡아 줘.
+  ESLint 플러그인 `react-hooks/rules-of-hooks`를 켜 두면 이런 패턴을 자동으로 잡아 줘요.
+references:
+  - title: "React — Hook 규칙"
+    url: "https://ko.react.dev/reference/rules/rules-of-hooks"
+  - title: "React — 커스텀 Hook으로 로직 재사용하기"
+    url: "https://ko.react.dev/learn/reusing-logic-with-custom-hooks"
 tags: [ hooks, rules-of-hooks, lint ]

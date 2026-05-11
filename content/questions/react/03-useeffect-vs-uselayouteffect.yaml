@@ -3,7 +3,7 @@ category: react
 difficulty: medium
 type: single_choice
 question: |
-  컴포넌트가 마운트되자마자 DOM의 크기를 측정해서, 그 값으로 위치를 보정해야 해. 사용자 눈에 깜빡임(jank)이 보이지 않아야 한다면?
+  컴포넌트가 마운트되자마자 DOM의 크기를 측정해서, 그 값으로 위치를 보정해야 해요. 사용자 눈에 깜빡임(jank)이 보이지 않아야 한다면 어떤 훅을 골라야 할까요?
 choices:
   - id: a
     text: useLayoutEffect — 브라우저가 paint하기 전에 동기적으로 실행돼서 측정/보정 후의 결과만 화면에 그려짐
@@ -15,7 +15,12 @@ choices:
     text: useState — 초기값에 측정 결과를 넣으면 됨
 answer: a
 explanation: |
-  실행 타이밍이 핵심. `useLayoutEffect`는 DOM 변경 직후 **paint 전에 동기적으로** 실행되니까, 측정·보정한 결과만 사용자가 보게 돼.
-  `useEffect`는 paint 직후 **비동기적으로** 실행돼서, 보정 전 상태가 한 번 깜빡 보일 수 있어.
-  단점도 알아두자: `useLayoutEffect`는 브라우저 paint를 잠시 막아서 무거운 로직을 넣으면 렌더가 느려져. 깜빡임 보정이 꼭 필요할 때만 써.
+  실행 타이밍이 핵심이에요. `useLayoutEffect`는 DOM 변경 직후 **paint 전에 동기적으로** 실행되니까, 측정·보정한 결과만 사용자가 보게 돼요.
+  `useEffect`는 paint 직후 **비동기적으로** 실행돼서, 보정 전 상태가 한 번 깜빡 보일 수 있어요.
+  단점도 같이 알아두면 좋아요. `useLayoutEffect`는 브라우저 paint를 잠시 막아서 무거운 로직을 넣으면 렌더가 느려져요. 깜빡임 보정이 꼭 필요할 때만 써 주세요.
+references:
+  - title: "React — useLayoutEffect"
+    url: "https://ko.react.dev/reference/react/useLayoutEffect"
+  - title: "React — useEffect"
+    url: "https://ko.react.dev/reference/react/useEffect"
 tags: [ useEffect, useLayoutEffect, hooks, rendering ]
