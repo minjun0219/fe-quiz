@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { CodeBlock } from "@/components/code-block";
 import type { PublicQuestion } from "@/lib/question.schema";
 import type {
   QuizSubmitResponse,
@@ -206,19 +207,12 @@ export default function RoundRunner({ questions }: Props) {
           </legend>
         )}
 
-        {current.code_html ? (
-          <div
-            className="quiz-code-block mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
-            dangerouslySetInnerHTML={{ __html: current.code_html }}
-          />
-        ) : (
-          current.code && (
-            <pre className="mb-6 overflow-x-auto rounded-2xl bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100">
-              <code>{current.code}</code>
-            </pre>
-          )
-        )}
+        <CodeBlock
+          code={current.code}
+          highlightedCodeHtml={current.code_html}
+          size="sm"
+          className="mb-6"
+        />
 
         {isMulti && (
           <p className="mb-3 text-xs font-medium text-zinc-500 dark:text-zinc-400">

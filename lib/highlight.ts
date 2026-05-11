@@ -114,11 +114,12 @@ function renderInlineSegment(text: string): string {
 const FENCE_RE = /```([a-zA-Z0-9_+-]*)\n([\s\S]*?)\n[ \t]*```/g;
 
 // Shared with the React result/explanation card so styling stays consistent.
-// `overflow-x-auto` keeps long lines on one line and lets the user scroll —
-// PR #22 had wrapped them, but horizontal scroll preserves code structure
-// better on narrow screens.
+// Fenced blocks inside markdown (questions / explanations / choices) default
+// to wrap (`whitespace-pre-wrap`) to match `<CodeBlock>`'s mobile-readable
+// default. The toggle (wrap ↔ scroll) only lives on the dedicated `<CodeBlock>`
+// for a question's `code` field; fenced blocks remain wrap-only.
 const FENCE_WRAPPER_CLASS =
-  "quiz-code-block my-3 overflow-x-auto rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100";
+  "quiz-code-block my-3 rounded-xl bg-zinc-900 p-3 font-mono text-xs leading-relaxed text-zinc-100 ring-1 ring-inset ring-white/5 whitespace-pre-wrap break-words [&_pre]:whitespace-pre-wrap [&_pre]:break-words";
 
 /**
  * Render a quiz text field (question / option text / explanation) to HTML.
