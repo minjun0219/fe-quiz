@@ -12,15 +12,18 @@ code: |
   .b > * + * { margin-left: 12px; }
 choices:
   - id: a
-    text: "`gap`은 flex/grid 컨테이너에서만 동작하므로 일반 인라인 요소엔 쓸 수 없다"
+    text: "`gap`은 flex/grid 컨테이너에서만 동작하므로 일반 인라인 요소엔 쓸 수 없어요"
   - id: b
-    text: 가장자리 자식에 불필요한 마진이 붙지 않고, 줄바꿈 시 행/열 간 간격이 자동 적용되며, 마진 collapse 같은 함정도 없다
+    text: 가장자리 자식에 불필요한 마진이 붙지 않고, 줄바꿈 시 행/열 간 간격이 자동 적용되며, 마진 collapse 같은 함정도 없어요
   - id: c
-    text: "`gap`은 부모의 padding을 자동으로 추가한다"
+    text: "`gap`은 부모의 padding을 자동으로 추가해요"
   - id: d
-    text: "`gap`은 자식 너비에 비례한 가변 간격을 만든다"
+    text: "`gap`은 자식 너비에 비례한 가변 간격을 만들어요"
 answer: b
 explanation: |
-  `gap`은 자식 "사이"의 간격만 만들기 때문에 양 끝 자식에 불필요한 마진이 붙지 않아 시각·계산 모두 깔끔해. flex가 줄바꿈하거나 grid처럼 2D 배치일 때도 행/열 간 간격이 한 번에 적용돼서 `> * + *` 류 트릭이 필요 없어.
-  `gap`은 flex/grid 외에 multi-column 레이아웃에서도 동작하지만 일반 block 흐름에서는 적용 안 돼. 모던 브라우저에서 flex `gap`은 2021년 전후로 안정 지원이라 새로 짜는 코드면 사실상 기본값으로 골라도 무방해.
+  `gap`은 자식 "사이"의 간격만 만들기 때문에 양 끝 자식에 불필요한 마진이 붙지 않아 시각·계산 모두 깔끔해요. flex가 줄바꿈하거나 grid처럼 2D 배치일 때도 행/열 간 간격이 한 번에 적용돼서 `> * + *` 류 트릭이 필요 없어요.
+  `gap`은 flex/grid 외에 multi-column 레이아웃에서도 동작하지만 일반 block 흐름에서는 적용되지 않아요. 모던 브라우저에서 flex `gap`은 2021년 전후로 안정 지원이라, 새로 짜는 코드면 사실상 기본값으로 골라도 무방해요.
+references:
+  - title: "MDN — gap"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/gap"
 tags: [ flexbox, grid, gap, layout ]

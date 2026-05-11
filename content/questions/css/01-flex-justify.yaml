@@ -19,4 +19,7 @@ explanation: |
   - `space-around`: 각 아이템 양옆에 동일한 마진(가장자리 마진은 사이 마진의 절반).
   - `space-evenly`: 가장자리 포함 모든 간격이 동일.
   - `stretch`: 명세상 `justify-content`의 유효 값이지만, flex 컨테이너의 main axis에서는 늘이기가 적용 안 돼 결과적으로 `flex-start`처럼 동작. (CSS Grid에선 실제로 트랙이 늘어남)
+references:
+  - title: "MDN — justify-content"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content"
 tags: [ flexbox, layout, justify-content ]
