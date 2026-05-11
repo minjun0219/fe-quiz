@@ -17,6 +17,7 @@ answer: a
 explanation: |
   `aspect-ratio: 16 / 9`는 박스의 한쪽 치수만 정해져도 나머지를 비율대로 자동 결정해 줘요. 예전에는 padding 트릭(`padding-top: 56.25%`)이 표준이었지만, 이젠 모던 브라우저(2021+)에서 `aspect-ratio` 한 줄이면 충분해요.
   `object-fit`은 이미 박스 크기가 잡힌 미디어의 잘림/맞춤만 결정하니 비율 유지와는 다른 도구예요. JS로 매번 계산하는 건 리사이즈 빈도가 높을수록 비효율적이에요.
-
-  참고: [MDN — aspect-ratio](https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio)
+references:
+  - title: "MDN — aspect-ratio"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio"
 tags: [ aspect-ratio, layout, modern-css ]

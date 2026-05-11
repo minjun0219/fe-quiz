@@ -18,6 +18,7 @@ explanation: |
   상태 A ↔ 상태 B 사이의 보간이라면 `transition`이 정답이에요. `:hover`로 색을 바꾸기만 하면 `transition: background-color 200ms`가 알아서 양방향 보간을 처리해 줘요.
   `@keyframes` + `animation`은 여러 단계(0% → 50% → 100%)를 거치는 시퀀스나, 트리거 없이 자동 반복되는 효과에 어울려요.
   단순 hover 보간을 keyframes로 하면 코드만 길어지고 마우스 떠날 때 되돌리기를 따로 처리해야 해서 비효율적이에요.
-
-  참고: [MDN — transition](https://developer.mozilla.org/en-US/docs/Web/CSS/transition)
+references:
+  - title: "MDN — transition"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/transition"
 tags: [ transition, animation, hover ]

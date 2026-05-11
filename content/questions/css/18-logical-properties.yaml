@@ -18,6 +18,7 @@ explanation: |
   CSS 로지컬 프로퍼티(`margin-inline`, `padding-block`, `inset-inline-start` 등)는 "left/right/top/bottom" 같은 물리 축 대신 "start/end"라는 흐름 축을 따라요.
   영어 같은 LTR에선 `margin-inline-start`가 `margin-left`와 같아 보이지만, 아랍어처럼 RTL이거나 세로쓰기(`writing-mode: vertical-rl`)에선 자동으로 의미에 맞는 축에 적용돼요.
   RTL을 지원하거나 일본어 세로쓰기 같은 케이스를 신경 쓰는 코드라면 처음부터 로지컬 프로퍼티를 기본값으로 쓰는 편이 유지보수가 편해요.
-
-  참고: [MDN — margin-inline](https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline)
+references:
+  - title: "MDN — margin-inline"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline"
 tags: [ logical-properties, i18n, rtl ]

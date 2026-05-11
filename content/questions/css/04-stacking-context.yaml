@@ -18,6 +18,7 @@ explanation: |
   stacking context는 z-index 비교의 "독립된 우주"를 만들어요. context 안의 자식 z-index는 바깥과 비교되지 않고, context 자체의 위치만 바깥과 경쟁하죠.
   `position: relative`만 적용하고 z-index가 `auto`면 context를 만들지 **않아요**. z-index가 정수로 지정돼야 비로소 context가 생겨요.
   반면 `opacity < 1`, `transform`(none이 아닌 값), `filter`, `will-change: transform` 같은 건 z-index 없이도 context를 만들어요. 그래서 "왜 갑자기 z-index가 안 먹지?" 싶을 때는 부모에 transform/opacity가 걸려 있는지 확인해 봐요.
-
-  참고: [MDN — z-index](https://developer.mozilla.org/en-US/docs/Web/CSS/z-index)
+references:
+  - title: "MDN — z-index"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/z-index"
 tags: [ stacking-context, z-index, position ]

@@ -25,6 +25,7 @@ answer: c
 explanation: |
   CSS 커스텀 프로퍼티는 일반 속성처럼 **상속**되고 cascade를 따라요. `.btn`은 자기 자신에 `--brand`를 정의하지 않았으니 부모 `.card`에서 상속된 `steelblue`가 적용돼요. `:root`의 정의는 더 멀리 있어 가까운 정의에 가려져요.
   `var(--brand, black)`의 두 번째 인자는 변수 자체가 정의되지 않았거나 파싱에 실패했을 때만 쓰는 fallback이에요. 변수가 정의돼 있으면 fallback은 절대 쓰이지 않아요.
-
-  참고: [MDN — `var()`](https://developer.mozilla.org/en-US/docs/Web/CSS/var)
+references:
+  - title: "MDN — var()"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/var"
 tags: [ custom-properties, variables, cascade ]

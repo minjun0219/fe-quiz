@@ -23,6 +23,7 @@ answer: b
 explanation: |
   `gap`은 자식 "사이"의 간격만 만들기 때문에 양 끝 자식에 불필요한 마진이 붙지 않아 시각·계산 모두 깔끔해요. flex가 줄바꿈하거나 grid처럼 2D 배치일 때도 행/열 간 간격이 한 번에 적용돼서 `> * + *` 류 트릭이 필요 없어요.
   `gap`은 flex/grid 외에 multi-column 레이아웃에서도 동작하지만 일반 block 흐름에서는 적용되지 않아요. 모던 브라우저에서 flex `gap`은 2021년 전후로 안정 지원이라, 새로 짜는 코드면 사실상 기본값으로 골라도 무방해요.
-
-  참고: [MDN — gap](https://developer.mozilla.org/en-US/docs/Web/CSS/gap)
+references:
+  - title: "MDN — gap"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/gap"
 tags: [ flexbox, grid, gap, layout ]

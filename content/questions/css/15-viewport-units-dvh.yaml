@@ -22,6 +22,7 @@ explanation: |
   - `lvh` (large): 가장 큰 viewport 기준 (`vh`와 동일하게 동작)
   - `dvh` (dynamic): 현재 UI 상태에 따라 실시간으로 변하는 값
   히어로 섹션 풀스크린엔 `100dvh`(또는 `100svh`)를 쓰는 게 일반적인 모던 패턴이에요.
-
-  참고: [MDN — `<length>`](https://developer.mozilla.org/en-US/docs/Web/CSS/length)
+references:
+  - title: "MDN — <length>"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/length"
 tags: [ viewport-units, mobile, dvh ]

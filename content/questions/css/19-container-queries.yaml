@@ -23,6 +23,7 @@ explanation: |
   Container query는 "부모 컨테이너의 사이즈"를 기준으로 자식의 스타일을 결정해서, 같은 카드 컴포넌트가 폭 좁은 사이드바에 들어가면 1단, 넓은 메인 영역에 들어가면 2단으로 자동 분기되도록 작성할 수 있어요. 컴포넌트 단위로 반응형을 짜는 데 강력하답니다.
   쓰려면 조상 어딘가에 `container-type` (또는 `container-name`까지)을 지정해야 해요. 매칭되는 size 컨테이너가 하나도 없으면 viewport로 폴백되는 게 아니라 그냥 그 `@container` 규칙이 적용되지 않으니, 컨테이너 선언이 빠졌는지 먼저 확인해 봐요.
   Chrome/Safari/Firefox 모두 2023년 이후 안정 지원이라 신규 컴포넌트 시스템에서 도입해 봐도 좋을 시점이에요.
-
-  참고: [MDN — `@container`](https://developer.mozilla.org/en-US/docs/Web/CSS/@container)
+references:
+  - title: "MDN — @container"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/@container"
 tags: [ container-queries, responsive, modern-css ]

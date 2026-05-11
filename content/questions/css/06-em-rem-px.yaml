@@ -18,6 +18,7 @@ explanation: |
   `rem` = "root em". 이름 그대로 항상 `<html>`의 font-size를 기준으로 잡아요. 그래서 사용자가 브라우저 설정에서 글자 크기를 키우면 `rem` 단위는 따라 커져 접근성에 좋답니다.
   `em`은 **현재 요소의 font-size**(상속/재정의 포함) 기준이라, 중첩되면 곱연산처럼 누적될 수 있어요 (`em` 안의 `em` 안의 `em`...).
   `px`는 절대 단위라 사용자 글자 크기 설정에 영향받지 않아요 (브라우저 줌은 별개예요).
-
-  참고: [MDN — `<length>`](https://developer.mozilla.org/en-US/docs/Web/CSS/length)
+references:
+  - title: "MDN — <length>"
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/length"
 tags: [ units, em, rem, font-size ]
