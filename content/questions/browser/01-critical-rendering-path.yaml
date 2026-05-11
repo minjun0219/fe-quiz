@@ -1,0 +1,20 @@
+id: browser-001
+category: browser
+difficulty: easy
+type: single_choice
+question: |
+  브라우저의 Critical Rendering Path 순서로 가장 알맞은 것은?
+choices:
+  - id: a
+    text: HTML 파싱 → DOM 생성, CSS 파싱 → CSSOM 생성, Render Tree 구성 → Layout → Paint → Composite
+  - id: b
+    text: HTML 파싱 → Paint → CSSOM 생성 → Layout → JavaScript 실행 → Composite
+  - id: c
+    text: CSSOM 생성 → HTML 다운로드 → Paint → DOM 생성 → Layout
+  - id: d
+    text: Render Tree 구성 → DOM 생성 → CSSOM 생성 → Paint → Layout
+answer: a
+explanation: |
+  브라우저는 먼저 HTML을 파싱해 DOM을 만들고, CSS를 파싱해 CSSOM을 만들어요. 이후 실제로 화면에 그릴 노드만 모아 Render Tree를 구성하고, Layout 단계에서 각 요소의 위치와 크기를 계산해요.
+  그 다음 Paint에서 텍스트·색상·이미지 등을 픽셀로 칠하고, Composite 단계에서 여러 레이어를 합성해 최종 화면을 보여줘요. 이 흐름을 알고 있으면 CSS/JS가 어디서 렌더링을 막는지, 어떤 변경이 비용이 큰 작업인지 판단하기 쉬워져요.
+tags: [ rendering, crp, dom, cssom ]

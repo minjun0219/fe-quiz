@@ -1,0 +1,20 @@
+id: next-004
+category: nextjs
+difficulty: hard
+type: single_choice
+question: |
+  App Router에서 Streaming SSR과 `Suspense`를 함께 쓰는 이유로 가장 알맞은 것은?
+choices:
+  - id: a
+    text: 느린 데이터 영역을 기다리는 동안 먼저 준비된 UI와 fallback을 보내 사용자가 더 빨리 화면을 보기 위해서예요.
+  - id: b
+    text: 모든 JavaScript를 제거해 Client Component 사용을 금지하기 위해서예요.
+  - id: c
+    text: 서버 렌더링을 중단하고 CSR만 사용하도록 강제하기 위해서예요.
+  - id: d
+    text: 이미지 파일을 자동으로 WebP로 변환하기 위해서예요.
+answer: a
+explanation: |
+  전통적인 SSR은 페이지에 필요한 데이터가 모두 준비될 때까지 HTML 응답이 늦어질 수 있어요. Streaming SSR은 준비된 부분부터 클라이언트로 흘려보내고, 느린 영역은 나중에 이어서 보낼 수 있게 해줘요.
+  `Suspense`는 이 느린 영역의 경계를 선언하고 fallback UI를 먼저 보여주는 역할을 해요. 예를 들어 상단 레이아웃과 기본 콘텐츠는 먼저 보여주고, 추천 목록처럼 느린 데이터는 skeleton을 보여주다가 준비되면 교체할 수 있어 사용자 체감 대기 시간을 줄일 수 있어요.
+tags: [ streaming-ssr, suspense, app-router, rendering ]

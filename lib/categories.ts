@@ -70,6 +70,43 @@ export const CATEGORIES = [
       blurb: "div 떡칠 안 하고 시맨틱 태그 딱 골라 쓰네.",
     },
   },
+  {
+    id: "browser",
+    idPrefix: "browser",
+    display: "Browser",
+    short: "Browser",
+    persona: {
+      code: "Browser",
+      name: "브라우저 탐험가",
+      emoji: "🌐",
+      blurb:
+        "렌더링 파이프라인부터 캐시까지, 브라우저 속살을 잘 알고 계시네요.",
+    },
+  },
+  {
+    id: "performance",
+    idPrefix: "perf",
+    display: "Performance",
+    short: "Perf",
+    persona: {
+      code: "Perf",
+      name: "성능 튜너",
+      emoji: "⚡",
+      blurb: "프레임 드랍과 Core Web Vitals를 그냥 지나치지 않으시네요.",
+    },
+  },
+  {
+    id: "nextjs",
+    idPrefix: "next",
+    display: "Next.js",
+    short: "Next",
+    persona: {
+      code: "Next",
+      name: "넥스트 항해사",
+      emoji: "▲",
+      blurb: "라우터·캐시·렌더링 전략을 상황에 맞게 잘 고르시네요.",
+    },
+  },
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number]["id"];

@@ -1,0 +1,20 @@
+id: next-002
+category: nextjs
+difficulty: medium
+type: single_choice
+question: |
+  Next.js App Router의 `fetch` 캐시 옵션 설명으로 맞는 것은?
+choices:
+  - id: a
+    text: '`cache: "no-store"`는 요청 결과를 저장하지 않고 매 요청 새로 가져오려는 의도에 가까워요.'
+  - id: b
+    text: '`next: { revalidate: 60 }`은 브라우저가 60초마다 강제로 새로고침한다는 뜻이에요.'
+  - id: c
+    text: 모든 `fetch`는 기본적으로 사용자 쿠키와 무관하게 영구 캐시돼요.
+  - id: d
+    text: 캐시 옵션은 Client Component에서만 동작하고 Server Component에서는 무시돼요.
+answer: a
+explanation: |
+  App Router의 서버 렌더링에서 `fetch` 옵션은 데이터 캐싱과 페이지 렌더링 전략에 영향을 줄 수 있어요. `cache: "no-store"`는 요청 결과를 저장하지 않고 매번 새로 가져오겠다는 의미에 가까워서, 사용자별 데이터나 항상 최신이어야 하는 데이터에 사용해요.
+  `next: { revalidate: 60 }`은 브라우저가 60초마다 새로고침한다는 뜻이 아니라, 서버 쪽에서 캐시된 데이터를 일정 시간 후 재검증할 수 있게 하는 설정이에요. 캐시를 잘못 고르면 오래된 데이터가 보이거나 반대로 매 요청이 느려질 수 있으니 데이터 성격에 맞춰 고르는 게 좋아요.
+tags: [ app-router, fetch-cache, revalidate ]

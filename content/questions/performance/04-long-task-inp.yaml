@@ -1,0 +1,20 @@
+id: perf-004
+category: performance
+difficulty: hard
+type: single_choice
+question: |
+  INP가 나쁜 페이지에서 클릭 직후 300ms 이상의 긴 JavaScript 작업이 반복돼요. 가장 적절한 개선 방향은?
+choices:
+  - id: a
+    text: 클릭 핸들러의 무거운 작업을 쪼개거나 지연해서 메인 스레드 점유 시간을 줄여요.
+  - id: b
+    text: 모든 이미지를 더 큰 해상도로 바꿔 LCP만 개선해요.
+  - id: c
+    text: '`z-index` 값을 낮춰 브라우저가 이벤트를 더 빨리 받게 해요.'
+  - id: d
+    text: 이벤트 핸들러를 더 많이 등록해 같은 작업을 병렬로 실행해요.
+answer: a
+explanation: |
+  INP는 사용자가 클릭·탭·키 입력을 했을 때 브라우저가 이벤트를 처리하고 다음 화면 업데이트를 보여주기까지의 지연을 봐요. 클릭 직후 긴 JavaScript 작업이 메인 스레드를 막고 있으면 이벤트 처리, React 렌더링, Paint가 모두 밀릴 수 있어요.
+  개선하려면 한 번에 오래 도는 작업을 작은 chunk로 나누거나, 즉시 필요하지 않은 작업은 뒤로 미루고, 무거운 계산은 Web Worker로 옮기는 식으로 메인 스레드 점유 시간을 줄여야 해요. React 앱이라면 불필요한 리렌더와 큰 동기 작업도 같이 줄이는 게 좋아요.
+tags: [ inp, long-task, main-thread, responsiveness ]
