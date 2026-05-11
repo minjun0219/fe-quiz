@@ -164,6 +164,10 @@ export default function RoundRunner({ questions }: Props) {
       return;
     }
     setIndex((i) => i + 1);
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "instant" : "smooth" });
   }
 
   return (
