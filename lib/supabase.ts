@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
@@ -24,9 +26,8 @@ let cached: SupabaseClient<Database> | null = null;
  * 안전.
  *
  * ⚠️ NEVER expose `SUPABASE_SECRET_KEY` to the browser. No `NEXT_PUBLIC_`
- * prefix. No client component import. This module's consumers
- * (`lib/share-store.ts` etc.) cross `import "server-only"` boundaries which
- * surfaces accidental client imports as a build-time error.
+ * prefix. No client component import. This module imports `server-only`
+ * so any accidental client-side import path surfaces as a build-time error.
  */
 export function getSupabase(): SupabaseClient<Database> {
   if (cached) {
