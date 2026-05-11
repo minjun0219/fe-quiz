@@ -20,7 +20,7 @@ explanation: |
   `autocomplete="off"`는 브라우저에 자동입력 힌트를 끌 뿐 키보드 모양에는 영향이 없고, 브라우저가 무시하는 케이스도 많아요.
 references:
   - title: "MDN — HTML autocomplete attribute"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Attributes/autocomplete"
   - title: "MDN — inputmode global attribute"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Global_attributes/inputmode"
 tags: [ forms, autocomplete, inputmode ]

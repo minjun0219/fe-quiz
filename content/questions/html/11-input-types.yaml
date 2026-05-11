@@ -20,7 +20,7 @@ explanation: |
   자동완성·`inputmode`·`autocomplete` 등 다른 속성과 결합하면 폼 전반의 UX가 더 좋아져요. 보안과는 직접적인 관련이 없어요 — XSS 방어는 별도 출력 인코딩이 담당해요.
 references:
   - title: "MDN — <input>: The Input element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/input"
   - title: "MDN — <input> types"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/input#input_types"
 tags: [ input, mobile, ux ]

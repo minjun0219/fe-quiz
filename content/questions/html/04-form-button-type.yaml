@@ -31,7 +31,7 @@ explanation: |
   실수로 폼이 전송되는 흔한 버그예요 — 폼 안의 모든 비-submit 버튼에는 `type="button"`을 붙이는 습관이 안전해요.
 references:
   - title: "MDN — <button> type attribute"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#type"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/button#type"
   - title: "MDN — <form>: Implicit submission"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/form"
 tags: [ forms, button, submit, gotcha ]

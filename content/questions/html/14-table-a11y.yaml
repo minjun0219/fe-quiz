@@ -30,9 +30,9 @@ explanation: |
   복잡한 표라면 `headers` 속성으로 셀과 헤더를 명시적으로 연결하는 패턴도 있어요.
 references:
   - title: "MDN — <caption>: The Table Caption element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/caption"
   - title: "MDN — <th> scope attribute"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th#scope"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/th#scope"
   - title: "W3C WAI — Tables Tutorial"
     url: "https://www.w3.org/WAI/tutorials/tables/"
 tags: [ a11y, table, semantics ]

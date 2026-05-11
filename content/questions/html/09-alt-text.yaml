@@ -26,7 +26,7 @@ explanation: |
   - e: 캡션 같은 텍스트가 같은 정보를 전달하면 alt=""로 두는 편이 자연스러워요.
 references:
   - title: "MDN — <img> alt attribute"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#alt"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/img#alt"
   - title: "W3C — An alt Decision Tree"
     url: "https://www.w3.org/WAI/tutorials/images/decision-tree/"
 tags: [ a11y, alt, semantics ]

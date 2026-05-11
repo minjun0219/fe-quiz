@@ -20,7 +20,7 @@ explanation: |
   `inert`는 시각적으론 표시되지만 이벤트·a11y에서 제외되므로 CSS로 흐릿하게 처리하면 의도가 명확해져요.
 references:
   - title: "MDN — inert global attribute"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inert"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Global_attributes/inert"
   - title: "web.dev — The inert attribute"
     url: "https://web.dev/articles/inert"
 tags: [ a11y, modal, focus-management ]

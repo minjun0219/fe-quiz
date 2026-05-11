@@ -25,7 +25,7 @@ explanation: |
   진짜 모달이 필요하면 거의 항상 `showModal()`을 써 주세요. 닫을 땐 `dialog.close()` 또는 폼 메서드 `dialog`로 submit하는 패턴(`<form method="dialog">`)도 표준이에요.
 references:
   - title: "MDN — <dialog>: The Dialog element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/dialog"
   - title: "MDN — HTMLDialogElement.showModal()"
-    url: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal"
+    url: "https://developer.mozilla.org/ko/docs/Web/API/HTMLDialogElement/showModal"
 tags: [ dialog, modal, a11y ]

@@ -25,7 +25,7 @@ explanation: |
   화면에 보이는 라벨과 a11y 라벨이 어긋나면 사용자가 혼란스러우니, 이미 표시되는 텍스트가 있으면 `aria-labelledby`로 그것을 그대로 가리키는 편이 자연스러워요.
 references:
   - title: "MDN — aria-label"
-    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label"
+    url: "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Attributes/aria-label"
   - title: "MDN — aria-labelledby"
-    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
+    url: "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
 tags: [ a11y, aria, labels ]

@@ -40,7 +40,7 @@ explanation: |
   연결된 라벨은 (1) 스크린 리더가 읽어 주고 (2) 라벨 클릭으로 input 활성화 — 클릭 영역도 넓어져 모바일 UX에 도움 돼요.
 references:
   - title: "MDN — <label>: The Label element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/label"
   - title: "MDN — aria-labelledby"
-    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
+    url: "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
 tags: [ a11y, forms, label, aria ]

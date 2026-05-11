@@ -24,5 +24,5 @@ references:
   - title: "The Open Graph protocol"
     url: "https://ogp.me/"
   - title: "MDN — <meta>: The metadata element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/meta"
 tags: [ meta, open-graph, seo ]

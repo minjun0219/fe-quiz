@@ -22,7 +22,7 @@ explanation: |
   - d: 메타 태그가 없으면 모바일 브라우저가 기본값(보통 980px)으로 렌더해 레이아웃이 깨져요.
 references:
   - title: "MDN — Viewport meta tag"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Viewport_meta_tag"
   - title: "web.dev — Responsive web design basics"
     url: "https://web.dev/articles/responsive-web-design-basics"
 tags: [ viewport, meta, responsive, mobile ]

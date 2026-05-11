@@ -24,7 +24,7 @@ explanation: |
   처음부터 펼쳐 두려면 `<details open>`처럼 `open` 속성을 추가하면 되고, 다른 details와 자동으로 연동되진 않아요. 같은 그룹에서 하나만 열리게 하려면 JS로 직접 제어해야 해요.
 references:
   - title: "MDN — <details>: The Details disclosure element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/details"
   - title: "MDN — <summary>: The Disclosure Summary element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/summary"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/summary"
 tags: [ details, summary, disclosure ]

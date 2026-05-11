@@ -25,7 +25,7 @@ explanation: |
   `pattern`은 `text`/`search`/`url`/`tel`/`email`/`password`에서 동작하고 `number`·`date` 등엔 적용되지 않아요. `required`는 제출 시 자동으로 검증되고 JS 제출은 `form.requestSubmit()` / `form.checkValidity()`로 같은 흐름을 따라가요.
 references:
   - title: "MDN — Client-side form validation"
-    url: "https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation"
+    url: "https://developer.mozilla.org/ko/docs/Learn/Forms/Form_validation"
   - title: "MDN — Constraint Validation API"
-    url: "https://developer.mozilla.org/en-US/docs/Web/API/Constraint_validation"
+    url: "https://developer.mozilla.org/ko/docs/Web/API/Constraint_validation"
 tags: [ forms, validation, a11y ]

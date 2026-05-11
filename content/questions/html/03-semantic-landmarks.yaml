@@ -22,7 +22,7 @@ explanation: |
   스크린 리더는 랜드마크 키로 `<main>`으로 점프할 수 있어요 — 시맨틱 태그가 곧 접근성 인프라예요.
 references:
   - title: "MDN — <main>: The Main element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/main"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/main"
   - title: "MDN — ARIA landmarks roles"
-    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles#3._landmark_roles"
+    url: "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Roles#3._landmark_roles"
 tags: [ semantics, landmarks, a11y ]

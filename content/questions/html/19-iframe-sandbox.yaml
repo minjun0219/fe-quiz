@@ -25,7 +25,7 @@ explanation: |
   제삼자 콘텐츠를 실으려면 동일 출처 권한을 사용하지 않거나 `allow-same-origin` 없이 쓰는 게 기본 원칙이에요.
 references:
   - title: "MDN — <iframe> sandbox attribute"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#sandbox"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/iframe#sandbox"
   - title: "HTML Standard — Sandboxing"
     url: "https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-sandbox"
 tags: [ iframe, sandbox, security ]

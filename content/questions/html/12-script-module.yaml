@@ -22,7 +22,7 @@ explanation: |
   `type="module"`은 실제로는 defer와 비슷하게 파싱을 막지 않고 평가 순서가 보존되며, cross-origin 모듈을 받을 땐 CORS 헤더가 필요해요. 모듈 스코프가 자동으로 `strict mode`라는 점도 잊지 마세요.
 references:
   - title: "MDN — JavaScript modules in <script>"
-    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+    url: "https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Modules"
   - title: "MDN — <script> type=module / nomodule"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#type"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/script#type"
 tags: [ script, module, defer ]

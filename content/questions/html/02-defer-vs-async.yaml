@@ -30,7 +30,7 @@ explanation: |
   - 둘 다 외부(`src`) 스크립트에만 적용. 인라인 `<script>`에는 무시돼요.
 references:
   - title: "MDN — <script>: defer / async"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/script#defer"
   - title: "HTML Standard — Script processing model"
     url: "https://html.spec.whatwg.org/multipage/scripting.html#attr-script-async"
 tags: [ scripts, defer, async, performance ]

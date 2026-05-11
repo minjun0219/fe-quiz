@@ -25,7 +25,7 @@ explanation: |
   반대로 도메인이 좁고 고정된 보기에서 하나를 고르게 하는 경우는 `<select>`가 더 적합해요. 접근성 측면에서도 datalist는 브라우저별 구현 차이가 있어 보조적 수단으로 생각하는 게 안전해요.
 references:
   - title: "MDN — <datalist>: The HTML Data List element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/datalist"
   - title: "MDN — <select>: The HTML Select element"
-    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/select"
 tags: [ form, autocomplete, datalist ]
