@@ -36,12 +36,7 @@ describe("renderFeedbackInline", () => {
   it("handles multiple inline spans on the same line", () => {
     expect(
       shape(renderFeedbackInline("`defer` 와 `async` 는 다릅니다.")),
-    ).toEqual([
-      { code: "defer" },
-      " 와 ",
-      { code: "async" },
-      " 는 다릅니다.",
-    ]);
+    ).toEqual([{ code: "defer" }, " 와 ", { code: "async" }, " 는 다릅니다."]);
   });
 
   it("treats an unclosed backtick as a literal", () => {
@@ -65,8 +60,14 @@ describe("renderFeedbackInline", () => {
 
   it("preserves whitespace-pre-line newlines outside code spans", () => {
     expect(
-      shape(renderFeedbackInline("첫 단락이에요.\n\n두 번째 단락은 `code` 포함.")),
-    ).toEqual(["첫 단락이에요.\n\n두 번째 단락은 ", { code: "code" }, " 포함."]);
+      shape(
+        renderFeedbackInline("첫 단락이에요.\n\n두 번째 단락은 `code` 포함."),
+      ),
+    ).toEqual([
+      "첫 단락이에요.\n\n두 번째 단락은 ",
+      { code: "code" },
+      " 포함.",
+    ]);
   });
 
   it("passes through ``...`` (multi-backtick runs) literally without pair-matching", () => {
