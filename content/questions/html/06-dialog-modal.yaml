@@ -23,4 +23,9 @@ explanation: |
   - `showModal()`: 백그라운드를 inert(상호작용 불가)로 만들고, `::backdrop`이 활성화되며, ESC 키로 자동 닫혀요. 시맨틱·접근성 관점에서 진짜 모달이에요.
   - `show()`: 그냥 보이게만 하고 inert·backdrop·ESC 자동 닫힘 모두 없어요 — 페이지 안 다른 요소와 자유롭게 상호작용 가능해요.
   진짜 모달이 필요하면 거의 항상 `showModal()`을 써 주세요. 닫을 땐 `dialog.close()` 또는 폼 메서드 `dialog`로 submit하는 패턴(`<form method="dialog">`)도 표준이에요.
+references:
+  - title: "MDN — <dialog>: The Dialog element"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/dialog"
+  - title: "MDN — HTMLDialogElement.showModal()"
+    url: "https://developer.mozilla.org/ko/docs/Web/API/HTMLDialogElement/showModal"
 tags: [ dialog, modal, a11y ]

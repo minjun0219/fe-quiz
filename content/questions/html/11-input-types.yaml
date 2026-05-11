@@ -18,4 +18,9 @@ explanation: |
   타입을 알려 주면 모바일 브라우저가 입력에 어울리는 가상 키보드를 띄워 줘요. `email`은 `@`/`.com` 키가 노출되고, `tel`/`number`는 숫자 패드, `url`은 `/` 키 등 입력 효율이 올라가요.
   기본 검증은 타입에 따라 달라요. `email`은 `@` 포함 같은 형식 검증, `number`는 `min`/`max`/`step`이 동작해요. 반면 `tel`은 형식이 나라마다 달라 사실상 키보드 힌트만 주고 별도 검증은 안 돼서, 정밀한 형식 검증이 필요하면 `pattern`을 같이 쓰는 게 안전해요.
   자동완성·`inputmode`·`autocomplete` 등 다른 속성과 결합하면 폼 전반의 UX가 더 좋아져요. 보안과는 직접적인 관련이 없어요 — XSS 방어는 별도 출력 인코딩이 담당해요.
+references:
+  - title: "MDN — <input>: The Input element"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/input"
+  - title: "MDN — <input> types"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/input#input_types"
 tags: [ input, mobile, ux ]

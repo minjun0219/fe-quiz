@@ -20,4 +20,9 @@ explanation: |
   - a: 너비를 1024로 고정하면 작은 화면에서 가로 스크롤이 발생해요.
   - c: `user-scalable=no`는 사용자 핀치 줌을 막아 접근성에 해롭고 대부분의 신규 페이지에서 권장하지 않아요.
   - d: 메타 태그가 없으면 모바일 브라우저가 기본값(보통 980px)으로 렌더해 레이아웃이 깨져요.
+references:
+  - title: "MDN — Viewport meta tag"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Viewport_meta_tag"
+  - title: "web.dev — Responsive web design basics"
+    url: "https://web.dev/articles/responsive-web-design-basics"
 tags: [ viewport, meta, responsive, mobile ]

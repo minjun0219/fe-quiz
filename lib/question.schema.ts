@@ -29,6 +29,18 @@ export const ChoiceSchema = z.object({
 
 export type Choice = z.infer<typeof ChoiceSchema>;
 
+export const ReferenceSchema = z.object({
+  title: z.string().min(1).max(200),
+  url: z
+    .string()
+    .url()
+    .refine((u) => u.startsWith("https://"), {
+      message: "reference url must use https://",
+    }),
+});
+
+export type Reference = z.infer<typeof ReferenceSchema>;
+
 const Base = z.object({
   id: z.string().min(1),
   category: Category,
@@ -37,6 +49,7 @@ const Base = z.object({
   code: z.string().optional(),
   choices: z.array(ChoiceSchema).min(2).max(6),
   explanation: z.string().min(1),
+  references: z.array(ReferenceSchema).min(1).max(5).optional(),
   tags: z.array(z.string()).default([]),
 });
 
@@ -84,6 +97,20 @@ export const QuestionSchema = z
       seenText.add(c.text);
     }
 
+    if (q.references) {
+      const seenUrls = new Set<string>();
+      q.references.forEach((r, i) => {
+        if (seenUrls.has(r.url)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["references", i, "url"],
+            message: `duplicate reference url "${r.url}"`,
+          });
+        }
+        seenUrls.add(r.url);
+      });
+    }
+
     const choiceIds = new Set(q.choices.map((c) => c.id));
 
     if (q.type === "single_choice") {
@@ -127,8 +154,9 @@ export const QuestionSchema = z
 export type Question = z.infer<typeof QuestionSchema>;
 
 /**
- * Client-safe view of a question. The answer + explanation are intentionally
- * omitted so the correct answer never reaches the browser bundle.
+ * Client-safe view of a question. The answer, explanation, and references
+ * are intentionally omitted so the correct answer (and any topic hints from
+ * MDN/spec links) never reaches the browser bundle before grading.
  *
  * Lives here (not in `lib/round.ts`) so client components can `import type`
  * this without crossing a `server-only` module boundary.
@@ -144,7 +172,7 @@ export type PublicChoice = Choice & {
 
 export type PublicQuestion = Omit<
   Question,
-  "answer" | "explanation" | "choices"
+  "answer" | "explanation" | "choices" | "references"
 > & {
   choices: PublicChoice[];
   question_html?: string;

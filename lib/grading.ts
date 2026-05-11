@@ -117,6 +117,7 @@ export async function gradeRound(
       is_correct,
       explanation: q.explanation,
       explanation_html: htmlBundle?.[i].explanationHtml,
+      references: q.references,
     });
   }
 

@@ -28,4 +28,11 @@ explanation: |
   표는 단순히 이차원 그리드가 아니라 "헤더-데이터" 관계를 가진 구조라, 그 관계를 마크업으로 알려 줘야 스크린리더가 셀을 읽을 때 어떤 분기·항목인지 함께 안내해 줘요.
   `<caption>`은 표 전체에 대한 짧은 제목/요약을 제공해서 사용자가 표에 진입할 때 컨텍스트를 잡게 해 주고, `scope`은 각 `<th>`가 행 헤더인지 열 헤더인지 명시해 데이터 셀 낭독 시 그 헤더가 같이 읽혀요.
   복잡한 표라면 `headers` 속성으로 셀과 헤더를 명시적으로 연결하는 패턴도 있어요.
+references:
+  - title: "MDN — <caption>: The Table Caption element"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/caption"
+  - title: "MDN — <th> scope attribute"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/th#scope"
+  - title: "W3C WAI — Tables Tutorial"
+    url: "https://www.w3.org/WAI/tutorials/tables/"
 tags: [ a11y, table, semantics ]

@@ -68,6 +68,16 @@ describe("publicView", () => {
     expect(view.id).toBe("js-1");
     expect(view.choices).toHaveLength(2);
   });
+
+  it("strips references so MDN/spec links don't leak before grading", async () => {
+    const q: Question = {
+      ...single("js-2"),
+      references: [{ title: "MDN", url: "https://developer.mozilla.org/ko/" }],
+    };
+    const view = await publicView(q);
+    // biome-ignore lint/suspicious/noExplicitAny: probe stripped fields
+    expect((view as any).references).toBeUndefined();
+  });
 });
 
 describe("pickRoundQuestions", () => {

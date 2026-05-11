@@ -20,4 +20,9 @@ answer: b
 explanation: |
   모던 빌드/레거시 빌드를 함께 배포하는 흔한 패턴이에요. ESM을 지원하는 브라우저는 `nomodule` 스크립트를 통째로 무시하고, 구형 브라우저는 `type="module"`을 인식하지 못해 그 스크립트를 무시하는 식으로 자연스럽게 폴백이 분리돼요.
   `type="module"`은 실제로는 defer와 비슷하게 파싱을 막지 않고 평가 순서가 보존되며, cross-origin 모듈을 받을 땐 CORS 헤더가 필요해요. 모듈 스코프가 자동으로 `strict mode`라는 점도 잊지 마세요.
+references:
+  - title: "MDN — JavaScript modules in <script>"
+    url: "https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Modules"
+  - title: "MDN — <script> type=module / nomodule"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/script#type"
 tags: [ script, module, defer ]

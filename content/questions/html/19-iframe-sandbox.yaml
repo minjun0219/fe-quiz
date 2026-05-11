@@ -23,4 +23,9 @@ explanation: |
   빈 `sandbox` 속성은 iframe의 모든 능력을 제한하는 최대 보수적 설정이에요. 스크립트 실행·폼 제출·팝업·동일 출처 접근·top-level 네비게이션 등이 모두 막혀요.
   `allow-scripts allow-same-origin`을 함께 두면 iframe이 서브트리에서 자신을 부모 origin으로 간주해 쿠키/로컬스토리지·DOM에 접근하면서 임의 코드를 실행할 수 있게 돼요 — 제삼자 콘텐츠를 이런 조합으로 임베딩하면 sandbox를 건 의미가 사라져요.
   제삼자 콘텐츠를 실으려면 동일 출처 권한을 사용하지 않거나 `allow-same-origin` 없이 쓰는 게 기본 원칙이에요.
+references:
+  - title: "MDN — <iframe> sandbox attribute"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/iframe#sandbox"
+  - title: "HTML Standard — Sandboxing"
+    url: "https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-sandbox"
 tags: [ iframe, sandbox, security ]

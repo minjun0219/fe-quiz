@@ -38,4 +38,9 @@ explanation: |
   - B: `<label>`이 입력을 자식으로 감싸면 암묵 연결이 돼요. 단순한 폼에 적합해요.
   - C: ARIA `aria-labelledby`는 텍스트 노드의 id를 가리켜 라벨 역할을 부여해요. label을 보일 수 없을 때나 복합 라벨이 필요할 때 써요.
   연결된 라벨은 (1) 스크린 리더가 읽어 주고 (2) 라벨 클릭으로 input 활성화 — 클릭 영역도 넓어져 모바일 UX에 도움 돼요.
+references:
+  - title: "MDN — <label>: The Label element"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/label"
+  - title: "MDN — aria-labelledby"
+    url: "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
 tags: [ a11y, forms, label, aria ]

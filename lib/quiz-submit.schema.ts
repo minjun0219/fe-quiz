@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { LEVEL_IDS } from "./levels";
-import type { Category, PublicChoice, QuestionType } from "./question.schema";
+import type {
+  Category,
+  PublicChoice,
+  QuestionType,
+  Reference,
+} from "./question.schema";
 
 /**
  * Per-question submitted answer:
@@ -87,6 +92,8 @@ export interface QuizQuestionResult {
   explanation: string;
   /** Server-rendered HTML for `explanation` with inline backtick spans. */
   explanation_html?: string;
+  /** Optional MDN / spec / web.dev links, surfaced as "관련 자료" under the explanation. */
+  references?: Reference[];
 }
 
 /** Per-category aggregate. */

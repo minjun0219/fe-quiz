@@ -23,4 +23,9 @@ answer: a
 explanation: |
   `<datalist>`는 input에 "추천 후보"를 제공하는 보조일 뿐이라 사용자가 목록에 없는 값도 그대로 적어 넣을 수 있어요. "몇 자만 입력하면 후보를 보여주고 그 외의 임의 값도 허용"하는 UX에 강점이 있어요.
   반대로 도메인이 좁고 고정된 보기에서 하나를 고르게 하는 경우는 `<select>`가 더 적합해요. 접근성 측면에서도 datalist는 브라우저별 구현 차이가 있어 보조적 수단으로 생각하는 게 안전해요.
+references:
+  - title: "MDN — <datalist>: The HTML Data List element"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/datalist"
+  - title: "MDN — <select>: The HTML Select element"
+    url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/select"
 tags: [ form, autocomplete, datalist ]

@@ -15,6 +15,7 @@ export async function publicView(q: Question): Promise<PublicQuestion> {
   const {
     answer: _answer,
     explanation: _explanation,
+    references: _references,
     choices,
     code,
     ...rest

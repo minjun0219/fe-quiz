@@ -211,3 +211,28 @@ describe("gradeRound — displayed_choice_ids reordering", () => {
     ).rejects.toBeInstanceOf(GradingError);
   });
 });
+
+describe("gradeRound — references passthrough", () => {
+  it("forwards references to per_question when present", async () => {
+    const q: Question = {
+      ...single("js-1", ["a", "b"], "a"),
+      references: [
+        { title: "MDN — closures", url: "https://developer.mozilla.org/ko/" },
+      ],
+    };
+    const r = await gradeRound(
+      { question_ids: ["js-1"], answers: ["a"] },
+      lookup([q]),
+    );
+    expect(r.per_question[0].references).toEqual(q.references);
+  });
+
+  it("leaves references undefined when not set on the question", async () => {
+    const q = single("js-1", ["a", "b"], "a");
+    const r = await gradeRound(
+      { question_ids: ["js-1"], answers: ["a"] },
+      lookup([q]),
+    );
+    expect(r.per_question[0].references).toBeUndefined();
+  });
+});
