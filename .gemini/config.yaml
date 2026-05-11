@@ -15,4 +15,4 @@ code_review:
 ignore_patterns:
   - "pnpm-lock.yaml"
   - "public/**"
-  - "supabase/migrations/**"
+  # supabase/migrations 는 RLS/권한 등 보안에 직결되므로 ignore 하지 않습니다.

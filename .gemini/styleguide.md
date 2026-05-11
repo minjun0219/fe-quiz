@@ -29,7 +29,7 @@
 
 ## 프로젝트 컨벤션
 
-- 본 저장소의 Next.js는 최신 버전을 사용합니다. 학습 데이터에 있는 구버전 API(예: pages 라우터 한정 동작, 구 `getServerSideProps` 가정 등)를 기준으로 한 지적은 피하고, 필요하면 `node_modules/next/dist/docs/` 의 가이드를 인용해 주세요. (`AGENTS.md` 참고)
+- 본 저장소는 **Next.js 16.x** (현재 `package.json` 기준 16.2.6)를 사용합니다. 학습 데이터에 있는 구버전 API(예: pages 라우터 한정 동작, 구 `getServerSideProps` 가정 등)를 기준으로 한 지적은 피해 주세요. 근거가 필요하면 [공식 Next.js 문서](https://nextjs.org/docs)를 우선 인용하고, 가능하면 보조로 `node_modules/next/dist/docs/`의 동일 항목을 참조합니다. (`AGENTS.md` 참고)
 - **정답과 해설은 서버사이드에서만 노출**되어야 합니다. 클라이언트에 내려가는 라운드/공유 데이터에 정답이 섞이는 변경이면 **HIGH severity로 강하게 경고**해 주세요. (`README.md`의 "서버사이드 채점" 원칙)
 - `lib/levels.ts` 와 같이 "단일 출처(Single Source of Truth)"로 명시된 파일은 다른 곳에 같은 정의가 중복되지 않는지 확인합니다.
 - 환경변수는 서버 전용 키(`SUPABASE_SECRET_KEY`, `ANTHROPIC_API_KEY` 등)가 클라이언트 번들로 노출되지 않는지 확인합니다.
