@@ -6,14 +6,14 @@ question: |
   모바일 Safari에서 `height: 100vh`가 풀스크린이 안 되고 일부가 가려 보이는 이유와, 가장 적절한 대체 단위는?
 choices:
   - id: a
-    text: "`vh` 단위는 모바일에서 동작하지 않으니 픽셀 단위로 직접 환산해야 해요."
+    text: "`vh` 단위는 모바일에서 동작하지 않으니 픽셀 단위로 직접 환산해야 해요"
   - id: b
-    text: iOS의 잘못된 반올림 때문이며 `100%`로 바꾸면 해결돼요.
+    text: iOS의 잘못된 반올림 때문이며 `100%`로 바꾸면 해결돼요
   - id: c
-    text: Safari가 `vh`를 disable하기 때문에 `vmin`으로 대체해야 해요.
+    text: Safari가 `vh`를 disable하기 때문에 `vmin`으로 대체해야 해요
   - id: d
     text: "`100vh`는 항상 가장 큰 viewport(주소창이 사라진 상태) 기준이라 주소창이 보일 때 화면을 넘어가 일부가 가려져요.
-      `100dvh`(dynamic viewport height)나 `100svh`(small)를 쓰면 현재 표시 가능한 영역에 맞춰져요."
+      `100dvh`(dynamic viewport height)나 `100svh`(small)를 쓰면 현재 표시 가능한 영역에 맞춰져요"
 answer: d
 explanation: |
   iOS Safari에서 `100vh`는 주소창이 숨었을 때 기준의 큰 viewport 높이로 계산돼요. 그래서 주소창이 보이는 상태엔 화면보다 큰 박스가 만들어져 하단이 가려지는 것처럼 보이는 거죠.
