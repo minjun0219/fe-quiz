@@ -18,20 +18,20 @@ code: |
   })()
 choices:
   - id: a
-    text: "`1`, `Promise { 2 }`, `3`, `done` — Promise가 풀리지 않고 객체 그대로 로깅된다"
+    text: "`1`, `Promise { 2 }`, `3`, `done` — Promise가 풀리지 않고 객체 그대로 로깅돼요"
   - id: b
-    text: "`1`, `2`, `3`, `done` — async generator의 `yield`가 Promise를 풀어 일반 값으로 흘려보내고, `for await...of`는 그 결과를 그대로 받는다"
+    text: "`1`, `2`, `3`, `done` — async generator의 `yield`가 Promise를 풀어 일반 값으로 흘려보내고, `for await...of`는 그 결과를 그대로 받아요"
   - id: c
-    text: "`1`, `3`, `2`, `done` — Promise는 마이크로태스크로 미뤄져 마지막에 처리된다"
+    text: "`1`, `3`, `2`, `done` — Promise는 마이크로태스크로 미뤄져 마지막에 처리돼요"
   - id: d
-    text: "TypeError — async generator는 Promise를 yield할 수 없다"
+    text: "TypeError — async generator는 Promise를 yield할 수 없어요"
 answer: b
 explanation: |
-  Promise를 풀어주는 주체는 `for await...of`가 아니라 **async generator의 `yield`** 야. 명세(AsyncGeneratorYield)상 yield는 `value ← Await(value)`를 먼저 수행해서, `yield Promise.resolve(2)`를 만나면 generator 안에서 Promise가 풀려 `2`가 되고, 그게 `{ value: 2, done: false }`로 감긴 Promise가 `next()` 결과로 나가.
-  `for await...of`는 그 `next()` 결과 Promise를 await해서 `{ value, done }`을 꺼내고, `value`를 그대로 루프 변수에 바인딩해 — value 자체는 추가로 await하지 않아. (`async function*`이 아닌 손으로 만든 async iterator가 Promise를 그대로 value로 내보내면 본문에선 `Promise { ... }`가 그대로 들어와.)
-  그래서 본문에는 이미 풀린 `2`가 들어오고, 출력은 `1`, `2`, `3`, `done`이 돼.
-  - a: yield 시점에 Promise가 풀려서 객체 형태 그대로 찍히지 않아.
-  - c: yield 순서 자체는 보존돼 — Promise라고 뒤로 미뤄지는 게 아니야.
-  - d: async generator는 동기 값이든 Promise든 자유롭게 yield할 수 있어.
-  HTTP 스트리밍·파일 청크 읽기처럼 "비동기로 도착하는 시퀀스"를 다룰 때 자연스럽게 쓸 수 있어.
+  Promise를 풀어주는 주체는 `for await...of`가 아니라 **async generator의 `yield`** 예요. 명세(AsyncGeneratorYield)상 yield는 `value ← Await(value)`를 먼저 수행해서, `yield Promise.resolve(2)`를 만나면 generator 안에서 Promise가 풀려 `2`가 되고, 그게 `{ value: 2, done: false }`로 감긴 Promise가 `next()` 결과로 나가요.
+  `for await...of`는 그 `next()` 결과 Promise를 await해서 `{ value, done }`을 꺼내고, `value`를 그대로 루프 변수에 바인딩해요 — value 자체는 추가로 await하지 않아요. (`async function*`이 아닌 손으로 만든 async iterator가 Promise를 그대로 value로 내보내면 본문에선 `Promise { ... }`가 그대로 들어와요.)
+  그래서 본문에는 이미 풀린 `2`가 들어오고, 출력은 `1`, `2`, `3`, `done`이 돼요.
+  - a: yield 시점에 Promise가 풀려서 객체 형태 그대로 찍히지 않아요.
+  - c: yield 순서 자체는 보존돼요 — Promise라고 뒤로 미뤄지는 게 아니에요.
+  - d: async generator는 동기 값이든 Promise든 자유롭게 yield할 수 있어요.
+  HTTP 스트리밍·파일 청크 읽기처럼 "비동기로 도착하는 시퀀스"를 다룰 때 자연스럽게 쓸 수 있어요.
 tags: [ async-iterator, generator, for-await ]

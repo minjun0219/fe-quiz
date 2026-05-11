@@ -26,9 +26,9 @@ choices:
     text: A, F, D, C, E, B
 answer: b
 explanation: |
-  동기 코드부터: `A` → `f()` 호출 → `D` (await 만나서 일시 중단) → `F`. 여기까지 동기 한 사이클.
-  마이크로태스크 큐엔 먼저 등록된 `Promise.resolve().then(C)`가 앞에 있고, 그 뒤에 `await` 다음에 이어지는 `E`가 들어가.
+  동기 코드부터: `A` → `f()` 호출 → `D` (await 만나서 일시 중단) → `F`. 여기까지 동기 한 사이클이에요.
+  마이크로태스크 큐엔 먼저 등록된 `Promise.resolve().then(C)`가 앞에 있고, 그 뒤에 `await` 다음에 이어지는 `E`가 들어가요.
   → 마이크로태스크 처리: `C` → `E`.
-  매크로태스크인 `setTimeout(B)`는 마이크로태스크 큐가 다 비워진 다음에야 실행 → `B`.
+  매크로태스크인 `setTimeout(B)`는 마이크로태스크 큐가 다 비워진 다음에야 실행돼서 → `B`.
   최종: `A, D, F, C, E, B`.
 tags: [ promise, async, await, event-loop, microtask ]

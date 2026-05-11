@@ -20,6 +20,6 @@ choices:
     text: 1, 3, 4, 2
 answer: b
 explanation: |
-  동기 코드(1, 4)가 먼저 → 마이크로태스크(`Promise.then`의 3) → 매크로태스크(`setTimeout`의 2) 순서로 실행돼.
-  마이크로태스크 큐는 매크로태스크 하나 처리 사이마다 전부 비워지기 때문에, `setTimeout`보다 `Promise.then`이 항상 먼저 도착해.
+  동기 코드(1, 4)가 먼저 → 마이크로태스크(`Promise.then`의 3) → 매크로태스크(`setTimeout`의 2) 순서로 실행돼요.
+  마이크로태스크 큐는 매크로태스크 하나 처리 사이마다 전부 비워지기 때문에, `setTimeout`보다 `Promise.then`이 항상 먼저 도착해요.
 tags: [ event-loop, async, microtask ]
