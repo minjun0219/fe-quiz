@@ -26,13 +26,12 @@ export function CodeBlock({
     return null;
   }
 
-  // 박스(패딩 포함)는 한 덩어리, 스크롤은 박스 바깥(중간 컨테이너)에서 발생.
-  // - wrap 모드: 박스가 부모 너비를 채우고 긴 줄은 줄바꿈
-  // - scroll 모드: 박스가 코드 내재 너비(w-max, 단 부모보다 작지는 않게)로 커지고,
-  //   부모(middle)에 가로 스크롤이 생겨 박스 전체가 좌우로 이동. 스크롤바는 박스 아래.
-  const boxClasses = wrap
-    ? "w-full whitespace-pre-wrap break-words [&_pre]:whitespace-pre-wrap [&_pre]:break-words"
-    : "w-max min-w-full whitespace-pre [&_pre]:whitespace-pre";
+  // 코드를 감싸는 시각적 박스(rounded + ring + bg + padding)와 스크롤이 같은
+  // 컨테이너에서 발생. 스크롤바는 박스의 둥근 경계 안 하단에 들어와 한 덩어리로 보임.
+  // 토글 버튼은 스크롤되지 않는 외곽 relative 래퍼에 두어 위치 고정.
+  const modeClasses = wrap
+    ? "whitespace-pre-wrap break-words [&_pre]:whitespace-pre-wrap [&_pre]:break-words"
+    : "overflow-x-auto whitespace-pre [&_pre]:whitespace-pre";
 
   return (
     <div className={`relative ${className}`}>
@@ -83,22 +82,20 @@ export function CodeBlock({
           </svg>
         )}
       </button>
-      <div className={wrap ? "" : "overflow-x-auto"}>
-        <div
-          className={`bg-zinc-900 font-mono leading-relaxed text-zinc-100 ring-1 ring-inset ring-white/5 ${SIZE_CLASSES[size]} ${boxClasses}`}
-        >
-          {codeHtml ? (
-            <div
-              className="quiz-code-block pr-8"
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
-              dangerouslySetInnerHTML={{ __html: codeHtml }}
-            />
-          ) : (
-            <pre className="pr-8">
-              <code>{code}</code>
-            </pre>
-          )}
-        </div>
+      <div
+        className={`bg-zinc-900 font-mono leading-relaxed text-zinc-100 ring-1 ring-inset ring-white/5 ${SIZE_CLASSES[size]} ${modeClasses}`}
+      >
+        {codeHtml ? (
+          <div
+            className="quiz-code-block pr-8"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: `highlightCode` output (HTML-escaped <pre><code>) from our own YAML seed; no user input.
+            dangerouslySetInnerHTML={{ __html: codeHtml }}
+          />
+        ) : (
+          <pre className="pr-8">
+            <code>{code}</code>
+          </pre>
+        )}
       </div>
     </div>
   );
