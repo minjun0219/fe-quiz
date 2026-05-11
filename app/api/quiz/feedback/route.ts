@@ -81,9 +81,10 @@ export async function POST(request: Request): Promise<Response> {
   // off the response body and appends them to the UI as they arrive.
   const sdkStream = anthropic.messages.stream({
     model: "claude-haiku-4-5",
-    // 4-6 Korean sentences typically run 200-400 tokens; 512 is a tight
-    // safety cap so a misbehaving generation can't blow up latency or cost.
-    max_tokens: 512,
+    // 5-8 Korean sentences across 2-3 단락 typically run 400-700 tokens;
+    // 1024 is a safety cap so a misbehaving generation can't blow up latency
+    // or cost. Stays comfortably under the 2000-char share-feedback cap.
+    max_tokens: 1024,
     system: FEEDBACK_SYSTEM_PROMPT,
     messages: [{ role: "user", content: userPrompt }],
   });
