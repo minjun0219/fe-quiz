@@ -1,0 +1,21 @@
+id: css-021
+category: css
+difficulty: easy
+type: single_choice
+question: |
+  Reset CSS와 Normalize CSS의 차이로 가장 알맞은 것은?
+choices:
+  - id: a
+    text: "Reset CSS는 브라우저 기본 스타일을 가능한 한 제거하고, Normalize CSS는 유용한 기본값은 유지하면서 브라우저 간 차이를 보정한다"
+  - id: b
+    text: "Reset CSS는 JavaScript 번들 크기를 줄이고, Normalize CSS는 이미지 용량을 줄인다"
+  - id: c
+    text: "Reset CSS는 접근성 속성을 자동으로 추가하고, Normalize CSS는 HTML 구조를 시맨틱하게 바꾼다"
+  - id: d
+    text: "둘은 완전히 같은 파일이며 이름만 다르다"
+answer: a
+explanation: |
+  Reset CSS는 요소의 margin, padding, heading 크기 같은 브라우저 기본 스타일을 넓게 초기화해서 거의 빈 캔버스에서 디자인을 시작하게 해. 디자인 시스템처럼 모든 요소의 스타일을 직접 통제하고 싶을 때 예측 가능성이 높지만, 기본 스타일을 다시 세심하게 정의해야 하는 부담이 있다.
+  Normalize CSS는 기본 스타일을 전부 없애기보다 브라우저마다 다르게 보이는 부분을 고치고, 폼·타이포그래피 같은 유용한 기본 동작은 최대한 유지하려는 접근이야. 그래서 빠르게 제품을 만들거나 기본 HTML 스타일을 일부 활용하는 프로젝트에서는 Normalize가 더 실용적일 수 있다.
+  오답 b/c는 CSS 초기화 도구의 역할을 번들 최적화나 HTML 변환과 혼동한 설명이고, d도 틀렸어. 둘 다 브라우저 기본 스타일 차이를 다루지만, “완전히 지우기”와 “차이를 보정하기”라는 전략이 다르다.
+tags: [ reset-css, normalize-css, browser-defaults ]
