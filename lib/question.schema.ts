@@ -97,6 +97,20 @@ export const QuestionSchema = z
       seenText.add(c.text);
     }
 
+    if (q.references) {
+      const seenUrls = new Set<string>();
+      q.references.forEach((r, i) => {
+        if (seenUrls.has(r.url)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["references", i, "url"],
+            message: `duplicate reference url "${r.url}"`,
+          });
+        }
+        seenUrls.add(r.url);
+      });
+    }
+
     const choiceIds = new Set(q.choices.map((c) => c.id));
 
     if (q.type === "single_choice") {
