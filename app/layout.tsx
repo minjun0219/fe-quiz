@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | FE 퀴즈",
   },
   description:
-    "10문제 5분. 가볍게 풀면 누룽지(🍘)가 한마디 보태주는 한국어 프론트엔드 미니퀴즈.",
+    "10문제 5분. 가볍게 풀면 누룽지(🍘)가 한마디 보태주는 프론트엔드 미니퀴즈.",
   openGraph: {
     title: "FE 퀴즈",
     description: "누룽지(🍘)가 퀴즈 내고 한마디 보태주는 프론트엔드 미니게임",
