@@ -13,16 +13,16 @@ code: |
   const a2: A = { x: undefined }   // (3)
 choices:
   - id: a
-    text: 아무 줄도 에러가 나지 않는다
+    text: 아무 줄도 에러가 나지 않아요
   - id: b
-    text: (2)만 에러 — `B`는 `x` 키가 반드시 존재해야 하므로 `{}`에선 키 누락으로 오류
+    text: (2)만 에러 — `B`는 `x` 키가 반드시 존재해야 하므로 `{}`에선 키 누락으로 오류가 나요
   - id: c
-    text: (1)과 (2) 둘 다 에러
+    text: (1)과 (2) 둘 다 에러가 나요
   - id: d
-    text: (3)만 에러
+    text: (3)만 에러가 나요
 answer: b
 explanation: |
-  optional `?`는 "키 자체가 없어도 OK"를 의미해. 그래서 (1)의 `{}`은 `A`에 합치.
-  반면 `{ x: number | undefined }`는 "키는 반드시 있되 그 값이 number 또는 undefined"라 키 자체는 필수여서 (2)의 `{}`는 에러.
-  (3) `{ x: undefined }`는 (`exactOptionalPropertyTypes` 플래그 OFF 기준) `A`에 허용돼. 해당 플래그를 켜면 (3)도 에러가 나서 "undefined 대입"과 "키 없음"을 엄격히 구분해.
+  optional `?`는 "키 자체가 없어도 OK"를 의미해요. 그래서 (1)의 `{}`은 `A`에 합치해요.
+  반면 `{ x: number | undefined }`는 "키는 반드시 있되 그 값이 number 또는 undefined"라 키 자체는 필수여서 (2)의 `{}`는 에러예요.
+  (3) `{ x: undefined }`는 (`exactOptionalPropertyTypes` 플래그 OFF 기준) `A`에 허용돼요. 해당 플래그를 켜면 (3)도 에러가 나서 "undefined 대입"과 "키 없음"을 엄격히 구분해요.
 tags: [ types, optional, undefined ]

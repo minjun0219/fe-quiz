@@ -19,6 +19,6 @@ choices:
     text: "`string`"
 answer: c
 explanation: |
-  템플릿 리터럴 타입은 리터럴 타입 조각을 이어 붙여 새 리터럴 유니온을 만들어. `Capitalize<E>`는 유니온 구성원 각각을 대문자로 바꿔 `'Click' | 'Hover'`로 자라나고, `"on"`과 결합해 `'onClick' | 'onHover'`가 돼.
-  이벤트 핸들러/CSS 프로퍼티명 같은 패턴의 타입을 자동으로 만들 때 유용. `Uppercase`, `Lowercase`, `Uncapitalize`도 함께 기억해 두면 좋아.
+  템플릿 리터럴 타입은 리터럴 타입 조각을 이어 붙여 새 리터럴 유니온을 만들어 줘요. `Capitalize<E>`는 유니온 구성원 각각을 대문자로 바꿔 `'Click' | 'Hover'`로 자라나고, `"on"`과 결합해서 `'onClick' | 'onHover'`가 돼요.
+  이벤트 핸들러/CSS 프로퍼티명 같은 패턴의 타입을 자동으로 만들 때 유용해요. `Uppercase`, `Lowercase`, `Uncapitalize`도 함께 기억해 두면 좋아요.
 tags: [ template-literal-type, capitalize ]

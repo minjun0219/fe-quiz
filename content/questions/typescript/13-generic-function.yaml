@@ -23,9 +23,9 @@ choices:
     text: "`number[]`, `string[]`, `boolean[]`"
 answer: b
 explanation: |
-  제네릭 `T`는 인자 리터럴의 원소 타입으로 구체화돼.
-  - (1) `[1, 2, 3]` → `T = number`, 반환 `number | undefined`.
-  - (2) `['a', 'b']` → `T = string`.
-  - (3) `<boolean>`으로 명시적 구체화 → `T = boolean`.
-  제네릭 함수는 "호출 시점에서만 속성이 결정되는 함수"라 다양한 타입을 하나의 구현으로 재사용할 수 있게 해 줘.
+  제네릭 `T`는 인자 리터럴의 원소 타입으로 구체화돼요.
+  - (1) `[1, 2, 3]` → `T = number`, 반환은 `number | undefined`예요.
+  - (2) `['a', 'b']` → `T = string`이에요.
+  - (3) `<boolean>`으로 명시적 구체화 → `T = boolean`이에요.
+  제네릭 함수는 "호출 시점에서만 속성이 결정되는 함수"라, 다양한 타입을 하나의 구현으로 재사용할 수 있게 해 줘요.
 tags: [ generics, inference ]

@@ -23,8 +23,8 @@ choices:
     text: "`never`"
 answer: a
 explanation: |
-  `infer U`는 조건부 타입 안에서 "여기에 들어가는 타입을 추론해서 `U`라는 이름으로 잡아줘"라는 의미야.
-  `T extends (...args: any[]) => infer U` 패턴은 함수 타입의 **반환 타입**을 추출 — 표준 `ReturnType<T>`가 정확히 이렇게 구현돼 있어.
-  `getUser`는 `{ id: number; name: string }`을 반환하니 `R`은 그 객체 타입.
-  매개변수 타입이 필요하면 `T extends (...args: infer P) => any ? P : never` 형태로 같은 트릭을 써.
+  `infer U`는 조건부 타입 안에서 "여기에 들어가는 타입을 추론해서 `U`라는 이름으로 잡아줘"라는 의미예요.
+  `T extends (...args: any[]) => infer U` 패턴은 함수 타입의 **반환 타입**을 추출해요 — 표준 `ReturnType<T>`가 정확히 이렇게 구현돼 있어요.
+  `getUser`는 `{ id: number; name: string }`을 반환하니 `R`은 그 객체 타입이 돼요.
+  매개변수 타입이 필요하면 `T extends (...args: infer P) => any ? P : never` 형태로 같은 트릭을 써요.
 tags: [ types, conditional-types, infer, return-type ]
