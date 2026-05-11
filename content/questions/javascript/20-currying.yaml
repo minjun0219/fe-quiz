@@ -3,7 +3,7 @@ category: javascript
 difficulty: hard
 type: single_choice
 question: |
-  다음 `curry` 구현으로 감싼 `add3`을 호출했을 때 콘솔 출력 순서는?
+  다음 `curry` 구현으로 감싼 `add3`을 호출했을 때, 각 `console.log` 라인의 **출력값**을 위에서부터 차례대로 나열한 것은?
 code: |
   const curry = (fn) =>
     function curried(...args) {

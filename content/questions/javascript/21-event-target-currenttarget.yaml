@@ -3,7 +3,7 @@ category: javascript
 difficulty: medium
 type: single_choice
 question: |
-  아래 코드에서 버튼을 클릭했을 때 `target`과 `currentTarget`으로 가장 알맞은 것은?
+  아래 코드에서 사용자가 `#save` 버튼을 클릭했을 때, `event.target.id`와 `event.currentTarget.id`로 찍히는 값은?
 code: |
   const menu = document.querySelector('#menu')
 
