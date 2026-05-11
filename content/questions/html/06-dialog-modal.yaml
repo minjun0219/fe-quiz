@@ -7,20 +7,20 @@ question: |
 choices:
   - id: a
     text: |
-      `showModal()`은 다이얼로그 외부와의 상호작용을 차단(inert)해 모달처럼 동작
+      `showModal()`은 다이얼로그 외부와의 상호작용을 차단(inert)해 모달처럼 동작해요
   - id: b
     text: |
-      `showModal()`은 `::backdrop` 가상 요소가 활성화되지만, `show()`는 활성화되지 않음
+      `showModal()`은 `::backdrop` 가상 요소가 활성화되지만, `show()`는 활성화되지 않아요
   - id: c
     text: |
-      `showModal()`로 연 다이얼로그는 ESC 키로 닫을 수 있다
+      `showModal()`로 연 다이얼로그는 ESC 키로 닫을 수 있어요
   - id: d
     text: |
-      `show()`로 열어도 페이지 스크롤이 잠기고 ESC로 닫을 수 있다
+      `show()`로 열어도 페이지 스크롤이 잠기고 ESC로 닫을 수 있어요
 answer: d
 explanation: |
-  d가 틀려 — `show()`는 다이얼로그를 **모달이 아니게** 띄우는 메서드야.
-  - `showModal()`: 백그라운드를 inert(상호작용 불가)로 만들고, `::backdrop`이 활성화되며, ESC 키로 자동 닫힘. 시맨틱·접근성 관점에서 진짜 모달.
-  - `show()`: 그냥 보이게만 하고 inert·backdrop·ESC 자동 닫힘 모두 없음 — 페이지 안 다른 요소와 자유롭게 상호작용 가능.
-  진짜 모달이 필요하면 거의 항상 `showModal()`을 써. 닫을 땐 `dialog.close()` 또는 폼 메서드 `dialog`로 submit하는 패턴(`<form method="dialog">`)도 표준이야.
+  d가 틀려요 — `show()`는 다이얼로그를 **모달이 아니게** 띄우는 메서드예요.
+  - `showModal()`: 백그라운드를 inert(상호작용 불가)로 만들고, `::backdrop`이 활성화되며, ESC 키로 자동 닫혀요. 시맨틱·접근성 관점에서 진짜 모달이에요.
+  - `show()`: 그냥 보이게만 하고 inert·backdrop·ESC 자동 닫힘 모두 없어요 — 페이지 안 다른 요소와 자유롭게 상호작용 가능해요.
+  진짜 모달이 필요하면 거의 항상 `showModal()`을 써 주세요. 닫을 땐 `dialog.close()` 또는 폼 메서드 `dialog`로 submit하는 패턴(`<form method="dialog">`)도 표준이에요.
 tags: [ dialog, modal, a11y ]

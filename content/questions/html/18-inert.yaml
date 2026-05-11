@@ -6,16 +6,16 @@ question: |
   HTML5의 `inert` 속성을 모달 외부 영역에 적용하는 이유로 가장 정확한 것은?
 choices:
   - id: a
-    text: "그 영역이 시각적으로 숨겨져 보이지 않게 된다 (`display: none`과 같음)"
+    text: "그 영역이 시각적으로 숨겨져 보이지 않게 돼요 (`display: none`과 같음)"
   - id: b
-    text: 클릭/포커스/탭 이동/스크린리더 탐색 등 모든 인터랙션이 차단돼 모달 외부와의 상호작용을 막는다. JS로 일일이 `tabindex="-1"`이나 `aria-hidden`을 다는 것보다 안전하다
+    text: 클릭/포커스/탭 이동/스크린리더 탐색 등 모든 인터랙션이 차단돼 모달 외부와의 상호작용을 막아요. JS로 일일이 `tabindex="-1"`이나 `aria-hidden`을 다는 것보다 안전해요
   - id: c
-    text: 그 영역의 모든 자식 요소가 자동으로 `disabled`된 폼처럼 회색으로 변한다
+    text: 그 영역의 모든 자식 요소가 자동으로 `disabled`된 폼처럼 회색으로 변해요
   - id: d
-    text: "`inert`는 deprecated이며 대신 `tabindex=\"-1\"`을 써야 한다"
+    text: "`inert`는 deprecated이며 대신 `tabindex=\"-1\"`을 써야 해요"
 answer: b
 explanation: |
-  `inert` 속성이 달린 서브트리는 포커스 타겟이 아니고 포인터 이벤트가 무시되며 접근성 트리에서도 제외돼. 모달이 떠 있는 동안 배경 영역을 "완전히 비활성화"하는 데 가장 간단하고 표준적인 방법.
-  과거에는 `aria-hidden` + 모든 포커스 가능 요소에 `tabindex="-1"` + JS 포커스 트랩을 조합해야 했는데, 누락하기 쉬웠어. 이젠 `inert` 한 줄로 동등 효과를 보장 받을 수 있고 Chrome/Safari/Firefox 모두 안정 지원해.
-  `inert`는 시각적으론 표시되지만 이벤트·a11y에서 제외되므로 CSS로 흐릿하게 처리하면 의도가 명확해져.
+  `inert` 속성이 달린 서브트리는 포커스 타겟이 아니고 포인터 이벤트가 무시되며 접근성 트리에서도 제외돼요. 모달이 떠 있는 동안 배경 영역을 "완전히 비활성화"하는 데 가장 간단하고 표준적인 방법이에요.
+  과거에는 `aria-hidden` + 모든 포커스 가능 요소에 `tabindex="-1"` + JS 포커스 트랩을 조합해야 했는데, 누락하기 쉬웠어요. 이젠 `inert` 한 줄로 동등 효과를 보장받을 수 있고 Chrome/Safari/Firefox 모두 안정 지원해요.
+  `inert`는 시각적으론 표시되지만 이벤트·a11y에서 제외되므로 CSS로 흐릿하게 처리하면 의도가 명확해져요.
 tags: [ a11y, modal, focus-management ]
