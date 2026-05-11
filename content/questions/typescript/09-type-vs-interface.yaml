@@ -19,4 +19,9 @@ explanation: |
   - `interface`는 같은 이름으로 재선언하면 멤버가 병합될 수 있어요(declaration merging). 라이브러리를 확장할 때 유용해요.
   - `type`은 유니온(`A | B`), 인터섹션(`A & B`), 기본 타입 별칭(`type Id = string`), 튜플, 조건부·매핑 타입 등 `interface`가 못 다루는 영역까지 표현할 수 있어요.
   둘 다 컴파일 후 사라지니 런타임 조건은 구분 근거가 아니에요. "공개 API·클래스 계약엔 interface, 나머지엔 type"이 대체적인 관습이에요.
+references:
+  - title: "TypeScript Handbook — Everyday Types: Differences Between Type Aliases and Interfaces"
+    url: "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces"
+  - title: "TypeScript Handbook — Object Types"
+    url: "https://www.typescriptlang.org/docs/handbook/2/objects.html"
 tags: [ types, interface, type-alias ]

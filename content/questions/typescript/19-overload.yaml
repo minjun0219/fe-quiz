@@ -27,4 +27,9 @@ answer: b
 explanation: |
   호출부가 참조하는 건 **외부에 공개된 오버로드 시그니처**이지 구현 시그니처가 아니에요. 공개된 건 `(string) => string`과 `(number) => string` 둘뿐이라 boolean 인자 호출은 매칭되는 시그니처가 없어서 에러가 나요.
   구현 시그니처의 union은 함수 내부에서만 보이는 "어떤 호출도 받을 수 있도록 넉넉하게 잡은" 타입이에요. 대부분의 케이스는 오버로드 대신 union을 인자로 받는 단일 시그니처가 더 간단하고 추론도 좋아요.
+references:
+  - title: "TypeScript Handbook — More on Functions: Function Overloads"
+    url: "https://www.typescriptlang.org/docs/handbook/2/functions.html#function-overloads"
+  - title: "TypeScript Handbook — More on Functions: Writing Good Overloads"
+    url: "https://www.typescriptlang.org/docs/handbook/2/functions.html#writing-good-overloads"
 tags: [ overload, signature ]

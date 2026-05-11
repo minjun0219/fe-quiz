@@ -22,4 +22,9 @@ explanation: |
   `User['id']`처럼 인덱스 액세스 타입과 결합하면 "특정 키의 값 타입"을 꺼낼 수 있고, 이걸 매핑드 타입(`{ [K in keyof T]: ... }`)에서 자주 활용해요.
   - b는 키의 **값** 타입 union이에요 — 그건 `User[keyof User]`로 만들어요.
   - d는 인덱스 시그니처가 `string`인 객체에 대해서만 그렇게 좁혀져요.
+references:
+  - title: "TypeScript Handbook — Keyof Type Operator"
+    url: "https://www.typescriptlang.org/docs/handbook/2/keyof-types.html"
+  - title: "TypeScript Handbook — Indexed Access Types"
+    url: "https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html"
 tags: [ types, keyof, indexed-access ]

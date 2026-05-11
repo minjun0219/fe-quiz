@@ -25,4 +25,9 @@ explanation: |
   optional `?`는 "키 자체가 없어도 OK"를 의미해요. 그래서 (1)의 `{}`은 `A`에 할당할 수 있어요.
   반면 `{ x: number | undefined }`는 "키는 반드시 있되 그 값이 number 또는 undefined"라 키 자체는 필수여서 (2)의 `{}`는 에러예요.
   (3) `{ x: undefined }`는 (`exactOptionalPropertyTypes` 플래그 OFF 기준) `A`에 허용돼요. 해당 플래그를 켜면 (3)도 에러가 나서 "undefined 대입"과 "키 없음"을 엄격히 구분해요.
+references:
+  - title: "TypeScript Handbook — Object Types: Optional Properties"
+    url: "https://www.typescriptlang.org/docs/handbook/2/objects.html#property-modifiers"
+  - title: "TSConfig — exactOptionalPropertyTypes"
+    url: "https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes"
 tags: [ types, optional, undefined ]

@@ -30,4 +30,9 @@ explanation: |
   - `b` — 어노테이션·`satisfies` 모두 없으면 객체 리터럴의 가변 프로퍼티는 `string`으로 widen돼요. `Config` 모양 검사도 빠져서 오타도 못 잡아요.
   - `c ... satisfies Config` — `satisfies`는 (1) `Config` 모양을 검증하면서 (2) 결과 타입은 추론된 더 좁은 형태를 유지해요. `theme`의 contextual 타입이 `Theme` union이라, 실제 값 `'light'`가 그 안에서 가장 좁은 매칭(`'light'`)으로 추론돼요.
   핵심은 이거예요. `satisfies`가 "리터럴 좁히기"를 만들어주는 건 **값 타입이 union**일 때(`'light' | 'dark'`, `string | RGB` 등)예요. 단일 `string`처럼 좁힐 여지가 없는 경우엔 `: T`와 차이가 없어요. TS 4.9+ 기능이에요.
+references:
+  - title: "TypeScript 4.9 Release Notes — The satisfies Operator"
+    url: "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#the-satisfies-operator"
+  - title: "TypeScript Handbook — Everyday Types: Literal Types"
+    url: "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
 tags: [ types, satisfies, literal-types, contextual-typing, ts49 ]

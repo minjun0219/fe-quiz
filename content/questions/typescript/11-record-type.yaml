@@ -26,4 +26,9 @@ explanation: |
   `Record<K, V>`는 "`K`의 모든 매칭 키에 대해 `V` 값을 가진 객체"의 단축 표기라, `Theme`가 유니온 리터럴이면 그 안의 모든 값이 키로 필수가 돼요.
   키를 부분적으로만 원하면 `Partial<Record<Theme, V>>`처럼 따로 감싸야 해요. `Record<string, V>`처럼 K가 `string`이면 인덱스 시그니처와 유사한 의미예요.
   업무에선 enum 같은 고정 키 세트에 일괄적인 값을 매핑할 때 유용하고, "누락 없는 매핑"을 컴파일 타임에 강제해 줘요.
+references:
+  - title: "TypeScript Handbook — Utility Types: Record<Keys, Type>"
+    url: "https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type"
+  - title: "TypeScript Handbook — Utility Types: Partial<Type>"
+    url: "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype"
 tags: [ utility-types, record, mapping ]

@@ -25,4 +25,9 @@ explanation: |
   `Pick<T, K>`는 `T`에서 키 `K`만 골라낸 새 타입을 만들어요. 선택적(`?`) 여부와 값 타입은 원본 그대로 유지돼요.
   - b는 `Partial<Pick<User, 'id' | 'name'>>` 같은 추가 변환이 들어가야 나오는 형태예요.
   - c는 `Omit<User, 'id' | 'name'>` — 정반대예요. `Pick`과 `Omit`은 짝이지만 결과가 서로 보완 관계라는 점, 헷갈리지 않게 주의해 주세요.
+references:
+  - title: "TypeScript Handbook — Utility Types: Pick"
+    url: "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys"
+  - title: "TypeScript Handbook — Utility Types: Omit"
+    url: "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys"
 tags: [ types, utility-types, pick, omit ]

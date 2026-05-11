@@ -33,4 +33,9 @@ explanation: |
   동작은 이래요. switch가 모든 `kind`를 다뤄 주면 default 위치에서 `shape`의 좁혀진 타입이 `never`가 돼서 `never`에 대입 OK예요.
   나중에 `Shape`에 `'triangle'`이 추가되면 default 위치에서의 타입이 `{ kind: 'triangle'; … }`가 되고, 그 타입은 `never`에 대입되지 않아 컴파일 에러를 터뜨려요. 다시 말해 "완전성(exhaustiveness)에 의존하는 다른 코드도 안전하게 같이 갱신될 수 있게" 해 주는 패턴이에요.
   `never`는 "도달 불가능"이라는 타입일 뿐 런타임 throw와는 관련이 없고(b 틀려요), 키워드도 아니에요(c 틀려요).
+references:
+  - title: "TypeScript Handbook — Narrowing: Exhaustiveness checking"
+    url: "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking"
+  - title: "TypeScript Handbook — Narrowing: Discriminated unions"
+    url: "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions"
 tags: [ never, exhaustiveness, discriminated-union ]
