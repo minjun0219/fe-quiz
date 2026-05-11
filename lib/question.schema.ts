@@ -49,7 +49,7 @@ const Base = z.object({
   code: z.string().optional(),
   choices: z.array(ChoiceSchema).min(2).max(6),
   explanation: z.string().min(1),
-  references: z.array(ReferenceSchema).max(5).optional(),
+  references: z.array(ReferenceSchema).min(1).max(5).optional(),
   tags: z.array(z.string()).default([]),
 });
 
