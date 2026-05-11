@@ -12,20 +12,20 @@ code: |
 choices:
   - id: a
     text: |
-      defer/async 모두 다운로드는 비동기 + 실행 순서는 문서상 등장 순서로 보장된다
+      defer/async 모두 다운로드는 비동기 + 실행 순서는 문서상 등장 순서로 보장돼요
   - id: b
     text: |
       defer는 다운로드 비동기 + 실행은 DOMContentLoaded 직전에 등장 순서대로,
-      async는 다운로드 비동기 + 다운로드가 끝나는 즉시 실행(=실행 순서 보장 안 됨)
+      async는 다운로드 비동기 + 다운로드가 끝나는 즉시 실행돼요(=실행 순서 보장 안 됨)
   - id: c
     text: |
-      defer는 동기 다운로드, async는 비동기 다운로드 — 둘 다 등장 순서대로 실행
+      defer는 동기 다운로드, async는 비동기 다운로드 — 둘 다 등장 순서대로 실행돼요
   - id: d
     text: |
-      defer는 head에서만 동작하고, async는 body 끝에서만 동작
+      defer는 head에서만 동작하고, async는 body 끝에서만 동작해요
 answer: b
 explanation: |
   - `defer`: HTML 파싱과 병렬로 다운로드, 실행은 **문서 등장 순서**로 DOMContentLoaded 직전에 일괄. DOM 준비가 보장되니 DOM에 의존하는 초기화에 적합.
   - `async`: 다운로드 병렬 + 끝나는 대로 즉시 실행 → 등장 순서·DOM 상태 보장 안 됨. 독립적인 분석 스크립트(예: 애널리틱스)처럼 다른 스크립트와 의존성이 없을 때 적합.
-  - 둘 다 외부(`src`) 스크립트에만 적용. 인라인 `<script>`에는 무시돼.
+  - 둘 다 외부(`src`) 스크립트에만 적용. 인라인 `<script>`에는 무시돼요.
 tags: [ scripts, defer, async, performance ]

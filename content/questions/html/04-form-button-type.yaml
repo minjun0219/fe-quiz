@@ -3,7 +3,7 @@ category: html
 difficulty: medium
 type: single_choice
 question: |
-  사용자가 "취소" 버튼을 클릭하면 어떻게 동작해?
+  사용자가 "취소" 버튼을 클릭하면 어떻게 동작할까요?
 code: |
   <form action="/save" method="post">
     <input name="title" />
@@ -13,20 +13,20 @@ code: |
 choices:
   - id: a
     text: |
-      closeModal()만 실행되고 폼은 전송되지 않음
+      closeModal()만 실행되고 폼은 전송되지 않아요
   - id: b
     text: |
-      closeModal()이 실행된 뒤, 폼이 /save로 POST 전송됨
+      closeModal()이 실행된 뒤, 폼이 /save로 POST 전송돼요
   - id: c
     text: |
-      closeModal()이 무시되고 폼만 전송됨
+      closeModal()이 무시되고 폼만 전송돼요
   - id: d
     text: |
-      "취소"는 type 미지정이라 아무 동작도 안 함
+      "취소"는 type 미지정이라 아무 동작도 안 해요
 answer: b
 explanation: |
-  `<form>` 안의 `<button>`은 **`type` 속성을 생략하면 기본값이 `submit`** 이야.
-  그래서 "취소" 버튼도 onclick으로 closeModal() 실행 후, 기본 동작인 폼 전송이 그대로 일어나 `/save`로 POST가 날아가.
-  의도한 대로 닫기만 하려면 `<button type="button" onclick="closeModal()">취소</button>`로 명시하거나, 핸들러에서 `event.preventDefault()`를 호출해.
-  실수로 폼이 전송되는 흔한 버그 — 폼 안의 모든 비-submit 버튼에는 `type="button"`을 붙이는 습관이 안전해.
+  `<form>` 안의 `<button>`은 **`type` 속성을 생략하면 기본값이 `submit`** 이에요.
+  그래서 "취소" 버튼도 onclick으로 closeModal() 실행 후, 기본 동작인 폼 전송이 그대로 일어나 `/save`로 POST가 날아가요.
+  의도한 대로 닫기만 하려면 `<button type="button" onclick="closeModal()">취소</button>`로 명시하거나, 핸들러에서 `event.preventDefault()`를 호출해요.
+  실수로 폼이 전송되는 흔한 버그예요 — 폼 안의 모든 비-submit 버튼에는 `type="button"`을 붙이는 습관이 안전해요.
 tags: [ forms, button, submit, gotcha ]
