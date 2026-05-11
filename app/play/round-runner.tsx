@@ -160,7 +160,15 @@ export default function RoundRunner({ questions, level }: Props) {
     return selected === choiceId;
   }
 
+  function scrollToTop() {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  }
+
   function nextStep() {
+    scrollToTop();
     if (isLast) {
       submit();
       return;
