@@ -15,6 +15,6 @@ choices:
     text: DOM, CSSOM, VDOM
 answer: a
 explanation: |
-  Core Web Vitals는 사용자 경험에 직접 연결되는 대표 성능 지표 묶음이에요. LCP는 주요 콘텐츠가 얼마나 빨리 보이는지, INP는 클릭·입력 같은 상호작용에 페이지가 얼마나 빨리 반응하는지, CLS는 예상치 못한 레이아웃 이동이 얼마나 적은지를 봅니다.
+  Core Web Vitals는 사용자 경험에 직접 연결되는 대표 성능 지표 묶음이에요. LCP는 주요 콘텐츠가 얼마나 빨리 보이는지, INP는 클릭·입력 같은 상호작용에 페이지가 얼마나 빨리 반응하는지, CLS는 예상치 못한 레이아웃 이동이 얼마나 적은지를 봐요.
   TTFB, FPS, CPU 사용량도 성능 분석에서 중요하지만, 현재 Core Web Vitals의 핵심 3종 조합은 LCP·INP·CLS로 보는 게 맞아요.
 tags: [ core-web-vitals, lcp, inp, cls ]

@@ -15,6 +15,6 @@ choices:
     text: 서버 응답과 무관하게 CSS 애니메이션만 늘린다.
 answer: a
 explanation: |
-  LCP는 사용자가 처음 보는 viewport 안에서 가장 큰 이미지·텍스트 블록 같은 주요 콘텐츠가 언제 렌더링되는지를 측정해요. 따라서 첫 화면 hero 이미지가 크거나 늦게 다운로드되면 LCP가 바로 나빠질 수 있습니다.
-  이미지의 실제 표시 크기에 맞는 리사이징, WebP/AVIF 같은 효율적인 포맷, 적절한 캐싱, `preload` 같은 우선순위 조정이 직접적인 개선책이 됩니다. Next.js 16 기준으로는 예전 `Image`의 `priority` prop보다 `preload`, `loading="eager"`, `fetchPriority="high"`처럼 의도에 맞는 최신 옵션을 고르는 게 좋아요. 반대로 화면 아래 이미지를 eager loading하면 네트워크 경쟁만 늘 수 있습니다.
+  LCP는 사용자가 처음 보는 viewport 안에서 가장 큰 이미지·텍스트 블록 같은 주요 콘텐츠가 언제 렌더링되는지를 측정해요. 따라서 첫 화면 hero 이미지가 크거나 늦게 다운로드되면 LCP가 바로 나빠질 수 있어요.
+  이미지의 실제 표시 크기에 맞는 리사이징, WebP/AVIF 같은 효율적인 포맷, 적절한 캐싱, `preload` 같은 우선순위 조정이 직접적인 개선책이 돼요. Next.js 16 기준으로는 예전 `Image`의 `priority` prop보다 `preload`, `loading="eager"`, `fetchPriority="high"`처럼 의도에 맞는 최신 옵션을 고르는 게 좋아요. 반대로 화면 아래 이미지를 eager loading하면 네트워크 경쟁만 늘 수 있어요.
 tags: [ lcp, image-optimization, preload ]
