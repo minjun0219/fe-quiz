@@ -551,7 +551,7 @@ export default function Result({ data }: Props) {
             {shareStatus === "creating"
               ? "공유 만드는 중…"
               : !canShare
-                ? "누룽지 한마디 기다리는 중…"
+                ? "🍘 누룽지의 한마디 기다리는 중…"
                 : "친구한테 보내기 →"}
           </button>
         )}

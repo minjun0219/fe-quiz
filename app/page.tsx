@@ -11,8 +11,6 @@ export default function Home() {
         </p>
         <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
           10문제만 풀어봐.
-          <br />
-          얼마나 알고 있는지.
         </h1>
         <p className="mb-10 max-w-md text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
           10문제, 5분이면 끝.
