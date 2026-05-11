@@ -10,6 +10,7 @@ import {
   STRONG_THRESHOLD,
   WEAK_THRESHOLD,
 } from "@/lib/diagnosis";
+import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Category } from "@/lib/question.schema";
 import { getShareById } from "@/lib/share-store";
 
@@ -97,7 +98,7 @@ export default async function SharePage({ params }: Props) {
           🍘 누룽지의 한마디
         </div>
         <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800 dark:text-zinc-100">
-          {share.feedback}
+          {renderFeedbackInline(share.feedback)}
         </p>
       </section>
 

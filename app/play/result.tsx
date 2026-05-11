@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
 import { ContributeNote } from "@/components/credits";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
+import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 import type { ShareCreateResponse } from "@/lib/share.schema";
@@ -304,7 +305,7 @@ export default function Result({ data }: Props) {
           ))}
         {feedback && (
           <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800 dark:text-zinc-100">
-            {feedback}
+            {renderFeedbackInline(feedback)}
             {feedbackStatus === "streaming" && (
               <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-rose-400 align-middle" />
             )}
