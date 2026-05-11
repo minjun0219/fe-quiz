@@ -20,6 +20,6 @@ choices:
     text: Busan Seoul
 answer: c
 explanation: |
-  스프레드 `{...a}`는 1단계만 복사하는 얕은 복사야. `b.profile`은 여전히 `a.profile`과 같은 객체를 가리키므로 `b.profile.city`를 바꾸면 `a.profile.city`도 같이 바뀌어 둘 다 `'Busan'`.
-  중첩 객체까지 끊어 내려면 `structuredClone(a)`(브라우저/Node 17+ 내장)나 lodash `cloneDeep`을 써야 해. `JSON.parse(JSON.stringify(a))`도 자주 쓰이지만 `Date`/`Map`/`Set`/함수/순환참조에서 깨지니 주의.
+  스프레드 `{...a}`는 1단계만 복사하는 얕은 복사예요. `b.profile`은 여전히 `a.profile`과 같은 객체를 가리키므로 `b.profile.city`를 바꾸면 `a.profile.city`도 같이 바뀌어 둘 다 `'Busan'`이 돼요.
+  중첩 객체까지 끊어 내려면 `structuredClone(a)`(브라우저/Node 17+ 내장)나 lodash `cloneDeep`을 써야 해요. `JSON.parse(JSON.stringify(a))`도 자주 쓰이지만 `Date`/`Map`/`Set`/함수/순환참조에서 깨지니 주의해 주세요.
 tags: [ clone, spread, structured-clone ]

@@ -3,7 +3,7 @@ category: javascript
 difficulty: medium
 type: single_choice
 question: |
-  다음 코드를 실행하면 어떤 일이 벌어져?
+  다음 코드를 실행하면 어떤 일이 벌어질까요?
 code: |
   console.log(a)
   console.log(b)
@@ -11,16 +11,16 @@ code: |
   let b = 2
 choices:
   - id: a
-    text: a, b 모두 undefined가 찍힘
+    text: a, b 모두 undefined가 찍혀요
   - id: b
-    text: a, b 모두 ReferenceError가 발생
+    text: a, b 모두 ReferenceError가 발생해요
   - id: c
-    text: 1, 2가 차례대로 찍힘
+    text: 1, 2가 차례대로 찍혀요
   - id: d
-    text: a는 undefined가 찍히고, b에서 ReferenceError가 발생
+    text: a는 undefined가 찍히고, b에서 ReferenceError가 발생해요
 answer: d
 explanation: |
-  `var`는 선언이 끌어올려지면서 `undefined`로 초기화돼. 그래서 `console.log(a)`에서 `undefined`가 찍혀.
-  `let`/`const`는 선언은 끌어올려지지만 초기화가 안 돼서 TDZ(Temporal Dead Zone) 상태야. 선언 라인 전에 접근하면 `ReferenceError`가 터져.
-  자주 헷갈리는데, "let/const는 호이스팅이 안 된다"는 흔한 오해고 정확히는 "초기화 전 접근이 막혀 있다"가 맞아.
+  `var`는 선언이 끌어올려지면서 `undefined`로 초기화돼요. 그래서 `console.log(a)`에서 `undefined`가 찍혀요.
+  `let`/`const`는 선언은 끌어올려지지만 초기화가 안 돼서 TDZ(Temporal Dead Zone) 상태예요. 선언 라인 전에 접근하면 `ReferenceError`가 터져요.
+  자주 헷갈리는데, "let/const는 호이스팅이 안 된다"는 흔한 오해고 정확히는 "초기화 전 접근이 막혀 있다"가 맞아요.
 tags: [ hoisting, tdz, var, let ]
