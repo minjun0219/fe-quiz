@@ -5,8 +5,8 @@ import { useState } from "react";
 type Size = "sm" | "xs";
 
 const SIZE_CLASSES: Record<Size, string> = {
-  sm: "rounded-2xl p-4 text-sm",
-  xs: "rounded-xl p-3 text-xs",
+  sm: "rounded-xl p-4 text-sm",
+  xs: "rounded-lg p-3 text-xs",
 };
 
 export function CodeBlock({
@@ -32,7 +32,7 @@ export function CodeBlock({
 
   return (
     <div
-      className={`relative bg-zinc-900 font-mono leading-relaxed text-zinc-100 ${SIZE_CLASSES[size]} ${wrapClass} ${className}`}
+      className={`relative bg-zinc-900 font-mono leading-relaxed text-zinc-100 ring-1 ring-inset ring-white/5 ${SIZE_CLASSES[size]} ${wrapClass} ${className}`}
     >
       <button
         type="button"
