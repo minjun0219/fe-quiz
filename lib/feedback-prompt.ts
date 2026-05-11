@@ -4,7 +4,7 @@ import type { Category } from "./question.schema";
 import type { Personality, Vibe } from "./quiz-submit.schema";
 
 /**
- * Friend-tone feedback system prompt for Haiku 4.5.
+ * Mascot ("누룽지") feedback system prompt for Haiku 4.5.
  * Kept short on purpose — falls below Haiku's 4096-token cache prefix minimum,
  * so prompt caching isn't activated. If we expand with more few-shot examples
  * later (and cross 4096 tokens), add `cache_control: {type: "ephemeral"}` on
@@ -93,7 +93,7 @@ export function buildFeedbackUserPrompt({
   });
 
   lines.push("");
-  lines.push("위 데이터 보고 누룽지 톤으로 4-6문장 한마디 해줘.");
+  lines.push("위 데이터 보고 단톡방 동료 톤으로 4-6문장 한마디 해줘.");
 
   return lines.join("\n");
 }
