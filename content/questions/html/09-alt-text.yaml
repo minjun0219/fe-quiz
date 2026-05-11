@@ -24,4 +24,9 @@ explanation: |
   - c: 이미지 안에 텍스트가 있다면 그 텍스트를 alt에 옮겨야 누락이 없어요.
   - d: 스크린리더가 이미 "이미지"라는 역할을 알려 주기 때문에 "사진", "image of" 같은 접두어는 중복 낭독이 돼서 권장하지 않아요.
   - e: 캡션 같은 텍스트가 같은 정보를 전달하면 alt=""로 두는 편이 자연스러워요.
+references:
+  - title: "MDN — <img> alt attribute"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#alt"
+  - title: "W3C — An alt Decision Tree"
+    url: "https://www.w3.org/WAI/tutorials/images/decision-tree/"
 tags: [ a11y, alt, semantics ]

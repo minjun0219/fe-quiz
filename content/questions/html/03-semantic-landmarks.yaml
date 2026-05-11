@@ -20,4 +20,9 @@ explanation: |
   - `<article>`: 자기 완결적 콘텐츠 단위(블로그 포스트, 댓글, 카드 등). 떼어내도 의미가 통하는지가 기준이에요.
   - `<div role="main">`: ARIA `main` role로 같은 의미를 부여할 수는 있지만, 시맨틱 태그(`<main>`)가 있으면 그걸 우선해요 (참고로 `role="content"`는 ARIA 표준에 없는 무효 값이에요).
   스크린 리더는 랜드마크 키로 `<main>`으로 점프할 수 있어요 — 시맨틱 태그가 곧 접근성 인프라예요.
+references:
+  - title: "MDN — <main>: The Main element"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/main"
+  - title: "MDN — ARIA landmarks roles"
+    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles#3._landmark_roles"
 tags: [ semantics, landmarks, a11y ]

@@ -23,4 +23,9 @@ explanation: |
   - `aria-label`은 화면에 텍스트가 없는 컨트롤(아이콘 버튼 등)에 "이 요소의 이름은 X"라고 직접 알려 주는 속성이에요.
   - `aria-labelledby`는 같은 페이지 안 다른 요소(`id` 참조)의 텍스트를 라벨로 빌려와요. 여러 id를 공백으로 나열하면 합쳐진 텍스트가 라벨이 돼요.
   화면에 보이는 라벨과 a11y 라벨이 어긋나면 사용자가 혼란스러우니, 이미 표시되는 텍스트가 있으면 `aria-labelledby`로 그것을 그대로 가리키는 편이 자연스러워요.
+references:
+  - title: "MDN — aria-label"
+    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label"
+  - title: "MDN — aria-labelledby"
+    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
 tags: [ a11y, aria, labels ]

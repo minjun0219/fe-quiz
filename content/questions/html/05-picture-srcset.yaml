@@ -26,4 +26,11 @@ explanation: |
   - `(max-width: 600px)` → 800 > 600이라 불일치, 통과.
   - `(max-width: 1200px)` → 800 ≤ 1200이라 매칭 → `medium.jpg` 선택.
   `<img>`는 매칭 실패 시 폴백 + alt·기본 width/height 등 표시 정보의 baseline이에요. 미디어 매칭 외에 화면 밀도 대응이 필요하면 `srcset="x.jpg 1x, x@2x.jpg 2x"`나 `sizes` 속성을 함께 써 보세요.
+references:
+  - title: "MDN — <picture>: The Picture element"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/picture"
+  - title: "MDN — Responsive images"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Responsive_images"
+  - title: "web.dev — Serve responsive images"
+    url: "https://web.dev/articles/serve-responsive-images"
 tags: [ images, picture, srcset, responsive ]

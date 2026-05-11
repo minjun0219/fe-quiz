@@ -28,4 +28,9 @@ explanation: |
   - `defer`: HTML 파싱과 병렬로 다운로드, 실행은 **문서 등장 순서**로 DOMContentLoaded 직전에 일괄. DOM 준비가 보장되니 DOM에 의존하는 초기화에 적합.
   - `async`: 다운로드 병렬 + 끝나는 대로 즉시 실행 → 등장 순서·DOM 상태 보장 안 됨. 독립적인 분석 스크립트(예: 애널리틱스)처럼 다른 스크립트와 의존성이 없을 때 적합.
   - 둘 다 외부(`src`) 스크립트에만 적용. 인라인 `<script>`에는 무시돼요.
+references:
+  - title: "MDN — <script>: defer / async"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer"
+  - title: "HTML Standard — Script processing model"
+    url: "https://html.spec.whatwg.org/multipage/scripting.html#attr-script-async"
 tags: [ scripts, defer, async, performance ]

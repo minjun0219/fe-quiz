@@ -450,6 +450,27 @@ export default function Result({ data, level }: Props) {
                     {q.explanation}
                   </p>
                 )}
+                {q.references && q.references.length > 0 && (
+                  <div className="mt-2 rounded-xl bg-zinc-50 p-3 text-sm dark:bg-zinc-950">
+                    <p className="mb-1 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+                      관련 자료
+                    </p>
+                    <ul className="flex flex-col gap-1">
+                      {q.references.map((ref) => (
+                        <li key={ref.url}>
+                          <a
+                            href={ref.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-700 underline-offset-2 hover:underline dark:text-emerald-400"
+                          >
+                            {ref.title}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </li>
             ))}
           </ol>

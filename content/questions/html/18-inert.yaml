@@ -18,4 +18,9 @@ explanation: |
   `inert` 속성이 달린 서브트리는 포커스 타겟이 아니고 포인터 이벤트가 무시되며 접근성 트리에서도 제외돼요. 모달이 떠 있는 동안 배경 영역을 "완전히 비활성화"하는 데 가장 간단하고 표준적인 방법이에요.
   과거에는 `aria-hidden` + 모든 포커스 가능 요소에 `tabindex="-1"` + JS 포커스 트랩을 조합해야 했는데, 누락하기 쉬웠어요. 이젠 `inert` 한 줄로 동등 효과를 보장받을 수 있고 Chrome/Safari/Firefox 모두 안정 지원해요.
   `inert`는 시각적으론 표시되지만 이벤트·a11y에서 제외되므로 CSS로 흐릿하게 처리하면 의도가 명확해져요.
+references:
+  - title: "MDN — inert global attribute"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inert"
+  - title: "web.dev — The inert attribute"
+    url: "https://web.dev/articles/inert"
 tags: [ a11y, modal, focus-management ]

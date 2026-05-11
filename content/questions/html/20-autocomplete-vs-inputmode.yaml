@@ -18,4 +18,9 @@ explanation: |
   둘은 관심사가 달라요. `autocomplete`는 "이 칸에 들어갈 의미"를 알려 주는 메타데이터라 브라우저/패스워드 매니저가 이메일·이름·주소·카드번호·OTP 등을 적절한 칸에 자동 채워주는 데 활용돼요.
   `inputmode`는 "키보드를 어떤 모양으로 띄워달라"는 힌트만을 주고 입력 검증은 하지 않아요. 예를 들어 OTP 입력이라면 `autocomplete="one-time-code" inputmode="numeric"`처럼 둘을 함께 주는 패턴이 일반적이에요.
   `autocomplete="off"`는 브라우저에 자동입력 힌트를 끌 뿐 키보드 모양에는 영향이 없고, 브라우저가 무시하는 케이스도 많아요.
+references:
+  - title: "MDN — HTML autocomplete attribute"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete"
+  - title: "MDN — inputmode global attribute"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode"
 tags: [ forms, autocomplete, inputmode ]

@@ -23,4 +23,9 @@ explanation: |
   HTML 내장 검증(`required`, `pattern`, `min`/`max`, `step` 등)은 사용자에게 즉각적인 피드백을 주어 경험을 개선하는 "1차 방어"로 쓰기 좋아요 — 조기 피드백과 `:invalid`·`:user-invalid` 스타일까지 공짜로 얻어요.
   하지만 사용자가 DevTools로 novalidate를 켜거나 직접 fetch로 요청을 보내면 우회할 수 있으니 결국 **서버 검증**이 최종 안전망이에요. 둘을 함께 장착하는 게 이상적이에요.
   `pattern`은 `text`/`search`/`url`/`tel`/`email`/`password`에서 동작하고 `number`·`date` 등엔 적용되지 않아요. `required`는 제출 시 자동으로 검증되고 JS 제출은 `form.requestSubmit()` / `form.checkValidity()`로 같은 흐름을 따라가요.
+references:
+  - title: "MDN — Client-side form validation"
+    url: "https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation"
+  - title: "MDN — Constraint Validation API"
+    url: "https://developer.mozilla.org/en-US/docs/Web/API/Constraint_validation"
 tags: [ forms, validation, a11y ]

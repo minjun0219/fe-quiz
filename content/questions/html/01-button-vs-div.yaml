@@ -24,4 +24,9 @@ explanation: |
   - e: `<form>` 안의 `<button>`은 기본 `type="submit"`이라 폼 전송이 트리거돼요. 막으려면 명시적으로 `type="button"`을 줘야 해요.
   - d: 잘못된 선택지예요 — 클릭 처리 속도는 둘이 사실상 차이가 없어요. 의미·접근성이 차이의 본질이에요.
   결론: 기본 동작·접근성을 공짜로 얻으려면 의미에 맞는 태그를 골라야 해요.
+references:
+  - title: "MDN — <button>: The Button element"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button"
+  - title: "ARIA Authoring Practices Guide — Button Pattern"
+    url: "https://www.w3.org/WAI/ARIA/apg/patterns/button/"
 tags: [ semantics, a11y, button, forms ]

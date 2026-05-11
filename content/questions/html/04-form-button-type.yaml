@@ -29,4 +29,9 @@ explanation: |
   그래서 "취소" 버튼도 onclick으로 closeModal() 실행 후, 기본 동작인 폼 전송이 그대로 일어나 `/save`로 POST가 날아가요.
   의도한 대로 닫기만 하려면 `<button type="button" onclick="closeModal()">취소</button>`로 명시하거나, 핸들러에서 `event.preventDefault()`를 호출해요.
   실수로 폼이 전송되는 흔한 버그예요 — 폼 안의 모든 비-submit 버튼에는 `type="button"`을 붙이는 습관이 안전해요.
+references:
+  - title: "MDN — <button> type attribute"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#type"
+  - title: "MDN — <form>: Implicit submission"
+    url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form"
 tags: [ forms, button, submit, gotcha ]

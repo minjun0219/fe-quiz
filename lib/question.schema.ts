@@ -29,6 +29,18 @@ export const ChoiceSchema = z.object({
 
 export type Choice = z.infer<typeof ChoiceSchema>;
 
+export const ReferenceSchema = z.object({
+  title: z.string().min(1).max(200),
+  url: z
+    .string()
+    .url()
+    .refine((u) => u.startsWith("https://"), {
+      message: "reference url must use https://",
+    }),
+});
+
+export type Reference = z.infer<typeof ReferenceSchema>;
+
 const Base = z.object({
   id: z.string().min(1),
   category: Category,
@@ -37,6 +49,7 @@ const Base = z.object({
   code: z.string().optional(),
   choices: z.array(ChoiceSchema).min(2).max(6),
   explanation: z.string().min(1),
+  references: z.array(ReferenceSchema).max(5).optional(),
   tags: z.array(z.string()).default([]),
 });
 
