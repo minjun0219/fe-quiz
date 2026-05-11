@@ -21,20 +21,25 @@ code: |
   }
 choices:
   - id: a
-    text: 둘 다 동일한 안전성을 가진다
+    text: 둘 다 동일한 안전성을 가져요
   - id: b
     text: |
       (A)는 컴파일러를 속이는 단언이라 컴파일은 통과하지만, 런타임에
       실제로 string이 아닌 값(예: `null`/`undefined`)이 들어오면
-      `.length` 접근에서 그대로 깨진다. (B)는 `v is string` 술어를
-      가진 타입 가드로 실제 검사 후에만 좁혀서 안전하다
+      `.length` 접근에서 그대로 깨져요. (B)는 `v is string` 술어를
+      가진 타입 가드로 실제 검사 후에만 좁혀서 안전해요
   - id: c
     text: (A)는 컴파일 에러, (B)는 통과
   - id: d
-    text: (B)는 `as`보다 성능이 느려서 비추된다
+    text: (B)는 `as`보다 성능이 느려서 비추돼요
 answer: b
 explanation: |
-  `as`는 "내가 더 잘 알아"하고 컴파일러에게 대신 말해 주는 단언이라, 컴파일 단계에선 무조건 통과시켜 줘. 그 대신 실제로 들어온 값이 단언과 다르면 그 값을 사용하는 코드(`.length`, `.map()` 등)에서 런타임 예외가 그대로 터져.
-  타입 가드 함수(`v is string`)는 **실제 검사 로직**과 **타입 좁힘 정보**를 한 곳에 묶어 둔 안전한 패턴. `Array.isArray`·`Number.isFinite`처럼 표준 인터페이스도 타입 가드로 정의돼 있어.
-  `as`는 외부 경계(JSON 파싱, 타사 API)에서 "이미 검증되었음"이 분명한 경우에만 조심스럽게 쓰는 게 좋아.
+  `as`는 "내가 더 잘 알아"하고 컴파일러에게 대신 말해 주는 단언이라, 컴파일 단계에선 무조건 통과시켜 줘요. 그 대신 실제로 들어온 값이 단언과 다르면 그 값을 사용하는 코드(`.length`, `.map()` 등)에서 런타임 예외가 그대로 터져요.
+  타입 가드 함수(`v is string`)는 **실제 검사 로직**과 **타입 좁힘 정보**를 한 곳에 묶어 둔 안전한 패턴이에요. `Array.isArray`·`Number.isFinite`처럼 표준 인터페이스도 타입 가드로 정의돼 있어요.
+  `as`는 외부 경계(JSON 파싱, 타사 API)에서 "이미 검증되었음"이 분명한 경우에만 조심스럽게 쓰는 게 좋아요.
+references:
+  - title: "TypeScript Handbook — Narrowing: Using type predicates"
+    url: "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates"
+  - title: "TypeScript Handbook — Everyday Types: Type Assertions"
+    url: "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions"
 tags: [ type-guard, as, narrowing ]

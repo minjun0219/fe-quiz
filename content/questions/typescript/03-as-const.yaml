@@ -18,7 +18,12 @@ choices:
     text: "`a: readonly ['x', 'y']`,  `b: ['x', 'y']`"
 answer: a
 explanation: |
-  일반 `const` 배열 리터럴은 가변(mutable) 배열로 추론돼 `string[]`이 돼.
-  `as const`를 붙이면 (1) 각 요소가 리터럴 타입(`'x'`, `'y'`)으로 좁혀지고, (2) 배열 전체가 `readonly` 튜플로 고정돼.
-  덕분에 `as const` 배열은 `typeof b[number]` 같은 인덱스 액세스로 값 union 타입(`'x' | 'y'`)을 만들 때 자주 쓰여. (`keyof typeof b`는 `'0' | '1' | 'length' | ...` 같은 인덱스/메서드 키들이 잡히니 주의.)
+  일반 `const` 배열 리터럴은 가변(mutable) 배열로 추론돼서 `string[]`이 돼요.
+  `as const`를 붙이면 (1) 각 요소가 리터럴 타입(`'x'`, `'y'`)으로 좁혀지고, (2) 배열 전체가 `readonly` 튜플로 고정돼요.
+  덕분에 `as const` 배열은 `typeof b[number]` 같은 인덱스 액세스로 값 union 타입(`'x' | 'y'`)을 만들 때 자주 쓰여요. (`keyof typeof b`는 `'0' | '1' | 'length' | ...` 같은 인덱스/메서드 키들이 잡히니 주의해 주세요.)
+references:
+  - title: "TypeScript 3.4 Release Notes — const assertions"
+    url: "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions"
+  - title: "TypeScript Handbook — Everyday Types: Literal Types"
+    url: "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
 tags: [ types, as-const, literal-types, readonly ]

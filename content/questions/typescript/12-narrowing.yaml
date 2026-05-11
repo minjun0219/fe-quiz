@@ -21,8 +21,13 @@ choices:
     text: "`unknown`"
 answer: c
 explanation: |
-  TS의 control-flow analysis는 각 가드를 통과한 이후 남은 타입을 자동으로 좁혀.
-  - `v == null`은 `null`과 `undefined` 둘 다 true로 판정되어 둘 다 제거 → `string | number`.
-  - 그 다음 `typeof v === 'string'` 분기에서 string을 거르면 남은 흐름의 타입은 `number`.
-  이런 조기 종료 분기(`if (...) return`) 패턴을 활용하면 주된 흐름이 단순해져 가독성이 좋아져.
+  TS의 control-flow analysis는 각 가드를 통과한 이후 남은 타입을 자동으로 좁혀줘요.
+  - `v == null`은 `null`과 `undefined` 둘 다 true로 판정되어 둘 다 제거돼요 → `string | number`.
+  - 그 다음 `typeof v === 'string'` 분기에서 string을 거르면 남은 흐름의 타입은 `number`가 돼요.
+  이런 조기 종료 분기(`if (...) return`) 패턴을 활용하면 주된 흐름이 단순해져서 가독성이 좋아져요.
+references:
+  - title: "TypeScript Handbook — Narrowing"
+    url: "https://www.typescriptlang.org/docs/handbook/2/narrowing.html"
+  - title: "TypeScript Handbook — Narrowing: typeof type guards"
+    url: "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards"
 tags: [ narrowing, typeof, control-flow ]

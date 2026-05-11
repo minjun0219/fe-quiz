@@ -6,17 +6,22 @@ question: |
   TypeScript의 `type`과 `interface`에 대한 설명 중 가장 정확한 것은?
 choices:
   - id: a
-    text: 둘 다 객체 형태를 정의할 수 있고 대부분 상호 교체 가능하지만, `interface`는 같은 이름으로 다시 선언하면 자동 병합(declaration merging)되고 `type`은 유니온/인터섹션·기본 타입 별칭 등 표현력이 더 넓다
+    text: 둘 다 객체 형태를 정의할 수 있고 대부분 상호 교체 가능하지만, `interface`는 같은 이름으로 다시 선언하면 자동 병합(declaration merging)되고 `type`은 유니온/인터섹션·기본 타입 별칭 등 표현력이 더 넓어요
   - id: b
-    text: "`interface`는 객체에만 쓸 수 있고 `type`은 함수 타입에 쓸 수 없다"
+    text: "`interface`는 객체에만 쓸 수 있고 `type`은 함수 타입에 쓸 수 없어요"
   - id: c
-    text: "`type`은 컴파일 후 런타임에 남고 `interface`는 사라진다"
+    text: "`type`은 컴파일 후 런타임에 남고 `interface`는 사라져요"
   - id: d
-    text: 두 키워드는 완전히 동일해 아무거나 써도 차이가 없다
+    text: 두 키워드는 완전히 동일해서 아무거나 써도 차이가 없어요
 answer: a
 explanation: |
-  `type`과 `interface`는 객체 형태·함수 타입·제네릭 등 대부분의 케이스에서 교체 가능해. 주요 차이:
-  - `interface`는 같은 이름으로 재선언하면 멤버가 병합될 수 있어(declaration merging). 라이브러리를 확장할 때 유용.
-  - `type`은 유니온(`A | B`), 인터섹션(`A & B`), 기본 타입 별칭(`type Id = string`), 튜플, 조건부·매핑 타입 등 `interface`가 못 다루는 영역까지 표현.
-  둘 다 컴파일 후 사라지니 런타임 조건은 구분 근거가 아니야. "공개 API·클래스 계약엔 interface, 나머지엔 type"이 대체적인 관습이야.
+  `type`과 `interface`는 객체 형태·함수 타입·제네릭 등 대부분의 케이스에서 교체 가능해요. 주요 차이는 이거예요.
+  - `interface`는 같은 이름으로 재선언하면 멤버가 병합될 수 있어요(declaration merging). 라이브러리를 확장할 때 유용해요.
+  - `type`은 유니온(`A | B`), 인터섹션(`A & B`), 기본 타입 별칭(`type Id = string`), 튜플, 조건부·매핑 타입 등 `interface`가 못 다루는 영역까지 표현할 수 있어요.
+  둘 다 컴파일 후 사라지니 런타임 조건은 구분 근거가 아니에요. "공개 API·클래스 계약엔 interface, 나머지엔 type"이 대체적인 관습이에요.
+references:
+  - title: "TypeScript Handbook — Everyday Types: Differences Between Type Aliases and Interfaces"
+    url: "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces"
+  - title: "TypeScript Handbook — Object Types"
+    url: "https://www.typescriptlang.org/docs/handbook/2/objects.html"
 tags: [ types, interface, type-alias ]

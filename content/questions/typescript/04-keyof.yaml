@@ -18,8 +18,13 @@ choices:
     text: "`string`"
 answer: a
 explanation: |
-  `keyof T`는 객체 타입 `T`의 **키 이름들의 union**을 만들어줘. 값 타입이 아니라 키 타입이라는 점이 핵심이야.
-  `User['id']`처럼 인덱스 액세스 타입과 결합하면 "특정 키의 값 타입"을 꺼낼 수 있고, 이걸 매핑드 타입(`{ [K in keyof T]: ... }`)에서 자주 활용해.
-  - b는 키의 **값** 타입 union이고 — 그건 `User[keyof User]`로 만들어.
-  - d는 인덱스 시그니처가 `string`인 객체에 대해서만 그렇게 좁혀져.
+  `keyof T`는 객체 타입 `T`의 **키 이름들의 union**을 만들어줘요. 값 타입이 아니라 키 타입이라는 점이 핵심이에요.
+  `User['id']`처럼 인덱스 액세스 타입과 결합하면 "특정 키의 값 타입"을 꺼낼 수 있고, 이걸 매핑드 타입(`{ [K in keyof T]: ... }`)에서 자주 활용해요.
+  - b는 키의 **값** 타입 union이에요 — 그건 `User[keyof User]`로 만들어요.
+  - d는 인덱스 시그니처가 `string`인 객체에 대해서만 그렇게 좁혀져요.
+references:
+  - title: "TypeScript Handbook — Keyof Type Operator"
+    url: "https://www.typescriptlang.org/docs/handbook/2/keyof-types.html"
+  - title: "TypeScript Handbook — Indexed Access Types"
+    url: "https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html"
 tags: [ types, keyof, indexed-access ]

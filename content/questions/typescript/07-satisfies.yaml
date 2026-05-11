@@ -14,20 +14,25 @@ code: |
 choices:
   - id: a
     text: |
-      a, b, c 모두 동일 — `satisfies`는 단순히 `: Config`의 다른 표기일 뿐
+      a, b, c 모두 동일해요 — `satisfies`는 단순히 `: Config`의 다른 표기일 뿐이에요
   - id: b
     text: |
-      `c.theme`은 리터럴 `'light'`로 좁혀지고 `Config` 모양도 검증됨 — `a.theme`은 `Theme`, `b.theme`은 `string`
+      `c.theme`은 리터럴 `'light'`로 좁혀지고 `Config` 모양도 검증돼요 — `a.theme`은 `Theme`, `b.theme`은 `string`이에요
   - id: c
     text: |
-      `satisfies`는 런타임 검증 — 빌드 시점엔 무시됨
+      `satisfies`는 런타임 검증이에요 — 빌드 시점엔 무시돼요
   - id: d
     text: |
-      a만 검증되고 b, c는 모양 검사가 안 돼
+      a만 검증되고 b, c는 모양 검사가 안 돼요
 answer: b
 explanation: |
-  - `a: Config` — 타입 어노테이션이 값 타입을 `Config` 모양으로 **고정**. `a.theme`은 `Theme`(=`'light' | 'dark'`)으로 넓어짐.
-  - `b` — 어노테이션·`satisfies` 모두 없으면 객체 리터럴의 가변 프로퍼티는 `string`으로 widen. `Config` 모양 검사도 빠져 오타도 못 잡음.
-  - `c ... satisfies Config` — `satisfies`는 (1) `Config` 모양을 검증하면서 (2) 결과 타입은 추론된 더 좁은 형태를 유지. `theme`의 contextual 타입이 `Theme` union이라, 실제 값 `'light'`가 그 안에서 가장 좁은 매칭(`'light'`)으로 추론돼.
-  핵심: `satisfies`가 "리터럴 좁히기"를 만들어주는 건 **값 타입이 union**일 때(`'light' | 'dark'`, `string | RGB` 등). 단일 `string`처럼 좁힐 여지가 없는 경우엔 `: T`와 차이가 없어. TS 4.9+ 기능.
+  - `a: Config` — 타입 어노테이션이 값 타입을 `Config` 모양으로 **고정**해요. `a.theme`은 `Theme`(=`'light' | 'dark'`)으로 넓어져요.
+  - `b` — 어노테이션·`satisfies` 모두 없으면 객체 리터럴의 가변 프로퍼티는 `string`으로 widen돼요. `Config` 모양 검사도 빠져서 오타도 못 잡아요.
+  - `c ... satisfies Config` — `satisfies`는 (1) `Config` 모양을 검증하면서 (2) 결과 타입은 추론된 더 좁은 형태를 유지해요. `theme`의 contextual 타입이 `Theme` union이라, 실제 값 `'light'`가 그 안에서 가장 좁은 매칭(`'light'`)으로 추론돼요.
+  핵심은 이거예요. `satisfies`가 "리터럴 좁히기"를 만들어주는 건 **값 타입이 union**일 때(`'light' | 'dark'`, `string | RGB` 등)예요. 단일 `string`처럼 좁힐 여지가 없는 경우엔 `: T`와 차이가 없어요. TS 4.9+ 기능이에요.
+references:
+  - title: "TypeScript 4.9 Release Notes — The satisfies Operator"
+    url: "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#the-satisfies-operator"
+  - title: "TypeScript Handbook — Everyday Types: Literal Types"
+    url: "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
 tags: [ types, satisfies, literal-types, contextual-typing, ts49 ]
