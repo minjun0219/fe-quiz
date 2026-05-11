@@ -97,7 +97,7 @@ export default function RoundRunner({ questions }: Props) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
         <p className="mb-3 animate-pulse text-sm font-medium text-rose-500">
-          친구가 채점 중…
+          누룽지가 채점 중…
         </p>
         <h1 className="text-2xl font-bold">잠깐만, 답 맞춰볼게</h1>
       </main>

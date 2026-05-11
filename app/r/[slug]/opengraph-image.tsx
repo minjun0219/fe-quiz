@@ -207,7 +207,7 @@ export default async function Image({ params }: Props) {
         </div>
       </div>
       <div style={{ display: "flex", fontSize: 36, color: "#71717a" }}>
-        친구야, 너도 풀어봐 →
+        너도 풀어봐 →
       </div>
     </div>,
     { ...size, fonts, emoji: "twemoji" },
