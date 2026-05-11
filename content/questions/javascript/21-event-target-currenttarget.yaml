@@ -1,0 +1,32 @@
+id: js-021
+category: javascript
+difficulty: medium
+type: single_choice
+question: |
+  아래 코드에서 버튼을 클릭했을 때 `target`과 `currentTarget`으로 가장 알맞은 것은?
+code: |
+  const menu = document.querySelector('#menu')
+
+  menu.addEventListener('click', (event) => {
+    console.log(event.target.id)
+    console.log(event.currentTarget.id)
+  })
+
+  // <ul id="menu">
+  //   <li><button id="save">저장</button></li>
+  // </ul>
+choices:
+  - id: a
+    text: "둘 다 `save`"
+  - id: b
+    text: "둘 다 `menu`"
+  - id: c
+    text: "`target`은 `save`, `currentTarget`은 `menu`"
+  - id: d
+    text: "`target`은 `menu`, `currentTarget`은 `save`"
+answer: c
+explanation: |
+  `event.target`은 이벤트가 실제로 발생한 가장 안쪽 요소를 가리키므로, 사용자가 누른 `<button id="save">`가 된다. 반면 `event.currentTarget`은 현재 실행 중인 이벤트 리스너가 붙어 있는 요소라서, 이 코드에서는 리스너를 등록한 `<ul id="menu">`를 가리켜.
+  이 차이는 이벤트 버블링과 이벤트 위임을 구현할 때 중요해. `target`만 믿고 처리하면 버튼 안의 아이콘이나 텍스트 노드처럼 더 깊은 자식이 들어올 수 있으니, 실무에서는 `closest()`로 원하는 항목까지 올려 찾거나 `currentTarget`으로 리스너 기준 컨테이너를 명확히 구분하는 패턴을 자주 쓴다.
+  오답 a/b/d는 이벤트가 발생한 요소와 리스너가 실행되는 요소를 같은 것으로 착각한 경우야. 버블링 중에는 같은 이벤트 객체라도 리스너가 붙은 위치에 따라 `currentTarget`이 달라질 수 있다는 점을 기억해야 해.
+tags: [ event, target, currentTarget, bubbling ]
