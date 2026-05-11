@@ -7,7 +7,7 @@ export default function Home() {
     <main className="flex min-h-dvh flex-col px-6 py-10 text-center">
       <div className="flex flex-1 flex-col items-center justify-center">
         <p className="mb-3 text-sm font-medium tracking-wide text-rose-500">
-          친구가 내는 프론트엔드 퀴즈
+          가볍게 풀어보는 프론트엔드 퀴즈
         </p>
         <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
           10문제만 풀어봐.
@@ -15,8 +15,7 @@ export default function Home() {
           얼마나 알고 있는지.
         </h1>
         <p className="mb-10 max-w-md text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
-          면접 압박 없이, 단톡방에서 친구 던지듯.
-          <br />다 풀면 AI가 친구처럼 피드백 + MBTI식 결과 타입까지 알려줘.
+          10문제, 5분이면 끝.
         </p>
         <div className="mb-6 flex w-full max-w-md flex-col gap-3">
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">

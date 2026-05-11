@@ -14,14 +14,14 @@ const SITE_URL = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "FE 퀴즈 — 친구가 내는 프론트엔드 퀴즈",
+    default: "FE 퀴즈 — 누룽지가 내는 프론트엔드 퀴즈",
     template: "%s | FE 퀴즈",
   },
   description:
-    "10문제 5분. 친구처럼 가볍게 풀고, AI가 친구처럼 피드백 주는 한국어 프론트엔드 미니퀴즈.",
+    "10문제 5분. 가볍게 풀면 누룽지(🍘)가 한마디 보태주는 한국어 프론트엔드 미니퀴즈.",
   openGraph: {
     title: "FE 퀴즈",
-    description: "친구처럼 퀴즈 내고 친구처럼 피드백하는 프론트엔드 미니게임",
+    description: "누룽지(🍘)가 퀴즈 내고 한마디 보태주는 프론트엔드 미니게임",
     type: "website",
     locale: "ko_KR",
     siteName: "FE 퀴즈",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FE 퀴즈",
-    description: "친구처럼 퀴즈 내고 친구처럼 피드백하는 프론트엔드 미니게임",
+    description: "누룽지(🍘)가 퀴즈 내고 한마디 보태주는 프론트엔드 미니게임",
   },
 };
 

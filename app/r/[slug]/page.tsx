@@ -64,7 +64,7 @@ export default async function SharePage({ params }: Props) {
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
       <section className="mb-8 text-center">
         <p className="mb-2 text-sm font-medium tracking-wide text-rose-500">
-          친구의 진단
+          🍘 누룽지의 진단
         </p>
         <h1 className="mb-2 text-4xl leading-tight font-bold tracking-tight">
           <span className="mr-2">{hero.emoji}</span>
@@ -94,7 +94,7 @@ export default async function SharePage({ params }: Props) {
 
       <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5 dark:border-rose-900/30 dark:bg-rose-500/5">
         <div className="mb-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
-          친구의 한마디
+          🍘 누룽지의 한마디
         </div>
         <p className="whitespace-pre-line text-base leading-relaxed text-zinc-800 dark:text-zinc-100">
           {share.feedback}

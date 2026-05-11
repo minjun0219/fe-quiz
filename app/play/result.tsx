@@ -99,7 +99,7 @@ export default function Result({ data }: Props) {
           // anything > 2000 chars with a 400; clamp here so a rare runaway
           // generation can't block the user from sharing.
           feedback: (
-            feedback.trim() || "(친구가 자리 비웠을 때 만든 결과)"
+            feedback.trim() || "(누룽지가 자리 비웠을 때 만든 결과)"
           ).slice(0, 2000),
         }),
       });
@@ -266,7 +266,7 @@ export default function Result({ data }: Props) {
 
       <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5 dark:border-rose-900/30 dark:bg-rose-500/5">
         <div className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
-          <span>친구의 한마디</span>
+          <span>🍘 누룽지의 한마디</span>
           {feedbackStatus === "loading" && (
             <span className="animate-pulse text-zinc-400 normal-case dark:text-zinc-500">
               생각 중…
@@ -280,7 +280,7 @@ export default function Result({ data }: Props) {
         </div>
         {feedbackStatus === "error" && (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            앗 친구가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
+            앗 누룽지가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
           </p>
         )}
         {feedbackStatus === "unavailable" &&
@@ -294,11 +294,11 @@ export default function Result({ data }: Props) {
               <code className="ml-1 rounded bg-zinc-100 px-1 dark:bg-zinc-800">
                 .env.local
               </code>
-              에 넣으면 친구가 깨어나요)
+              에 넣으면 누룽지가 깨어나요)
             </p>
           ) : (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              앗 친구가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
+              앗 누룽지가 잠깐 자리 비웠어. 새로고침하면 다시 와줄지도 🤞
             </p>
           ))}
         {feedback && (
@@ -551,7 +551,7 @@ export default function Result({ data }: Props) {
             {shareStatus === "creating"
               ? "공유 만드는 중…"
               : !canShare
-                ? "친구의 한마디 기다리는 중…"
+                ? "누룽지 한마디 기다리는 중…"
                 : "친구한테 보내기 →"}
           </button>
         )}
