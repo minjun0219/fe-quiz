@@ -20,4 +20,9 @@ explanation: |
   - `useDeferredValue`는 어떤 값(직접 가진 state든 부모로부터 받은 props든 파생 값이든)을 인자로 받아서 **한 박자 늦은 "지연된 복사본"** 을 돌려줘요. 이 deferred value를 무거운 서브트리에 흘려 보내면 그 트리의 리렌더만 낮은 우선순위로 처리돼서, 입력 같은 급한 업데이트를 가로막지 않아요.
   - 그래서 setter를 내가 가지고 있지 않은 props에 대해서도 쓸 수 있지만, 거꾸로 `const deferred = useDeferredValue(state)`처럼 내가 만든 state에 그대로 적용해도 괜찮아요.
   큰 그림은 비슷하지만 "어느 지점에서 우선순위를 낮추느냐"가 달라요. 업데이트 발생 지점(setter 호출 단위)에서 낮추면 `useTransition`, 렌더에서 소비할 값 단위로 낮추면 `useDeferredValue`예요.
+references:
+  - title: "React — useTransition"
+    url: "https://ko.react.dev/reference/react/useTransition"
+  - title: "React — useDeferredValue"
+    url: "https://ko.react.dev/reference/react/useDeferredValue"
 tags: [ concurrent, useTransition, useDeferredValue ]

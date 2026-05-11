@@ -27,4 +27,9 @@ explanation: |
   매 렌더마다 `{ name: '하늘' }`이 **새 객체 리터럴**로 만들어져 참조가 바뀌니까, Context는 "값이 바뀌었네"라고 판단하고 모든 consumer를 리렌더해요.
   `useMemo(() => ({ name: '하늘' }), [])`로 감싸면 의존성이 바뀌지 않는 한 같은 참조를 유지해서 consumer가 흔들리지 않아요.
   `useCallback`은 함수 참조용이라 객체엔 맞지 않고, `React.memo`는 Provider 자체의 props 비교라 도움이 되지 않아요.
+references:
+  - title: "React — useContext"
+    url: "https://ko.react.dev/reference/react/useContext"
+  - title: "React — useMemo"
+    url: "https://ko.react.dev/reference/react/useMemo"
 tags: [ context, useMemo, rerender ]

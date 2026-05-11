@@ -18,4 +18,9 @@ explanation: |
   실행 타이밍이 핵심이에요. `useLayoutEffect`는 DOM 변경 직후 **paint 전에 동기적으로** 실행되니까, 측정·보정한 결과만 사용자가 보게 돼요.
   `useEffect`는 paint 직후 **비동기적으로** 실행돼서, 보정 전 상태가 한 번 깜빡 보일 수 있어요.
   단점도 같이 알아두면 좋아요. `useLayoutEffect`는 브라우저 paint를 잠시 막아서 무거운 로직을 넣으면 렌더가 느려져요. 깜빡임 보정이 꼭 필요할 때만 써 주세요.
+references:
+  - title: "React — useLayoutEffect"
+    url: "https://ko.react.dev/reference/react/useLayoutEffect"
+  - title: "React — useEffect"
+    url: "https://ko.react.dev/reference/react/useEffect"
 tags: [ useEffect, useLayoutEffect, hooks, rendering ]

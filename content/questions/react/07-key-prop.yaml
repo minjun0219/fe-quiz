@@ -22,4 +22,9 @@ explanation: |
   `key={i}`로 인덱스를 쓰면 React 입장에서 "0번 자리, 1번 자리, ..."로 식별하는 셈이에요.
   앞에 항목이 추가되면 모든 인덱스가 한 칸씩 밀리는데, key는 그대로 0,1,2...이니까 React는 "같은 key의 컴포넌트가 다른 item을 받았다"고 판단해서 props만 갈아끼우게 돼요.
   그러면 Row 내부 state(예: 입력 중인 텍스트)나 포커스가 엉뚱한 항목에 따라붙어요. 해결책은 항목 고유의 안정적인 id를 key로 쓰는 거예요.
+references:
+  - title: "React — 리스트 렌더링"
+    url: "https://ko.react.dev/learn/rendering-lists"
+  - title: "React — state 보존과 초기화"
+    url: "https://ko.react.dev/learn/preserving-and-resetting-state"
 tags: [ key, list, reconciliation ]

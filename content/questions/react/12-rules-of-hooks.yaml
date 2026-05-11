@@ -41,4 +41,9 @@ explanation: |
   }
   ```
   ESLint 플러그인 `react-hooks/rules-of-hooks`를 켜 두면 이런 패턴을 자동으로 잡아 줘요.
+references:
+  - title: "React — Hook 규칙"
+    url: "https://ko.react.dev/reference/rules/rules-of-hooks"
+  - title: "React — 커스텀 Hook으로 로직 재사용하기"
+    url: "https://ko.react.dev/learn/reusing-logic-with-custom-hooks"
 tags: [ hooks, rules-of-hooks, lint ]

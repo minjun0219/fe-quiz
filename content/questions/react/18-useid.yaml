@@ -28,4 +28,7 @@ explanation: |
   `useId`는 트리 위치 기반으로 결정적인 ID를 만들어 돌려줘요. 마운트 이후에도 같은 값을 유지해서 (d는 틀려요), 주로 label/input, aria-describedby, headlessui 같은 a11y 패턴에 써요.
   제일 중요한 건 서버와 클라이언트에서 **같은 ID**가 나와서 hydration 불일치를 막는 거예요. 직접 카운터나 `Math.random()`은 그 보장이 없으니 피해야 해요.
   PK나 캠페인 식별자처럼 전역 고유성이 필요하면 `crypto.randomUUID()`나 서버 생성 ID를 따로 써야 해요.
+references:
+  - title: "React — useId"
+    url: "https://ko.react.dev/reference/react/useId"
 tags: [ hooks, useId, a11y, ssr ]

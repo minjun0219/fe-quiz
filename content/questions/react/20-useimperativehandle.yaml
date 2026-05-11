@@ -26,4 +26,9 @@ explanation: |
   `forwardRef`만 쓰면 부모가 자식의 DOM 노드 전체를 다룰 수 있게 돼요—DOM의 구조가 구현 세부사항이라 그게 외부에 의존되면 리팩터링이 극도로 어려워져요.
   `useImperativeHandle`은 부모가 동일한 `ref`로 볼 객체를 내가 전달할 수 있게 해 줘요. 일부 명령형 API(예: `focus`, `scrollIntoView`, `play`)만 노출하고 나머지는 감추는 패턴이 권장돼요.
   대부분의 React 코드는 선언적 prop으로 해결하는 게 좋고, `useImperativeHandle`은 양날의 검처럼 아껴서 써야 해요.
+references:
+  - title: "React — useImperativeHandle"
+    url: "https://ko.react.dev/reference/react/useImperativeHandle"
+  - title: "React — forwardRef"
+    url: "https://ko.react.dev/reference/react/forwardRef"
 tags: [ refs, forwardRef, useImperativeHandle, encapsulation ]

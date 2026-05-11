@@ -23,4 +23,9 @@ answer: c
 explanation: |
   `React.lazy`로 만든 컴포넌트는 첫 렌더에서 모듈을 비동기로 불러오는 동안 렌더 트리를 "일시 중단(suspend)"시켜요. 이걸 받아 줄 `<Suspense fallback={...}>`이 상위에 없으면 React가 "A component suspended while rendering, but no fallback UI was specified" 에러를 던져서 컴포넌트가 깨져요.
   보통 라우트 단위로 `<Suspense fallback={<Spinner />}>`로 감싸는 패턴을 써요. 코드 스플리팅으로 초기 번들을 줄일 때 자주 등장해요.
+references:
+  - title: "React — lazy"
+    url: "https://ko.react.dev/reference/react/lazy"
+  - title: "React — <Suspense>"
+    url: "https://ko.react.dev/reference/react/Suspense"
 tags: [ code-splitting, suspense, lazy ]

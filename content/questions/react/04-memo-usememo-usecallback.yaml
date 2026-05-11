@@ -18,4 +18,11 @@ explanation: |
   `React.memo`는 **props 비교**로 리렌더를 스킵할 뿐, 자기 자신의 state나 사용 중인 context가 바뀌면 당연히 리렌더돼요. "state까지 막아준다"는 건 흔한 오해예요.
   `useMemo`는 값(반환값) 캐시, `useCallback`은 함수 참조 캐시라고 짝지어 외워 두면 헷갈리지 않아요.
   세 도구 모두 비교 비용/메모리를 쓰니까 진짜 필요한 자리에만 써야 해요. 무지성으로 두르는 건 오히려 손해예요.
+references:
+  - title: "React — memo"
+    url: "https://ko.react.dev/reference/react/memo"
+  - title: "React — useMemo"
+    url: "https://ko.react.dev/reference/react/useMemo"
+  - title: "React — useCallback"
+    url: "https://ko.react.dev/reference/react/useCallback"
 tags: [ memoization, memo, useMemo, useCallback ]
