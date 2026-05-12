@@ -39,7 +39,7 @@ No ESLint, no Prettier — `biome.json` is the single source for lint and format
 - **Env branching uses `VERCEL_ENV`, NOT `NODE_ENV`** — `next start` sets `NODE_ENV=production` locally and would otherwise hit prod Supabase. See `lib/supabase.ts`.
 - **No client-side answer leakage**: the `PublicQuestion` shape strips `answer` and `explanation`; scoring is server-side. Don't add answer fields to anything served to the browser.
 - **Optional integrations are no-op / fail-open** when env is unset: Upstash rate limit, PostHog (server + client), Anthropic. Do not turn these into hard requirements.
-- **YAML content is schema-validated**: run `pnpm questions:check` after any edit under `content/questions/`. Prose/code style is enforced — see `docs/CONTENT_STYLE.md`.
+- **YAML content is schema-validated**: run `pnpm questions:check` after any edit under `content/questions/`. Prose/code style is enforced — see `content/AGENTS.md`.
 
-For deeper context, read `docs/DECISIONS.md` and `docs/CONTENT_STYLE.md` before non-trivial changes.
+For deeper context, read `docs/DECISIONS.md` and `content/AGENTS.md` before non-trivial changes.
 <!-- END:project-agent-rules -->

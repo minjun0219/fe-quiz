@@ -1,7 +1,7 @@
 /**
  * Build-time guard: validate every YAML under `content/questions/` against
  * the zod schema, the loader's invariants (unique ids, directory ↔ category
- * match), and the prose/code wrapping convention (see `docs/CONTENT_STYLE.md`).
+ * match), and the prose/code wrapping convention (see `content/AGENTS.md`).
  * Wired into the `prebuild` script so CI/Vercel fail before Next.js starts
  * compiling on a broken seed.
  *
@@ -27,7 +27,7 @@ try {
 const hits = lintQuestionProse(ROOT);
 if (hits.length > 0) {
   console.error(
-    `✗ ${hits.length} unwrapped code-shaped value${hits.length === 1 ? "" : "s"} (see docs/CONTENT_STYLE.md):\n`,
+    `✗ ${hits.length} unwrapped code-shaped value${hits.length === 1 ? "" : "s"} (see content/AGENTS.md):\n`,
   );
   console.error(formatHits(hits));
   process.exit(1);

@@ -75,35 +75,10 @@ PostHog 키가 비어 있으면 서버/클라이언트 둘 다 no-op으로 떨�
 
 ## 콘텐츠 추가
 
-문제는 `content/questions/<category>/` 아래 `.yaml` 파일로 관리합니다.
-카테고리 목록과 id prefix는 `lib/categories.ts`가 단일 출처입니다.
-
-```yaml
-id: js-001
-category: javascript
-difficulty: medium
-type: single_choice
-question: 다음 코드의 출력 결과는?
-code: |
-  console.log(1)
-  setTimeout(() => console.log(2))
-  Promise.resolve().then(() => console.log(3))
-choices:
-  - id: a
-    text: "1, 2, 3"
-  - id: b
-    text: "1, 3, 2"
-  - id: c
-    text: "3, 2, 1"
-answer: b
-explanation: |
-  마이크로태스크 큐가 매크로태스크 큐보다 먼저 처리됩니다.
-tags: [event-loop, async]
-```
-
-복수 정답 문제는 `type: multi_choice`, `answer: [a, c]`처럼 작성합니다.
-코드 스니펫 표기(인라인 백틱 vs 펜스) 컨벤션은 [`docs/CONTENT_STYLE.md`](./docs/CONTENT_STYLE.md) 참고 — `pnpm questions:check`가 빌드 타임에 강제합니다.
-추가/수정 후에는 최소 `pnpm questions:check`를 돌려주세요.
+콘텐츠는 `content/` 아래 카테고리별 `.yaml` 파일로 관리해요. YAML 예시·톤
+가이드·라이선스 안내는 [`content/README.md`](./content/README.md)에, 코드
+스니펫 표기·검사 룰 같은 강제 규칙은 [`content/AGENTS.md`](./content/AGENTS.md)에
+정리돼 있어요. 추가/수정 후에는 최소 `pnpm questions:check`를 돌려 주세요.
 
 ## 라이선스
 
@@ -116,9 +91,9 @@ tags: [event-loop, async]
 
 ## 기여
 
-현재는 MVP 뼈대와 시드 콘텐츠 100문제가 들어간 상태입니다.
-새 카테고리/문제 형식/공유 구조처럼 UX나 데이터 구조에 영향을 주는 변경은 먼저 이슈로 논의 부탁드립니다.
+새 카테고리·문제 형식·공유 구조처럼 UX나 데이터 구조에 영향을 주는 변경은
+먼저 이슈로 논의 부탁드려요.
 
 문제 작성 시 코드 스니펫 표기(백틱·펜스) 컨벤션은
-[`docs/CONTENT_STYLE.md`](./docs/CONTENT_STYLE.md) 참고. `pnpm questions:check`가
+[`content/AGENTS.md`](./content/AGENTS.md) 참고. `pnpm questions:check`가
 이 컨벤션을 빌드 타임에 강제해요.
