@@ -1,0 +1,18 @@
+# Gemini Code Assist 저장소 설정
+# 공식 문서: https://developers.google.com/gemini-code-assist/docs/customize-repo-review
+# 리뷰 언어(한국어) 및 세부 리뷰 규칙은 .gemini/styleguide.md 에서 지시합니다.
+
+have_fun: false
+
+code_review:
+  disable: false
+  comment_severity_threshold: MEDIUM
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+
+ignore_patterns:
+  - "pnpm-lock.yaml"
+  - "public/**"
+  # supabase/migrations 는 RLS/권한 등 보안에 직결되므로 ignore 하지 않습니다.
