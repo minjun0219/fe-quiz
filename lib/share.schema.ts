@@ -59,7 +59,12 @@ export const ShareRowSchema = z.object({
   score: z.number().int().min(0).max(100),
   feedback: z.string(),
   result_type: z.string(),
-  category_scores: z.record(
+  // Sparse by design: a round only includes a subset of categories, so the
+  // stored row carries only the categories that actually appeared. Zod 4's
+  // `z.record(z.enum, …)` is exhaustive — adding a new category to
+  // `CATEGORIES` would otherwise retroactively invalidate every existing
+  // share row (safeParse → null → 404). `z.partialRecord` skips that check.
+  category_scores: z.partialRecord(
     Category,
     z.object({
       correct: z.number().int().nonnegative(),
