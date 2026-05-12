@@ -1,0 +1,21 @@
+id: react-022
+category: react
+difficulty: medium
+type: single_choice
+question: |
+  TanStack Query에서 `staleTime`과 `gcTime`의 차이를 설명한 내용으로 맞는 것은?
+choices:
+  - id: a
+    text: "`staleTime`은 쿼리가 안 쓰인 뒤 캐시에서 삭제되기까지의 시간이고, `gcTime`은 데이터를 신선하게 보는 시간이에요."
+  - id: b
+    text: "`staleTime` 동안 데이터는 fresh로 간주되어 불필요한 refetch를 피할 수 있고, `gcTime`은 inactive 쿼리 캐시를 얼마나 유지할지 정해요."
+  - id: c
+    text: "`staleTime`이 지나면 캐시 데이터는 즉시 삭제되어 화면에 더 이상 사용할 수 없어요."
+  - id: d
+    text: "`gcTime`을 길게 설정하면 쿼리가 active 상태여도 항상 네트워크 요청을 막아요."
+answer: b
+explanation: |
+  `staleTime`은 데이터를 가져온 뒤 얼마 동안 fresh로 볼지를 정하는 값이에요. 이 시간 안에는 refetch가 트리거될 만한 상황이 와도 캐시 데이터를 신선하다고 보고 불필요한 네트워크 요청을 줄일 수 있어요.
+  `gcTime`은 쿼리를 사용하는 컴포넌트가 없어져 inactive 상태가 된 뒤, 그 캐시를 메모리에 얼마나 더 남겨둘지 정해요. `staleTime`이 지났다고 캐시가 바로 삭제되는 것은 아니고, stale 데이터도 새 데이터를 받아오기 전까지 기존 화면을 보여 주는 데 활용될 수 있어요.
+  오답 a는 두 개념을 서로 바꿔 말했고, c는 stale과 garbage collection을 혼동한 설명이에요. d도 `gcTime`이 신선도나 refetch 여부를 직접 제어하는 값처럼 설명해서 틀렸어요.
+tags: [ tanstack-query, cache, staleTime, gcTime ]
