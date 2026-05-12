@@ -41,5 +41,5 @@ No ESLint, no Prettier — `biome.json` is the single source for lint and format
 - **Optional integrations are no-op / fail-open** when env is unset: Upstash rate limit, PostHog (server + client), Anthropic. Do not turn these into hard requirements.
 - **YAML content is schema-validated**: run `pnpm questions:check` after any edit under `content/questions/`. Prose/code style is enforced — see `docs/CONTENT_STYLE.md`.
 
-For deeper context, read `docs/ROADMAP.md` and `docs/CONTENT_STYLE.md` before non-trivial changes.
+For deeper context, read `docs/DECISIONS.md` and `docs/CONTENT_STYLE.md` before non-trivial changes.
 <!-- END:project-agent-rules -->

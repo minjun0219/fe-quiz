@@ -19,7 +19,7 @@
 - 보호 장치: Supabase secret key 기반 서버 접근, anon 직접 접근 차단, Upstash 기반 rate limit(선택)
 - 모니터링: PostHog(에러/이벤트, 키 미설정 시 서버·클라이언트 모두 no-op) + Vercel Analytics(컴포넌트 마운트로 활성, Vercel 배포에서만 데이터 수집)
 
-자세한 컨셉/스택/로드맵은 [`docs/ROADMAP.md`](./docs/ROADMAP.md) 참고.
+자세한 컨셉·스택·아키텍처 결정은 [`docs/DECISIONS.md`](./docs/DECISIONS.md) 참고.
 
 ## 로컬 실행
 
