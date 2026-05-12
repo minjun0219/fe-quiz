@@ -1,0 +1,21 @@
+id: js-022
+category: javascript
+difficulty: medium
+type: single_choice
+question: |
+  `CommonJS`와 `ES Module`의 차이를 설명한 내용으로 가장 적절한 것은?
+choices:
+  - id: a
+    text: "`CommonJS`는 `import`/`export`를 쓰고, `ES Module`은 `require`/`module.exports`를 써요."
+  - id: b
+    text: "`ES Module`은 정적 구조라 번들러가 의존성을 분석하기 쉽고, 트리 쉐이킹에 더 유리해요."
+  - id: c
+    text: "`CommonJS`는 브라우저 표준 모듈 시스템이라 `<script type=\"module\">` 없이도 바로 동작해요."
+  - id: d
+    text: "두 방식은 문법만 다르고 로딩 방식이나 최적화 가능성에는 차이가 없어요."
+answer: b
+explanation: |
+  `ES Module`은 `import`/`export`가 파일 최상위의 정적인 형태로 선언되기 때문에, 번들러가 어떤 값이 실제로 사용되는지 분석하기 쉬워요. 그래서 사용하지 않는 export를 제거하는 트리 쉐이킹이나 브라우저의 네이티브 모듈 로딩과 잘 맞아요.
+  `CommonJS`는 주로 Node.js에서 쓰인 `require`/`module.exports` 기반 방식이고, 런타임에 조건부로 `require()`를 호출할 수 있어 정적 분석이 상대적으로 어려워요. 브라우저에서 그대로 표준처럼 실행되는 방식도 아니어서 보통 번들러 변환이 필요해요.
+  오답 a는 두 문법을 반대로 설명했고, c는 브라우저 표준 모듈 시스템을 잘못 짚었어요. d처럼 단순 문법 차이만 있는 것이 아니라 로딩 시점, 분석 가능성, 번들 최적화 전략까지 실무 선택에 영향을 줘요.
+tags: [ module, commonjs, esm, tree-shaking ]
