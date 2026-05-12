@@ -25,7 +25,7 @@ React 19. Server Components are the default in this codebase; client interactivi
 <!-- BEGIN:tooling-agent-rules -->
 # Tooling: Biome v2, Vitest v4, pnpm 10
 
-No ESLint, no Prettier — `biome.json` is the single source for lint and format, and `noConsole` is enforced (use `lib/logger.ts` / pino instead). Tests run in Node only (`vitest.config.ts`, `environment: "node"`); DOM tests are not configured. Package manager is pnpm via corepack — do not run `npm` or `yarn`.
+No ESLint, no Prettier — `biome.json` is the single source for lint and format. `noConsole` is enforced in app/library code (use `lib/logger.ts` / pino instead); the `scripts/**`, `*.config.*`, and `*.test.*`/`*.spec.*` overrides leave `console` on for build scripts and tests. Tests run in Node only (`vitest.config.ts`, `environment: "node"`); DOM tests are not configured. Package manager is pnpm via corepack — do not run `npm` or `yarn`.
 <!-- END:tooling-agent-rules -->
 
 <!-- BEGIN:project-agent-rules -->

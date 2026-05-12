@@ -10,11 +10,14 @@ content/questions/
   css/*.yaml
   typescript/*.yaml
   html/*.yaml
+  browser/*.yaml
+  performance/*.yaml
+  nextjs/*.yaml
 ```
 
-카테고리 목록과 id prefix(`js-`, `react-`, `css-`, `ts-`, `html-`)는
-`lib/categories.ts`가 단일 출처예요. 새 카테고리를 추가할 일이 생기면 거기서
-시작해 주세요.
+카테고리 목록과 id prefix는 `lib/categories.ts`가 단일 출처예요. 현재 prefix는
+`js-`, `react-`, `css-`, `ts-`, `html-`, `browser-`, `perf-`, `next-` 8종.
+새 카테고리를 추가할 일이 생기면 `lib/categories.ts`부터 시작해 주세요.
 
 ## YAML 예시
 
@@ -45,7 +48,7 @@ tags: [event-loop, async]
 
 검증 규칙 핵심:
 
-- `id`는 카테고리 prefix로 시작해야 해요 (`js-`, `react-`, `css-`, `ts-`, `html-`)
+- `id`는 카테고리 prefix로 시작해야 해요 (`js-`, `react-`, `css-`, `ts-`, `html-`, `browser-`, `perf-`, `next-` — `lib/categories.ts` 기준)
 - choice id·text 중복 금지
 - `answer`는 실제 choice id만 참조
 - `multi_choice`는 모든 선택지를 정답으로 둘 수 없음

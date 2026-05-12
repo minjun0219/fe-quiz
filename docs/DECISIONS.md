@@ -192,28 +192,33 @@ fe-quiz/
 │   └── PostHogProvider.tsx      # 클라이언트 PostHog 부트스트랩
 ├── content/
 │   ├── LICENSE                  # CC BY-SA 4.0
-│   └── questions/               # YAML 시드 문제 100개
+│   ├── README.md                # 콘텐츠 작성자 가이드 (한국어)
+│   ├── AGENTS.md                # 콘텐츠 강제 규칙 (영어)
+│   └── questions/               # YAML 시드 문제 (카테고리별 폴더)
 ├── lib/                         # 도메인 로직
 │   ├── categories.ts            # 카테고리 단일 출처
 │   ├── question.schema.ts       # zod 질문 스키마
 │   ├── levels.ts                # 난이도 3단계 단일 출처
-│   ├── round.ts                 # 라운드 선택
+│   ├── round.ts                 # 라운드 로드/공개 데이터
+│   ├── round-picker.ts          # 라운드 픽커 + ROUND_SIZE 단일 출처
 │   ├── grading.ts               # 채점
 │   ├── diagnosis.ts             # 진단/페르소나
 │   ├── feedback-prompt.ts       # LLM 프롬프트
 │   ├── share-store.ts           # shares 저장/조회
+│   ├── highlight.ts             # 마크다운/코드 렌더
 │   ├── supabase.ts              # 서버 Supabase 클라이언트
 │   ├── rate-limit.ts            # Upstash rate limit
 │   ├── logger.ts                # pino 싱글턴
 │   └── posthog-server.ts        # 서버 PostHog 싱글턴
 ├── scripts/
 │   ├── check-questions.ts
-│   └── check-round.ts
+│   ├── check-round.ts
+│   └── lint-question-prose.ts   # prose vs code 휴리스틱 검사
 ├── supabase/
+│   ├── AGENTS.md                # 마이그레이션 운영 가이드 (영어)
 │   └── migrations/
 ├── docs/
-│   ├── ROADMAP.md
-│   └── CONTENT_STYLE.md         # 코드 스니펫 표기 컨벤션
+│   └── DECISIONS.md             # 이 문서 — 영구 설계 결정
 ├── instrumentation.ts           # Next.js 16 onRequestError → PostHog
 ├── .env.local.example
 ├── .mcp.json
