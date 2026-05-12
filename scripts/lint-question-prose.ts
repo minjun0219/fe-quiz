@@ -12,7 +12,7 @@
  * flag the remainder if it still looks like code. False-positives are silenced
  * with `# fmt: off-prose` on the line directly above the offending field.
  *
- * See `docs/CONTENT_STYLE.md` for the convention this enforces.
+ * See `content/AGENTS.md` for the convention this enforces.
  */
 
 import { readdirSync, readFileSync } from "node:fs";

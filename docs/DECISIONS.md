@@ -1,8 +1,8 @@
-# FE 퀴즈 — 로드맵
+# FE 퀴즈 — 핵심 설계 결정
 
-이 문서는 프로젝트의 현재 상태와 다음 작업 컨텍스트를 저장소 안에 박제해둔 것입니다.
-다음 PR을 시작할 때마다 여기서 컨텍스트를 복원하세요.
-변경사항이 생기면 별도 PR로 이 문서를 갱신해주세요.
+이 문서는 프로젝트의 영구적인 설계 결정과 컨벤션을 저장소 안에 박제해둔 것이에요.
+구현 진척도나 PR별 진행 상태가 아니라, **앞으로도 유지될 결정**만 담아요.
+결정이 바뀌면 별도 PR로 이 문서를 갱신해 주세요.
 
 ## 한 줄 정의
 
@@ -10,20 +10,6 @@
 
 한국어 사용 FE 개발자(특히 면접 준비 중인 주니어/미들) 대상.
 단톡방에서 슬쩍 던지는 퀴즈처럼 가볍게 풀고, 끝에 누룽지(🍘)가 한마디 보태주는 미니게임.
-
-## 현재 구현 상태
-
-- **라운드**: 10문제 랜덤 추출 (`ROUND_SIZE = 10` in `lib/round-picker.ts`), 공유 링크에서 진입하면 같은 문제/같은 순서로 재생
-- **난이도**: 3단계(`intro`/`normal`/`challenge`) 선택. 카테고리별 풀이 부족하면 인접 난이도로 자동 대체. `lib/levels.ts`가 단일 출처
-- **카테고리**: JavaScript, React, CSS, TypeScript, HTML
-- **콘텐츠**: 카테고리별 20문제, 총 100문제 시드
-- **문제 형식**: `single_choice`, `multi_choice`
-- **채점**: 서버사이드 검증. 클라이언트 라운드 데이터에는 정답/해설 미포함
-- **결과**: 총점, 카테고리별 점수, 진단명/페르소나, 타입 코드
-- **AI 피드백**: `/api/quiz/feedback`에서 Claude Haiku 4.5 스트리밍 응답
-- **공유**: `/api/share`가 서버 재채점 후 `shares` row 생성, `/r/[slug]` 결과 페이지와 OG 이미지 제공. 공유 URL은 요청 헤더(`x-forwarded-host`/`host`) + Vercel 운영 도메인 화이트리스트로 도출하며 그 외 호스트는 `VERCEL_PROJECT_PRODUCTION_URL` 또는 `localhost`로 폴백 (`app/api/share/route.ts`, #36)
-- **보안/남용 방지**: Supabase secret key 서버 접근, anon 직접 접근 차단, Upstash rate limit 선택 적용
-- **Observability**: PostHog 서버/클라이언트(키 미설정 시 양쪽 no-op) + Next.js `instrumentation.onRequestError`로 미처리 예외 캡처, `app/error.tsx`/`app/global-error.tsx`로 라우트 단 에러 바운더리, Vercel Analytics(루트 layout에서 `<Analytics />` 마운트로 활성, Vercel 배포에서만 데이터 수집)
 
 ## 핵심 설계 결정
 
@@ -37,7 +23,9 @@
 ### 의도적으로 만들지 않는 것
 
 스트릭, 하트, 티어, 리더보드, 매일 출석, 광고. **Duolingo가 아닌 토스 미니퀴즈/카훗 결**.
-학습 압박 요소는 모두 제거합니다.
+학습 압박 요소는 모두 제거해요.
+
+차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, AI 자동 콘텐츠 수집(GitHub Actions cron), Supabase CLI 로컬 dev DB, 콘텐츠/엔진 저장소 분리.
 
 ### 차별화
 
@@ -165,53 +153,7 @@ create index idx_shares_created on shares (created_at desc);
 **중요**: 같은 라운드를 친구가 풀 때 10문제 순서까지 동일해야 합니다.
 점수 비교 의미를 살려야 바이럴이 작동합니다.
 
-## 환경변수
-
-`.env.local.example` 참조.
-
-| 변수 | 용도 |
-| --- | --- |
-| `SUPABASE_URL` | 운영 Supabase 프로젝트 URL (`VERCEL_ENV=production` 전용) |
-| `SUPABASE_SECRET_KEY` | 운영 서버 전용 secret/service-role key |
-| `SUPABASE_DEV_URL` | 비-운영(preview/local/CI) Supabase 프로젝트 URL |
-| `SUPABASE_DEV_SECRET_KEY` | 비-운영 서버 전용 secret/service-role key |
-| `ANTHROPIC_API_KEY` | Claude 피드백 호출 |
-| `UPSTASH_REDIS_REST_URL` | rate limit Redis REST URL |
-| `UPSTASH_REDIS_REST_TOKEN` | rate limit Redis REST token |
-| `LOG_LEVEL` | pino 로그 레벨 |
-| `NEXT_PUBLIC_POSTHOG_KEY` | PostHog project API key (write-only, 노출 OK) |
-| `NEXT_PUBLIC_POSTHOG_HOST` | PostHog 리전 origin (기본 `https://us.i.posthog.com`) |
-
-Upstash가 미설정되거나 장애가 나면 rate limit은 fail-open입니다. 비용/스팸 보호용이지 보안 경계가 아닙니다.
-PostHog 키도 미설정이면 서버/클라이언트 둘 다 no-op으로 떨어집니다.
-공유/메타 URL의 base는 별도 env가 아니라 Vercel이 자동 주입하는 `VERCEL_URL` / `VERCEL_PROJECT_PRODUCTION_URL` + 요청 헤더 화이트리스트로 도출됩니다.
-
-## MVP 범위와 완료 상태
-
-| # | 단계 | 상태 |
-| --- | --- | --- |
-| 1 | Next.js 16 + TypeScript + Tailwind 프로젝트 초기화 + 로드맵 박제 | ✅ 완료 |
-| 2 | Supabase 연결 + `shares` 테이블 마이그레이션 + RLS | ✅ 완료 |
-| 3 | `content/questions/` YAML 스키마 + 빌드/검증 파이프라인 | ✅ 완료 |
-| 4 | `/play` 라운드 페이지 — 10문제 진행 UI | ✅ 완료 |
-| 5 | 서버사이드 정답 검증 API (`/api/quiz/submit`) | ✅ 완료 |
-| 6 | 결과 진단 로직 (카테고리별 정확도 → 진단명/타입 코드) | ✅ 완료 |
-| 7 | AI 피드백 통합 (Haiku 4.5 스트리밍) | ✅ 완료 |
-| 8 | 공유 API + 공유 페이지 (`/r/[slug]`) | ✅ 완료 |
-| 9 | Vercel OG 이미지 동적 생성 | ✅ 완료 |
-| 10 | 시드 콘텐츠 100문제 작성 | ✅ 완료 |
-| 11 | Upstash rate limit + secret-key 기반 Supabase 접근 강화 | ✅ 완료 |
-| 12 | 라운드 난이도 3단계 선택 (#25) | ✅ 완료 |
-| 13 | Observability — PostHog + Vercel Analytics + `onRequestError` (#38) | ✅ 완료 |
-
-## v2 이후 후보 (지금은 만들지 말 것)
-
-- AI 면접관 모드 (주관식 + 꼬리질문)
-- 사용자 계정 / 누적 진척도
-- 카테고리 추가
-- AI 자동 수집 워크플로우 (GitHub Actions cron)
-- Supabase CLI 기반 로컬 dev DB / migration push
-- 저장소 분리 (콘텐츠/엔진)
+환경변수 표는 `README.md`가 단일 출처예요. `.env.local.example`도 함께 참조해 주세요. Upstash·PostHog·Anthropic은 키가 비면 모두 no-op/fail-open으로 떨어지는 게 기본 원칙이고, 공유/메타 URL의 base는 별도 env 없이 `VERCEL_URL` / `VERCEL_PROJECT_PRODUCTION_URL` + 요청 헤더 화이트리스트로 도출돼요.
 
 ## 톤 & UX 가이드라인
 
@@ -250,28 +192,33 @@ fe-quiz/
 │   └── PostHogProvider.tsx      # 클라이언트 PostHog 부트스트랩
 ├── content/
 │   ├── LICENSE                  # CC BY-SA 4.0
-│   └── questions/               # YAML 시드 문제 100개
+│   ├── README.md                # 콘텐츠 작성자 가이드 (한국어)
+│   ├── AGENTS.md                # 콘텐츠 강제 규칙 (영어)
+│   └── questions/               # YAML 시드 문제 (카테고리별 폴더)
 ├── lib/                         # 도메인 로직
 │   ├── categories.ts            # 카테고리 단일 출처
 │   ├── question.schema.ts       # zod 질문 스키마
 │   ├── levels.ts                # 난이도 3단계 단일 출처
-│   ├── round.ts                 # 라운드 선택
+│   ├── round.ts                 # 라운드 로드/공개 데이터
+│   ├── round-picker.ts          # 라운드 픽커 + ROUND_SIZE 단일 출처
 │   ├── grading.ts               # 채점
 │   ├── diagnosis.ts             # 진단/페르소나
 │   ├── feedback-prompt.ts       # LLM 프롬프트
 │   ├── share-store.ts           # shares 저장/조회
+│   ├── highlight.ts             # 마크다운/코드 렌더
 │   ├── supabase.ts              # 서버 Supabase 클라이언트
 │   ├── rate-limit.ts            # Upstash rate limit
 │   ├── logger.ts                # pino 싱글턴
 │   └── posthog-server.ts        # 서버 PostHog 싱글턴
 ├── scripts/
 │   ├── check-questions.ts
-│   └── check-round.ts
+│   ├── check-round.ts
+│   └── lint-question-prose.ts   # prose vs code 휴리스틱 검사
 ├── supabase/
+│   ├── AGENTS.md                # 마이그레이션 운영 가이드 (영어)
 │   └── migrations/
 ├── docs/
-│   ├── ROADMAP.md
-│   └── CONTENT_STYLE.md         # 코드 스니펫 표기 컨벤션
+│   └── DECISIONS.md             # 이 문서 — 영구 설계 결정
 ├── instrumentation.ts           # Next.js 16 onRequestError → PostHog
 ├── .env.local.example
 ├── .mcp.json
@@ -280,43 +227,4 @@ fe-quiz/
 └── LICENSE                      # MIT
 ```
 
-## 마이그레이션 적용 방법
-
-`supabase/migrations/*.sql`은 `.github/workflows/migrate.yml`이 `supabase db push`로
-자동 적용합니다(Supabase의 GitHub 통합은 미사용). 운영/비-운영 두 프로젝트가
-분리되어 있어서(`lib/supabase.ts`) 워크플로가 이벤트별로 분기:
-
-- `pull_request` (PR 열림/푸시) → **dev 프로젝트**에 자동 적용
-- `push` to `main` (PR 머지 직후) → **prod 프로젝트**에 자동 적용
-- `workflow_dispatch` (수동) → **dev 프로젝트**에 적용 (prod 수동 실행은 의도적으로 금지)
-
-순서를 보장하는 이유: dev 적용 → preview 검증 → main 머지 → prod 적용. prod-first
-경로를 두지 않으므로, preview가 옛 스키마를 읽어 머지 전 검증이 무력화되는 일이
-없습니다. 반대로 dev 적용을 건너뛰고 main에 머지해도 prod 적용은 안전 — 다만
-다음 PR의 preview는 이번 SQL이 dev에 들어와야 정상 동작.
-
-### PR 체크리스트 (마이그레이션 포함 PR 한정)
-
-- [ ] PR 푸시 후 Actions의 `Apply Supabase migrations` (apply 잡) **dev 적용** 성공 확인
-- [ ] preview 배포에서 관련 플로우 검증
-- [ ] (머지 후) Actions에서 **prod 적용** 성공 확인
-- [ ] 운영 도메인 smoke check (공유 1회 생성)
-
-### 필요한 GitHub Secrets
-
-| Secret                         | 용도                           |
-|--------------------------------|--------------------------------|
-| `SUPABASE_ACCESS_TOKEN`        | supabase CLI 인증 (계정 토큰)  |
-| `SUPABASE_PROJECT_REF`         | 운영 프로젝트 ref              |
-| `SUPABASE_DB_PASSWORD`         | 운영 DB 비밀번호               |
-| `SUPABASE_DEV_PROJECT_REF`     | 비-운영 프로젝트 ref           |
-| `SUPABASE_DEV_DB_PASSWORD`     | 비-운영 DB 비밀번호            |
-
-### 주의
-
-`20260509000002_lock_down_shares_rls.sql` 적용 전에는 해당 환경의 secret 키(운영=`SUPABASE_SECRET_KEY`, 비-운영=`SUPABASE_DEV_SECRET_KEY`)가 준비되어 있어야 합니다. SQL만 먼저 적용하면 기존 publishable-key 기반 경로가 `permission denied`로 깨질 수 있습니다.
-
-## 목표
-
-MVP 뼈대와 시드 콘텐츠는 완료된 상태입니다.
-이후 작업은 품질 안정화, 배포 환경 점검, 콘텐츠 검수, 공유 바이럴 UX 개선에 집중합니다.
+마이그레이션 운영 가이드(워크플로 분기, GitHub Secrets, lock-down 주의사항)는 `supabase/AGENTS.md` 참고.
