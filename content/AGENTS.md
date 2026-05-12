@@ -1,51 +1,49 @@
-# Quiz content — agent guide
+# 퀴즈 콘텐츠 — 에이전트 가이드
 
-Rules for writing or modifying `content/questions/**/*.yaml`. The renderer
-is `renderQuizMarkdown` in `lib/highlight.ts`, and these conventions are
-enforced by `pnpm questions:check` (which `prebuild` runs).
+`content/questions/**/*.yaml`을 작성·수정할 때 적용되는 규칙이에요. 렌더는
+`lib/highlight.ts`의 `renderQuizMarkdown`이 담당하고, 여기 정리된 컨벤션은
+`pnpm questions:check`(prebuild에 연결돼 있음)가 빌드 타임에 강제해요.
 
-For human-oriented context (tone, contributor onboarding, examples), see
-`content/README.md`.
+사람용 맥락(톤·기여자 온보딩·예시)은 `content/README.md` 참고.
 
-## At a glance
+## 한눈에
 
-| What you are showing | Wrap with |
+| 표현 | 표기 방식 |
 | --- | --- |
-| Single identifier / keyword / one-line expression / type literal | `` `code` `` (inline backticks) |
-| Multi-line code / JSX / function body / multi-line object | ` ```lang … ``` ` (fenced block, prefer a language tag) |
-| Semantic emphasis | `**bold**` |
-| The question's main code sample | YAML `code:` field (plain text, no backticks) |
+| 단일 식별자 / 키워드 / 한 줄 표현식 / 타입 리터럴 | `` `code` `` (인라인 백틱) |
+| 여러 줄 코드 / JSX / 함수 본문 / 멀티라인 객체 | ` ```lang … ``` ` (펜스 블록, 언어 태그 권장) |
+| 의미적 강조 | `**bold**` |
+| 문제의 메인 코드 샘플 | YAML `code:` 필드 (백틱 없이 plain text) |
 
-## Inline backticks
+## 인라인 백틱
 
-Always wrap with `` `…` ``:
+다음은 무조건 `` `…` ``으로 감싸요:
 
-- Single identifier, keyword, operator: `` `useEffect` ``, `` `as` ``, `` `:has()` ``
-- Property name or single-line CSS rule: `` `position: sticky` ``, `` `flex-grow: 1; flex-shrink: 1; flex-basis: 0%` ``
-- One-line expression / method call / type literal: `` `xs.map(x => x * 2)` ``, `` `{ id: number; name: string }` ``
-- Type keyword answers: `` `any` ``, `` `never` ``, `` `void` ``, `` `unknown` ``
-- Array/object literal answers: `` `[2, 4, 6, 8]` ``, `` `{ a: 1 }` ``
-- HTML element names: `` `<main>` ``, `` `<div role="main">` ``
+- 단일 식별자(identifier)·키워드·연산자: `` `useEffect` ``, `` `as` ``, `` `:has()` ``
+- 속성명·한 줄짜리 CSS 룰: `` `position: sticky` ``, `` `flex-grow: 1; flex-shrink: 1; flex-basis: 0%` ``
+- 한 줄 표현식·메서드 호출·타입 리터럴: `` `xs.map(x => x * 2)` ``, `` `{ id: number; name: string }` ``
+- 타입 키워드 답안: `` `any` ``, `` `never` ``, `` `void` ``, `` `unknown` ``
+- 배열/객체 리터럴 답안: `` `[2, 4, 6, 8]` ``, `` `{ a: 1 }` ``
+- HTML 엘리먼트명: `` `<main>` ``, `` `<div role="main">` ``
 
-Same rule applies when code tokens appear inline in prose. Example:
+산문(prose)에 코드 토큰이 섞일 때도 같은 규칙:
 
 ```yaml
 explanation: |
   `Pick<T, K>`는 `T`에서 키 `K`만 골라낸 새 타입을 만들어요.
 ```
 
-## Fenced blocks
+## 펜스 블록
 
-Use a fence when:
+다음 상황엔 펜스를 써요:
 
-- The content is a multi-line function, branch, or full code block
-- A single line exceeds ~60 chars and would line-break awkwardly on mobile
-- It's a JSX tree, multi-line object/type, or template literal
+- 여러 줄 함수·분기·전체 코드 블록
+- 한 줄이라도 ~60자를 넘겨 모바일에서 임의 줄바꿈이 발생할 때
+- JSX 트리, 멀티라인 객체/타입, template literal
 
-Language tag preference: `ts`, `tsx`, `js`, `jsx`, `html`, `css`. The current
-renderer parses the info-string but does not use it for visual rendering, so
-tags are visually inert today — still **required** so they apply automatically
-when syntax highlighting (#30) ships.
+언어 태그 권장값: `ts`, `tsx`, `js`, `jsx`, `html`, `css`. 현재 렌더러는
+info-string을 파싱만 하고 시각적 렌더링엔 쓰지 않지만, syntax highlighting
+도입(#30) 시 즉시 적용되도록 **태그는 반드시 붙여 주세요**.
 
 ```yaml
 choices:
@@ -58,27 +56,26 @@ choices:
       ```
 ```
 
-Inside YAML block scalars the fence is still recognized. Mind indentation —
-match the first and last line exactly so the YAML parser doesn't trim blank
-lines.
+YAML 블록 스칼라(block scalar) 안에서도 펜스는 인식돼요. 들여쓰기 주의 —
+첫 줄·끝 줄을 정확히 맞춰서 YAML 파서가 빈 줄을 트리밍하지 않도록.
 
-## Bold emphasis
+## 굵게 강조
 
-`**…**` is for semantic emphasis only:
+`**…**`는 의미적 강조 전용:
 
 - `**올바른 설명**`, `**규칙 위반**`, `**컴파일 에러**`
 
-Avoid:
+피해야 할 것:
 
-- Never wrap code tokens in bold. Code = backticks.
-- Surround the exponent operator `**` with spaces. The `BOLD_RE` flanking
-  rule (`lib/highlight.ts:39`) won't mis-bold `Math.PI * shape.r ** 2`, but
-  putting such code inside a fence is the safe path.
+- 코드 토큰을 굵게 감싸지 마세요. 코드는 백틱.
+- 지수 연산자 `**`와 인접한 굵게 표기는 양옆에 공백을 둬요. `BOLD_RE` flanking
+  규칙(`lib/highlight.ts:39`)이 `Math.PI * shape.r ** 2` 같은 패턴을 굵게로
+  잘못 잡지는 않지만, 그런 코드는 펜스로 분리하는 게 안전.
 
-## `code:` field
+## `code:` 필드
 
-The question's primary code sample goes in the YAML top-level `code:` field
-as plain text — no backticks. The renderer wraps it in `<pre>` automatically:
+문제의 메인 코드 샘플은 YAML 최상위 `code:` 블록에 백틱 없이 plain text로
+넣어요. 렌더가 자동으로 `<pre>`로 감싸 줍니다:
 
 ```yaml
 code: |
@@ -87,13 +84,13 @@ code: |
     | { kind: 'square'; s: number }
 ```
 
-Backtick/fence rules only apply when you embed code inside `question:`,
-`choices[].text`, or `explanation:`.
+백틱/펜스 규칙은 `question:`, `choices[].text`, `explanation:`에 코드를
+끼워넣을 때만 적용돼요.
 
-## Don't do this (failure cases)
+## 하지 말 것 (실패 사례)
 
 ```yaml
-# ❌ function body falls into prose font; mobile wraps it randomly
+# ❌ 함수 본문이 prose 폰트로 떨어져 모바일에서 임의 줄바꿈
 choices:
   - id: a
     text: |
@@ -101,33 +98,31 @@ choices:
         return Math.PI * shape.r ** 2
       }
 
-# ❌ type-keyword answer with no backticks
+# ❌ 타입 키워드 답안에 백틱 없음
 choices:
   - id: c
     text: "any"
 
-# ❌ CSS rule left as prose
+# ❌ CSS 룰을 prose로 남김
 choices:
   - id: a
     text: "label > input:checked { background: yellow }"
 ```
 
-The correct form lives in the [Inline backticks](#inline-backticks) and
-[Fenced blocks](#fenced-blocks) sections above.
+올바른 형태는 위 [인라인 백틱](#인라인-백틱)·[펜스 블록](#펜스-블록) 섹션 참고.
 
-## Automated checks
+## 검사 자동화
 
-`pnpm questions:check` (wired into `prebuild`) enforces:
+`pnpm questions:check`(prebuild에 연결)가 강제하는 것:
 
-1. The Zod schema in `lib/question.schema.ts`
-2. The prose-vs-code heuristic in `scripts/lint-question-prose.ts` —
-   unwrapped code-shaped text in `question:` / `choices[].text` /
-   `explanation:` exits non-zero.
+1. `lib/question.schema.ts`의 Zod 스키마
+2. `scripts/lint-question-prose.ts`의 prose-vs-code 휴리스틱 — `question:`·
+   `choices[].text`·`explanation:` 값에 래핑 안 된 코드 모양 텍스트가 있으면
+   비제로 종료.
 
-### Opt-out
+### opt-out
 
-If the heuristic false-positives on a rare case, place an opt-out marker as
-a comment on the line immediately above:
+휴리스틱이 false-positive를 잡는 드문 케이스엔 바로 위 라인에 코멘트 마커:
 
 ```yaml
 choices:
@@ -136,21 +131,19 @@ choices:
     text: "프로토타입 상속(prototype chain) 자체"
 ```
 
-The marker applies to **the single next field** (same key block) and nothing
-else. Mark each opt-out line explicitly — the goal is to keep blanket
-opt-outs out of the codebase.
+마커는 **바로 다음 라인의 한 필드**(같은 키 블록)에만 적용돼요. 매번 한 줄씩
+명시적으로 표시 — 무분별한 opt-out을 막는 게 목적이에요.
 
-## Tone
+## 톤(tone)
 
-Quiz copy uses a friendly Korean polite form (친근한 존댓말 — `~해요` 위주,
-not `~합니다` 일변도). Detailed conversion patterns and constraints live in
-`content/README.md#톤-가이드`. When editing existing content, only flip
-verb endings — never change meaning, indentation, or short code-shaped
-choice text.
+퀴즈 콘텐츠 톤은 친근한 존댓말(`~합니다` 일변도가 아니라 `~해요` 위주)이에요.
+어미 전환 패턴·제약 등 상세는 `content/README.md#톤-가이드`에 정리돼 있어요.
+기존 콘텐츠를 수정할 때는 어미만 전환할 것 — 의미·들여쓰기·짧은 코드성 선택지
+텍스트는 절대 건드리지 마세요.
 
-## Reference
+## 참고
 
-- Render pipeline: `lib/highlight.ts` `renderQuizMarkdown`
-- Inline-text call sites: `lib/round.ts:26`, `lib/round.ts:30`, `lib/grading.ts:54`
-- Lint rule: `scripts/lint-question-prose.ts`
-- Bold flanking rule: `lib/highlight.ts:39` (`BOLD_RE`)
+- 렌더 파이프라인: `lib/highlight.ts`의 `renderQuizMarkdown`
+- 인라인 텍스트 호출처: `lib/round.ts:26`, `lib/round.ts:30`, `lib/grading.ts:54`
+- 린트 룰: `scripts/lint-question-prose.ts`
+- 굵게 flanking 규칙: `lib/highlight.ts:39` (`BOLD_RE`)
