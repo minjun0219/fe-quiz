@@ -66,7 +66,7 @@ jobs:
           # MCP/툴 허용은 claude_args 로 넘기고, 타임아웃은 job 의 timeout-minutes 사용.
           claude_args: |
             --mcp-config .mcp.json
-            --allowedTools Task,Read,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs
+            --allowedTools "Task,Read,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
 
       - name: Run /factcheck via Claude Code
         if: github.event.inputs.dry_run != 'true'
@@ -76,7 +76,7 @@ jobs:
           prompt: "/factcheck all"
           claude_args: |
             --mcp-config .mcp.json
-            --allowedTools Task,Read,Edit,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs
+            --allowedTools "Task,Read,Edit,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
 
       - name: Verify schema and lint
         run: |
