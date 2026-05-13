@@ -16,7 +16,7 @@ choices:
 answer: a
 explanation: |
   LCP는 사용자가 처음 보는 viewport 안에서 가장 큰 이미지·텍스트 블록 같은 주요 콘텐츠가 언제 렌더링되는지를 측정해요. 따라서 첫 화면 hero 이미지가 크거나 늦게 다운로드되면 LCP가 바로 나빠질 수 있어요.
-  이미지의 실제 표시 크기에 맞는 리사이징, WebP/AVIF 같은 효율적인 포맷, 적절한 캐싱, 우선순위 조정이 직접적인 개선책이 돼요. Next.js 16에서는 `Image`의 `priority` prop이 deprecated되고 `preload` prop으로 대체됐는데, 대부분의 경우 `preload`보다는 `loading="eager"`나 `fetchPriority="high"`를 쓰는 게 권장돼요. 반대로 화면 아래 이미지를 eager loading하면 네트워크 경쟁만 늘 수 있어요.
+  이미지의 실제 표시 크기에 맞는 리사이징, WebP/AVIF 같은 효율적인 포맷, 적절한 캐싱, 우선순위 조정이 직접적인 개선책이 돼요. Next.js 16에서는 `Image`의 `priority` prop이 deprecated되고 동작이 명확한 `preload` prop으로 대체됐어요. 이건 다른 레이어 옵션인 `loading="eager"`(lazy-loading 해제)·`fetchPriority="high"`(fetch 우선순위 힌트)와 보완 관계라, 첫 화면 LCP 후보에는 `preload`를 기본으로 두고 더 세밀한 제어가 필요할 때 둘을 같이 쓰는 식이에요. 반대로 화면 아래 이미지를 eager loading하면 네트워크 경쟁만 늘 수 있어요.
 references:
   - title: "web.dev — Largest Contentful Paint (LCP)"
     url: "https://web.dev/articles/lcp"

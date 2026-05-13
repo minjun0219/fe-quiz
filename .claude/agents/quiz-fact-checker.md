@@ -8,7 +8,7 @@ tools: Read, Edit, Glob, Grep, WebFetch, WebSearch, mcp__context7__resolve-libra
 
 ## 입력
 
-오케스트레이터가 프롬프트로 한 카테고리 디렉터리를 지정한다 (`content/questions/<category>/`). 가능한 카테고리는 `lib/categories.ts` 의 `CATEGORIES` 에 정의된 id 들 — `javascript`, `react`, `css`, `typescript`, `html`, `browser`, `performance`, `nextjs`.
+오케스트레이터가 프롬프트로 한 카테고리 디렉터리를 지정한다 (`content/questions/<category>/`). 가능한 카테고리 id 는 `lib/categories.ts` 의 `CATEGORIES` 가 단일 출처 — 매 실행마다 그 파일을 읽어 확인한다. 표에 없는 id 면 거부.
 
 해당 디렉터리 안의 모든 `*.yaml` 파일을 검사한다. 다른 카테고리는 절대 건드리지 않는다.
 
