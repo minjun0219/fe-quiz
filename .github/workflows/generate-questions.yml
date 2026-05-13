@@ -1,0 +1,200 @@
+name: Quiz Generate
+
+on:
+  workflow_dispatch:
+    inputs:
+      categories:
+        description: "쉼표 구분 카테고리 (비우면 1개 랜덤). 매뉴얼 burst 시 'react,css,html' 식으로 N개 지정 가능."
+        required: false
+        default: ""
+      difficulties:
+        description: "쉼표 구분 난이도. 카테고리 수만큼 순환 적용(부족하면 첫 항목으로 wrap)."
+        required: false
+        default: "easy,medium,hard"
+      dry_run:
+        description: "true면 PR 미생성"
+        type: boolean
+        default: false
+  schedule:
+    # KST 월~금 05:00 출근길 검수 타이밍.
+    # KST 05:00 = UTC 20:00 (전날). KST 월~금 = UTC 일~목 → dow=0-4.
+    - cron: "0 20 * * 0-4"
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: quiz-generate
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    # 무한 루프 방지: 이 워크플로가 만든 PR에서는 다시 돌지 않음
+    if: "!startsWith(github.head_ref, 'claude/generate-quiz-')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Pick categories
+        id: pick
+        env:
+          INPUT_CATS: ${{ github.event.inputs.categories }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -n "${INPUT_CATS}" ]; then
+            CATS="${INPUT_CATS}"
+          else
+            # 디렉터리만 추려 run_id 시드로 랜덤 1개 — 검수 품질이 binding constraint 라
+            # 기본은 1/일. burst가 필요하면 workflow_dispatch의 categories 입력에
+            # "react,css,html" 식으로 넘기면 그대로 처리됨(아래 인프라가 N개 받음).
+            CATS=$(find content/questions -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+              | shuf --random-source=<(yes "${RUN_ID}") -n 1 \
+              | paste -sd ',' -)
+          fi
+          echo "cats=${CATS}" >> "$GITHUB_OUTPUT"
+          echo "선택된 카테고리: ${CATS}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Prepare batch
+        env:
+          CATS: ${{ steps.pick.outputs.cats }}
+          DIFFS: ${{ github.event.inputs.difficulties || 'easy,medium,hard' }}
+        run: pnpm questions:prepare-batch "${CATS}" "${DIFFS}"
+
+      - name: Generate (Opus authors)
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: "/generate-quiz"
+          mcp_config: ".mcp.json"
+          allowed_tools: "Task,Read,Write"
+          timeout_minutes: "15"
+
+      - name: Write YAML (deterministic)
+        run: pnpm questions:write-generated
+
+      - name: Rebuild index
+        run: pnpm questions:index
+
+      - name: Verify schema + lint
+        run: pnpm questions:check
+
+      - name: Resolve generated paths
+        id: files
+        run: |
+          set -euo pipefail
+          PATHS=$(git diff --name-only --diff-filter=A -- 'content/questions/**' | tr '\n' ' ')
+          echo "paths=${PATHS}" >> "$GITHUB_OUTPUT"
+          echo "생성된 파일: ${PATHS}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Review (Sonnet reviewers)
+        if: steps.files.outputs.paths != ''
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: "/review-quiz ${{ steps.files.outputs.paths }}"
+          mcp_config: ".mcp.json"
+          allowed_tools: "Task,Read,Write,WebFetch,WebSearch,mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
+          timeout_minutes: "20"
+
+      - name: Apply review verdicts
+        if: steps.files.outputs.paths != ''
+        env:
+          ALLOWED_PATHS: ${{ steps.files.outputs.paths }}
+        run: |
+          set -euo pipefail
+          if [ ! -d .cache/review ]; then
+            echo "::warning::reviewer 결과 디렉터리(.cache/review)가 없습니다. 모든 파일을 그대로 유지합니다."
+            exit 0
+          fi
+          for f in .cache/review/*.json; do
+            [ -e "$f" ] || continue
+            verdict=$(jq -r '.verdict // "missing"' "$f")
+            target=$(jq -r '.target // ""' "$f")
+            reason=$(jq -r '.reason // ""' "$f")
+            if [ "$verdict" != "reject" ]; then
+              continue
+            fi
+            if [ -z "$target" ]; then
+              echo "::warning::reviewer reject without target ($f) — ignored. reason: ${reason}"
+              continue
+            fi
+            # reviewer가 hallucinated target을 적었을 때 기존 트래킹 파일을 지우지
+            # 않도록 이번 회차에 생성된 path 화이트리스트와 정확히 일치할 때만 rm.
+            matched=0
+            for allowed in $ALLOWED_PATHS; do
+              if [ "$allowed" = "$target" ]; then
+                matched=1
+                break
+              fi
+            done
+            if [ "$matched" != "1" ]; then
+              echo "::warning::reviewer가 생성 화이트리스트 밖의 path '${target}'에 reject 판정 — 무시. reason: ${reason}"
+              continue
+            fi
+            if [ ! -f "$target" ]; then
+              echo "::warning::reject 대상 ${target}이 이미 없음 — skip. reason: ${reason}"
+              continue
+            fi
+            echo "::warning::reject - ${target} (${reason})"
+            rm -f "$target"
+          done
+          pnpm questions:index
+
+      - name: Final gate
+        run: pnpm check
+
+      - name: Detect changes
+        id: diff
+        run: |
+          set -euo pipefail
+          if git diff --quiet content/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat content/ >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # 안전장치: content/ 밖을 건드리면 즉시 실패
+          if ! git diff --quiet -- ':!content'; then
+            echo "::error::quiz-generate가 content/ 외부 파일을 수정했습니다."
+            git diff --stat -- ':!content' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: Build PR body
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm exec tsx scripts/build-pr-body.ts > .cache/pr-body.md
+
+      - name: Create draft PR
+        if: >
+          steps.diff.outputs.changed == 'true' &&
+          github.event.inputs.dry_run != 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: claude/generate-quiz-${{ github.run_id }}
+          add-paths: |
+            content/questions/**
+            content/INDEX.md
+          title: "chore(quiz): 자동 출제 (run ${{ github.run_id }})"
+          body-path: .cache/pr-body.md
+          commit-message: "chore(quiz): generate daily questions"
+          labels: |
+            generated
+            automated
+          draft: true
