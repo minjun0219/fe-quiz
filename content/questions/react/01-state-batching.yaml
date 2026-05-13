@@ -28,7 +28,7 @@ answer: a
 explanation: |
   세 번의 `setN(n + 1)` 호출 모두 클로저로 잡힌 같은 `n`(=0)을 읽어서 매번 `setN(1)`을 예약해요. 결과적으로 React가 세 업데이트를 배치 처리한 뒤 한 번 리렌더하지만, 다음 렌더의 `n`은 결국 1이에요.
   `console.log`는 클릭 시점의 렌더 컨텍스트 안이라 그 시점의 `n`(=0)을 그대로 출력해요.
-  3까지 올리고 싶으면 함수형 업데이트 `setN(prev => prev + 1)`로 바꿔 주세요. (출처: https://react.dev/learn/queueing-a-series-of-state-updates)
+  3까지 올리고 싶으면 함수형 업데이트 `setN(prev => prev + 1)`로 바꿔 주세요.
 references:
   - title: "React — useState"
     url: "https://ko.react.dev/reference/react/useState"
