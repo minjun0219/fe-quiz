@@ -2,7 +2,7 @@
  * Pre-build the per-category prompts for the daily generation workflow.
  *
  * Why this is a script (not inside the sub-agent):
- *   - id assignment, slug collision detection, and index excerpts are
+ *   - id assignment and the carrying of schema/prose/index context are
  *     deterministic. Doing them in the script keeps `quiz-author` from
  *     having to read schema/AGENTS.md/INDEX.md through tool round-trips,
  *     which would inflate token cost.
@@ -11,8 +11,11 @@
  *     `.cache/batch.json`).
  *
  * Output: `.cache/batch.json` — an array of `{category, difficulty, next_id,
- * slug_blocklist, system_prompt, user_prompt}`. The orchestrator slash command
- * reads this file and spawns one `quiz-author` Task per entry.
+ * system_prompt, user_prompt}`. The orchestrator slash command reads this file
+ * and spawns one `quiz-author` Task per entry. Filename slug collisions are
+ * NOT pre-checked here — `scripts/write-generated.ts` does the final slug
+ * normalization at write time, and prebuild's `id` uniqueness invariant
+ * catches anything that would actually conflict on disk.
  *
  * Args: `<cat1,cat2,...> [<diff1,diff2,...>]` — categories required,
  * difficulties default to `easy,medium,hard` cycled to match category count.
@@ -72,27 +75,17 @@ function extractSchemaExcerpt(): string {
   return src.slice(start, end).trimEnd();
 }
 
-function buildIndexExcerpt(category: Category): {
-  block: string;
-  slugBlocklist: string[];
-} {
+function buildIndexExcerpt(category: Category): string {
   const all = loadAllQuestions(ROOT).filter((q) => q.category === category);
   all.sort((a, b) => a.id.localeCompare(b.id, "en", { numeric: true }));
 
-  const slugBlocklist = all.map((q) => slugFromFilename(q.id));
-  const lines = all.map((q) => {
-    const tags = q.tags.length > 0 ? ` (${q.tags.join(", ")})` : "";
-    const preview = q.question.replace(/\s+/g, " ").trim().slice(0, 100);
-    return `- ${q.id} [${q.difficulty}]${tags}: ${preview}`;
-  });
-  return { block: lines.join("\n"), slugBlocklist };
-}
-
-/** Best-effort guess at the slug from an existing id; only used for blocklist hints. */
-function slugFromFilename(id: string): string {
-  // We can't recover the filename slug from the id alone; the blocklist is
-  // advisory ("avoid these themes"), so derive a token from tags or the id.
-  return id;
+  return all
+    .map((q) => {
+      const tags = q.tags.length > 0 ? ` (${q.tags.join(", ")})` : "";
+      const preview = q.question.replace(/\s+/g, " ").trim().slice(0, 100);
+      return `- ${q.id} [${q.difficulty}]${tags}: ${preview}`;
+    })
+    .join("\n");
 }
 
 function nextIdFor(
@@ -223,12 +216,11 @@ function main() {
   const batch = categories.map((category, i) => {
     const difficulty = difficulties[i % difficulties.length];
     const { next_id } = nextIdFor(category, allIds);
-    const { block, slugBlocklist } = buildIndexExcerpt(category);
+    const indexExcerpt = buildIndexExcerpt(category);
     return {
       category,
       difficulty,
       next_id,
-      slug_blocklist: slugBlocklist,
       system_prompt: buildSystemPrompt({
         category,
         difficulty,
@@ -240,7 +232,7 @@ function main() {
         category,
         difficulty,
         next_id,
-        indexExcerpt: block,
+        indexExcerpt,
       }),
     };
   });

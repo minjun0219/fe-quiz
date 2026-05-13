@@ -52,25 +52,27 @@ jobs:
 
       - name: Pick categories
         id: pick
+        env:
+          INPUT_CATS: ${{ github.event.inputs.categories }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
-          INPUT_CATS="${{ github.event.inputs.categories }}"
           if [ -n "${INPUT_CATS}" ]; then
             CATS="${INPUT_CATS}"
           else
-            # ls의 디렉터리만 골라서 run_id 시드로 랜덤 3개
+            # 디렉터리만 추려 run_id 시드로 랜덤 3개
             CATS=$(find content/questions -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
-              | shuf --random-source=<(yes "${{ github.run_id }}") -n 3 \
+              | shuf --random-source=<(yes "${RUN_ID}") -n 3 \
               | paste -sd ',' -)
           fi
           echo "cats=${CATS}" >> "$GITHUB_OUTPUT"
           echo "선택된 카테고리: ${CATS}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Prepare batch
-        run: |
-          pnpm questions:prepare-batch \
-            "${{ steps.pick.outputs.cats }}" \
-            "${{ github.event.inputs.difficulties || 'easy,medium,hard' }}"
+        env:
+          CATS: ${{ steps.pick.outputs.cats }}
+          DIFFS: ${{ github.event.inputs.difficulties || 'easy,medium,hard' }}
+        run: pnpm questions:prepare-batch "${CATS}" "${DIFFS}"
 
       - name: Generate (Opus authors)
         uses: anthropics/claude-code-action@v1
@@ -82,7 +84,7 @@ jobs:
           timeout_minutes: "15"
 
       - name: Write YAML (deterministic)
-        run: pnpm questions:write-batch
+        run: pnpm questions:write-generated
 
       - name: Rebuild index
         run: pnpm questions:index
@@ -110,6 +112,8 @@ jobs:
 
       - name: Apply review verdicts
         if: steps.files.outputs.paths != ''
+        env:
+          ALLOWED_PATHS: ${{ steps.files.outputs.paths }}
         run: |
           set -euo pipefail
           if [ ! -d .cache/review ]; then
@@ -121,10 +125,32 @@ jobs:
             verdict=$(jq -r '.verdict // "missing"' "$f")
             target=$(jq -r '.target // ""' "$f")
             reason=$(jq -r '.reason // ""' "$f")
-            if [ "$verdict" = "reject" ] && [ -n "$target" ] && [ -f "$target" ]; then
-              echo "::warning::reject - ${target} (${reason})"
-              rm -f "$target"
+            if [ "$verdict" != "reject" ]; then
+              continue
             fi
+            if [ -z "$target" ]; then
+              echo "::warning::reviewer reject without target ($f) — ignored. reason: ${reason}"
+              continue
+            fi
+            # reviewer가 hallucinated target을 적었을 때 기존 트래킹 파일을 지우지
+            # 않도록 이번 회차에 생성된 path 화이트리스트와 정확히 일치할 때만 rm.
+            matched=0
+            for allowed in $ALLOWED_PATHS; do
+              if [ "$allowed" = "$target" ]; then
+                matched=1
+                break
+              fi
+            done
+            if [ "$matched" != "1" ]; then
+              echo "::warning::reviewer가 생성 화이트리스트 밖의 path '${target}'에 reject 판정 — 무시. reason: ${reason}"
+              continue
+            fi
+            if [ ! -f "$target" ]; then
+              echo "::warning::reject 대상 ${target}이 이미 없음 — skip. reason: ${reason}"
+              continue
+            fi
+            echo "::warning::reject - ${target} (${reason})"
+            rm -f "$target"
           done
           pnpm questions:index
 

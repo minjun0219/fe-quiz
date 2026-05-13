@@ -37,7 +37,6 @@ type BatchEntry = {
   category: string;
   difficulty: string;
   next_id: string;
-  slug_blocklist: string[];
 };
 
 const KEY_ORDER = [
@@ -178,7 +177,9 @@ function main() {
       continue;
     }
 
-    const numLabel = String(idNum).padStart(2, "0");
+    // 파일명 정렬을 위한 패딩은 id 자릿수(3)와 맞춘다 — 100번째 문제부터
+    // `99-…` 다음에 `100-…`가 자연 정렬되도록.
+    const numLabel = String(idNum).padStart(3, "0");
     const outDir = join(CONTENT_ROOT, parsed.data.category);
     mkdirSync(outDir, { recursive: true });
     const outFile = join(outDir, `${numLabel}-${slug}.yaml`);

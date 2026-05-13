@@ -15,7 +15,6 @@ allowed-tools: Task, Read, Bash(ls .cache/*:*), Bash(cat .cache/*:*)
   "category": "react",
   "difficulty": "easy",
   "next_id": "react-019",            // 스크립트가 결정한 다음 id
-  "slug_blocklist": ["..."],
   "system_prompt": "...",            // quiz-author에 그대로 전달
   "user_prompt": "..."
 }

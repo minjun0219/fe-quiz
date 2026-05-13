@@ -52,7 +52,7 @@
   ├─ Read content/AGENTS.md → prose 컨벤션 (그대로 박음)
   └─ Write .cache/batch.json
        [
-         { category, difficulty, next_id, slug_blocklist, system_prompt, user_prompt },
+         { category, difficulty, next_id, system_prompt, user_prompt },
          ...
        ]
 
@@ -136,7 +136,7 @@
   "questions:index": "tsx scripts/build-questions-index.ts",
   "questions:index:check": "tsx scripts/build-questions-index.ts --check",
   "questions:prepare-batch": "tsx scripts/prepare-batch.ts",
-  "questions:write-batch": "tsx scripts/write-generated.ts"
+  "questions:write-generated": "tsx scripts/write-generated.ts"
 }
 ```
 
@@ -220,7 +220,7 @@
 
 1. **로컬 인덱스**: `pnpm questions:index && pnpm questions:index:check && pnpm prebuild`
 2. **로컬 prepare**: `pnpm questions:prepare-batch react,css,html` → `cat .cache/batch.json | jq '.[0].system_prompt' | head`
-3. **로컬 write (mock)**: `.cache/out/<cat>.json`에 손으로 만든 JSON 1~2개 넣고 `pnpm questions:write-batch` → YAML 형식·키 순서·Zod 통과 확인
+3. **로컬 write (mock)**: `.cache/out/<cat>.json`에 손으로 만든 JSON 1~2개 넣고 `pnpm questions:write-generated` → YAML 형식·키 순서·Zod 통과 확인
 4. **워크플로 manual dry-run**: `categories=react,css,html`, `dry_run=true` → 로그에서 diff·verdict 확인, PR 미생성 검증
 5. **실제 dry_run=false**: draft PR + `check.yml` 통과 확인
 6. **사람 검수**: 정답·해설·출처 직접 확인 → ready-for-review → 머지

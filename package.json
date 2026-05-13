@@ -18,7 +18,7 @@
     "questions:index": "tsx scripts/build-questions-index.ts",
     "questions:index:check": "tsx scripts/build-questions-index.ts --check",
     "questions:prepare-batch": "tsx scripts/prepare-batch.ts",
-    "questions:write-batch": "tsx scripts/write-generated.ts",
+    "questions:write-generated": "tsx scripts/write-generated.ts",
     "round:check": "tsx scripts/check-round.ts",
     "test": "vitest run",
     "test:watch": "vitest"

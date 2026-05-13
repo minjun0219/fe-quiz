@@ -2,9 +2,14 @@
  * Render the PR body for the daily quiz-generate run.
  *
  * Pulls together:
- *   - the batch (which categories/difficulties/ids were targeted)
+ *   - the batch (which categories/difficulties/ids were targeted, from
+ *     `.cache/batch.json`)
  *   - reviewer verdicts (`.cache/review/*.json`)
- *   - the set of YAML paths that actually survived to the working tree
+ *
+ * The "which YAMLs actually survived to disk" view is computed indirectly:
+ * a category with a reject verdict shows up as `reject` in the table, and
+ * the workflow `rm`s that path before the PR is opened. We don't re-walk
+ * the working tree here — that's the workflow's `git diff` gate's job.
  *
  * Stdout is the PR body. The workflow redirects it to `.cache/pr-body.md`.
  */
@@ -21,12 +26,19 @@ type BatchEntry = {
   next_id: string;
 };
 
+const VERDICTS = ["approve", "reject"] as const;
+type VerdictTag = (typeof VERDICTS)[number] | "missing" | "malformed";
+
 type Verdict = {
-  verdict: "approve" | "reject";
+  verdict: VerdictTag;
   reason?: string;
   citations?: string[];
   target?: string;
 };
+
+function isVerdictTag(v: unknown): v is (typeof VERDICTS)[number] {
+  return typeof v === "string" && (VERDICTS as readonly string[]).includes(v);
+}
 
 function readBatch(): BatchEntry[] {
   if (!existsSync(BATCH_PATH)) {
@@ -45,11 +57,25 @@ function readVerdicts(): Map<string, Verdict> {
       continue;
     }
     try {
-      const v = JSON.parse(
-        readFileSync(join(REVIEW_DIR, name), "utf8"),
-      ) as Verdict;
-      const key = (v.target ?? name.replace(/\.json$/, "")).toString();
-      map.set(key, v);
+      const raw = JSON.parse(readFileSync(join(REVIEW_DIR, name), "utf8")) as {
+        verdict?: unknown;
+        reason?: unknown;
+        citations?: unknown;
+        target?: unknown;
+      };
+      const target =
+        typeof raw.target === "string"
+          ? raw.target
+          : name.replace(/\.json$/, "");
+      const v: Verdict = {
+        verdict: isVerdictTag(raw.verdict) ? raw.verdict : "malformed",
+        reason: typeof raw.reason === "string" ? raw.reason : undefined,
+        citations: Array.isArray(raw.citations)
+          ? raw.citations.filter((u): u is string => typeof u === "string")
+          : undefined,
+        target,
+      };
+      map.set(target, v);
     } catch {
       // ignore malformed verdict files; the workflow log already surfaced them.
     }
@@ -71,12 +97,12 @@ function main() {
   lines.push("| 카테고리 | 난이도 | id | 검수 결과 |");
   lines.push("| --- | --- | --- | --- |");
   for (const item of batch) {
-    const v = [...verdicts.entries()].find(
-      ([target]) =>
-        target.includes(`/${item.category}/`) ||
-        target.startsWith(item.category),
+    // reviewer가 적은 target 경로에 카테고리 디렉터리 segment가 포함되면 매칭.
+    // 이 매칭 실패 시 verdict는 "missing"(생성/검수 양 단계 중 한 곳에서 누락).
+    const match = [...verdicts.entries()].find(([target]) =>
+      target.includes(`/${item.category}/`),
     );
-    const verdict = v ? v[1].verdict : "missing";
+    const verdict: VerdictTag = match ? match[1].verdict : "missing";
     lines.push(
       `| \`${item.category}\` | ${item.difficulty} | \`${item.next_id}\` | ${verdict} |`,
     );

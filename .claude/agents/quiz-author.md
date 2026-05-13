@@ -32,7 +32,6 @@ tools: Write
 ## 작성 규칙 요약 (실수 방지)
 
 - `id` / `category` / `difficulty` 키를 JSON에 **포함하지 마라**. 스크립트가 자동 주입한다.
-  단, prompt에서 `difficulty` 키를 응답에 포함하라고 명시한 경우는 그 지시를 따른다.
 - `answer`는 `choices[].id` 중 하나(들). **인덱스(0/1/2)가 아니다.**
 - `multi_choice`라면 정답이 1개 이상이지만 **모든 choices가 정답인 경우는 금지**.
 - `references[]`는 최소 1개. 모든 url은 `https://`로 시작.
