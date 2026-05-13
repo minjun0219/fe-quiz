@@ -17,8 +17,8 @@ choices:
 answer: d
 explanation: |
   Render Phase는 React가 컴포넌트를 호출해 새 Virtual DOM을 만들고 diff를 계산하는 단계예요. 같은 입력에 같은 출력이 나와야 해서 **순수**해야 하고, StrictMode에서 일부러 두 번 호출해 검사하기도 해요.
-  실제 DOM 변경(mutation)은 **Commit Phase 안에서** 적용되고, `componentDidMount`/`componentDidUpdate`나 `useEffect` 콜백은 그 뒤(보통 브라우저 paint 이후) 비동기적으로 실행돼요. `useLayoutEffect`만 paint 전, Commit 단계에서 동기로 돌아요.
-  그래서 render 안에서 `setState`를 무한히 부르거나 DOM을 직접 만지면 안 되는 거예요.
+  실제 DOM 변경(mutation)은 **Commit Phase 안에서** 적용되고, `useEffect` 콜백은 그 커밋이 끝나고 브라우저 paint 이후에 비동기적으로 실행돼요. 반면 `useLayoutEffect`와 클래스의 `componentDidMount`/`componentDidUpdate`는 paint 전, Commit 단계에서 동기로 돌아요.
+  그래서 render 안에서 `setState`를 무한히 부르거나 DOM을 직접 만지면 안 되는 거예요. (출처: https://react.dev/reference/react/Component#componentdidmount, https://react.dev/reference/react/useLayoutEffect)
 references:
   - title: "React — 렌더와 커밋"
     url: "https://ko.react.dev/learn/render-and-commit"
