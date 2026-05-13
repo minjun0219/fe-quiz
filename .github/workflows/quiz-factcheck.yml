@@ -3,15 +3,6 @@ name: Quiz Fact Check
 on:
   workflow_dispatch:
     inputs:
-      category:
-        description: "대상 카테고리"
-        default: "all"
-        type: choice
-        options:
-          - all
-          - javascript
-          - react
-          - css
       dry_run:
         description: "수정 없이 검증만 (read-only, PR 생성 안 함)"
         type: boolean
@@ -50,8 +41,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      # pnpm 버전은 package.json 의 `packageManager: "pnpm@x.y.z"` 가 SoT.
-      # 여기서 `with: version: …` 을 따로 지정하면 v4 action 이 충돌로 fail 함.
+      # pnpm 버전은 package.json의 `packageManager`에서 단일 소스로 관리.
+      # action-setup@v4는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
       - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
@@ -64,26 +55,36 @@ jobs:
       - name: Run /factcheck (dry run, read-only)
         if: github.event.inputs.dry_run == 'true'
         uses: anthropics/claude-code-action@v1
+        # job 의 30분 안에서 Claude 단계가 시간을 다 쓰면 뒤의 검증/PR 생성이
+        # 못 돌아감. step 자체에 25분 cap 을 둬서 후속 단계 여유를 확보.
+        timeout-minutes: 25
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # 기본 OIDC -> GitHub App token 교환은 PR 브랜치 워크플로 파일이 main 과 다르면
+          # "Workflow validation failed ... identical content to ... default branch" 로 401.
+          # 표준 GITHUB_TOKEN 을 명시 전달해 교환을 우회. PR 생성은 peter-evans/create-pull-request 가 담당.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
-            `/factcheck ${{ github.event.inputs.category || 'all' }}` 를 **dry-run 모드**로 실행하라.
+            `/factcheck all` 를 **dry-run 모드**로 실행하라.
 
             중요: YAML 파일을 절대 수정하지 마라. `Edit` 도구를 호출하지 마라.
             대신 어떤 파일의 어떤 필드를 어떻게 고쳐야 하는지 사유와 출처 URL만 보고하라.
-          mcp_config: ".mcp.json"
-          allowed_tools: "Task,Read,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
-          timeout_minutes: "25"
+          # v1에서 mcp_config / allowed_tools 입력은 제거되어 claude_args 로 이동.
+          claude_args: |
+            --mcp-config .mcp.json
+            --allowedTools "Task,Read,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
 
       - name: Run /factcheck via Claude Code
         if: github.event.inputs.dry_run != 'true'
         uses: anthropics/claude-code-action@v1
+        timeout-minutes: 25
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: "/factcheck ${{ github.event.inputs.category || 'all' }}"
-          mcp_config: ".mcp.json"
-          allowed_tools: "Task,Read,Edit,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
-          timeout_minutes: "25"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: "/factcheck all"
+          claude_args: |
+            --mcp-config .mcp.json
+            --allowedTools "Task,Read,Edit,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
 
       - name: Verify schema and lint
         run: |
@@ -139,7 +140,6 @@ jobs:
             `/factcheck` 스킬이 카테고리별 sub-agent로 병렬 팩트체크 후 자동 수정한 결과입니다.
 
             - 트리거: `${{ github.event_name }}`
-            - 카테고리: `${{ github.event.inputs.category || 'all' }}`
             - 워크플로 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             ⚠️ **반드시 사람이 인용 출처(URL)를 검토한 뒤 머지하세요.** LLM이 잘못된 사양을 주장할 수 있습니다.
