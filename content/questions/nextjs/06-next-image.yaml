@@ -1,0 +1,20 @@
+id: next-006
+category: nextjs
+difficulty: medium
+type: single_choice
+question: |
+  Next.js에서 기본 `<img>` 대신 `next/image`를 사용하는 이유로 가장 적절한 것은?
+choices:
+  - id: a
+    text: 모든 이미지를 무조건 base64 문자열로 HTML에 인라인 삽입해서 네트워크 요청을 없애기 때문이에요.
+  - id: b
+    text: 이미지 크기 조정, 최신 포맷 제공, lazy loading, placeholder 같은 최적화와 UX 기능을 프레임워크 차원에서 제공하기 때문이에요.
+  - id: c
+    text: 외부 도메인 이미지는 별도 설정 없이 항상 자동 최적화되기 때문이에요.
+  - id: d
+    text: "`next/image`를 쓰면 이미지의 `width`와 `height`를 전혀 지정하지 않아도 레이아웃 이동이 항상 방지돼요."
+answer: b
+explanation: |
+  `next/image`는 요청 상황에 맞는 이미지 크기와 포맷을 제공하고, 기본 lazy loading과 placeholder 같은 기능으로 초기 로딩 성능과 사용자 경험을 개선할 수 있어요. 직접 `<img loading="lazy">`나 이미지 CDN을 조합해도 비슷한 최적화를 만들 수 있지만, Next.js에서는 이를 컴포넌트와 설정으로 일관되게 다룰 수 있다는 장점이 있어요.
+  a처럼 모든 이미지를 인라인으로 바꾸는 기능은 아니고, c처럼 외부 이미지를 아무 설정 없이 항상 처리하는 것도 아니에요. 보통 외부 이미지는 `next.config.js`의 `images.remotePatterns` 같은 허용 설정이 필요해요. d도 과장된 설명으로, 레이아웃 안정성을 위해서는 이미지의 크기 정보나 `fill` 사용 시 부모 컨테이너 설계가 필요해요.
+tags: [ next-image, image-optimization, lazy-loading, placeholder ]

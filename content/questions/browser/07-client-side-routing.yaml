@@ -1,0 +1,20 @@
+id: browser-007
+category: browser
+difficulty: medium
+type: single_choice
+question: |
+  클라이언트 사이드 라우팅(CSR 라우팅)이 페이지 이동을 처리하는 방식으로 맞는 것은?
+choices:
+  - id: a
+    text: 링크 클릭마다 서버에서 새 HTML 문서를 받아와 전체 페이지를 다시 로드해요.
+  - id: b
+    text: "`history.pushState()` 등으로 URL과 히스토리를 바꾸고, 현재 앱 안에서 경로에 맞는 컴포넌트를 렌더링해요."
+  - id: c
+    text: URL은 바꾸지 않고 DOM만 교체하기 때문에 브라우저 뒤로 가기와 앞으로 가기를 사용할 수 없어요.
+  - id: d
+    text: "`pushState()`를 호출하면 브라우저가 자동으로 서버 요청을 보내고 새 화면을 렌더링해요."
+answer: b
+explanation: |
+  클라이언트 사이드 라우터는 링크 클릭의 기본 전체 문서 이동을 막고, `history.pushState()` 같은 History API로 주소와 히스토리만 갱신해요. 그다음 현재 URL과 라우트 설정을 매칭해 필요한 컴포넌트를 렌더링하므로, 새 HTML 문서를 매번 내려받지 않고 앱 내부에서 화면 전환을 만들 수 있어요.
+  a는 전통적인 서버 중심 내비게이션에 가까운 설명이고, c는 History API와 `popstate` 이벤트를 활용하는 라우터의 특징을 놓친 설명이에요. d도 틀렸는데, `pushState()` 자체는 서버 요청이나 렌더링을 자동으로 수행하지 않아요. 실무에서는 뒤로 가기 대응, 새로고침 시 서버 fallback 설정, 전환 시 데이터 fetching 전략까지 함께 설계해야 안정적인 CSR 라우팅이 돼요.
+tags: [ client-side-routing, history-api, pushState, popstate ]
