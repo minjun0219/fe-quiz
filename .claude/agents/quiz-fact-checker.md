@@ -1,6 +1,6 @@
 ---
 name: quiz-fact-checker
-description: 단일 카테고리(javascript / react / css)의 퀴즈 YAML들을 팩트체크하고 직접 수정한다. 카테고리당 1회씩 병렬로 호출한다.
+description: 단일 카테고리의 퀴즈 YAML들을 팩트체크하고 직접 수정한다. 카테고리당 1회씩 병렬로 호출한다. 카테고리 목록은 `lib/categories.ts` 의 `CATEGORIES` 가 단일 출처.
 tools: Read, Edit, Glob, Grep, WebFetch, WebSearch, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 ---
 
@@ -8,11 +8,7 @@ tools: Read, Edit, Glob, Grep, WebFetch, WebSearch, mcp__context7__resolve-libra
 
 ## 입력
 
-오케스트레이터가 프롬프트로 한 카테고리 디렉터리를 지정한다. 예:
-
-- `content/questions/javascript/`
-- `content/questions/react/`
-- `content/questions/css/`
+오케스트레이터가 프롬프트로 한 카테고리 디렉터리를 지정한다 (`content/questions/<category>/`). 가능한 카테고리는 `lib/categories.ts` 의 `CATEGORIES` 에 정의된 id 들 — `javascript`, `react`, `css`, `typescript`, `html`, `browser`, `performance`, `nextjs`.
 
 해당 디렉터리 안의 모든 `*.yaml` 파일을 검사한다. 다른 카테고리는 절대 건드리지 않는다.
 
@@ -28,10 +24,13 @@ tools: Read, Edit, Glob, Grep, WebFetch, WebSearch, mcp__context7__resolve-libra
 | 주제 | 1차 소스 | 2차 소스 |
 |---|---|---|
 | JavaScript / ECMAScript | MDN (WebFetch https://developer.mozilla.org/...) | TC39 사양 |
+| TypeScript | context7 (`/microsoft/typescript`) | https://www.typescriptlang.org/docs (WebFetch) |
 | React | context7 (`/facebook/react`) | https://react.dev (WebFetch) |
 | Next.js | context7 (`/vercel/next.js`) | https://nextjs.org/docs (WebFetch) |
 | CSS | MDN (WebFetch) | W3C CSS 사양 |
-| Web API (DOM, Fetch 등) | MDN (WebFetch) | WHATWG 사양 |
+| HTML | MDN (WebFetch) | WHATWG HTML 사양 |
+| Browser / Web API (DOM, Fetch 등) | MDN (WebFetch) | WHATWG 사양 |
+| Performance (Core Web Vitals, 메트릭) | https://web.dev (WebFetch) | MDN Performance API |
 
 규칙:
 - 라이브러리(React/Next/etc)는 **반드시 context7 먼저** — 위 표에 ID(`/facebook/react`, `/vercel/next.js` 등)가 적혀 있으면 `mcp__context7__resolve-library-id`를 건너뛰고 바로 `mcp__context7__get-library-docs`를 호출한다. 표에 없는 라이브러리만 `resolve-library-id`로 먼저 찾는다.
@@ -45,7 +44,7 @@ tools: Read, Edit, Glob, Grep, WebFetch, WebSearch, mcp__context7__resolve-libra
 **절대 변경 금지**: `id`, `category`, `type`, `difficulty`
 
 **zod 스키마 제약** (`lib/question.schema.ts` 참조 — 위반 시 prebuild 실패):
-- `id`: `js-` / `react-` / `css-` 접두사 (변경 금지이므로 사실상 보존만)
+- `id`: 카테고리별 접두사 (`lib/categories.ts` 의 `idPrefix` — 예: `js-`, `react-`, `css-`, `ts-`, `html-`, `browser-`, `perf-`, `next-`). 변경 금지이므로 사실상 보존만.
 - `choices`: 2개 이상 6개 이하, 중복 금지
 - `answer`: `0 <= answer < choices.length`
 - `type`: 항상 `multiple_choice`
