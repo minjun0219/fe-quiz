@@ -8,7 +8,7 @@
 
 `content/questions/` 트리는 수기로만 추가돼 카테고리별 문제 수가 들쭉날쭉하고 증가 속도가 느려요. 라운드 다양성(`ROUND_SIZE=10`)을 유지하고 학습자가 같은 문제를 반복해 만나는 빈도를 줄이려면 **매일 일정한 페이스의 신규 문제 유입**이 필요해요.
 
-이 워크플로는 GitHub Actions 스케줄(KST 09:00)에서 **신규 1문제**(랜덤 1개 카테고리 × 1문제)를 자동 생성하고, draft PR로 띄워 사람이 검수 후 머지하는 흐름이에요. 매뉴얼 실행에서는 `categories=cat1,cat2,...` 식으로 한 번에 N개 burst 가능 — `prepare-batch.ts`·`write-generated.ts`·sub-agent 들이 N개를 그대로 받습니다.
+이 워크플로는 GitHub Actions 스케줄(**KST 월~금 05:00** 출근길 검수 타이밍)에서 **신규 1문제**(랜덤 1개 카테고리 × 1문제)를 자동 생성하고, draft PR로 띄워 사람이 검수 후 머지하는 흐름이에요. 매뉴얼 실행에서는 `categories=cat1,cat2,...` 식으로 한 번에 N개 burst 가능 — `prepare-batch.ts`·`write-generated.ts`·sub-agent 들이 N개를 그대로 받습니다.
 
 ## 핵심 결정: 결정적인 일은 스크립트, 언어 추론만 모델
 
@@ -40,7 +40,7 @@
 - 카테고리: 8개 중 매일 **랜덤 1개** (기본). 매뉴얼 실행 시 `categories=cat1,...` 식으로 N개 명시.
 - 출제: **신규**만 (변형 모드 없음)
 - 모델: 작성 = **Opus 4.7** (`claude-opus-4-7`), 리뷰 = **Sonnet 4.6** (`claude-sonnet-4-6`)
-- 스케줄: 매일 **KST 09:00** (`cron: '0 0 * * *'`) + `workflow_dispatch`
+- 스케줄: **KST 월~금 05:00** (`cron: '0 20 * * 0-4'` — UTC 일~목 20:00) + `workflow_dispatch`
 - 구조: 슬래시 커맨드 + author/reviewer sub-agent 분리
 - 인덱스: `content/INDEX.md`를 git 커밋 + `prebuild`에서 stale 검증
 
@@ -183,7 +183,7 @@
 
 ## 워크플로 `.github/workflows/generate-questions.yml`
 
-- 트리거: `schedule: 0 0 * * *` (KST 09:00) + `workflow_dispatch` (categories/difficulties/dry_run 옵션)
+- 트리거: `schedule: 0 20 * * 0-4` (UTC 일~목 20:00 = KST 월~금 05:00) + `workflow_dispatch` (categories/difficulties/dry_run 옵션)
 - 무한 루프 방지: `if: !startsWith(github.head_ref, 'claude/generate-quiz-')`
 - 동시성: `quiz-generate` 그룹 (cancel-in-progress: false)
 - 안전장치: `content/` 외부 diff 감지 시 즉시 fail

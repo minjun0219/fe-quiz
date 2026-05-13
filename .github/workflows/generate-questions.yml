@@ -16,8 +16,9 @@ on:
         type: boolean
         default: false
   schedule:
-    # 매일 00:00 UTC = 09:00 KST
-    - cron: "0 0 * * *"
+    # KST 월~금 05:00 출근길 검수 타이밍.
+    # KST 05:00 = UTC 20:00 (전날). KST 월~금 = UTC 일~목 → dow=0-4.
+    - cron: "0 20 * * 0-4"
 
 permissions:
   contents: write
