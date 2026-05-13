@@ -1,18 +1,19 @@
 ---
 description: 카테고리별 sub-agent를 병렬로 spawn해 퀴즈 YAML을 팩트체크하고 직접 수정한다.
-argument-hint: "[javascript|react|css|all]"
+argument-hint: "[<category>|all]"
 allowed-tools: Task, Read, Glob, Bash(pnpm questions:check), Bash(pnpm check), Bash(git diff:*), Bash(git status:*)
 ---
 
 # /factcheck — 퀴즈 자동 팩트체크
 
-대상 카테고리: **$ARGUMENTS** (없거나 `all`이면 javascript / react / css 전체).
+대상 카테고리: **$ARGUMENTS** (없거나 `all`이면 `lib/categories.ts` 의 `CATEGORIES` 전부).
 
 ## 절차
 
 ### 1. 카테고리 결정
-- `$ARGUMENTS`가 비어있거나 `all` → `[javascript, react, css]`
-- 단일 카테고리(예: `react`) → 해당 카테고리만
+- `$ARGUMENTS`가 비어있거나 `all` → `lib/categories.ts` 의 `CATEGORIES` 에 있는 모든 `id` (단일 출처). 절대 하드코딩하지 말고 매 실행마다 그 파일을 읽어 목록을 가져와라.
+- 단일 카테고리(예: `react`) → 해당 카테고리만. `CATEGORIES` 에 없는 id 면 거부.
+- 쉼표로 나열된 여러 카테고리(예: `javascript,react`) → 각각을 같은 방식으로 검증해 선택.
 - 그 외 입력은 거부하고 사용법을 안내해라.
 
 ### 2. sub-agent 병렬 spawn
@@ -37,14 +38,13 @@ pnpm check
 
 ### 4. 결과 요약 (둘 다 통과한 경우)
 
-다음 형식으로 출력:
+다음 형식으로 출력 (한 줄에 한 카테고리씩, 선택된 카테고리 모두 포함):
 
 ```
 ## /factcheck 결과
 
-- javascript: 변경 N개, 의심 M개
-- react: 변경 N개, 의심 M개
-- css: 변경 N개, 의심 M개
+- <category-id>: 변경 N개, 의심 M개
+- ...
 
 ### 변경 상세
 <sub-agent들이 보고한 파일·필드·사유·출처를 카테고리별로 그대로 합친다>
