@@ -60,6 +60,10 @@ jobs:
         timeout-minutes: 25
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # 기본 OIDC -> GitHub App token 교환은 PR 브랜치 워크플로 파일이 main 과 다르면
+          # "Workflow validation failed ... identical content to ... default branch" 로 401.
+          # 표준 GITHUB_TOKEN 을 명시 전달해 교환을 우회. PR 생성은 peter-evans/create-pull-request 가 담당.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
             `/factcheck all` 를 **dry-run 모드**로 실행하라.
 
@@ -76,6 +80,7 @@ jobs:
         timeout-minutes: 25
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: "/factcheck all"
           claude_args: |
             --mcp-config .mcp.json
