@@ -1,12 +1,14 @@
-# 매일 3문제 자동 출제 — 설계 결정과 워크플로
+# 매일 자동 출제 — 설계 결정과 워크플로
 
 > 2026-05-13 결정. 변경 시 이 문서를 같은 PR에서 갱신해 주세요.
+>
+> **revision (2026-05-13)**: 기본 출제량을 3문제 → **1문제/일**로 줄임. 사람 검수 품질이 binding constraint 라서. 멀티 카테고리 인프라는 그대로 두고 워크플로 cron 의 랜덤 픽 개수만 1로 변경 — `workflow_dispatch`에 `categories=react,css,html`을 명시하면 N개 burst 도 그대로 작동함.
 
 ## 무엇을 푸는가
 
 `content/questions/` 트리는 수기로만 추가돼 카테고리별 문제 수가 들쭉날쭉하고 증가 속도가 느려요. 라운드 다양성(`ROUND_SIZE=10`)을 유지하고 학습자가 같은 문제를 반복해 만나는 빈도를 줄이려면 **매일 일정한 페이스의 신규 문제 유입**이 필요해요.
 
-이 워크플로는 GitHub Actions 스케줄(KST 09:00)에서 **신규 3문제**(랜덤 3개 카테고리 × 1문제)를 자동 생성하고, draft PR로 띄워 사람이 검수 후 머지하는 흐름이에요.
+이 워크플로는 GitHub Actions 스케줄(KST 09:00)에서 **신규 1문제**(랜덤 1개 카테고리 × 1문제)를 자동 생성하고, draft PR로 띄워 사람이 검수 후 머지하는 흐름이에요. 매뉴얼 실행에서는 `categories=cat1,cat2,...` 식으로 한 번에 N개 burst 가능 — `prepare-batch.ts`·`write-generated.ts`·sub-agent 들이 N개를 그대로 받습니다.
 
 ## 핵심 결정: 결정적인 일은 스크립트, 언어 추론만 모델
 
@@ -25,26 +27,29 @@
 
 ### 비교 (참고)
 
-| 방식 | 일일 비용 추정 | 형식 정확도 | 사실 정확도 | 결정성 |
-|---|---|---|---|---|
-| A. 스크립트가 SDK 직접 호출 | ~$0.6 | ↑ | ↓ (도구 없음) | ↑ |
-| B. claude-code-action에 풀세트 도구 부여 | ~$1.9 | ↓ (모델이 직접 Write) | ↑ | ↓ |
-| **현재 채택: 하이브리드** | **~$0.8** | **↑** (스크립트 직렬화) | **↑** (reviewer만 도구) | **↑** (시드+사전 빌드 프롬프트) |
+아래 표는 아키텍처 결정 시점(3문제 회차)을 기준으로 산정한 값. 현재 기본은 1문제이므로 모든 비용을 `÷3` 으로 보면 됨.
+
+| 방식 | 일일 비용 (3문제 기준) | 1문제 기준 | 형식 정확도 | 사실 정확도 | 결정성 |
+|---|---|---|---|---|---|
+| A. 스크립트가 SDK 직접 호출 | ~$0.6 | ~$0.2 | ↑ | ↓ (도구 없음) | ↑ |
+| B. claude-code-action에 풀세트 도구 부여 | ~$1.9 | ~$0.63 | ↓ (모델이 직접 Write) | ↑ | ↓ |
+| **현재 채택: 하이브리드** | **~$0.8** | **~$0.27** | **↑** (스크립트 직렬화) | **↑** (reviewer만 도구) | **↑** (시드+사전 빌드 프롬프트) |
 
 ## 사용자 확정 사항
 
-- 카테고리: 8개 중 매일 **랜덤 3개**, 카테고리당 1문제
-- 출제: 3개 모두 **신규**(변형 모드 없음)
+- 카테고리: 8개 중 매일 **랜덤 1개** (기본). 매뉴얼 실행 시 `categories=cat1,...` 식으로 N개 명시.
+- 출제: **신규**만 (변형 모드 없음)
 - 모델: 작성 = **Opus 4.7** (`claude-opus-4-7`), 리뷰 = **Sonnet 4.6** (`claude-sonnet-4-6`)
 - 스케줄: 매일 **KST 09:00** (`cron: '0 0 * * *'`) + `workflow_dispatch`
 - 구조: 슬래시 커맨드 + author/reviewer sub-agent 분리
 - 인덱스: `content/INDEX.md`를 git 커밋 + `prebuild`에서 stale 검증
 
-## 데이터 흐름 (1일 1회)
+## 데이터 흐름 (1일 1회, 기본)
 
 ```
 [워크플로 shell]
-  └─ shuf --random-source=run_id → cats = "react,css,html"
+  └─ shuf --random-source=run_id -n 1 → cats = "react"
+     # 매뉴얼 burst: workflow_dispatch에 categories="react,css,html" → 그대로 3개 처리
 
 [scripts/prepare-batch.ts <cats> <difficulties>]
   ├─ loadAllQuestions() → 카테고리별 next_id, 인덱스 발췌
@@ -59,7 +64,7 @@
 [claude-code-action] → /generate-quiz
   └─ 오케스트레이터 (Task 글루)
        ├─ Read .cache/batch.json
-       └─ Task × 3 (병렬) → quiz-author (Opus, tools: Write 만)
+       └─ Task × N (단일 메시지에 병렬, 보통 1) → quiz-author (Opus, tools: Write 만)
              입력: 사전 빌드된 system+user
              출력: 단일 JSON → .cache/out/<category>.json
 
@@ -74,8 +79,8 @@
 [워크플로 shell] pnpm questions:index && pnpm questions:check
   → 형식·prose lint·id 유일성·라운드 invariant 게이트
 
-[claude-code-action] → /review-quiz <file1> <file2> <file3>
-  └─ Task × 3 (병렬) → quiz-reviewer (Sonnet, WebFetch + context7)
+[claude-code-action] → /review-quiz <file1> [<file2> ...]
+  └─ Task × N (병렬) → quiz-reviewer (Sonnet, WebFetch + context7)
         파일별 1개 검수
         출력: .cache/review/<basename>.json { target, verdict, reason, citations[] }
 
@@ -219,9 +224,11 @@
 ## 검증 방법
 
 1. **로컬 인덱스**: `pnpm questions:index && pnpm questions:index:check && pnpm prebuild`
-2. **로컬 prepare**: `pnpm questions:prepare-batch react,css,html` → `cat .cache/batch.json | jq '.[0].system_prompt' | head`
-3. **로컬 write (mock)**: `.cache/out/<cat>.json`에 손으로 만든 JSON 1~2개 넣고 `pnpm questions:write-generated` → YAML 형식·키 순서·Zod 통과 확인
-4. **워크플로 manual dry-run**: `categories=react,css,html`, `dry_run=true` → 로그에서 diff·verdict 확인, PR 미생성 검증
-5. **실제 dry_run=false**: draft PR + `check.yml` 통과 확인
-6. **사람 검수**: 정답·해설·출처 직접 확인 → ready-for-review → 머지
-7. **스케줄**: 머지 후 다음 09:00 KST 자동 실행 확인
+2. **로컬 prepare (단일)**: `pnpm questions:prepare-batch react` → `.cache/batch.json` 엔트리 1개
+3. **로컬 prepare (burst)**: `pnpm questions:prepare-batch react,css,html` → 3개 엔트리 + 카테고리별 next_id 다 다름
+4. **로컬 write (mock)**: `.cache/out/<cat>.json`에 손으로 만든 JSON 1~2개 넣고 `pnpm questions:write-generated` → YAML 형식·키 순서·Zod 통과 확인
+5. **워크플로 manual dry-run (1개 경로)**: `categories=""` 두고 `dry_run=true` → 로그에서 무작위 1개 카테고리 선택·verdict 확인, PR 미생성 검증
+6. **워크플로 manual burst (N개 경로)**: `categories=react,css,html`, `dry_run=true` → 3개 모두 처리되는 경로 작동 확인
+7. **실제 dry_run=false**: draft PR + `check.yml` 통과 확인
+8. **사람 검수**: 정답·해설·출처 직접 확인 → ready-for-review → 머지
+9. **스케줄**: 머지 후 다음 09:00 KST 자동 실행 확인

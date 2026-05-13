@@ -8,10 +8,16 @@ allowed-tools: Task, Read
 
 ## 입력
 
-공백으로 구분된 YAML 경로들 (`$ARGUMENTS`). 예:
+공백으로 구분된 YAML 경로들 (`$ARGUMENTS`). 보통은 1개(cron 기본), 매뉴얼 burst 시 N개. 예:
 
 ```
-content/questions/react/19-suspense-fallback.yaml content/questions/css/22-aspect-ratio.yaml
+content/questions/react/023-suspense-fallback.yaml
+```
+
+(burst 예시)
+
+```
+content/questions/react/023-suspense-fallback.yaml content/questions/css/022-aspect-ratio.yaml
 ```
 
 ## 절차
@@ -22,7 +28,7 @@ content/questions/react/19-suspense-fallback.yaml content/questions/css/22-aspec
 
 ### 2. quiz-reviewer 병렬 spawn
 
-**반드시 단일 메시지에 모든 `Task` 호출을 동시에 보내**라. 각 파일마다 `quiz-reviewer` sub-agent를 호출한다.
+N ≥ 2 인 경우 **반드시 단일 메시지에 모든 `Task` 호출을 동시에 보내**라. 각 파일마다 `quiz-reviewer` sub-agent를 호출한다.
 
 각 Task의 prompt:
 
@@ -41,8 +47,8 @@ content/questions/react/19-suspense-fallback.yaml content/questions/css/22-aspec
 ```
 ## /review-quiz 결과
 
-- content/questions/react/19-suspense-fallback.yaml → approve
-- content/questions/css/22-aspect-ratio.yaml       → reject (사유: ..., 출처: ...)
+- content/questions/react/023-suspense-fallback.yaml → approve
+- content/questions/css/022-aspect-ratio.yaml       → reject (사유: ..., 출처: ...)
 ```
 
 ## 안전 규칙

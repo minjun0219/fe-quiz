@@ -27,9 +27,9 @@
 
 차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, Supabase CLI 로컬 dev DB, 콘텐츠/엔진 저장소 분리.
 
-### 매일 3문제 자동 출제 (2026-05)
+### 매일 자동 출제 (2026-05)
 
-GitHub Actions가 KST 09:00마다 랜덤 3개 카테고리에 신규 문제 1개씩을 생성하고 draft PR을 띄워요. 핵심 분리는 "**결정적인 일은 스크립트, 언어 추론만 sub-agent**":
+GitHub Actions가 KST 09:00마다 랜덤 1개 카테고리에 신규 문제 1개를 생성하고 draft PR을 띄워요. (사람 검수 품질이 binding constraint 라서 기본 1/일. 매뉴얼 burst는 `workflow_dispatch`에 `categories=react,css,html` 식으로 N개 명시 가능.) 핵심 분리는 "**결정적인 일은 스크립트, 언어 추론만 sub-agent**":
 
 - 인덱스 빌드·`next_id` 결정·Zod 검증·YAML 직렬화 → `scripts/*.ts` (토큰 0)
 - 본문 작성 → `quiz-author` sub-agent (Opus 4.7, 도구는 `Write`만)

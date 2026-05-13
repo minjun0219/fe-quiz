@@ -27,7 +27,7 @@ allowed-tools: Task, Read, Bash(ls .cache/*:*), Bash(cat .cache/*:*)
 
 ### 2. quiz-author 병렬 spawn
 
-**반드시 단일 메시지에 모든 `Task` 호출을 동시에 보내** 병렬 실행되게 하라. 각 항목마다 `quiz-author` sub-agent를 호출한다.
+배치 엔트리 수만큼 `Task` 를 spawn 한다. 보통은 cron 기본 1개라 1번 호출이지만, 매뉴얼 burst (`categories=react,css,html` 식)에서는 N개가 올라온다. **N ≥ 2 인 경우 반드시 단일 메시지에 모든 `Task` 호출을 동시에 보내** 병렬 실행되게 하라. 각 항목마다 `quiz-author` sub-agent를 호출한다.
 
 각 Task의 prompt는 다음 텍스트를 그대로 보낸다(가공·요약·번역 금지):
 
@@ -49,11 +49,17 @@ allowed-tools: Task, Read, Bash(ls .cache/*:*), Bash(cat .cache/*:*)
 
 ### 3. 결과 보고
 
-다음 형식으로 한 번만 출력해라:
+다음 형식으로 한 번만 출력해라(N개 행 = 배치 엔트리 수):
 
 ```
 ## /generate-quiz 결과
 
+- react / easy / react-019 → .cache/out/react.json  ✓
+```
+
+(burst 예시)
+
+```
 - react / easy / react-019 → .cache/out/react.json  ✓
 - css   / medium / css-022 → .cache/out/css.json    ✓
 - html  / hard / html-008 → .cache/out/html.json    ✗ (사유: ...)

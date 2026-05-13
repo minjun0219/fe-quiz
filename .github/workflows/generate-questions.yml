@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       categories:
-        description: "쉼표 구분 카테고리 3개 (비우면 랜덤)"
+        description: "쉼표 구분 카테고리 (비우면 1개 랜덤). 매뉴얼 burst 시 'react,css,html' 식으로 N개 지정 가능."
         required: false
         default: ""
       difficulties:
-        description: "쉼표 구분 난이도 3개 (기본 easy,medium,hard)"
+        description: "쉼표 구분 난이도. 카테고리 수만큼 순환 적용(부족하면 첫 항목으로 wrap)."
         required: false
         default: "easy,medium,hard"
       dry_run:
@@ -60,9 +60,11 @@ jobs:
           if [ -n "${INPUT_CATS}" ]; then
             CATS="${INPUT_CATS}"
           else
-            # 디렉터리만 추려 run_id 시드로 랜덤 3개
+            # 디렉터리만 추려 run_id 시드로 랜덤 1개 — 검수 품질이 binding constraint 라
+            # 기본은 1/일. burst가 필요하면 workflow_dispatch의 categories 입력에
+            # "react,css,html" 식으로 넘기면 그대로 처리됨(아래 인프라가 N개 받음).
             CATS=$(find content/questions -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
-              | shuf --random-source=<(yes "${RUN_ID}") -n 3 \
+              | shuf --random-source=<(yes "${RUN_ID}") -n 1 \
               | paste -sd ',' -)
           fi
           echo "cats=${CATS}" >> "$GITHUB_OUTPUT"
