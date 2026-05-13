@@ -255,7 +255,7 @@
 - `perf-005` [easy] — tags: transform, composite, animation, reflow
   > 버튼 hover 시 살짝 위로 이동하는 애니메이션을 만들 때 성능 관점에서 더 선호되는 방식은?
 
-## nextjs (5)
+## nextjs (6)
 
 - `next-001` [easy] — tags: ssr, ssg, rendering
   > Next.js에서 SSR과 SSG 선택 기준으로 가장 알맞은 것은?
@@ -267,3 +267,5 @@
   > App Router에서 Streaming SSR과 `Suspense`를 함께 쓰는 이유로 가장 알맞은 것은?
 - `next-005` [easy] — tags: proxy, middleware, redirect, rewrite, auth
   > Next.js Proxy를 쓰기 좋은 경우는?
+- `next-006` [easy] — tags: app-router, error-boundary, file-conventions, routing
+  > App Router의 특수 파일 중, 같은 세그먼트에서 에러가 던져졌을 때 fallback UI를 보여 주는 파일은 무엇인가요?
