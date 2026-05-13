@@ -44,3 +44,6 @@ supabase/.branches
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch artifacts for the quiz-generate workflow (prepared prompts, sub-agent outputs, reviewer verdicts).
+.cache/

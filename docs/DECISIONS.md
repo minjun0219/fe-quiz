@@ -25,7 +25,17 @@
 스트릭, 하트, 티어, 리더보드, 매일 출석, 광고. **Duolingo가 아닌 토스 미니퀴즈/카훗 결**.
 학습 압박 요소는 모두 제거해요.
 
-차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, AI 자동 콘텐츠 수집(GitHub Actions cron), Supabase CLI 로컬 dev DB, 콘텐츠/엔진 저장소 분리.
+차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, Supabase CLI 로컬 dev DB, 콘텐츠/엔진 저장소 분리.
+
+### 매일 3문제 자동 출제 (2026-05)
+
+GitHub Actions가 KST 09:00마다 랜덤 3개 카테고리에 신규 문제 1개씩을 생성하고 draft PR을 띄워요. 핵심 분리는 "**결정적인 일은 스크립트, 언어 추론만 sub-agent**":
+
+- 인덱스 빌드·`next_id` 결정·Zod 검증·YAML 직렬화 → `scripts/*.ts` (토큰 0)
+- 본문 작성 → `quiz-author` sub-agent (Opus 4.7, 도구는 `Write`만)
+- 사양 교차 검증 → `quiz-reviewer` sub-agent (Sonnet 4.6, WebFetch + context7)
+
+상세 설계·데이터 흐름·에지 케이스는 `docs/quiz-generation.md` 참고.
 
 ### 차별화
 
