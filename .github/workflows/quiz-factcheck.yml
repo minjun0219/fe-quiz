@@ -55,6 +55,9 @@ jobs:
       - name: Run /factcheck (dry run, read-only)
         if: github.event.inputs.dry_run == 'true'
         uses: anthropics/claude-code-action@v1
+        # job 의 30분 안에서 Claude 단계가 시간을 다 쓰면 뒤의 검증/PR 생성이
+        # 못 돌아감. step 자체에 25분 cap 을 둬서 후속 단계 여유를 확보.
+        timeout-minutes: 25
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -62,8 +65,7 @@ jobs:
 
             중요: YAML 파일을 절대 수정하지 마라. `Edit` 도구를 호출하지 마라.
             대신 어떤 파일의 어떤 필드를 어떻게 고쳐야 하는지 사유와 출처 URL만 보고하라.
-          # v1에서 mcp_config / allowed_tools / timeout_minutes 입력은 제거됨.
-          # MCP/툴 허용은 claude_args 로 넘기고, 타임아웃은 job 의 timeout-minutes 사용.
+          # v1에서 mcp_config / allowed_tools 입력은 제거되어 claude_args 로 이동.
           claude_args: |
             --mcp-config .mcp.json
             --allowedTools "Task,Read,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
@@ -71,6 +73,7 @@ jobs:
       - name: Run /factcheck via Claude Code
         if: github.event.inputs.dry_run != 'true'
         uses: anthropics/claude-code-action@v1
+        timeout-minutes: 25
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: "/factcheck all"
