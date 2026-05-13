@@ -79,12 +79,14 @@ jobs:
 
       - name: Generate (Opus authors)
         uses: anthropics/claude-code-action@v1
+        timeout-minutes: 15
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: "/generate-quiz"
-          mcp_config: ".mcp.json"
-          allowed_tools: "Task,Read,Write"
-          timeout_minutes: "15"
+          claude_args: |
+            --mcp-config .mcp.json
+            --allowedTools Task,Read,Write
 
       - name: Write YAML (deterministic)
         run: pnpm questions:write-generated
@@ -106,12 +108,14 @@ jobs:
       - name: Review (Sonnet reviewers)
         if: steps.files.outputs.paths != ''
         uses: anthropics/claude-code-action@v1
+        timeout-minutes: 20
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: "/review-quiz ${{ steps.files.outputs.paths }}"
-          mcp_config: ".mcp.json"
-          allowed_tools: "Task,Read,Write,WebFetch,WebSearch,mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
-          timeout_minutes: "20"
+          claude_args: |
+            --mcp-config .mcp.json
+            --allowedTools Task,Read,Write,WebFetch,WebSearch,mcp__context7__resolve-library-id,mcp__context7__get-library-docs
 
       - name: Apply review verdicts
         if: steps.files.outputs.paths != ''
