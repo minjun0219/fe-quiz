@@ -451,13 +451,11 @@ export default function Result({ data, level }: Props) {
       <section className="mb-10">
         <button
           type="button"
-          onClick={() =>
-            setOpen((v) => {
-              const next = !v;
-              track("result_questions_toggled", { open: next, level });
-              return next;
-            })
-          }
+          onClick={() => {
+            const next = !open;
+            track("result_questions_toggled", { open: next, level });
+            setOpen(next);
+          }}
           aria-expanded={open}
           aria-controls="result-questions"
           className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
