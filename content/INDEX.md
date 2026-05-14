@@ -49,7 +49,7 @@
 - `js-022` [medium] — tags: module, commonjs, esm, tree-shaking
   > `CommonJS`와 `ES Module`의 차이를 설명한 내용으로 가장 적절한 것은?
 
-## react (22)
+## react (23)
 
 - `react-001` [medium] — tags: hooks, useState, closure, batching
   > 버튼을 한 번 클릭했을 때, 클릭 직후 화면에 표시되는 숫자와 console에 찍히는 값은?
@@ -95,6 +95,8 @@
   > React 컴포넌트 안에서 타이머 ID처럼 렌더 사이에 유지돼야 하지만 값 변경만으로 리렌더링할 필요는 없는 값을 저장하려고 해요. 가장 적절…
 - `react-022` [medium] — tags: tanstack-query, cache, staleTime, gcTime
   > TanStack Query에서 `staleTime`과 `gcTime`의 차이를 설명한 내용으로 맞는 것은?
+- `react-023` [easy] — tags: props, children, jsx, components
+  > 다음 `Card` 컴포넌트를 `<Card>안녕하세요</Card>` 처럼 사용했을 때, 컴포넌트 안에서 `안녕하세요` 텍스트에 접근하려면 어떤 …
 
 ## css (21)
 
