@@ -2,7 +2,7 @@
 
 import posthog from "posthog-js";
 import type { Level } from "@/lib/levels";
-import type { Category, Difficulty } from "@/lib/question.schema";
+import type { Category, Difficulty, QuestionType } from "@/lib/question.schema";
 import type { Personality } from "@/lib/quiz-submit.schema";
 
 type RoundStartedProps = {
@@ -21,7 +21,7 @@ type QuestionViewedProps = {
   question_id: string;
   category: Category;
   difficulty: Difficulty;
-  question_type: "single_choice" | "multi_choice";
+  question_type: QuestionType;
 };
 
 type QuestionAnsweredProps = QuestionViewedProps & {
