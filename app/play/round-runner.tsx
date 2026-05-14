@@ -1,9 +1,10 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
+import { track } from "@/lib/analytics";
 import type { Level } from "@/lib/levels";
-import type { PublicQuestion } from "@/lib/question.schema";
+import type { Difficulty, PublicQuestion } from "@/lib/question.schema";
 import type {
   QuizSubmitResponse,
   SubmittedAnswer,
@@ -13,6 +14,24 @@ import Result from "./result";
 interface Props {
   questions: PublicQuestion[];
   level: Level;
+  replay: boolean;
+}
+
+function selectionCount(a: AnswerState): number {
+  if (a === null) {
+    return 0;
+  }
+  return Array.isArray(a) ? a.length : 1;
+}
+
+function difficultyMix(
+  questions: PublicQuestion[],
+): Record<Difficulty, number> {
+  const mix: Record<Difficulty, number> = { easy: 0, medium: 0, hard: 0 };
+  for (const q of questions) {
+    mix[q.difficulty] += 1;
+  }
+  return mix;
 }
 
 type Phase =
@@ -46,15 +65,51 @@ function normalize(a: AnswerState): SubmittedAnswer {
   return a;
 }
 
-export default function RoundRunner({ questions, level }: Props) {
+export default function RoundRunner({ questions, level, replay }: Props) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerState[]>(() =>
     initialAnswers(questions),
   );
   const [phase, setPhase] = useState<Phase>({ kind: "answering" });
   const groupNameBase = useId();
+  // `round_started` 와 `round_submitted` 의 경과시간 측정용. round 동안
+  // 변하지 않는 값이라 ref로 충분.
+  const roundStartedAtRef = useRef<number>(Date.now());
+  const questionViewedAtRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    if (questions.length === 0) {
+      return;
+    }
+    roundStartedAtRef.current = Date.now();
+    questionViewedAtRef.current = Date.now();
+    track("round_started", {
+      level,
+      question_count: questions.length,
+      question_ids: questions.map((q) => q.id),
+      categories: questions.map((q) => q.category),
+      difficulties: questions.map((q) => q.difficulty),
+      mix: difficultyMix(questions),
+      replay,
+    });
+    const first = questions[0];
+    track("question_viewed", {
+      level,
+      index: 0,
+      question_id: first.id,
+      category: first.category,
+      difficulty: first.difficulty,
+      question_type: first.type,
+    });
+  }, [questions, level, replay]);
 
   async function submit() {
+    const submittedAt = Date.now();
+    track("round_submitted", {
+      level,
+      round_duration_ms: submittedAt - roundStartedAtRef.current,
+      question_count: questions.length,
+    });
     setPhase({ kind: "submitting" });
     try {
       const res = await fetch("/api/quiz/submit", {
@@ -75,9 +130,11 @@ export default function RoundRunner({ questions, level }: Props) {
       const result = (await res.json()) as QuizSubmitResponse;
       setPhase({ kind: "done", result });
     } catch (err) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
+      track("round_submit_failed", { level, message });
       setPhase({
         kind: "error",
-        message: err instanceof Error ? err.message : "알 수 없는 오류",
+        message,
       });
     }
   }
@@ -168,11 +225,32 @@ export default function RoundRunner({ questions, level }: Props) {
   }
 
   function nextStep() {
+    const now = Date.now();
+    track("question_answered", {
+      level,
+      index,
+      question_id: current.id,
+      category: current.category,
+      difficulty: current.difficulty,
+      question_type: current.type,
+      dwell_ms: now - questionViewedAtRef.current,
+      selection_count: selectionCount(selected),
+    });
     scrollToTop();
     if (isLast) {
       submit();
       return;
     }
+    const next = questions[index + 1];
+    questionViewedAtRef.current = now;
+    track("question_viewed", {
+      level,
+      index: index + 1,
+      question_id: next.id,
+      category: next.category,
+      difficulty: next.difficulty,
+      question_type: next.type,
+    });
     setIndex((i) => i + 1);
   }
 

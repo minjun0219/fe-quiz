@@ -33,7 +33,12 @@ export default async function PlayPage({ searchParams }: Props) {
   // path (or a remount on navigation) gives us clean state.
   const roundKey = questions.map((q) => q.id).join(",");
   return (
-    <RoundRunner key={roundKey} questions={questions} level={resolvedLevel} />
+    <RoundRunner
+      key={roundKey}
+      questions={questions}
+      level={resolvedLevel}
+      replay={Boolean(from)}
+    />
   );
 }
 
