@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
 import { ContributeNote } from "@/components/credits";
+import { track } from "@/lib/analytics";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Level } from "@/lib/levels";
@@ -56,6 +57,13 @@ export default function Result({ data, level }: Props) {
   const [canNativeShare, setCanNativeShare] = useState(false);
   const copyResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const overallPct = Math.round((data.total_correct / data.total) * 100);
+  // Dwell 캡처: pagehide(탭 닫기·BFCache)와 컴포넌트 unmount(다음 라운드로
+  // 이동) 양쪽 모두에서 한 번만 발행되도록 firedRef로 가드. 최신 status·shared
+  // 값을 effect 클로저 stale 없이 보낼 수 있게 ref로 미러링.
+  const mountedAtRef = useRef<number>(Date.now());
+  const dwellFiredRef = useRef<boolean>(false);
+  const feedbackStatusRef = useRef<FeedbackStatus>("loading");
+  const sharedRef = useRef<boolean>(false);
 
   // Share is enabled once the feedback flow has settled in any terminal
   // state — including "error" / "unavailable", where we'll fall back to a
@@ -69,6 +77,51 @@ export default function Result({ data, level }: Props) {
       typeof navigator !== "undefined" && typeof navigator.share === "function",
     );
   }, []);
+
+  useEffect(() => {
+    feedbackStatusRef.current = feedbackStatus;
+  }, [feedbackStatus]);
+
+  useEffect(() => {
+    sharedRef.current = shareStatus === "ready";
+  }, [shareStatus]);
+
+  // 결과 페이지 도달 + dwell 측정. `data` 가 바뀌면 (새 라운드로 진입) 새로
+  // mount 한 것처럼 취급한다. cleanup의 dwell 발행은 unmount 와 effect 재실행
+  // 둘 다에서 호출되므로 firedRef로 중복 방지.
+  useEffect(() => {
+    mountedAtRef.current = Date.now();
+    dwellFiredRef.current = false;
+    track("result_viewed", {
+      level,
+      total: data.total,
+      total_correct: data.total_correct,
+      pct: overallPct,
+      type_code: data.type_code,
+      personality: data.personality,
+      strengths: data.strengths,
+      weaknesses: data.weaknesses,
+    });
+
+    function fireDwell() {
+      if (dwellFiredRef.current) {
+        return;
+      }
+      dwellFiredRef.current = true;
+      track("result_dwell", {
+        level,
+        dwell_ms: Date.now() - mountedAtRef.current,
+        feedback_status: feedbackStatusRef.current,
+        shared: sharedRef.current,
+      });
+    }
+
+    window.addEventListener("pagehide", fireDwell);
+    return () => {
+      window.removeEventListener("pagehide", fireDwell);
+      fireDwell();
+    };
+  }, [data, level, overallPct]);
 
   useEffect(() => {
     return () => {
@@ -90,6 +143,12 @@ export default function Result({ data, level }: Props) {
     if (!canShare || shareStatus === "creating" || shareStatus === "ready") {
       return;
     }
+    track("share_clicked", {
+      level,
+      total_correct: data.total_correct,
+      pct: overallPct,
+    });
+    const startedAt = Date.now();
     setShareStatus("creating");
     try {
       const res = await fetch("/api/share", {
@@ -113,11 +172,21 @@ export default function Result({ data, level }: Props) {
       const body = (await res.json()) as ShareCreateResponse;
       setShareUrl(body.url);
       setShareStatus("ready");
+      track("share_created", {
+        level,
+        slug: body.slug,
+        duration_ms: Date.now() - startedAt,
+      });
       const ok = await copyToClipboard(body.url);
       if (ok) {
+        track("share_copy_clicked", { level, surface: "auto" });
         flashCopiedFeedback();
       }
-    } catch {
+    } catch (err) {
+      track("share_failed", {
+        level,
+        message: err instanceof Error ? err.message : "unknown",
+      });
       setShareStatus("error");
     }
   }
@@ -126,6 +195,7 @@ export default function Result({ data, level }: Props) {
     if (!shareUrl) {
       return;
     }
+    track("share_copy_clicked", { level, surface: "panel" });
     const ok = await copyToClipboard(shareUrl);
     if (ok) {
       flashCopiedFeedback();
@@ -136,6 +206,7 @@ export default function Result({ data, level }: Props) {
     if (!shareUrl || !canNativeShare) {
       return;
     }
+    track("share_native_clicked", { level });
     try {
       await navigator.share({
         title: `${data.emoji} ${data.result_type}`,
@@ -176,7 +247,10 @@ export default function Result({ data, level }: Props) {
       copyResetRef.current = null;
     }
     let ignore = false;
+    let charCount = 0;
+    const startedAt = Date.now();
     const abort = new AbortController();
+    track("feedback_requested", { level });
 
     (async () => {
       try {
@@ -193,6 +267,12 @@ export default function Result({ data, level }: Props) {
         if (res.status === 503) {
           if (!ignore) {
             setFeedbackStatus("unavailable");
+            track("feedback_completed", {
+              level,
+              status: "unavailable",
+              duration_ms: Date.now() - startedAt,
+              char_count: 0,
+            });
           }
           return;
         }
@@ -209,22 +289,37 @@ export default function Result({ data, level }: Props) {
           if (done || ignore) {
             break;
           }
-          setFeedback((prev) => prev + decoder.decode(value, { stream: true }));
+          const chunk = decoder.decode(value, { stream: true });
+          charCount += chunk.length;
+          setFeedback((prev) => prev + chunk);
         }
         // Flush any byte sequence that was held back on a UTF-8 boundary —
         // Korean characters are 3 bytes, easy to bisect across chunks.
         if (!ignore) {
           const tail = decoder.decode();
           if (tail) {
+            charCount += tail.length;
             setFeedback((prev) => prev + tail);
           }
           setFeedbackStatus("done");
+          track("feedback_completed", {
+            level,
+            status: "done",
+            duration_ms: Date.now() - startedAt,
+            char_count: charCount,
+          });
         }
       } catch (err) {
         if (ignore || (err as { name?: string }).name === "AbortError") {
           return;
         }
         setFeedbackStatus("error");
+        track("feedback_completed", {
+          level,
+          status: "error",
+          duration_ms: Date.now() - startedAt,
+          char_count: charCount,
+        });
       }
     })();
 
@@ -356,7 +451,11 @@ export default function Result({ data, level }: Props) {
       <section className="mb-10">
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => {
+            const next = !open;
+            track("result_questions_toggled", { open: next, level });
+            setOpen(next);
+          }}
           aria-expanded={open}
           aria-controls="result-questions"
           className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
