@@ -86,8 +86,63 @@ export type AnalyticsEvents = {
 };
 
 /**
- * 타입 안전한 PostHog 이벤트 캡처. 키가 미설정인 환경에서는 `posthog.__loaded`가
- * false라 no-op이 되므로 dev/CI에서도 throw 없이 안전하다.
+ * 키 유무는 빌드 타임에 inlining 되므로 모듈 로드 시 한 번만 본다. 키 없는
+ * dev/CI에서는 큐잉도 하지 않고 즉시 no-op.
+ */
+const HAS_KEY =
+  typeof process !== "undefined" && !!process.env.NEXT_PUBLIC_POSTHOG_KEY;
+
+type QueuedEvent = {
+  event: keyof AnalyticsEvents;
+  props: Record<string, unknown>;
+};
+
+// React effect는 child→parent 순으로 실행되므로 `/play` cold load 시
+// `RoundRunner`의 mount effect가 `PostHogProvider`의 init effect보다 먼저
+// 돈다 → `posthog.__loaded`가 false라 round_started/첫 question_viewed가
+// 영구 드롭. init 직후를 따라잡기 위해 짧게 큐잉 후 flush.
+const queue: QueuedEvent[] = [];
+const MAX_QUEUE = 50;
+// 50ms × 20 = ~1s. 그 안에 init이 안 끝나면 키 잘못 설정/네트워크 문제로
+// 보고 큐를 버린다 (메모리 무한 증가 방지).
+const DRAIN_INTERVAL_MS = 50;
+const MAX_DRAIN_ATTEMPTS = 20;
+let drainScheduled = false;
+let drainAttempts = 0;
+
+function scheduleDrain(): void {
+  if (drainScheduled) {
+    return;
+  }
+  drainScheduled = true;
+  setTimeout(drain, DRAIN_INTERVAL_MS);
+}
+
+function drain(): void {
+  drainScheduled = false;
+  if (posthog.__loaded) {
+    for (const item of queue) {
+      posthog.capture(item.event, item.props);
+    }
+    queue.length = 0;
+    drainAttempts = 0;
+    return;
+  }
+  drainAttempts += 1;
+  if (drainAttempts >= MAX_DRAIN_ATTEMPTS) {
+    queue.length = 0;
+    drainAttempts = 0;
+    return;
+  }
+  scheduleDrain();
+}
+
+/**
+ * 타입 안전한 PostHog 이벤트 캡처.
+ *
+ * - 키 미설정 환경: 즉시 no-op (큐잉도 안 함).
+ * - 키 설정 + init 완료: 즉시 capture.
+ * - 키 설정 + init 진행 중(cold mount 직후): 큐에 쌓고 init 후 flush.
  */
 export function track<K extends keyof AnalyticsEvents>(
   event: K,
@@ -96,8 +151,16 @@ export function track<K extends keyof AnalyticsEvents>(
   if (typeof window === "undefined") {
     return;
   }
-  if (!posthog.__loaded) {
+  if (!HAS_KEY) {
     return;
   }
-  posthog.capture(event, props as Record<string, unknown>);
+  if (posthog.__loaded) {
+    posthog.capture(event, props as Record<string, unknown>);
+    return;
+  }
+  if (queue.length >= MAX_QUEUE) {
+    return;
+  }
+  queue.push({ event, props: props as Record<string, unknown> });
+  scheduleDrain();
 }
