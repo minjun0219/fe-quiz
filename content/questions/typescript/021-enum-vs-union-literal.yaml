@@ -1,0 +1,41 @@
+id: ts-021
+category: typescript
+difficulty: easy
+type: single_choice
+question: 다음 두 선언 (A)와 (B)에 대한 설명으로 가장 정확한 것은? (`isolatedModules`나 `erasableSyntaxOnly` 같은 추가 옵션은 끈 기본 상태)
+code: |
+  // (A)
+  enum Role {
+    Admin = 'admin',
+    User = 'user',
+  }
+
+  // (B)
+  type Role2 = 'admin' | 'user'
+
+  function greet(r: Role) {}
+  function greet2(r: Role2) {}
+
+  greet('admin')      // (1)
+  greet2('admin')     // (2)
+choices:
+  - id: a
+    text: (1)과 (2) 모두 통과해요. `enum`이든 유니언 리터럴이든 호출부에서 문자열 `'admin'`을 그대로 넘길 수 있어요.
+  - id: b
+    text: (1)은 컴파일 에러예요. `enum`은 `Role.Admin`처럼 멤버로 접근해야 하고, 일반 문자열을 그대로 넣을 수는 없어요. (2)는 통과해요.
+  - id: c
+    text: (2)가 컴파일 에러예요. 유니언 리터럴 타입은 런타임 값이 없어서 문자열 리터럴을 인자로 받을 수 없어요.
+  - id: d
+    text: (1)과 (2) 모두 컴파일 에러예요. `enum`과 유니언 모두 `as` 단언 없이는 문자열 리터럴을 넘길 수 없어요.
+answer: b
+explanation: 문자열 값이 붙은 `enum`이라도 TypeScript는 멤버 외의 문자열을 그 `enum` 타입으로 받아주지 않아요. 그래서 `greet('admin')`은 **컴파일 에러**가 나고, `greet(Role.Admin)`처럼 멤버로 넘겨야 해요. 반대로 `type Role2 = 'admin' | 'user'`는 문자열 리터럴 타입의 유니언이라 `'admin'` 같은 리터럴을 그대로 받을 수 있어요. 그래서 단순한 "몇 개 중 하나" 표현에는 유니언 리터럴이 더 가볍게 쓰여요.
+references:
+  - title: TypeScript Handbook — Enums
+    url: https://www.typescriptlang.org/docs/handbook/enums.html
+  - title: TypeScript Handbook — Literal Types
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+tags:
+  - enum
+  - union
+  - literal-types
+  - string-literal
