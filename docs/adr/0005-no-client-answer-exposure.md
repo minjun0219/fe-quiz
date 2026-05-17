@@ -32,7 +32,9 @@ export type PublicQuestion = Omit<
 };
 ```
 
-(`PublicChoice`는 `Choice`에서 `text` + `text_html`만 유지)
+(`PublicChoice = Choice & { text_html?: string }` — `id`·`text`는 그대로 유지,
+서버 렌더링된 `text_html`만 추가. **`id`는 반드시 남아야** 채점 라우트가
+사용자가 어떤 선택지를 골랐는지 식별할 수 있어요.)
 
 - 변환은 `lib/round.ts`의 `publicView()` 한 곳에서만 수행. 채점은 서버
   사이드(`POST /api/quiz/submit`)에서 원본 `Question`을 들고 수행.
