@@ -51,5 +51,5 @@
   않아요.
 - **함정**: `lib/categories.ts`·`lib/levels.ts`·`lib/round-picker.ts`(`ROUND_SIZE
   = 10`)는 단일 출처. 카테고리를 추가할 때 `lib/categories.ts`와
-  `content/questions/<id>/`를 함께 추가하고 `pnpm questions:check`로 검증.
+  `content/questions/<category>/`를 함께 추가하고 `pnpm questions:check`로 검증.
   스키마/단일 출처를 우회해 YAML을 손으로 형식만 맞춰 머지하지 마세요.

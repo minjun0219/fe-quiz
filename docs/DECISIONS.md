@@ -79,7 +79,7 @@ content/questions/
 ```
 
 카테고리 목록과 id prefix는 `lib/categories.ts`가 단일 출처입니다.
-새 카테고리를 추가할 때는 `lib/categories.ts`와 `content/questions/<id>/`를 함께 추가하고, `pnpm questions:check`로 검증합니다.
+새 카테고리를 추가할 때는 `lib/categories.ts`와 `content/questions/<category>/`를 함께 추가하고, `pnpm questions:check`로 검증합니다.
 
 ### 질문 YAML 스키마
 
@@ -208,6 +208,7 @@ fe-quiz/
 │   ├── LICENSE                  # CC BY-SA 4.0
 │   ├── README.md                # 콘텐츠 작성자 가이드 (한국어)
 │   ├── AGENTS.md                # 콘텐츠 강제 규칙 (영어)
+│   ├── INDEX.md                 # 카테고리별 카탈로그 (questions:index 산출)
 │   └── questions/               # YAML 시드 문제 (카테고리별 폴더)
 ├── lib/                         # 도메인 로직
 │   ├── categories.ts            # 카테고리 단일 출처
