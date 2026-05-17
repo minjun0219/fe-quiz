@@ -4,6 +4,10 @@
 구현 진척도나 PR별 진행 상태가 아니라, **앞으로도 유지될 결정**만 담아요.
 결정이 바뀌면 별도 PR로 이 문서를 갱신해 주세요.
 
+개별 결정의 배경·대안·결과는 [`docs/adr/`](./adr/)를 참고해 주세요. 이 문서는
+"지금 이 프로젝트가 어떻게 생겼는가"를 빠르게 훑는 살아있는 개요이고, ADR은
+"왜 그렇게 정했고 되돌리면 뭐가 깨지는지"를 박제해요.
+
 ## 한 줄 정의
 
 > 🍘 누룽지가 퀴즈 내고 한마디 보태주는 프론트엔드 미니게임
@@ -27,7 +31,7 @@
 
 차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, Supabase CLI 로컬 dev DB, 콘텐츠/엔진 저장소 분리.
 
-### 매일 자동 출제 (2026-05)
+### 매일 자동 출제 (2026-05) — [ADR 0001](./adr/0001-daily-quiz-generation-hybrid.md)
 
 GitHub Actions가 **월~금 KST 05:00** 출근길 검수 타이밍에 랜덤 1개 카테고리에 신규 문제 1개를 생성하고 draft PR을 띄워요. (사람 검수 품질이 binding constraint 라서 기본 1/일. 매뉴얼 burst는 `workflow_dispatch`에 `categories=react,css,html` 식으로 N개 명시 가능.) 핵심 분리는 "**결정적인 일은 스크립트, 언어 추론만 sub-agent**":
 
@@ -60,7 +64,7 @@ GitHub Actions가 **월~금 KST 05:00** 출근길 검수 타이밍에 랜덤 1�
 
 ## 아키텍처
 
-### 질문 콘텐츠는 YAML, DB는 공유에만
+### 질문 콘텐츠는 YAML, DB는 공유에만 — [ADR 0004](./adr/0004-yaml-content-with-zod-validation.md)
 
 마크다운 본문이 없고 메타데이터만 다루므로 `.md` frontmatter 대신 YAML 파일을 사용합니다.
 파서/툴체인이 단순해지고(`gray-matter` 불필요, `yaml` 패키지만 사용), 스키마 검증도 직접적입니다.
@@ -109,7 +113,7 @@ tags: [event-loop, async]
 - `answer`는 실제 choice id만 참조
 - `multi_choice`는 모든 선택지를 정답으로 둘 수 없음
 
-### 공개 질문 데이터
+### 공개 질문 데이터 — [ADR 0005](./adr/0005-no-client-answer-exposure.md)
 
 브라우저로 내려가는 `PublicQuestion`에는 `answer`, `explanation`이 없습니다.
 코드/인라인 코드 표시는 서버에서 HTML로 변환해 `question_html`, `code_html`, `choices[].text_html`로 전달합니다.
@@ -124,7 +128,7 @@ tags: [event-loop, async]
 
 세 라우트 모두 `runtime = "nodejs"`, `dynamic = "force-dynamic"`입니다.
 
-### Supabase 스키마
+### Supabase 스키마 — [ADR 0002](./adr/0002-supabase-server-only-secret-key.md), [ADR 0003](./adr/0003-vercel-env-environment-split.md)
 
 ```sql
 create table shares (
@@ -228,7 +232,9 @@ fe-quiz/
 │   ├── AGENTS.md                # 마이그레이션 운영 가이드 (영어)
 │   └── migrations/
 ├── docs/
-│   └── DECISIONS.md             # 이 문서 — 영구 설계 결정
+│   ├── DECISIONS.md             # 이 문서 — 영구 설계 결정 (살아있는 개요)
+│   ├── adr/                     # Architecture Decision Records (개별 결정 박제)
+│   └── quiz-generation.md       # 자동 출제 워크플로 상세 설계
 ├── instrumentation.ts           # Next.js 16 onRequestError → PostHog
 ├── .env.local.example
 ├── .mcp.json
