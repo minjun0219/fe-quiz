@@ -1,0 +1,36 @@
+id: ts-021
+category: typescript
+difficulty: easy
+type: single_choice
+question: 아래처럼 `Status` 값을 표현하는 두 가지 방법이 있어요. (A) `enum`과 (B) `union of string literals`의 차이로 가장 정확한 설명은 무엇일까요?
+code: |-
+  // (A)
+  enum Status {
+    Idle = 'idle',
+    Loading = 'loading',
+    Done = 'done',
+  }
+
+  // (B)
+  type Status = 'idle' | 'loading' | 'done'
+choices:
+  - id: a
+    text: (A)는 런타임에 객체가 생성되어 JS 번들에 포함되지만, (B)는 타입 정보만 있어서 컴파일 후 코드에 흔적이 남지 않아요.
+  - id: b
+    text: (A)와 (B) 모두 타입 정보일 뿐이라 컴파일 후 JS 출력에는 어느 쪽도 코드를 남기지 않아요.
+  - id: c
+    text: (B)는 `'idle' | 'loading' | 'done'` 외의 문자열도 허용하지만, (A)는 정확히 세 값만 허용해요.
+  - id: d
+    text: (A)와 (B)는 완전히 동일한 타입으로 취급되어 서로 자유롭게 대입할 수 있어요.
+answer: a
+explanation: "`enum`은 타입과 **런타임 값**(역방향 매핑을 위한 객체)을 함께 만들어요. 그래서 `Status.Idle` 같은 표현이 가능하고, 컴파일 후 JS에도 객체가 남아요. 반면 `type Status = 'idle' | 'loading' | 'done'`은 순수 타입 별칭(type alias)이라 컴파일 시 모두 사라지고 런타임 흔적이 없어요. 두 방식 모두 허용 값은 세 가지로 동일해요."
+references:
+  - title: TypeScript Handbook — Enums
+    url: https://www.typescriptlang.org/docs/handbook/enums.html
+  - title: TypeScript Handbook — Literal Types
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+tags:
+  - enum
+  - union
+  - literal-types
+  - runtime
