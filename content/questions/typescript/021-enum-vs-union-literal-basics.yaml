@@ -1,0 +1,38 @@
+id: ts-021
+category: typescript
+difficulty: easy
+type: single_choice
+question: 아래처럼 문자열 리터럴 유니언으로 선언한 `Direction` 타입의 동작으로 가장 정확한 것은? (strict 옵션은 기본값)
+code: |-
+  type Direction = 'up' | 'down' | 'left' | 'right'
+
+  function move(d: Direction) {
+    // ...
+  }
+
+  move('up')
+  move('north')
+
+  const raw: string = 'up'
+  move(raw)
+choices:
+  - id: a
+    text: "`move('up')`만 통과하고, `move('north')`와 `move(raw)` 두 줄 모두 컴파일 에러예요."
+  - id: b
+    text: 세 호출 모두 런타임에 검사되므로 컴파일은 모두 통과해요.
+  - id: c
+    text: "`move('north')`만 에러가 나고, 변수 `raw`는 값이 `'up'`이라 통과해요."
+  - id: d
+    text: "`Direction` 같은 리터럴 유니언은 타입으로 쓸 수 없고 `enum`으로만 가능해요."
+answer: a
+explanation: 문자열 리터럴 유니언은 정확히 그 리터럴 값만 허용해요. `'north'`는 `Direction`에 없으니 바로 컴파일 에러고, `raw`는 타입이 넓은 `string`이라 `Direction`으로 좁혀지지 않아서 역시 에러예요. 값이 우연히 `'up'`이라는 사실은 타입 검사에 영향을 주지 않아요. 좁히려면 `as const`로 리터럴로 만들거나 타입 가드를 쓰면 돼요. 그리고 리터럴 유니언은 `enum` 없이도 충분히 타입으로 쓸 수 있어요.
+references:
+  - title: TypeScript Handbook — Literal Types
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+  - title: TypeScript Handbook — Union Types
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types
+tags:
+  - types
+  - literal-types
+  - union
+  - string-literal

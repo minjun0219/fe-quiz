@@ -141,7 +141,7 @@
 - `css-021` [easy] — tags: reset-css, normalize-css, browser-defaults
   > Reset CSS와 Normalize CSS의 차이로 가장 알맞은 것은?
 
-## typescript (20)
+## typescript (21)
 
 - `ts-001` [medium] — tags: types, any, unknown, narrowing
   > `any`와 `unknown`의 차이는?
@@ -183,6 +183,8 @@
   > 다음 함수 오버로드 선언에서 (1), (2), (3) 호출의 결과로 가장 정확한 것은?
 - `ts-020` [medium] — tags: type-guard, as, narrowing
   > 아래 (A)와 (B) 방식의 차이로 가장 정확한 설명은?
+- `ts-021` [easy] — tags: types, literal-types, union, string-literal
+  > 아래처럼 문자열 리터럴 유니언으로 선언한 `Direction` 타입의 동작으로 가장 정확한 것은? (strict 옵션은 기본값)
 
 ## html (20)
 
