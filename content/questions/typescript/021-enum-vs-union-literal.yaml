@@ -1,0 +1,41 @@
+id: ts-021
+category: typescript
+difficulty: easy
+type: single_choice
+question: 아래 두 정의 `Direction1`과 `Direction2`의 차이로 가장 정확한 설명은 무엇인가요?
+code: |-
+  enum Direction1 {
+    Up = 'UP',
+    Down = 'DOWN',
+  }
+
+  type Direction2 = 'UP' | 'DOWN'
+
+  function move1(d: Direction1) {}
+  function move2(d: Direction2) {}
+
+  move1('UP')          // (1)
+  move2('UP')          // (2)
+  move1(Direction1.Up) // (3)
+  move2(Direction1.Up) // (4)
+choices:
+  - id: a
+    text: (1)과 (2) 모두 컴파일을 통과해요. `enum`과 유니온 리터럴 타입은 런타임·타입 모두 완전히 같은 표현이거든요.
+  - id: b
+    text: (1)은 컴파일 에러예요. `Direction1`은 enum 멤버 자체를 요구하는 명목적(nominal) 타입이라서 문자열 `'UP'`을 그대로 넘길 수 없어요. (2)는 통과해요.
+  - id: c
+    text: (2)는 컴파일 에러예요. 유니온 리터럴 타입은 반드시 `as const` 값으로만 전달할 수 있거든요.
+  - id: d
+    text: (3)과 (4) 모두 컴파일 에러예요. enum 멤버는 함수 인자로 전달할 수 없어요.
+answer: b
+explanation: TypeScript의 `enum`은 구조적 타입 시스템 안에서 예외적으로 **명목적(nominal)** 으로 동작해요. 그래서 `Direction1`을 요구하는 자리엔 원시 문자열 `'UP'`을 넘길 수 없고, 반드시 `Direction1.Up`처럼 enum 멤버를 써야 해요. 반면 `Direction2`는 그냥 `'UP' | 'DOWN'` 유니온 리터럴이라 문자열 `'UP'`을 그대로 받을 수 있어요. 그리고 `Direction1.Up`의 값은 `'UP'` 문자열이라 `move2`에도 호환돼서 (4)도 통과해요. 정리하면 에러는 (1)뿐이에요.
+references:
+  - title: TypeScript Handbook — Enums
+    url: https://www.typescriptlang.org/docs/handbook/enums.html
+  - title: TypeScript Handbook — Literal Types
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+tags:
+  - enum
+  - literal-types
+  - union
+  - nominal-typing
