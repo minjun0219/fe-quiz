@@ -22,7 +22,7 @@ answer: d
 explanation: |
   React 18까지의 함수형 컴포넌트는 기본적으로 `ref` prop을 받지 못해요. 그래서 부모가 `<MyInput ref={ref} />`처럼 넘겨도 자식에 닿지 않고, "Function components cannot be given refs" 경고가 떠요.
   해결은 `forwardRef`로 컴포넌트를 감싸서 두 번째 인자로 들어오는 `ref`를 자식 DOM에 연결하는 거예요. 더 추상화된 명령형 API가 필요하면 그 안에서 `useImperativeHandle`을 조합해 쓰면 돼요.
-  참고로 React 19부터는 함수형 컴포넌트가 `ref`를 일반 prop처럼 받을 수 있어서 `forwardRef`가 점차 필요 없어질 예정이지만, 대부분의 코드베이스에선 여전히 forwardRef 사용이 일반적이에요.
+  참고로 React 19부터는 함수형 컴포넌트가 `ref`를 일반 prop처럼 받을 수 있어서 `forwardRef`는 공식적으로 사용 중단(deprecated) 상태이고, 새 코드에서는 `ref`를 prop으로 직접 받는 패턴이 권장돼요. 다만 React 18까지 유지되는 코드베이스에선 여전히 `forwardRef`가 필요해요. (출처: https://react.dev/reference/react/forwardRef)
 references:
   - title: "React — forwardRef"
     url: "https://ko.react.dev/reference/react/forwardRef"
