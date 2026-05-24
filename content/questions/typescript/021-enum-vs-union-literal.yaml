@@ -1,0 +1,40 @@
+id: ts-021
+category: typescript
+difficulty: easy
+type: single_choice
+question: 아래 두 선언 `Direction1`과 `Direction2`의 차이로 가장 정확한 것은? (strict 모드, 추가 옵션은 기본값)
+code: |-
+  enum Direction1 {
+    Up = 'UP',
+    Down = 'DOWN',
+  }
+
+  type Direction2 = 'UP' | 'DOWN'
+
+  function move1(d: Direction1) {}
+  function move2(d: Direction2) {}
+
+  move1('UP')             // (1)
+  move2('UP')             // (2)
+  move1(Direction1.Up)    // (3)
+choices:
+  - id: a
+    text: (1)·(2)·(3) 모두 통과해요. `enum`은 결국 문자열 리터럴 유니온과 완전히 동일하게 취급돼요.
+  - id: b
+    text: (1)은 **컴파일 에러**, (2)와 (3)은 통과해요. `enum`은 명목적(nominal)으로 동작해서 같은 값의 문자열 리터럴이라도 직접 넘길 수 없어요.
+  - id: c
+    text: (2)가 **컴파일 에러**예요. 문자열 리터럴 유니온 타입은 변수에 담긴 값만 받고, 인라인 문자열은 거부해요.
+  - id: d
+    text: (3)이 **컴파일 에러**예요. `enum` 멤버는 런타임 객체라서 타입 위치에는 못 써요.
+answer: b
+explanation: TypeScript의 `enum`은 구조적(structural) 타이핑의 예외로, 같은 문자열 값이라도 명목적으로 구분돼요. 그래서 `move1('UP')`처럼 리터럴을 그대로 넘기면 `Direction1` 타입에 할당할 수 없다는 에러가 나요. 반면 `Direction2`는 단순 문자열 리터럴 유니온이라 `'UP'`을 직접 넘겨도 잘 통과해요. `Direction1.Up`은 enum 멤버 자체이므로 (3)은 당연히 OK예요. 이 차이 때문에 최근에는 enum 대신 리터럴 유니온이나 `as const` 객체를 선호하는 흐름도 있어요.
+references:
+  - title: TypeScript Handbook — Enums
+    url: https://www.typescriptlang.org/docs/handbook/enums.html
+  - title: TypeScript Handbook — Literal Types
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+tags:
+  - enum
+  - literal-types
+  - union
+  - nominal-typing
