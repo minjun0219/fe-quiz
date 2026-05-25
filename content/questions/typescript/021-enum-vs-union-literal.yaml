@@ -1,0 +1,35 @@
+id: ts-021
+category: typescript
+difficulty: easy
+type: single_choice
+question: 다음 두 가지 방식 중 `Direction` 값을 표현할 때, TypeScript에서 **타입 전용(type-only)** 으로 동작해서 런타임 JavaScript 출력에 어떤 코드도 남기지 않는 쪽은 어느 것일까요?
+code: |-
+  // (A)
+  enum Direction {
+    Up = 'UP',
+    Down = 'DOWN',
+  }
+
+  // (B)
+  type Direction = 'UP' | 'DOWN'
+choices:
+  - id: a
+    text: (A) `enum Direction` — `enum` 키워드는 런타임에 아무 코드도 만들지 않아요.
+  - id: b
+    text: (B) `type Direction = 'UP' | 'DOWN'` — `type` 선언은 컴파일 후 완전히 사라져요.
+  - id: c
+    text: 둘 다 런타임 코드를 만들지 않아요 — TypeScript의 모든 선언은 타입 전용이에요.
+  - id: d
+    text: 둘 다 런타임에 객체를 만들어요 — `enum`과 `type` 모두 JS 출력에 남아요.
+answer: b
+explanation: "`type` 선언(타입 별칭)은 **타입 전용**이라 컴파일 후 JavaScript 출력에는 흔적이 남지 않아요. 반면 `enum`은 (`const enum`이 아니라면) 컴파일 시 양방향 매핑을 위한 객체를 런타임에 만들어 내요. 그래서 번들 크기·트리 셰이킹을 신경 쓸 때는 유니온 리터럴 타입을 선호하는 가이드가 흔해요."
+references:
+  - title: "TypeScript Handbook — Everyday Types: Union & Literal Types"
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types
+  - title: TypeScript Handbook — Enums
+    url: https://www.typescriptlang.org/docs/handbook/enums.html
+tags:
+  - types
+  - enum
+  - union-literal
+  - type-alias
