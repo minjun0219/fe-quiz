@@ -227,7 +227,7 @@
 - `html-020` [hard] — tags: forms, autocomplete, inputmode
   > `autocomplete`와 `inputmode` 속성의 역할 차이로 가장 정확한 것은?
 
-## browser (6)
+## browser (7)
 
 - `browser-001` [easy] — tags: rendering, crp, dom, cssom
   > 브라우저의 Critical Rendering Path 순서로 가장 알맞은 것은?
@@ -241,6 +241,8 @@
   > 브라우저 이벤트 루프에서 렌더링과 가장 가까운 설명은?
 - `browser-006` [easy] — tags: cache, memory-cache, disk-cache, browser
   > 브라우저의 메모리 캐시와 디스크 캐시에 대한 설명으로 가장 적절한 것은?
+- `browser-007` [easy] — tags: security, same-origin-policy, origin, browser
+  > 브라우저의 동일 출처 정책(Same-Origin Policy)에서 '같은 출처(origin)'를 구성하는 요소로 가장 알맞은 것은 무엇인가요?
 
 ## performance (5)
 
