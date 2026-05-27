@@ -1,0 +1,41 @@
+id: ts-021
+category: typescript
+difficulty: easy
+type: single_choice
+question: 다음 두 선언 `A`와 `B`의 차이로 가장 정확한 설명은 무엇일까요?
+code: |
+  // A
+  enum Direction {
+    Up = 'UP',
+    Down = 'DOWN',
+  }
+
+  // B
+  type Direction2 = 'UP' | 'DOWN'
+
+  function move(d: Direction) {}
+  function move2(d: Direction2) {}
+
+  move('UP')        // (1)
+  move2('UP')       // (2)
+choices:
+  - id: a
+    text: "`A`는 런타임 객체(`Direction.Up` 같은 멤버 접근)를 만들지만, `B`는 컴파일 후 사라지는 타입-온리 선언이에요. (1)은 컴파일 에러, (2)는 정상 통과예요."
+  - id: b
+    text: "`A`와 `B`는 컴파일 결과가 완전히 동일하고, 둘 다 `move('UP')` 호출이 그대로 통과해요."
+  - id: c
+    text: "`B`는 런타임 객체를 만들지만 `A`는 만들지 않아요. 그래서 (1)이 더 빠르게 동작해요."
+  - id: d
+    text: "`A`도 문자열 리터럴이라 `move('UP')`이 통과하고, `B`는 유니온이라 (2)에서 컴파일 에러가 나요."
+answer: a
+explanation: "`enum`은 타입과 함께 **런타임 값**(객체)을 생성해요. 예를 들어 `Direction.Up`은 컴파일 후에도 남아 있는 객체 프로퍼티 접근이에요. 반면 유니온 리터럴 타입은 타입 검사용으로만 존재하고 컴파일 결과물에는 흔적이 없어요. 또 `enum`은 명목(nominal)에 가깝게 동작해서 멤버가 아닌 raw 문자열 `'UP'`을 직접 넘기면 거부해요. 유니온 리터럴은 구조적으로 동일한 리터럴이면 그대로 받기 때문에 `move2('UP')`은 통과해요."
+references:
+  - title: TypeScript Handbook — Enums
+    url: https://www.typescriptlang.org/docs/handbook/enums.html
+  - title: TypeScript Handbook — Literal Types
+    url: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types
+tags:
+  - enum
+  - literal-types
+  - union
+  - runtime
