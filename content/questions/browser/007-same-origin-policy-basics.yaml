@@ -1,0 +1,26 @@
+id: browser-007
+category: browser
+difficulty: easy
+type: single_choice
+question: 브라우저의 동일 출처 정책(Same-Origin Policy)에서 두 URL이 "같은 출처"로 간주되려면 무엇이 모두 같아야 할까요?
+choices:
+  - id: a
+    text: 스킴(scheme), 호스트(host), 포트(port)가 모두 같아야 해요
+  - id: b
+    text: 호스트와 경로(path)만 같으면 같은 출처예요
+  - id: c
+    text: 도메인만 같으면 스킴이 달라도 같은 출처로 봐요
+  - id: d
+    text: 호스트와 쿼리 문자열(query string)이 같아야 해요
+answer: a
+explanation: 출처(origin)는 `scheme` + `host` + `port` 세 가지 조합으로 정의돼요. 예를 들어 `https://example.com`과 `http://example.com`은 스킴이 달라서 다른 출처이고, `https://example.com:443`과 `https://example.com:8443`은 포트가 달라서 다른 출처예요. 경로(path)나 쿼리 문자열은 출처를 결정하는 데 쓰이지 않아요.
+references:
+  - title: MDN — Same-origin policy
+    url: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
+  - title: MDN — Origin
+    url: https://developer.mozilla.org/en-US/docs/Glossary/Origin
+tags:
+  - security
+  - same-origin
+  - origin
+  - web-platform
