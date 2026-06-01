@@ -18,8 +18,9 @@ explanation: |
   `<main>`은 문서의 **유일한 주요 콘텐츠**를 감싸는 랜드마크 — 한 페이지에 한 번만 가시 상태로 존재해야 해요.
   - `<section>`: 의미 있는 묶음(주제별 섹션). 보통 헤딩과 함께 써요.
   - `<article>`: 자기 완결적 콘텐츠 단위(블로그 포스트, 댓글, 카드 등). 떼어내도 의미가 통하는지가 기준이에요.
-  - `<div role="main">`: ARIA `main` role로 같은 의미를 부여할 수는 있지만, 시맨틱 태그(`<main>`)가 있으면 그걸 우선해요 (참고로 `role="content"`는 ARIA 표준에 없는 무효 값이에요).
+  - `<div role="main">`: ARIA `main` role로 같은 의미를 부여할 수는 있지만, 시맨틱 태그(`<main>`)가 있으면 그걸 우선해요 — 레거시 브라우저 지원이 필요한 게 아니면 굳이 div + role로 우회할 이유가 없어요.
   스크린 리더는 랜드마크 키로 `<main>`으로 점프할 수 있어요 — 시맨틱 태그가 곧 접근성 인프라예요.
+  (출처: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/main)
 references:
   - title: "MDN — <main>: The Main element"
     url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/main"
