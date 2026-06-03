@@ -1,0 +1,28 @@
+id: browser-007
+category: browser
+difficulty: easy
+type: single_choice
+question: 브라우저의 동일 출처 정책(Same-Origin Policy)에서 말하는 "같은 출처(origin)"의 구성 요소로 가장 알맞은 것은 무엇인가요?
+choices:
+  - id: a
+    text: 도메인(호스트)만 같으면 같은 출처예요.
+  - id: b
+    text: 스킴(scheme) + 호스트(host) + 포트(port) 세 가지가 모두 같아야 같은 출처예요.
+  - id: c
+    text: 스킴 + 호스트 + 경로(path)가 같아야 같은 출처예요.
+  - id: d
+    text: 쿠키가 공유되는 모든 페이지는 같은 출처로 간주돼요.
+answer: b
+explanation: 동일 출처 정책에서 출처(origin)는 **스킴 + 호스트 + 포트**의 튜플로 정의돼요. 예를 들어 `https://example.com`과 `http://example.com`은 스킴이 달라서 다른 출처, `https://example.com`과 `https://example.com:8443`은 포트가 달라서 다른 출처예요. 경로(path)는 출처 비교에 포함되지 않고, 쿠키의 도메인 범위는 사이트(site) 개념에 가까워서 출처 정의와는 별개의 규칙이에요.
+references:
+  - title: MDN — Same-origin policy
+    url: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
+  - title: MDN — Origin
+    url: https://developer.mozilla.org/en-US/docs/Glossary/Origin
+  - title: HTML Standard — Origin
+    url: https://html.spec.whatwg.org/multipage/browsers.html#origin
+tags:
+  - security
+  - same-origin-policy
+  - origin
+  - web-platform
