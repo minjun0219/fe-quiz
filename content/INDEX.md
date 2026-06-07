@@ -2,7 +2,7 @@
 
 # Question Index (auto)
 
-## javascript (22)
+## javascript (23)
 
 - `js-001` [medium] — tags: event-loop, async, microtask
   > 다음 코드의 출력 순서는?
@@ -48,6 +48,8 @@
   > 아래 코드에서 사용자가 `#save` 버튼을 클릭했을 때, `event.target.id`와 `event.currentTarget.id`로 찍…
 - `js-022` [medium] — tags: module, commonjs, esm, tree-shaking
   > `CommonJS`와 `ES Module`의 차이를 설명한 내용으로 가장 적절한 것은?
+- `js-023` [easy] — tags: typeof, null, type-check, primitives
+  > 자바스크립트에서 `typeof null`을 평가하면 어떤 문자열이 나올까요?
 
 ## react (22)
 

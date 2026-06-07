@@ -1,0 +1,26 @@
+id: js-023
+category: javascript
+difficulty: easy
+type: single_choice
+question: 자바스크립트에서 `typeof null`을 평가하면 어떤 문자열이 나올까요?
+choices:
+  - id: a
+    text: '`"null"`'
+  - id: b
+    text: '`"object"`'
+  - id: c
+    text: '`"undefined"`'
+  - id: d
+    text: '`"boolean"`'
+answer: b
+explanation: '`typeof null`은 `"object"`를 돌려줘요. 이건 자바스크립트 초창기부터 있던 유명한 버그인데, 값의 타입 태그 비트가 객체와 동일하게 `0`으로 인코딩돼 있어서 그래요. 사양에서도 이미 너무 많은 코드가 이 동작에 의존하기 때문에 호환성을 위해 그대로 두기로 정해졌어요. 그래서 `null`인지 확인하려면 `typeof`가 아니라 `value === null` 같은 동등 비교를 써야 해요.'
+references:
+  - title: MDN — typeof
+    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
+  - title: ECMAScript Language Specification — The typeof Operator
+    url: https://tc39.es/ecma262/#sec-typeof-operator
+tags:
+  - typeof
+  - "null"
+  - type-check
+  - primitives
