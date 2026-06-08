@@ -30,9 +30,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  generate:
+  # 검수 적체 방지: 아직 머지/클로즈 안 된 자동출제 PR이 남아 있으면
+  # 이번 회차는 통째로 스킵한다(=새 PR을 더 쌓지 않는다).
+  # 검수가 binding constraint 라 PR이 무한정 누적되는 걸 막는 게 핵심.
+  guard:
     # 무한 루프 방지: 이 워크플로가 만든 PR에서는 다시 돌지 않음
     if: "!startsWith(github.head_ref, 'claude/generate-quiz-')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      proceed: ${{ steps.check.outputs.proceed }}
+    steps:
+      - name: Skip if an auto-generated PR is still open
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # 'generated' 라벨이 붙은 열린 PR = 아직 검수 안 끝난 자동출제분.
+          # head 브랜치 prefix 가 아니라 라벨로 판정 — create-pull-request 가
+          # 항상 generated/automated 라벨을 달기 때문에 단일 출처로 충분.
+          OPEN=$(gh pr list --repo "$REPO" --state open --label generated \
+            --json number --jq 'length')
+          if [ "$OPEN" -gt 0 ]; then
+            echo "::notice::열린 자동출제 PR이 ${OPEN}개 있어 이번 회차를 스킵합니다. 검수 후 머지/클로즈하면 다음 스케줄부터 재개됩니다."
+            echo "열린 자동출제 PR ${OPEN}개 — 스킵" >> "$GITHUB_STEP_SUMMARY"
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  generate:
+    needs: guard
+    if: needs.guard.outputs.proceed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
