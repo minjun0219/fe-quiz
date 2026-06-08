@@ -1,0 +1,29 @@
+id: js-023
+category: javascript
+difficulty: easy
+type: single_choice
+question: 다음 표현식을 평가했을 때 콘솔에 찍히는 값은 무엇일까요?
+code: console.log(typeof null);
+choices:
+  - id: a
+    text: '`"null"`'
+  - id: b
+    text: '`"object"`'
+  - id: c
+    text: '`"undefined"`'
+  - id: d
+    text: "`null`"
+  - id: e
+    text: "`TypeError` 발생"
+answer: b
+explanation: 자바스크립트 초창기부터 내려온 유명한 동작이에요. `null`의 `typeof` 결과는 문자열 `"object"`로 나와요. 사양상 명시된 동작이라 고쳐지지 않고 유지되고 있고, `typeof` 자체는 어떤 피연산자에도 예외를 던지지 않기 때문에 `TypeError`도 나지 않아요. 값이 정말 `null`인지 확인하려면 `value === null`처럼 일치 비교로 직접 검사해야 해요.
+references:
+  - title: MDN — typeof
+    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
+  - title: MDN — null
+    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/null
+tags:
+  - typeof
+  - "null"
+  - primitives
+  - type-check
