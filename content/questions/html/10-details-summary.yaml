@@ -21,7 +21,8 @@ choices:
 answer: a
 explanation: |
   `<details>`/`<summary>`는 브라우저가 토글 동작을 기본 제공하는 disclosure 위젯이라 JS가 필요 없어요. 시각/스크린리더 모두 "펼쳐짐/접힘" 상태를 알려 줘서 a11y 측면에서도 접근하기 좋아요.
-  처음부터 펼쳐 두려면 `<details open>`처럼 `open` 속성을 추가하면 되고, 다른 details와 자동으로 연동되진 않아요. 같은 그룹에서 하나만 열리게 하려면 JS로 직접 제어해야 해요.
+  처음부터 펼쳐 두려면 `<details open>`처럼 `open` 속성을 추가하면 돼요. 기본적으론 다른 details와 자동 연동되지 않지만, 여러 `<details>`에 같은 `name` 속성을 주면 JS 없이도 그룹 안에서 하나만 열리는 아코디언을 만들 수 있어요(브라우저 지원은 비교적 최근에 추가됐어요).
+  (출처: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details)
 references:
   - title: "MDN — <details>: The Details disclosure element"
     url: "https://developer.mozilla.org/ko/docs/Web/HTML/Element/details"
