@@ -1,0 +1,33 @@
+id: react-023
+category: react
+difficulty: easy
+type: single_choice
+question: 다음 `Card` 컴포넌트를 `<Card>안녕하세요</Card>` 처럼 사용했을 때, 컴포넌트 안에서 `안녕하세요` 텍스트에 접근하려면 어떤 prop을 읽어야 할까요?
+code: |-
+  function Card(props) {
+    return <div className="card">{/* ??? */}</div>
+  }
+
+  // 사용:
+  // <Card>안녕하세요</Card>
+choices:
+  - id: a
+    text: "`props.children`"
+  - id: b
+    text: "`props.content`"
+  - id: c
+    text: "`props.body`"
+  - id: d
+    text: "`props.text`"
+answer: a
+explanation: JSX에서 여는 태그와 닫는 태그 사이에 넣은 내용은 React가 자동으로 `children`이라는 특별한 prop으로 전달해 줘요. 그래서 `<Card>안녕하세요</Card>`처럼 쓰면 `Card` 안에서는 `props.children`으로 그 내용을 읽고 원하는 위치에 `{props.children}`으로 렌더할 수 있어요. `content`·`body`·`text` 같은 이름은 React가 자동으로 만들어 주는 prop이 아니라, 직접 속성으로 넘겨야만 채워지는 일반 prop이에요.
+references:
+  - title: Passing JSX as children – react.dev
+    url: https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children
+  - title: Components and Props – react.dev
+    url: https://react.dev/learn/your-first-component
+tags:
+  - props
+  - children
+  - jsx
+  - components
