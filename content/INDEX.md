@@ -2,7 +2,7 @@
 
 # Question Index (auto)
 
-## javascript (22)
+## javascript (24)
 
 - `js-001` [medium] — tags: event-loop, async, microtask
   > 다음 코드의 출력 순서는?
@@ -48,8 +48,12 @@
   > 아래 코드에서 사용자가 `#save` 버튼을 클릭했을 때, `event.target.id`와 `event.currentTarget.id`로 찍…
 - `js-022` [medium] — tags: module, commonjs, esm, tree-shaking
   > `CommonJS`와 `ES Module`의 차이를 설명한 내용으로 가장 적절한 것은?
+- `js-023` [easy] — tags: typeof, type-check, null, array
+  > 다음 코드의 각 `typeof` 결과를 위에서부터 차례대로 나열한 것은 무엇일까요?
+- `js-024` [medium] — tags: memory-leak, garbage-collection, event-listener, closure
+  > 자바스크립트 애플리케이션에서 메모리 누수를 유발하기 쉬운 상황으로 가장 적절한 것은?
 
-## react (22)
+## react (23)
 
 - `react-001` [medium] — tags: hooks, useState, closure, batching
   > 버튼을 한 번 클릭했을 때, 클릭 직후 화면에 표시되는 숫자와 console에 찍히는 값은?
@@ -95,6 +99,8 @@
   > React 컴포넌트 안에서 타이머 ID처럼 렌더 사이에 유지돼야 하지만 값 변경만으로 리렌더링할 필요는 없는 값을 저장하려고 해요. 가장 적절…
 - `react-022` [medium] — tags: tanstack-query, cache, staleTime, gcTime
   > TanStack Query에서 `staleTime`과 `gcTime`의 차이를 설명한 내용으로 맞는 것은?
+- `react-023` [easy] — tags: props, children, jsx, components
+  > 다음 `Card` 컴포넌트를 `<Card>안녕하세요</Card>` 처럼 사용했을 때, 컴포넌트 안에서 `안녕하세요` 텍스트에 접근하려면 어떤 …
 
 ## css (21)
 
@@ -141,7 +147,7 @@
 - `css-021` [easy] — tags: reset-css, normalize-css, browser-defaults
   > Reset CSS와 Normalize CSS의 차이로 가장 알맞은 것은?
 
-## typescript (20)
+## typescript (21)
 
 - `ts-001` [medium] — tags: types, any, unknown, narrowing
   > `any`와 `unknown`의 차이는?
@@ -183,6 +189,8 @@
   > 다음 함수 오버로드 선언에서 (1), (2), (3) 호출의 결과로 가장 정확한 것은?
 - `ts-020` [medium] — tags: type-guard, as, narrowing
   > 아래 (A)와 (B) 방식의 차이로 가장 정확한 설명은?
+- `ts-021` [easy] — tags: enum, literal-types, union, runtime
+  > 다음 두 선언 `A`와 `B`의 차이로 가장 정확한 설명은 무엇일까요?
 
 ## html (20)
 
@@ -227,7 +235,7 @@
 - `html-020` [hard] — tags: forms, autocomplete, inputmode
   > `autocomplete`와 `inputmode` 속성의 역할 차이로 가장 정확한 것은?
 
-## browser (6)
+## browser (8)
 
 - `browser-001` [easy] — tags: rendering, crp, dom, cssom
   > 브라우저의 Critical Rendering Path 순서로 가장 알맞은 것은?
@@ -241,6 +249,10 @@
   > 브라우저 이벤트 루프에서 렌더링과 가장 가까운 설명은?
 - `browser-006` [easy] — tags: cache, memory-cache, disk-cache, browser
   > 브라우저의 메모리 캐시와 디스크 캐시에 대한 설명으로 가장 적절한 것은?
+- `browser-007` [easy] — tags: security, same-origin-policy, origin, cors, web-platform
+  > 브라우저의 동일 출처 정책(Same-Origin Policy)에서 두 URL이 **같은 출처**로 간주되려면 무엇이 모두 일치해야 할까요?
+- `browser-008` [medium] — tags: client-side-routing, history-api, pushState, popstate
+  > 클라이언트 사이드 라우팅(CSR 라우팅)이 페이지 이동을 처리하는 방식으로 맞는 것은?
 
 ## performance (5)
 
@@ -255,7 +267,7 @@
 - `perf-005` [easy] — tags: transform, composite, animation, reflow
   > 버튼 hover 시 살짝 위로 이동하는 애니메이션을 만들 때 성능 관점에서 더 선호되는 방식은?
 
-## nextjs (5)
+## nextjs (7)
 
 - `next-001` [easy] — tags: ssr, ssg, rendering
   > Next.js에서 SSR과 SSG 선택 기준으로 가장 알맞은 것은?
@@ -267,3 +279,7 @@
   > App Router에서 Streaming SSR과 `Suspense`를 함께 쓰는 이유로 가장 알맞은 것은?
 - `next-005` [easy] — tags: proxy, middleware, redirect, rewrite, auth
   > Next.js Proxy를 쓰기 좋은 경우는?
+- `next-006` [easy] — tags: app-router, error-boundary, file-conventions, routing
+  > App Router의 특수 파일 중, 같은 세그먼트에서 에러가 던져졌을 때 fallback UI를 보여 주는 파일은 무엇인가요?
+- `next-007` [medium] — tags: next-image, image-optimization, lazy-loading, placeholder
+  > Next.js에서 기본 `<img>` 대신 `next/image`를 사용하는 이유로 가장 적절한 것은?
