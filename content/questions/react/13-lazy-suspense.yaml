@@ -16,13 +16,14 @@ choices:
   - id: b
     text: 동기로 즉시 모듈을 로딩한 뒤 렌더해요.
   - id: c
-    text: 가장 가까운 Suspense 경계가 없으면 React가 에러를 던져요.
+    text: 상위에 Suspense 경계가 없으면 React가 커밋을 미뤄서, 모듈이 로드될 때까지 그 트리는 화면에 반영되지 않아요.
   - id: d
     text: 처음 한 번만 fallback 없이 렌더되고, 이후엔 정상 렌더돼요.
 answer: c
 explanation: |
-  `React.lazy`로 만든 컴포넌트는 첫 렌더에서 모듈을 비동기로 불러오는 동안 렌더 트리를 "일시 중단(suspend)"시켜요. 이걸 받아 줄 `<Suspense fallback={...}>`이 상위에 없으면 React가 "A component suspended while rendering, but no fallback UI was specified" 에러를 던져서 컴포넌트가 깨져요.
-  보통 라우트 단위로 `<Suspense fallback={<Spinner />}>`로 감싸는 패턴을 써요. 코드 스플리팅으로 초기 번들을 줄일 때 자주 등장해요.
+  `React.lazy`로 만든 컴포넌트는 첫 렌더에서 모듈을 비동기로 불러오는 동안 렌더 트리를 "일시 중단(suspend)"시켜요. 상위에 이걸 받아 줄 `<Suspense fallback={...}>`이 없으면, React 18+의 concurrent 루트(`createRoot`)에서는 에러 대신 **커밋 자체가 미뤄져서** 모듈이 로드될 때까지 그 트리가 화면에 아무것도 반영되지 않아요. 사용자 입장에선 로딩 표시도 없이 멈춘 것처럼 보이는 거죠.
+  참고로 옛 legacy 루트(`ReactDOM.render`)에서는 경계 없이 suspend하면 에러를 던졌어요. 어느 쪽이든 로딩 UI를 보여 주려면 보통 라우트 단위로 `<Suspense fallback={<Spinner />}>`로 감싸는 패턴을 써요. 코드 스플리팅으로 초기 번들을 줄일 때 자주 등장해요.
+  (출처: https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberThrow.js)
 references:
   - title: "React — lazy"
     url: "https://ko.react.dev/reference/react/lazy"
