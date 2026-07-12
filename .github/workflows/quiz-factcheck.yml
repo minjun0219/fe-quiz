@@ -3,6 +3,15 @@ name: Quiz Fact Check
 on:
   workflow_dispatch:
     inputs:
+      category:
+        # 가능한 값: `all` 또는 `lib/categories.ts` 의 id (`javascript`, `react`,
+        # `css`, `typescript`, `html`, `browser`, `performance`, `nextjs`).
+        # 콤마로 여러 개 지정 가능 (예: `javascript,react`).
+        # type: choice 로 enum 박으면 카테고리 추가 때마다 워크플로까지 고쳐야 하므로
+        # 자유 입력 + 스킬 단계에서 `CATEGORIES` 와 대조 검증.
+        description: "대상 카테고리 (all | <id> | <id>,<id>,...)"
+        type: string
+        default: "all"
       dry_run:
         description: "수정 없이 검증만 (read-only, PR 생성 안 함)"
         type: boolean
@@ -65,7 +74,7 @@ jobs:
           # 표준 GITHUB_TOKEN 을 명시 전달해 교환을 우회. PR 생성은 peter-evans/create-pull-request 가 담당.
           github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
-            `/factcheck all` 를 **dry-run 모드**로 실행하라.
+            `/factcheck ${{ github.event.inputs.category || 'all' }}` 를 **dry-run 모드**로 실행하라.
 
             중요: YAML 파일을 절대 수정하지 마라. `Edit` 도구를 호출하지 마라.
             대신 어떤 파일의 어떤 필드를 어떻게 고쳐야 하는지 사유와 출처 URL만 보고하라.
@@ -81,7 +90,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          prompt: "/factcheck all"
+          prompt: "/factcheck ${{ github.event.inputs.category || 'all' }}"
           claude_args: |
             --mcp-config .mcp.json
             --allowedTools "Task,Read,Edit,Glob,Grep,WebFetch,WebSearch,Bash(pnpm questions:check),Bash(pnpm check),Bash(git diff:*),Bash(git status:*),mcp__context7__resolve-library-id,mcp__context7__get-library-docs"
@@ -140,6 +149,7 @@ jobs:
             `/factcheck` 스킬이 카테고리별 sub-agent로 병렬 팩트체크 후 자동 수정한 결과입니다.
 
             - 트리거: `${{ github.event_name }}`
+            - 카테고리: `${{ github.event.inputs.category || 'all' }}`
             - 워크플로 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             ⚠️ **반드시 사람이 인용 출처(URL)를 검토한 뒤 머지하세요.** LLM이 잘못된 사양을 주장할 수 있습니다.

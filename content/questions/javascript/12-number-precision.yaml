@@ -16,5 +16,6 @@ choices:
 answer: b
 explanation: |
   자바스크립트의 `number`는 IEEE 754 64bit double이라 0.1, 0.2처럼 십진수에서 깔끔한 소수가 이진 부동소수점에선 무한 반복돼서 정확히 표현 안 돼요. 그 결과 합이 `0.30000000000000004`가 되고 `=== 0.3`은 false예요.
-  실무에서는 `Math.abs(a - b) < Number.EPSILON`으로 근사 비교하거나, 금액처럼 정밀도가 중요한 값은 정수 단위(원/센트)로 다루는 게 안전해요.
+  실무에서는 `Math.abs(a - b) < 허용오차`로 근사 비교하는데, `Number.EPSILON`을 그대로 임계값으로 쓰는 건 크기가 1 근처인 수에서만 유효해요 — 수가 커지면 비교하는 값의 크기에 맞게 허용오차를 키워야 해요. 금액처럼 정밀도가 중요한 값은 정수 단위(원/센트)로 다루는 게 안전해요.
+  (출처: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/EPSILON)
 tags: [ number, ieee754, precision ]

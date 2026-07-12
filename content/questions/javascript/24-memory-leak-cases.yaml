@@ -1,0 +1,20 @@
+id: js-024
+category: javascript
+difficulty: medium
+type: single_choice
+question: |
+  자바스크립트 애플리케이션에서 메모리 누수를 유발하기 쉬운 상황으로 가장 적절한 것은?
+choices:
+  - id: a
+    text: 함수 안에서 만든 지역 변수가 함수 실행이 끝난 뒤 더 이상 참조되지 않는 경우예요.
+  - id: b
+    text: 제거된 DOM 요소를 참조하는 이벤트 리스너나 클로저를 계속 유지하는 경우예요.
+  - id: c
+    text: "`const`로 선언한 원시값 변수를 여러 번 읽는 경우예요."
+  - id: d
+    text: 사용이 끝난 객체의 모든 참조가 사라져 가비지 컬렉션 대상이 되는 경우예요.
+answer: b
+explanation: |
+  메모리 누수는 더 이상 필요 없는 객체가 어떤 경로로든 계속 참조되어 가비지 컬렉터가 회수하지 못할 때 발생해요. 제거된 DOM 요소에 붙은 이벤트 리스너를 해제하지 않거나, 클로저가 큰 객체·DOM 노드를 계속 붙잡고 있으면 화면에서는 사라졌어도 메모리에 남을 수 있어요.
+  a와 d는 참조가 사라져 정상적으로 회수될 수 있는 상황이라 누수라고 보기 어려워요. c처럼 원시값을 읽는 행위 자체도 누수를 만들지 않아요. 실무에서는 컴포넌트 unmount 시 `removeEventListener`, 타이머 해제, 구독 해제 등을 cleanup으로 처리하고, Chrome DevTools Memory 탭의 heap snapshot으로 남아 있는 참조를 확인하는 방식이 도움이 돼요.
+tags: [ memory-leak, garbage-collection, event-listener, closure ]

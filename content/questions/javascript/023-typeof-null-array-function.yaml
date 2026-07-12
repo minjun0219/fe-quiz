@@ -1,0 +1,31 @@
+id: js-023
+category: javascript
+difficulty: easy
+type: single_choice
+question: 다음 코드의 각 `typeof` 결과를 위에서부터 차례대로 나열한 것은 무엇일까요?
+code: |-
+  console.log(typeof null);
+  console.log(typeof []);
+  console.log(typeof function () {});
+  console.log(typeof undefined);
+choices:
+  - id: a
+    text: '`"object"`, `"array"`, `"function"`, `"undefined"`'
+  - id: b
+    text: '`"null"`, `"object"`, `"function"`, `"undefined"`'
+  - id: c
+    text: '`"object"`, `"object"`, `"function"`, `"undefined"`'
+  - id: d
+    text: '`"object"`, `"object"`, `"object"`, `"undefined"`'
+answer: c
+explanation: 자바스크립트의 `typeof`는 몇 가지 역사적 특이점이 있어요. `typeof null`은 언어 초창기의 버그성 설계로 `"object"`를 반환하고, 배열은 별도 타입이 아니라 객체이므로 `typeof []`도 `"object"`예요. 반면 함수는 호출 가능한 객체라는 특별 케이스로 `"function"`을 돌려주고, `typeof undefined`는 그대로 `"undefined"`예요. 배열인지 판별하려면 `Array.isArray()`를, `null` 여부는 `value === null`로 직접 비교해야 해요.
+references:
+  - title: MDN — typeof
+    url: https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/typeof
+  - title: MDN — Array.isArray()
+    url: https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+tags:
+  - typeof
+  - type-check
+  - "null"
+  - array

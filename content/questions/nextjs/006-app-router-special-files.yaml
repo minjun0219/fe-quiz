@@ -1,0 +1,26 @@
+id: next-006
+category: nextjs
+difficulty: easy
+type: single_choice
+question: App Router의 특수 파일 중, 같은 세그먼트에서 에러가 던져졌을 때 fallback UI를 보여 주는 파일은 무엇인가요?
+choices:
+  - id: a
+    text: "`loading.tsx`"
+  - id: b
+    text: "`error.tsx`"
+  - id: c
+    text: "`not-found.tsx`"
+  - id: d
+    text: "`layout.tsx`"
+answer: b
+explanation: App Router는 세그먼트 단위로 규약(convention) 파일을 둬요. `error.tsx`는 해당 세그먼트(또는 하위)에서 발생한 런타임 에러를 React Error Boundary로 잡아 fallback UI를 보여줘요. `loading.tsx`는 Suspense 기반 로딩 UI, `not-found.tsx`는 `notFound()` 호출 시 띄우는 404, `layout.tsx`는 공통 레이아웃을 정의하는 파일이라 역할이 달라요.
+references:
+  - title: Next.js Docs — error.js
+    url: https://nextjs.org/docs/app/api-reference/file-conventions/error
+  - title: "Next.js Docs — Routing: File Conventions"
+    url: https://nextjs.org/docs/app/api-reference/file-conventions
+tags:
+  - app-router
+  - error-boundary
+  - file-conventions
+  - routing
