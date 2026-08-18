@@ -7,7 +7,11 @@ import { defineConfig } from "vite";
 // CI(Workers Builds 포함)에서 이 변수 없이 빌드하면 dev 설정(SITE_URL=localhost,
 // preview D1)이 그대로 배포되는 사고가 난다 — 실제로 발생했던 사고라(2026-08-19,
 // Workers Builds 빌드 커맨드 누락) 조용히 넘어가지 않고 여기서 실패시킨다.
-if (process.env.CI && !process.env.CLOUDFLARE_ENV) {
+//
+// vite config는 `react-router typegen`(typecheck 경로)도 로드하므로 process.argv로
+// 실제 `build` 명령일 때만 가드한다 — 안 그러면 CI typecheck까지 같이 죽는다.
+const isBuildCommand = process.argv.includes("build");
+if (process.env.CI && isBuildCommand && !process.env.CLOUDFLARE_ENV) {
   throw new Error(
     "CI 빌드에 CLOUDFLARE_ENV가 없습니다. 배포 빌드는 반드시 " +
       "`CLOUDFLARE_ENV=production`(또는 preview)을 명시하세요 — " +
