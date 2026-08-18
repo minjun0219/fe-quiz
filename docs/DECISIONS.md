@@ -29,7 +29,7 @@
 스트릭, 하트, 티어, 리더보드, 매일 출석, 광고. **Duolingo가 아닌 토스 미니퀴즈/카훗 결**.
 학습 압박 요소는 모두 제거해요.
 
-차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, Supabase CLI 로컬 dev DB, 콘텐츠/엔진 저장소 분리.
+차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, 콘텐츠/엔진 저장소 분리.
 
 ### 매일 자동 출제 (2026-05) — [ADR 0001](./adr/0001-daily-quiz-generation-hybrid.md)
 
@@ -236,7 +236,6 @@ fe-quiz/
 │   ├── check-questions.ts
 │   ├── check-round.ts
 │   ├── build-questions-json.ts  # questions.generated.json 생성/검증
-│   ├── export-shares-to-d1.ts   # (일회성) Supabase → D1 데이터 이전
 │   └── lint-question-prose.ts   # prose vs code 휴리스틱 검사
 ├── docs/
 │   ├── DECISIONS.md             # 이 문서 — 영구 설계 결정 (살아있는 개요)

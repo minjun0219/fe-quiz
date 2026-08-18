@@ -35,10 +35,6 @@ npm-debug.log*
 .env
 .env*.local
 
-# supabase CLI (컷오버 완료 후 supabase/ 와 함께 제거 예정)
-supabase/.temp
-supabase/.branches
-
 # typescript
 *.tsbuildinfo
 

@@ -31,7 +31,13 @@ DB도 함께 검토: supabase-js는 Workers에서 동작하므로 유지 가능�
   (`/api/quiz/submit`, `/api/quiz/feedback`, `/api/share`)은 그대로 유지.
 - **D1**로 `shares` 이전 (`migrations/0001_create_shares.sql`): `text[]`→JSON
   TEXT, `jsonb`→TEXT(+`json_valid` CHECK), `timestamptz`→ISO8601 UTC TEXT.
-  기존 Supabase 데이터는 `scripts/export-shares-to-d1.ts`로 이전.
+  데이터 이전은 계획했으나 **이전할 데이터가 남아있지 않았어요** — 컷오버
+  시점 확인 결과 Supabase prod/dev 프로젝트 양쪽 모두 public 테이블 0개.
+  마이그레이션은 2026-05-10에 성공적으로 적용된 이력이 있으므로(워크플로
+  #40) 테이블은 존재했으나, 두 프로젝트가 무료 티어 자동 일시정지로 장기간
+  방치되면서 스토리지가 제거됐고 복원 시 빈 DB가 올라온 것. 무료 티어
+  Supabase의 "일시정지 → 장기 방치 → 데이터 소실" 경로 자체가 D1 이전의
+  사후 정당화이기도 해요 — D1은 유휴 정지가 없어요.
 - **환경 분리는 wrangler env** — top-level(로컬 dev) / `env.preview` /
   `env.production`, 각각 전용 D1 + `APP_ENV`/`SITE_URL` vars. ⚠️ 환경 선택은
   **빌드 타임**(`CLOUDFLARE_ENV`) — vite 플러그인이 resolved config를 굽고
