@@ -60,7 +60,9 @@
       "name": "fe-quiz",
       "vars": {
         "APP_ENV": "production",
-        "SITE_URL": "https://fe-quiz.minjun.workers.dev",
+        // 커스텀 도메인 (2026-08-19 스위칭). workers.dev 라우트는 비활성 —
+        // 이 값이 공유 URL·og:image·sitemap의 canonical origin이다.
+        "SITE_URL": "https://fe-quiz.minjun.dev",
         "POSTHOG_HOST": "https://us.i.posthog.com"
       },
       "d1_databases": [
