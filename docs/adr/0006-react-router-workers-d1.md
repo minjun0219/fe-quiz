@@ -38,10 +38,14 @@ DB도 함께 검토: supabase-js는 Workers에서 동작하므로 유지 가능�
   방치되면서 스토리지가 제거됐고 복원 시 빈 DB가 올라온 것. 무료 티어
   Supabase의 "일시정지 → 장기 방치 → 데이터 소실" 경로 자체가 D1 이전의
   사후 정당화이기도 해요 — D1은 유휴 정지가 없어요.
-- **환경 분리는 wrangler env** — top-level(로컬 dev) / `env.preview` /
-  `env.production`, 각각 전용 D1 + `APP_ENV`/`SITE_URL` vars. ⚠️ 환경 선택은
-  **빌드 타임**(`CLOUDFLARE_ENV`) — vite 플러그인이 resolved config를 굽고
-  `wrangler deploy`는 그걸 올려요. `wrangler deploy --env`는 무시됨.
+- **환경 분리는 wrangler env** — top-level = **production**(기본값) /
+  `env.preview`, 각각 전용 D1 + `APP_ENV`/`SITE_URL` vars. 로컬 dev
+  오버라이드는 `.dev.vars`. ⚠️ 환경 선택은 **빌드 타임**(`CLOUDFLARE_ENV`,
+  preview만 명시) — vite 플러그인이 resolved config를 굽고 `wrangler deploy`는
+  그걸 올려요. `wrangler deploy --env`는 무시됨.
+  (처음엔 top-level이 로컬 dev 설정이었으나, Workers Builds가 env 미지정으로
+  빌드해 dev 설정이 프로덕션에 배포된 사고(2026-08-19) 후 "기본 = production"
+  으로 뒤집음 — 실수의 방향이 안전한 쪽이 되도록.)
 - **질문 YAML은 빌드 타임 번들** — Workers엔 파일시스템이 없으므로
   `scripts/build-questions-json.ts`가 zod 검증 후
   `lib/questions.generated.json`을 생성(git 커밋 + `--check` 게이트), 런타임은

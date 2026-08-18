@@ -63,7 +63,7 @@ PostHog 키가 비어 있으면 서버/클라이언트 둘 다 no-op으로 떨�
 | `pnpm dev` | 개발 서버 (vite + workerd, 로컬 D1) |
 | `pnpm build` | 질문/라운드 검사 후 프로덕션 빌드 |
 | `pnpm preview` | 빌드된 worker를 로컬 workerd로 실행 |
-| `pnpm deploy` / `pnpm deploy:preview` | production / preview 배포 (`CLOUDFLARE_ENV` 빌드 포함) |
+| `pnpm deploy` / `pnpm deploy:preview` | production / preview 배포 (기본 빌드 = production, preview만 `CLOUDFLARE_ENV=preview`) |
 | `pnpm lint` | Biome 린트 |
 | `pnpm format` | Biome 포맷터 (덮어쓰기) |
 | `pnpm check` | Biome + 타입체크 + 질문/번들/라운드 검사 + 테스트 |

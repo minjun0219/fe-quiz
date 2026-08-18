@@ -58,12 +58,11 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
+          # production은 top-level 설정이라 --env 불필요 (wrangler.jsonc 참고)
           if [ "$IS_PROD" = "true" ]; then
-            DB="fe-quiz-shares"
-            ENV="production"
+            echo "Applying migrations to fe-quiz-shares (production)"
+            pnpm exec wrangler d1 migrations apply fe-quiz-shares --remote
           else
-            DB="fe-quiz-shares-preview"
-            ENV="preview"
+            echo "Applying migrations to fe-quiz-shares-preview (preview)"
+            pnpm exec wrangler d1 migrations apply fe-quiz-shares-preview --remote --env preview
           fi
-          echo "Applying migrations to $DB (env: $ENV)"
-          pnpm exec wrangler d1 migrations apply "$DB" --remote --env "$ENV"

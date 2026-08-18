@@ -1,11 +1,17 @@
 # Copy to `.dev.vars` and fill in real values. (`.dev.vars`는 gitignored)
 #
-# 서버 전용 secrets — 로컬 dev에서 workerd로 주입된다.
-# 배포 환경(preview/production)에는 커밋하지 말고:
-#   wrangler secret put <NAME> --env preview
-#   wrangler secret put <NAME> --env production
-#
-# vars(APP_ENV, SITE_URL, POSTHOG_HOST)는 wrangler.jsonc에서 env별 관리.
+# 로컬 dev(`pnpm dev`) 전용 vars/secrets. wrangler.jsonc의 top-level은
+# production 설정이므로, 로컬 오버라이드는 전부 이 파일이 담당한다.
+# 배포 환경 secrets는 커밋하지 말고:
+#   wrangler secret put <NAME>                  # production
+#   wrangler secret put <NAME> --env preview    # preview
+
+# --- 로컬 dev 오버라이드 ---
+# 없으면 production 값(APP_ENV=production, SITE_URL=커스텀 도메인)이 쓰인다.
+# D1은 어차피 로컬 sqlite 시뮬레이션이라 원격에 닿지 않지만, 로그 레벨과
+# sitemap/공유 fallback URL이 어색해지므로 로컬에선 넣어두는 걸 권장.
+APP_ENV=development
+SITE_URL=http://localhost:3000
 
 # --- Anthropic (Claude Haiku 4.5 피드백 스트리밍) ---
 # 미설정 시 /api/quiz/feedback이 503 → 클라이언트는 stub 문구로 폴백.
