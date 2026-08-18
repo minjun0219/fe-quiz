@@ -6,6 +6,11 @@
  *   - env.preview      PR 프리뷰 배포 (전용 preview D1 — prod 바인딩 격리)
  *   - env.production   운영 (main 브랜치)
  *
+ * ⚠️ 환경 선택은 배포 시점이 아니라 **빌드 시점** — @cloudflare/vite-plugin이
+ * `CLOUDFLARE_ENV`로 env를 골라 resolved config를 build/server/wrangler.json에
+ * 굽고, `wrangler deploy`는 그걸 그대로 올린다. (`wrangler deploy --env`는
+ * 무시됨.) 예: `CLOUDFLARE_ENV=production pnpm build && wrangler deploy`.
+ *
  * secrets(ANTHROPIC_API_KEY, UPSTASH_*, POSTHOG_KEY)는 여기 두지 않는다 —
  * 로컬은 `.dev.vars`, 배포 env는 `wrangler secret put <NAME> --env <env>`.
  * `nodejs_compat` + 최신 compatibility_date에서 vars/secrets는 `process.env`로도
@@ -30,39 +35,39 @@
     {
       "binding": "DB",
       "database_name": "fe-quiz-shares-preview",
-      // 로컬 dev는 miniflare sqlite를 쓰므로 id가 실제로 조회되진 않지만,
-      // 스키마상 필수라 preview DB id를 넣어둔다. Phase 2에서
-      // `wrangler d1 create` 후 실제 id로 교체.
-      "database_id": "00000000-0000-0000-0000-000000000000"
+      // 로컬 dev는 miniflare sqlite를 쓰므로 id가 실제로 조회되진 않는다.
+      "database_id": "69bb7a3f-66b3-4d89-8104-9f0e45ee1ac7"
     }
   ],
   "env": {
     "preview": {
+      "name": "fe-quiz-preview",
       "vars": {
         "APP_ENV": "preview",
-        // Phase 3에서 실제 workers.dev 서브도메인으로 교체
-        "SITE_URL": "https://fe-quiz-preview.CHANGEME.workers.dev",
+        "SITE_URL": "https://fe-quiz-preview.minjun.workers.dev",
         "POSTHOG_HOST": "https://us.i.posthog.com"
       },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "fe-quiz-shares-preview",
-          "database_id": "00000000-0000-0000-0000-000000000000"
+          "database_id": "69bb7a3f-66b3-4d89-8104-9f0e45ee1ac7"
         }
       ]
     },
     "production": {
+      // 운영은 top-level 이름 그대로 fe-quiz — URL이 가장 짧다.
+      "name": "fe-quiz",
       "vars": {
         "APP_ENV": "production",
-        "SITE_URL": "https://fe-quiz-production.CHANGEME.workers.dev",
+        "SITE_URL": "https://fe-quiz.minjun.workers.dev",
         "POSTHOG_HOST": "https://us.i.posthog.com"
       },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "fe-quiz-shares",
-          "database_id": "00000000-0000-0000-0000-000000000000"
+          "database_id": "9ab01bfd-bf8c-47e2-a7e2-b53c6d1741f0"
         }
       ]
     }

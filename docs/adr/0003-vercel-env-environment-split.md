@@ -1,6 +1,6 @@
 # 0003. 환경 분기는 `VERCEL_ENV` 기준 (`NODE_ENV` 금지)
 
-- 상태: Accepted
+- 상태: Superseded by [0006](./0006-react-router-workers-d1.md) — Cloudflare 이전으로 `VERCEL_ENV`가 사라지고 wrangler env별 `APP_ENV`/`SITE_URL` vars로 대체됨
 - 결정일: 2026-05-09
 - 관련: `lib/supabase.ts`, [docs/DECISIONS.md](../DECISIONS.md), [AGENTS.md](../../AGENTS.md)
 

@@ -127,6 +127,10 @@ jobs:
       - name: Rebuild index
         run: pnpm questions:index
 
+      # Workers 런타임 번들 — 잊으면 Final gate의 questions:bundle:check가 실패
+      - name: Rebuild question bundle
+        run: pnpm questions:bundle
+
       - name: Verify schema + lint
         run: pnpm questions:check
 
@@ -193,6 +197,7 @@ jobs:
             rm -f "$target"
           done
           pnpm questions:index
+          pnpm questions:bundle
 
       - name: Final gate
         run: pnpm check
@@ -208,7 +213,7 @@ jobs:
             git diff --stat content/ >> "$GITHUB_STEP_SUMMARY"
           fi
           # 안전장치: content/ 밖을 건드리면 즉시 실패
-          if ! git diff --quiet -- ':!content'; then
+          if ! git diff --quiet -- ':!content' ':!lib/questions.generated.json'; then
             echo "::error::quiz-generate가 content/ 외부 파일을 수정했습니다."
             git diff --stat -- ':!content' >> "$GITHUB_STEP_SUMMARY"
             exit 1
@@ -228,6 +233,7 @@ jobs:
           add-paths: |
             content/questions/**
             content/INDEX.md
+            lib/questions.generated.json
           title: "chore(quiz): 자동 출제 (run ${{ github.run_id }})"
           body-path: .cache/pr-body.md
           commit-message: "chore(quiz): generate daily questions"

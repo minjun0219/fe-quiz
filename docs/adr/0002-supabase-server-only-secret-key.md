@@ -1,6 +1,6 @@
 # 0002. Supabase `shares`는 서버 전용 secret 키로만 접근
 
-- 상태: Accepted
+- 상태: Superseded by [0006](./0006-react-router-workers-d1.md) — D1 binding 전환으로 공개 REST 표면 자체가 사라져 이 잠금 모델이 불필요해짐
 - 결정일: 2026-05-09
 - 관련: `supabase/migrations/20260509000002_lock_down_shares_rls.sql`, `lib/supabase.ts`, `app/api/share/`, [docs/DECISIONS.md](../DECISIONS.md)
 

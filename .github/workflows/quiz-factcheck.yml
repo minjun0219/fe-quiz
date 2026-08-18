@@ -98,6 +98,8 @@ jobs:
       - name: Verify schema and lint
         run: |
           pnpm questions:check
+          # factcheck가 YAML을 고쳤으면 Workers 런타임 번들도 함께 재생성
+          pnpm questions:bundle
           pnpm check
 
       - name: Detect changes
@@ -110,9 +112,9 @@ jobs:
             git diff --stat content/questions/ >> "$GITHUB_STEP_SUMMARY"
           fi
           # 안전장치: factcheck가 content/questions/ 밖을 건드리면 즉시 실패
-          if ! git diff --quiet -- ':!content/questions'; then
+          if ! git diff --quiet -- ':!content/questions' ':!lib/questions.generated.json'; then
             echo "::error::factcheck가 content/questions/ 외부 파일을 수정했습니다. 워크플로 로그를 확인하세요."
-            git diff --stat -- ':!content/questions' >> "$GITHUB_STEP_SUMMARY"
+            git diff --stat -- ':!content/questions' ':!lib/questions.generated.json' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -144,6 +146,7 @@ jobs:
           branch: claude/factcheck-${{ github.run_id }}
           add-paths: |
             content/questions/**
+            lib/questions.generated.json
           title: "chore(quiz): /factcheck 자동 수정 제안"
           body: |
             `/factcheck` 스킬이 카테고리별 sub-agent로 병렬 팩트체크 후 자동 수정한 결과입니다.

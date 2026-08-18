@@ -1,5 +1,10 @@
 # Supabase 마이그레이션 — 에이전트 가이드
 
+> ⚠️ **DEPRECATED (2026-08)**: DB는 Cloudflare D1으로 이전됐어요
+> ([ADR 0006](../docs/adr/0006-react-router-workers-d1.md), `migrations/`).
+> 이 디렉터리는 데이터 이전 검증이 끝나고 Supabase 프로젝트를 해지할 때까지만
+> 참고용으로 남아 있어요. 여기에 새 마이그레이션을 추가하지 마세요.
+
 이 폴더는 **두 개의 분리된 Supabase 프로젝트**(prod / non-prod)에 적용돼요.
 `migrations/` 아래에 뭐든 추가·삭제·수정하기 전에 이 문서부터 읽어 주세요.
 
