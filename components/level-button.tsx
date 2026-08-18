@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "react-router";
 import { track } from "@/lib/analytics";
 import type { Level } from "@/lib/levels";
 
@@ -14,7 +12,7 @@ interface Props {
 export function LevelButton({ level, display, blurb, isDefault }: Props) {
   return (
     <Link
-      href={`/play?level=${level}`}
+      to={`/play?level=${level}`}
       onClick={() => track("level_selected", { level })}
       className={
         isDefault

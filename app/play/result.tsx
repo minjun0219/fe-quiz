@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
 import { ContributeNote } from "@/components/credits";
@@ -384,7 +382,7 @@ export default function Result({ data, level }: Props) {
           </p>
         )}
         {feedbackStatus === "unavailable" &&
-          (process.env.NODE_ENV === "development" ? (
+          (import.meta.env.DEV ? (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               (개발자에게:{" "}
               <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">
@@ -392,7 +390,7 @@ export default function Result({ data, level }: Props) {
               </code>
               를
               <code className="ml-1 rounded bg-zinc-100 px-1 dark:bg-zinc-800">
-                .env.local
+                .dev.vars
               </code>
               에 넣으면 누룽지가 깨어나요)
             </p>

@@ -13,7 +13,8 @@
       "**/*.jsx",
       "**/*.mjs",
       "**/*.json",
-      "**/*.css"
+      "**/*.css",
+      "!lib/questions.generated.json"
     ]
   },
   "formatter": {
@@ -62,7 +63,13 @@
   },
   "overrides": [
     {
-      "includes": ["scripts/**", "**/*.config.*", "**/*.test.*", "**/*.spec.*"],
+      "includes": [
+        "scripts/**",
+        "**/*.config.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "lib/logger.server.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {

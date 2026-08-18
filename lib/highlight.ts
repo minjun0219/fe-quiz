@@ -1,4 +1,3 @@
-import "server-only";
 import type { Category } from "./question.schema";
 
 const HTML_ESCAPES: Record<string, string> = {

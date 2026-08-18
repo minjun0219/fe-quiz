@@ -1,0 +1,70 @@
+/**
+ * Wrangler 설정 — https://developers.cloudflare.com/workers/wrangler/configuration/
+ *
+ * 환경 구조:
+ *   - top-level        로컬 dev (`pnpm dev` — vite + workerd, D1은 로컬 sqlite)
+ *   - env.preview      PR 프리뷰 배포 (전용 preview D1 — prod 바인딩 격리)
+ *   - env.production   운영 (main 브랜치)
+ *
+ * secrets(ANTHROPIC_API_KEY, UPSTASH_*, POSTHOG_KEY)는 여기 두지 않는다 —
+ * 로컬은 `.dev.vars`, 배포 env는 `wrangler secret put <NAME> --env <env>`.
+ * `nodejs_compat` + 최신 compatibility_date에서 vars/secrets는 `process.env`로도
+ * 주입되므로 서버 코드는 `process.env.*` 읽기를 그대로 쓴다.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fe-quiz",
+  "compatibility_date": "2026-08-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./workers/app.ts",
+  "observability": {
+    "enabled": true
+  },
+  "upload_source_maps": true,
+  "vars": {
+    "APP_ENV": "development",
+    "SITE_URL": "http://localhost:3000",
+    "POSTHOG_HOST": "https://us.i.posthog.com"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fe-quiz-shares-preview",
+      // 로컬 dev는 miniflare sqlite를 쓰므로 id가 실제로 조회되진 않지만,
+      // 스키마상 필수라 preview DB id를 넣어둔다. Phase 2에서
+      // `wrangler d1 create` 후 실제 id로 교체.
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "env": {
+    "preview": {
+      "vars": {
+        "APP_ENV": "preview",
+        // Phase 3에서 실제 workers.dev 서브도메인으로 교체
+        "SITE_URL": "https://fe-quiz-preview.CHANGEME.workers.dev",
+        "POSTHOG_HOST": "https://us.i.posthog.com"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "fe-quiz-shares-preview",
+          "database_id": "00000000-0000-0000-0000-000000000000"
+        }
+      ]
+    },
+    "production": {
+      "vars": {
+        "APP_ENV": "production",
+        "SITE_URL": "https://fe-quiz-production.CHANGEME.workers.dev",
+        "POSTHOG_HOST": "https://us.i.posthog.com"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "fe-quiz-shares",
+          "database_id": "00000000-0000-0000-0000-000000000000"
+        }
+      ]
+    }
+  }
+}
