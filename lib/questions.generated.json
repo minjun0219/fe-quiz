@@ -1,0 +1,5088 @@
+[
+ {
+  "id": "browser-001",
+  "category": "browser",
+  "difficulty": "easy",
+  "question": "브라우저의 Critical Rendering Path 순서로 가장 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "HTML 파싱 → DOM 생성, CSS 파싱 → CSSOM 생성, Render Tree 구성 → Layout → Paint → Composite"
+   },
+   {
+    "id": "b",
+    "text": "HTML 파싱 → Paint → CSSOM 생성 → Layout → JavaScript 실행 → Composite"
+   },
+   {
+    "id": "c",
+    "text": "CSSOM 생성 → HTML 다운로드 → Paint → DOM 생성 → Layout"
+   },
+   {
+    "id": "d",
+    "text": "Render Tree 구성 → DOM 생성 → CSSOM 생성 → Paint → Layout"
+   }
+  ],
+  "explanation": "브라우저는 먼저 HTML을 파싱해 DOM을 만들고, CSS를 파싱해 CSSOM을 만들어요. 이후 실제로 화면에 그릴 노드만 모아 Render Tree를 구성하고, Layout 단계에서 각 요소의 위치와 크기를 계산해요.\n그 다음 Paint에서 텍스트·색상·이미지 등을 픽셀로 칠하고, Composite 단계에서 여러 레이어를 합성해 최종 화면을 보여줘요. 이 흐름을 알고 있으면 CSS/JS가 어디서 렌더링을 막는지, 어떤 변경이 비용이 큰 작업인지 판단하기 쉬워져요.\n",
+  "tags": [
+   "rendering",
+   "crp",
+   "dom",
+   "cssom"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "browser-002",
+  "category": "browser",
+  "difficulty": "medium",
+  "question": "다음 중 레이아웃 재계산을 피하고 대체로 Composite 단계에서 처리되어 애니메이션에 유리한 CSS 속성 조합은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`top`, `left`"
+   },
+   {
+    "id": "b",
+    "text": "`width`, `height`"
+   },
+   {
+    "id": "c",
+    "text": "`transform`, `opacity`"
+   },
+   {
+    "id": "d",
+    "text": "`margin`, `padding`"
+   }
+  ],
+  "explanation": "`transform`과 `opacity`는 요소의 실제 문서 흐름을 바꾸지 않고 시각적 결과만 바꾸는 경우가 많아서, 브라우저가 Layout/Reflow를 다시 계산하지 않고 Composite 단계에서 처리할 수 있어요.\n반대로 `top`, `left`, `width`, `height`, `margin`, `padding`은 요소의 크기나 위치 계산에 영향을 줘 주변 요소까지 다시 배치해야 할 수 있어요. 그래서 스크롤·드래그·hover처럼 자주 변하는 애니메이션에는 `transform` 기반 이동이 보통 더 안전해요.\n",
+  "tags": [
+   "rendering",
+   "reflow",
+   "repaint",
+   "composite",
+   "css"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "browser-003",
+  "category": "browser",
+  "difficulty": "medium",
+  "question": "`<link rel=\"preconnect\">`, `<link rel=\"preload\">`, `<link rel=\"prefetch\">` 설명으로 맞는 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`preconnect`는 리소스 다운로드까지 완료하고, `preload`는 연결만 미리 만들어요."
+   },
+   {
+    "id": "b",
+    "text": "`preload`는 현재 페이지에서 곧 필요한 리소스를 높은 우선순위로 가져오게 힌트를 줘요."
+   },
+   {
+    "id": "c",
+    "text": "`prefetch`는 현재 렌더링에 필수인 CSS를 항상 가장 높은 우선순위로 가져와요."
+   },
+   {
+    "id": "d",
+    "text": "세 값은 모두 같은 동작이고 브라우저 호환성을 위해 이름만 달라요."
+   }
+  ],
+  "explanation": "`preconnect`는 리소스를 다운로드하지 않고, 특정 origin에 대한 DNS 조회·TCP 연결·TLS 핸드셰이크 같은 연결 비용을 미리 치르게 해요. 외부 CDN이나 폰트 서버처럼 곧 요청할 도메인에 유용해요.\n`preload`는 현재 페이지 렌더링에 곧 필요한 폰트·이미지·스크립트 등을 높은 우선순위로 가져오게 하는 힌트예요. 반면 `prefetch`는 다음 페이지에서 필요할 가능성이 있는 리소스를 유휴 시간에 낮은 우선순위로 가져오는 용도라, 현재 화면 필수 리소스에는 `preload`가 더 잘 맞아요.\n",
+  "tags": [
+   "resource-hints",
+   "preconnect",
+   "preload",
+   "prefetch",
+   "html"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "browser-004",
+  "category": "browser",
+  "difficulty": "easy",
+  "question": "웹 폰트 로딩에서 FOUT와 FOIT 설명으로 가장 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "FOUT는 텍스트가 보이지 않는 현상, FOIT는 fallback 폰트가 먼저 보이는 현상이에요."
+   },
+   {
+    "id": "b",
+    "text": "FOUT는 fallback 폰트가 먼저 보였다가 웹 폰트로 바뀌는 현상, FOIT는 폰트 로드 전 텍스트가 숨는 현상이에요."
+   },
+   {
+    "id": "c",
+    "text": "둘 다 이미지 lazy loading에서만 발생해요."
+   },
+   {
+    "id": "d",
+    "text": "`font-display: swap`은 FOIT를 늘리기 위해 텍스트를 오래 숨겨요."
+   }
+  ],
+  "explanation": "FOUT는 Flash Of Unstyled Text로, 일단 시스템/fallback 폰트로 텍스트를 보여준 뒤 웹 폰트가 도착하면 교체되는 현상이에요. 사용자는 글을 빨리 볼 수 있지만 폰트 교체 순간 레이아웃이 살짝 흔들릴 수 있어요.\nFOIT는 Flash Of Invisible Text로, 웹 폰트가 로드될 때까지 텍스트를 숨기는 현상이에요. 브랜드 폰트 일관성은 좋아 보일 수 있지만 사용자가 빈 영역을 보게 될 수 있어요. `font-display: swap`은 대체로 fallback을 먼저 보여줘 FOIT를 줄이는 선택이고, 필요하면 `preload`와 함께 폰트 로딩 지연을 줄일 수 있어요.\n",
+  "tags": [
+   "font-loading",
+   "fout",
+   "foit",
+   "font-display"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "browser-005",
+  "category": "browser",
+  "difficulty": "hard",
+  "question": "브라우저 이벤트 루프에서 렌더링과 가장 가까운 설명은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "매 Task가 끝나면 Microtask를 비운 뒤 브라우저가 필요하면 렌더링 단계를 수행해요."
+   },
+   {
+    "id": "b",
+    "text": "Microtask는 렌더링보다 항상 뒤에 실행돼요."
+   },
+   {
+    "id": "c",
+    "text": "`requestAnimationFrame` 콜백은 Paint가 끝난 뒤 다음 Task로 실행돼요."
+   },
+   {
+    "id": "d",
+    "text": "긴 Task는 렌더링과 무관해서 프레임 드랍을 만들지 않아요."
+   }
+  ],
+  "explanation": "브라우저 이벤트 루프는 Task 하나를 처리한 뒤 Promise callback 같은 Microtask queue를 비우고, 렌더링이 필요하면 스타일 계산·Layout·Paint 같은 화면 갱신 단계를 수행해요.\n그래서 Microtask가 너무 많이 쌓이거나 하나의 Task가 오래 실행되면 브라우저가 렌더링할 틈을 얻지 못해 프레임 드랍이 생길 수 있어요. `requestAnimationFrame`은 다음 Paint 직전에 실행되므로 애니메이션 상태를 갱신하기 좋은 타이밍을 제공해요.\n",
+  "tags": [
+   "event-loop",
+   "rendering",
+   "microtask",
+   "requestAnimationFrame"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "browser-006",
+  "category": "browser",
+  "difficulty": "easy",
+  "question": "브라우저의 메모리 캐시와 디스크 캐시에 대한 설명으로 가장 적절한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "메모리 캐시는 RAM에 저장되어 빠르지만 오래 유지되기 어렵고, 디스크 캐시는 저장장치에 남아 재방문 시 재사용되기 쉬워요."
+   },
+   {
+    "id": "b",
+    "text": "메모리 캐시는 브라우저를 껐다 켜도 항상 유지되고, 디스크 캐시는 탭을 닫으면 즉시 사라져요."
+   },
+   {
+    "id": "c",
+    "text": "디스크 캐시는 네트워크보다 항상 느리므로 브라우저는 정적 리소스를 절대 저장하지 않아요."
+   },
+   {
+    "id": "d",
+    "text": "두 캐시는 저장 위치만 다르고 속도, 생명주기, 재사용 상황에는 차이가 없어요."
+   }
+  ],
+  "explanation": "메모리 캐시는 RAM에 리소스를 보관하므로 접근이 빠르고, 현재 페이지나 탭에서 곧 다시 사용할 CSS·JS 같은 리소스에 유리해요. 다만 메모리에 있기 때문에 브라우저나 탭의 생명주기, 메모리 압박에 따라 오래 유지되지 않을 수 있어요.\n디스크 캐시는 SSD나 HDD 같은 저장장치에 리소스를 보관해서 브라우저를 다시 열거나 사이트를 재방문할 때도 재사용될 가능성이 높아요. 접근 속도는 메모리보다 느릴 수 있지만, 이미지·폰트처럼 반복해서 쓰이는 정적 리소스를 다시 다운로드하지 않게 해 로딩 비용을 줄여요.\n오답 b는 두 캐시의 생명주기를 반대로 설명했고, c는 디스크 캐시의 목적을 부정해서 틀렸어요. d처럼 단순 저장 위치 차이만 있는 것이 아니라 속도와 유지 기간, 브라우저가 선택하는 재사용 전략까지 달라요.\n",
+  "tags": [
+   "cache",
+   "memory-cache",
+   "disk-cache",
+   "browser"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "browser-007",
+  "category": "browser",
+  "difficulty": "easy",
+  "question": "브라우저의 동일 출처 정책(Same-Origin Policy)에서 두 URL이 **같은 출처**로 간주되려면 무엇이 모두 일치해야 할까요?",
+  "choices": [
+   {
+    "id": "a",
+    "text": "스킴(scheme), 호스트(host), 포트(port)가 모두 같아야 해요"
+   },
+   {
+    "id": "b",
+    "text": "호스트(host)만 같으면 같은 출처로 봐요"
+   },
+   {
+    "id": "c",
+    "text": "도메인의 최상위(TLD)만 같으면 같은 출처로 봐요"
+   },
+   {
+    "id": "d",
+    "text": "경로(pathname)와 쿼리스트링까지 모두 같아야 해요"
+   }
+  ],
+  "explanation": "출처(origin)는 `scheme` + `host` + `port` 세 가지의 조합으로 정의돼요. 예를 들어 `https://example.com`과 `http://example.com`은 스킴이 달라서 다른 출처고, `https://example.com:443`과 `https://example.com:8443`은 포트가 달라서 다른 출처예요. 경로나 쿼리스트링은 출처 판정에 들어가지 않아요. 같은 출처 사이에서는 `fetch`·DOM 접근·스토리지 등이 자유롭지만, 다른 출처 자원에 접근하려면 CORS 같은 별도 메커니즘이 필요해요.",
+  "references": [
+   {
+    "title": "MDN — Same-origin policy",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy"
+   },
+   {
+    "title": "MDN — Origin",
+    "url": "https://developer.mozilla.org/en-US/docs/Glossary/Origin"
+   },
+   {
+    "title": "HTML Standard — Origin",
+    "url": "https://html.spec.whatwg.org/multipage/browsers.html#origin"
+   }
+  ],
+  "tags": [
+   "security",
+   "same-origin-policy",
+   "origin",
+   "cors",
+   "web-platform"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "browser-008",
+  "category": "browser",
+  "difficulty": "medium",
+  "question": "클라이언트 사이드 라우팅(CSR 라우팅)이 페이지 이동을 처리하는 방식으로 맞는 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "링크 클릭마다 서버에서 새 HTML 문서를 받아와 전체 페이지를 다시 로드해요."
+   },
+   {
+    "id": "b",
+    "text": "`history.pushState()` 등으로 URL과 히스토리를 바꾸고, 현재 앱 안에서 경로에 맞는 컴포넌트를 렌더링해요."
+   },
+   {
+    "id": "c",
+    "text": "URL은 바꾸지 않고 DOM만 교체하기 때문에 브라우저 뒤로 가기와 앞으로 가기를 사용할 수 없어요."
+   },
+   {
+    "id": "d",
+    "text": "`pushState()`를 호출하면 브라우저가 자동으로 서버 요청을 보내고 새 화면을 렌더링해요."
+   }
+  ],
+  "explanation": "클라이언트 사이드 라우터는 링크 클릭의 기본 전체 문서 이동을 막고, `history.pushState()` 같은 History API로 주소와 히스토리만 갱신해요. 그다음 현재 URL과 라우트 설정을 매칭해 필요한 컴포넌트를 렌더링하므로, 새 HTML 문서를 매번 내려받지 않고 앱 내부에서 화면 전환을 만들 수 있어요.\na는 전통적인 서버 중심 내비게이션에 가까운 설명이고, c는 History API와 `popstate` 이벤트를 활용하는 라우터의 특징을 놓친 설명이에요. d도 틀렸는데, `pushState()` 자체는 서버 요청이나 렌더링을 자동으로 수행하지 않아요. 실무에서는 뒤로 가기 대응, 새로고침 시 서버 fallback 설정, 전환 시 데이터 fetching 전략까지 함께 설계해야 안정적인 CSR 라우팅이 돼요.\n",
+  "tags": [
+   "client-side-routing",
+   "history-api",
+   "pushState",
+   "popstate"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-001",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "flex 컨테이너에서 자식 아이템을 main axis 양 끝에 붙이고, 사이사이는 균등 간격으로 배치하려면?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`justify-content: space-between`"
+   },
+   {
+    "id": "b",
+    "text": "`justify-content: space-around`"
+   },
+   {
+    "id": "c",
+    "text": "`justify-content: space-evenly`"
+   },
+   {
+    "id": "d",
+    "text": "`justify-content: stretch`"
+   }
+  ],
+  "explanation": "- `space-between`: 양 끝 아이템이 컨테이너 가장자리에 딱 붙고, 사이 간격만 균등.\n- `space-around`: 각 아이템 양옆에 동일한 마진(가장자리 마진은 사이 마진의 절반).\n- `space-evenly`: 가장자리 포함 모든 간격이 동일.\n- `stretch`: 명세상 `justify-content`의 유효 값이지만, flex 컨테이너의 main axis에서는 늘이기가 적용 안 돼 결과적으로 `flex-start`처럼 동작. (CSS Grid에선 실제로 트랙이 늘어남)\n",
+  "references": [
+   {
+    "title": "MDN — justify-content",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content"
+   }
+  ],
+  "tags": [
+   "flexbox",
+   "layout",
+   "justify-content"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "css-002",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "아래 박스의 실제 콘텐츠 영역 너비는?\n",
+  "code": ".box {\n  width: 200px;\n  padding: 20px;\n  border: 5px solid;\n  box-sizing: border-box;\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "200px"
+   },
+   {
+    "id": "b",
+    "text": "150px"
+   },
+   {
+    "id": "c",
+    "text": "230px"
+   },
+   {
+    "id": "d",
+    "text": "250px"
+   }
+  ],
+  "explanation": "`box-sizing: border-box`는 `width`가 **border + padding + content**를 모두 포함한 박스의 전체 너비라는 뜻이에요.\n그래서 콘텐츠 영역 = 200 - (padding 20×2) - (border 5×2) = 200 - 40 - 10 = **150px**.\n반대로 기본값인 `content-box`였다면 `width: 200px`이 콘텐츠 영역 자체라 박스 전체는 250px이 됐을 거예요. 모던 프로젝트에서 `* { box-sizing: border-box }`를 깔고 가는 이유랍니다.\n",
+  "references": [
+   {
+    "title": "MDN — box-sizing",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing"
+   }
+  ],
+  "tags": [
+   "box-model",
+   "box-sizing"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-003",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "`position: sticky`의 동작으로 가장 정확한 설명은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "viewport 기준으로 항상 같은 자리에 박혀 움직이지 않아요"
+   },
+   {
+    "id": "b",
+    "text": "가장 가까운 위치 지정된 조상 기준으로 `absolute`처럼 위치해요"
+   },
+   {
+    "id": "c",
+    "text": "스크롤 임계값 이전엔 `relative`처럼, 임계값 이후엔 `fixed`처럼 동작해요. 단 가장 가까운 스크롤 가능한 조상 안에 갇혀 있어요"
+   },
+   {
+    "id": "d",
+    "text": "z-index가 자동으로 최상단으로 올라가 다른 요소를 가려요"
+   }
+  ],
+  "explanation": "sticky는 두 모드 사이를 오가는 하이브리드예요. 스크롤이 임계값(`top: 0` 등)에 도달하기 전엔 평범한 `relative`처럼 흐름 안에 있고, 도달한 뒤엔 `fixed`처럼 화면에 붙어요.\n중요한 건 **부모(스크롤 컨테이너)를 벗어나지 못한다**는 점이에요. 부모가 화면 밖으로 빠져나가면 sticky 요소도 같이 밀려 사라져요.\n안 붙는다면 의심해 봐도 좋을 만한 부분: 부모에 `overflow: hidden`이 걸려 있거나, 부모 높이가 너무 작아서 sticky 영역이 즉시 끝나는 경우가 흔해요.\n",
+  "references": [
+   {
+    "title": "MDN — position",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/position"
+   }
+  ],
+  "tags": [
+   "position",
+   "sticky",
+   "scroll"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "css-004",
+  "category": "css",
+  "difficulty": "hard",
+  "question": "다음 중 새로운 stacking context를 **만들지 않는** 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`opacity: 0.5` 적용"
+   },
+   {
+    "id": "b",
+    "text": "`transform: translateZ(0)` 적용"
+   },
+   {
+    "id": "c",
+    "text": "`position: relative` + `z-index: 0`"
+   },
+   {
+    "id": "d",
+    "text": "`position: relative` 단독 적용 (z-index 없음)"
+   }
+  ],
+  "explanation": "stacking context는 z-index 비교의 \"독립된 우주\"를 만들어요. context 안의 자식 z-index는 바깥과 비교되지 않고, context 자체의 위치만 바깥과 경쟁하죠.\n`position: relative`만 적용하고 z-index가 `auto`면 context를 만들지 **않아요**. z-index가 정수로 지정돼야 비로소 context가 생겨요.\n반면 `opacity < 1`, `transform`(none이 아닌 값), `filter`, `will-change: transform` 같은 건 z-index 없이도 context를 만들어요. 그래서 \"왜 갑자기 z-index가 안 먹지?\" 싶을 때는 부모에 transform/opacity가 걸려 있는지 확인해 봐요.\n",
+  "references": [
+   {
+    "title": "MDN — z-index",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/z-index"
+   }
+  ],
+  "tags": [
+   "stacking-context",
+   "z-index",
+   "position"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "css-005",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "아래 HTML/CSS에서 `<p>`의 텍스트 색은?\n",
+  "code": "/* CSS */\n#main .box p { color: red; }\n.box p.text { color: blue; }\np { color: green; }\n\n<!-- HTML -->\n<div id=\"main\">\n  <div class=\"box\">\n    <p class=\"text\">hi</p>\n  </div>\n</div>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "red"
+   },
+   {
+    "id": "b",
+    "text": "blue"
+   },
+   {
+    "id": "c",
+    "text": "green"
+   },
+   {
+    "id": "d",
+    "text": "선언 순서상 마지막인 green"
+   }
+  ],
+  "explanation": "명시도(specificity)는 (id, class/속성/가상클래스, 요소/가상요소) 순으로 비교해요.\n- `#main .box p` → (1, 1, 1)\n- `.box p.text`  → (0, 2, 1)\n- `p`            → (0, 0, 1)\nid가 1개인 첫 번째가 가장 높아서 **red** 승리예요. 선언 순서는 명시도가 같을 때만 의미가 있거든요.\n실무 팁: id 셀렉터를 마구 쓰면 나중에 덮어쓰기가 어려워지니까, 가능하면 클래스 조합으로 다루는 게 유지보수에 좋아요.\n",
+  "references": [
+   {
+    "title": "MDN — Specificity",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity"
+   }
+  ],
+  "tags": [
+   "specificity",
+   "selector",
+   "cascade"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "css-006",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "CSS 단위 `em`, `rem`, `px`에 대한 설명 중 **옳은** 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`em`은 root 요소의 font-size 기준으로 계산돼요"
+   },
+   {
+    "id": "b",
+    "text": "`rem`은 항상 root(html) 요소의 font-size를 기준으로 계산돼요"
+   },
+   {
+    "id": "c",
+    "text": "`px`는 사용자 브라우저의 글자 크기 설정에 따라 자동으로 스케일돼요"
+   },
+   {
+    "id": "d",
+    "text": "`rem`은 부모 요소의 font-size 기준으로 계산돼요"
+   }
+  ],
+  "explanation": "`rem` = \"root em\". 이름 그대로 항상 `<html>`의 font-size를 기준으로 잡아요. 그래서 사용자가 브라우저 설정에서 글자 크기를 키우면 `rem` 단위는 따라 커져 접근성에 좋답니다.\n`em`은 **현재 요소의 font-size**(상속/재정의 포함) 기준이라, 중첩되면 곱연산처럼 누적될 수 있어요 (`em` 안의 `em` 안의 `em`...).\n`px`는 절대 단위라 사용자 글자 크기 설정에 영향받지 않아요 (브라우저 줌은 별개예요).\n",
+  "references": [
+   {
+    "title": "MDN — <length>",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/length"
+   }
+  ],
+  "tags": [
+   "units",
+   "em",
+   "rem",
+   "font-size"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-007",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "아래 grid 컨테이너에 자식 요소 7개를 넣으면 어떻게 배치될까요?\n",
+  "code": ".grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 16px;\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "3열 × 7행, 매 행에 자식 하나씩"
+   },
+   {
+    "id": "b",
+    "text": "7열 × 1행, 1fr씩 균등 분할"
+   },
+   {
+    "id": "c",
+    "text": "3열 × 3행, 마지막 행에는 1개만 채워지고 나머지 2칸은 비어 있어요"
+   },
+   {
+    "id": "d",
+    "text": "1열 × 7행"
+   }
+  ],
+  "explanation": "`grid-template-columns: repeat(3, 1fr)`은 \"3열, 각 열은 남은 공간을 1:1:1로 나눠 가져라\"라는 뜻이에요.\n자식이 7개니까 자연스럽게 줄바꿈되어 3 + 3 + 1로 들어가서 행이 3개 만들어져요 (`grid-auto-rows`로 행이 자동 생성).\n마지막 행의 빈 2칸은 비어 있는 grid cell이고, 다음 자식이 추가되면 거기부터 채워져요.\n",
+  "references": [
+   {
+    "title": "MDN — grid-template-columns",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns"
+   }
+  ],
+  "tags": [
+   "grid",
+   "layout",
+   "repeat"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "css-008",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "아래 CSS만 작성했는데 화면에 빨간 점이 안 보여요. 가장 큰 이유는 뭘까요?\n",
+  "code": ".badge::before {\n  background: red;\n  width: 8px;\n  height: 8px;\n  display: inline-block;\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`::before`는 항상 `display: none` 상태가 기본이에요"
+   },
+   {
+    "id": "b",
+    "text": "`background-color`로 써야지 `background`로는 색이 적용되지 않아요"
+   },
+   {
+    "id": "c",
+    "text": "`::before`는 부모가 `position: relative`여야만 보여요"
+   },
+   {
+    "id": "d",
+    "text": "`content` 속성이 없으면 `::before`/`::after`는 렌더링되지 않아요"
+   }
+  ],
+  "explanation": "`::before`/`::after`는 \"이 요소의 앞/뒤에 가짜 자식을 만들어줘\"라는 거라, **`content` 속성이 명시돼야 비로소 박스가 생성돼요**.\n값이 비어 있어도 좋으니 `content: \"\"`라고만 써 주면 다른 스타일이 살아나요. 가장 흔한 실수 중 하나랍니다.\n`background`는 단축 속성이라 `background-color`로 쓰지 않아도 색이 잘 적용되고, `::before`도 부모의 position과 무관하게 그릴 수 있어요.\n",
+  "references": [
+   {
+    "title": "MDN — ::before",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/::before"
+   }
+  ],
+  "tags": [
+   "pseudo-element",
+   "before",
+   "after",
+   "content"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "css-009",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "버튼에 hover하면 색이 부드럽게 변하다가, 마우스를 떼면 다시 부드럽게 원래 색으로 돌아오게 만들고 싶어요. 가장 적절한 도구는 뭘까요?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`transition`으로 변환할 속성과 duration을 지정해요"
+   },
+   {
+    "id": "b",
+    "text": "`@keyframes`와 `animation`으로 from/to를 정의해요"
+   },
+   {
+    "id": "c",
+    "text": "JS의 `setInterval`로 색상을 보간해요"
+   },
+   {
+    "id": "d",
+    "text": "`@keyframes`를 `infinite`로 무한 반복시켜요"
+   }
+  ],
+  "explanation": "상태 A ↔ 상태 B 사이의 보간이라면 `transition`이 정답이에요. `:hover`로 색을 바꾸기만 하면 `transition: background-color 200ms`가 알아서 양방향 보간을 처리해 줘요.\n`@keyframes` + `animation`은 여러 단계(0% → 50% → 100%)를 거치는 시퀀스나, 트리거 없이 자동 반복되는 효과에 어울려요.\n단순 hover 보간을 keyframes로 하면 코드만 길어지고 마우스 떠날 때 되돌리기를 따로 처리해야 해서 비효율적이에요.\n",
+  "references": [
+   {
+    "title": "MDN — transition",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/transition"
+   }
+  ],
+  "tags": [
+   "transition",
+   "animation",
+   "hover"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "css-010",
+  "category": "css",
+  "difficulty": "hard",
+  "question": "부모 div 안의 첫 자식 div에 `margin-top: 40px`을 줬는데, 그 마진이 부모 안에 머물지 않고 **부모 바깥으로 빠져나가** 부모 위에 간격이 생겼어요. 가장 표준적인 해결책은 뭘까요?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "자식의 `margin-top`을 같은 크기의 `padding-top`으로 바꿔요"
+   },
+   {
+    "id": "b",
+    "text": "부모를 BFC로 만들어요 (예: `display: flow-root`, `overflow: hidden`, padding-top·border-top 추가)"
+   },
+   {
+    "id": "c",
+    "text": "자식을 `position: absolute`로 띄워요"
+   },
+   {
+    "id": "d",
+    "text": "`<html>` 요소에 `overflow: hidden`을 적용해요"
+   }
+  ],
+  "explanation": "부모와 첫 자식의 인접한 마진은 **collapse**돼서 더 큰 쪽 하나로 합쳐지고, 그게 부모 바깥으로 빠져나간 것처럼 보이는 거예요 (parent-child margin collapse).\n부모를 **BFC**(Block Formatting Context)로 만들면 자식 마진이 BFC 경계를 못 넘어 부모 안에 갇혀요. 모던하게는 `display: flow-root`가 부수효과 없이 가장 깔끔하답니다.\n`padding-top` 교체는 마진과 의미가 달라 레이아웃이 어긋날 수 있고, `position: absolute`는 흐름 자체를 빼버려 다른 형제와 겹치는 부작용이 있어요.\n",
+  "references": [
+   {
+    "title": "MDN — margin",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/margin"
+   }
+  ],
+  "tags": [
+   "bfc",
+   "margin-collapse",
+   "layout",
+   "flow-root"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-011",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "`<img>`나 `<div>`에 가로:세로 16:9 비율을 유지시키려면 가장 간결한 방법은 뭘까요?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`aspect-ratio: 16 / 9` 한 줄로 지정해요"
+   },
+   {
+    "id": "b",
+    "text": "`padding-top: 56.25%` 트릭과 absolute positioned 자식을 써요"
+   },
+   {
+    "id": "c",
+    "text": "JS에서 `resize` 이벤트로 `height = width * 9 / 16`을 매번 계산해요"
+   },
+   {
+    "id": "d",
+    "text": "`object-fit: cover`만 지정하면 자동으로 비율이 잡혀요"
+   }
+  ],
+  "explanation": "`aspect-ratio: 16 / 9`는 박스의 한쪽 치수만 정해져도 나머지를 비율대로 자동 결정해 줘요. 예전에는 padding 트릭(`padding-top: 56.25%`)이 표준이었지만, 이젠 모던 브라우저(2021+)에서 `aspect-ratio` 한 줄이면 충분해요.\n`object-fit`은 이미 박스 크기가 잡힌 미디어의 잘림/맞춤만 결정하니 비율 유지와는 다른 도구예요. JS로 매번 계산하는 건 리사이즈 빈도가 높을수록 비효율적이에요.\n",
+  "references": [
+   {
+    "title": "MDN — aspect-ratio",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio"
+   }
+  ],
+  "tags": [
+   "aspect-ratio",
+   "layout",
+   "modern-css"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "css-012",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "\"체크된 input을 가진 label\"의 배경색만 바꾸려고 해요. 가장 알맞은 셀렉터는 뭘까요?\n",
+  "code": "<label>\n  <input type=\"checkbox\" />\n  동의합니다\n</label>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`label > input:checked { background: yellow }`"
+   },
+   {
+    "id": "b",
+    "text": "`label:has(input:checked) { background: yellow }`"
+   },
+   {
+    "id": "c",
+    "text": "`label:checked { background: yellow }`"
+   },
+   {
+    "id": "d",
+    "text": "`input:checked + label { background: yellow }`"
+   }
+  ],
+  "explanation": "`:has()`는 인자로 들어간 셀렉터에 매칭되는 자손/자식을 가진 **부모**를 선택할 수 있는 관계형 가상 클래스예요(2023년부터 모던 브라우저 전반 지원). `label:has(input:checked)`은 \"체크된 input을 자식으로 가진 label\" 자체를 잡으니 label에 스타일을 줄 수 있어요.\n- 1번은 `input` 자체에 배경을 주는 셀렉터라, 부모 label은 못 바꿔요.\n- 3번은 `:checked`가 input에만 적용되는 가상 클래스라 label엔 매칭이 안 돼요.\n- 4번은 `+` 형제 선택자라 label이 input 옆에 있을 때만 동작하고, 위 마크업처럼 input이 label의 자식인 구조엔 맞지 않아요.\n",
+  "references": [
+   {
+    "title": "MDN — :has()",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/:has"
+   }
+  ],
+  "tags": [
+   "selectors",
+   "has",
+   "modern-css"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-013",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "다음 CSS와 HTML에서 `.btn`의 최종 `color`는?\n",
+  "code": "/* CSS */\n:root { --brand: tomato; }\n.card { --brand: steelblue; }\n.btn  { color: var(--brand, black); }\n\n/* HTML */\n<div class=\"card\"><button class=\"btn\">Hi</button></div>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "tomato"
+   },
+   {
+    "id": "b",
+    "text": "black"
+   },
+   {
+    "id": "c",
+    "text": "steelblue"
+   },
+   {
+    "id": "d",
+    "text": "문자열 `var(--brand, black)`가 그대로 적용돼요"
+   }
+  ],
+  "explanation": "CSS 커스텀 프로퍼티는 일반 속성처럼 **상속**되고 cascade를 따라요. `.btn`은 자기 자신에 `--brand`를 정의하지 않았으니 부모 `.card`에서 상속된 `steelblue`가 적용돼요. `:root`의 정의는 더 멀리 있어 가까운 정의에 가려져요.\n`var(--brand, black)`의 두 번째 인자는 변수 자체가 정의되지 않았거나 파싱에 실패했을 때만 쓰는 fallback이에요. 변수가 정의돼 있으면 fallback은 절대 쓰이지 않아요.\n",
+  "references": [
+   {
+    "title": "MDN — var()",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/var"
+   }
+  ],
+  "tags": [
+   "custom-properties",
+   "variables",
+   "cascade"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "css-014",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "`flex: 1` 단축 표기는 어떤 longhand 값으로 풀릴까요?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`flex-grow: 1; flex-shrink: 1; flex-basis: 0%`"
+   },
+   {
+    "id": "b",
+    "text": "`flex-grow: 1; flex-shrink: 1; flex-basis: auto`"
+   },
+   {
+    "id": "c",
+    "text": "`flex-grow: 1; flex-shrink: 0; flex-basis: auto`"
+   },
+   {
+    "id": "d",
+    "text": "`flex-grow: 1; flex-shrink: 1; flex-basis: 100%`"
+   }
+  ],
+  "explanation": "`flex: 1`은 `flex: 1 1 0%`와 동일하게 풀려요. 핵심은 `flex-basis: 0%`라는 점이에요. 기본 크기를 0으로 두고 남은 공간을 grow 비율대로 나눠 갖기 때문에, 자식들이 콘텐츠 크기와 무관하게 비율대로 균등 분배돼요.\n헷갈리는 게 `flex-basis: auto`인 경우인데요, 이건 콘텐츠/`width`를 먼저 반영한 뒤 남은 공간만 grow에 분배하므로, 콘텐츠 길이에 따라 너비가 달라져 균등 분배가 안 돼요. `flex: auto`(= 1 1 auto), `flex: none`(= 0 0 auto)도 같이 외워 두면 좋아요.\n",
+  "references": [
+   {
+    "title": "MDN — flex",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/flex"
+   }
+  ],
+  "tags": [
+   "flexbox",
+   "flex-shorthand",
+   "layout"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "css-015",
+  "category": "css",
+  "difficulty": "hard",
+  "question": "모바일 Safari에서 `height: 100vh`가 풀스크린이 안 되고 일부가 가려 보이는 이유와, 가장 적절한 대체 단위는?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`vh` 단위는 모바일에서 동작하지 않으니 픽셀 단위로 직접 환산해야 해요"
+   },
+   {
+    "id": "b",
+    "text": "iOS의 잘못된 반올림 때문이며 `100%`로 바꾸면 해결돼요"
+   },
+   {
+    "id": "c",
+    "text": "Safari가 `vh`를 disable하기 때문에 `vmin`으로 대체해야 해요"
+   },
+   {
+    "id": "d",
+    "text": "`100vh`는 항상 가장 큰 viewport(주소창이 사라진 상태) 기준이라 주소창이 보일 때 화면을 넘어가 일부가 가려져요. `100dvh`(dynamic viewport height)나 `100svh`(small)를 쓰면 현재 표시 가능한 영역에 맞춰져요"
+   }
+  ],
+  "explanation": "iOS Safari에서 `100vh`는 주소창이 숨었을 때 기준의 큰 viewport 높이로 계산돼요. 그래서 주소창이 보이는 상태엔 화면보다 큰 박스가 만들어져 하단이 가려지는 것처럼 보이는 거죠.\nCSS Viewport Units Level 4가 도입한 동적 단위들로 해결할 수 있어요:\n- `svh` (small): 가장 작은 viewport 기준, 항상 가장 안전\n- `lvh` (large): 가장 큰 viewport 기준 (`vh`와 동일하게 동작)\n- `dvh` (dynamic): 현재 UI 상태에 따라 실시간으로 변하는 값\n히어로 섹션 풀스크린엔 `100dvh`(또는 `100svh`)를 쓰는 게 일반적인 모던 패턴이에요.\n",
+  "references": [
+   {
+    "title": "MDN — <length>",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/length"
+   }
+  ],
+  "tags": [
+   "viewport-units",
+   "mobile",
+   "dvh"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "css-016",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "flex / grid 컨테이너에서 자식 사이 간격을 줄 때 `gap`을 쓰는 게 옛날의 `margin` 트릭보다 좋은 이유로 가장 적절한 것은?\n",
+  "code": ".a { display: flex; gap: 12px; }\n\n/* 옛 방식 */\n.b { display: flex; }\n.b > * + * { margin-left: 12px; }\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`gap`은 flex/grid 컨테이너에서만 동작하므로 일반 인라인 요소엔 쓸 수 없어요"
+   },
+   {
+    "id": "b",
+    "text": "가장자리 자식에 불필요한 마진이 붙지 않고, 줄바꿈 시 행/열 간 간격이 자동 적용되며, 마진 collapse 같은 함정도 없어요"
+   },
+   {
+    "id": "c",
+    "text": "`gap`은 부모의 padding을 자동으로 추가해요"
+   },
+   {
+    "id": "d",
+    "text": "`gap`은 자식 너비에 비례한 가변 간격을 만들어요"
+   }
+  ],
+  "explanation": "`gap`은 자식 \"사이\"의 간격만 만들기 때문에 양 끝 자식에 불필요한 마진이 붙지 않아 시각·계산 모두 깔끔해요. flex가 줄바꿈하거나 grid처럼 2D 배치일 때도 행/열 간 간격이 한 번에 적용돼서 `> * + *` 류 트릭이 필요 없어요.\n`gap`은 flex/grid 외에 multi-column 레이아웃에서도 동작하지만 일반 block 흐름에서는 적용되지 않아요. 모던 브라우저에서 flex `gap`은 2021년 전후로 안정 지원이라, 새로 짜는 코드면 사실상 기본값으로 골라도 무방해요.\n",
+  "references": [
+   {
+    "title": "MDN — gap",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/gap"
+   }
+  ],
+  "tags": [
+   "flexbox",
+   "grid",
+   "gap",
+   "layout"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-017",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "다음 두 셀렉터의 specificity 차이로 가장 정확한 것은?\n",
+  "code": ":is(h1, h2, h3) .title { color: red; }\n:where(h1, h2, h3) .title { color: blue; }\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`:is()`는 인자 중 가장 높은 specificity를 본문에 더하고, `:where()`는 항상 0이라 specificity에 기여하지 않아요. 따라서 첫 줄이 우선해 `red`가 적용돼요"
+   },
+   {
+    "id": "b",
+    "text": "둘은 동일하게 인자 specificity를 더해요"
+   },
+   {
+    "id": "c",
+    "text": "`:where()`가 인자 중 가장 높은 specificity를 가지고 `:is()`가 0이에요"
+   },
+   {
+    "id": "d",
+    "text": "둘 다 specificity 0이며 위치 순서로만 결정돼요"
+   }
+  ],
+  "explanation": "`:is(...)`의 specificity는 \"인자 중 가장 높은 셀렉터의 specificity\"가 본문에 더해져요. 그래서 `:is(h1, h2, h3) .title`은 사실상 `h1 .title` 수준의 가중치를 가져요.\n`:where(...)`는 항상 0이라 같은 셀렉터를 묶을 수 있게 해 주면서도 specificity에는 영향이 없어요. 사용자 스타일·디자인 시스템 베이스에서 \"덮어쓰기 쉬운\" 규칙을 만들 때 자주 써요.\n결과적으로 첫 줄이 더 강해 `red`가 이겨요. 둘이 동작 면에서는 같지만 specificity가 다르다는 게 핵심이에요.\n",
+  "references": [
+   {
+    "title": "MDN — :is()",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/:is"
+   },
+   {
+    "title": "MDN — :where()",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/:where"
+   }
+  ],
+  "tags": [
+   "selectors",
+   "specificity",
+   "is",
+   "where"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "css-018",
+  "category": "css",
+  "difficulty": "medium",
+  "question": "`margin-inline: 16px`이 `margin-left: 16px; margin-right: 16px`와 차이가 있는 부분으로 가장 정확한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘은 항상 동일하게 동작해요"
+   },
+   {
+    "id": "b",
+    "text": "`margin-inline`은 글자 흐름(`writing-mode`/`direction`)에 따라 결정돼 LTR에선 좌/우, RTL에선 우/좌, 세로쓰기에선 위/아래에 적용돼 다국어/세로쓰기 레이아웃을 자동으로 따라가요"
+   },
+   {
+    "id": "c",
+    "text": "`margin-inline`은 inline-block 요소에만 적용돼요"
+   },
+   {
+    "id": "d",
+    "text": "`margin-inline`은 inline 방향으로만 영향을 주므로 부모의 콘텐츠 너비를 늘리지 못해요"
+   }
+  ],
+  "explanation": "CSS 로지컬 프로퍼티(`margin-inline`, `padding-block`, `inset-inline-start` 등)는 \"left/right/top/bottom\" 같은 물리 축 대신 \"start/end\"라는 흐름 축을 따라요.\n영어 같은 LTR에선 `margin-inline-start`가 `margin-left`와 같아 보이지만, 아랍어처럼 RTL이거나 세로쓰기(`writing-mode: vertical-rl`)에선 자동으로 의미에 맞는 축에 적용돼요.\nRTL을 지원하거나 일본어 세로쓰기 같은 케이스를 신경 쓰는 코드라면 처음부터 로지컬 프로퍼티를 기본값으로 쓰는 편이 유지보수가 편해요.\n",
+  "references": [
+   {
+    "title": "MDN — margin-inline",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline"
+   }
+  ],
+  "tags": [
+   "logical-properties",
+   "i18n",
+   "rtl"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-019",
+  "category": "css",
+  "difficulty": "hard",
+  "question": "다음 `@container` 쿼리가 `@media (min-width: 400px)`와 다른 점으로 가장 정확한 것은?\n",
+  "code": ".card-container { container-type: inline-size; }\n@container (min-width: 400px) {\n  .card { display: grid; grid-template-columns: 1fr 1fr; }\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘은 동일하며 `@container`는 `@media`의 별칭이에요"
+   },
+   {
+    "id": "b",
+    "text": "`@container`는 가장 가까운 컨테이너(`container-type` 지정 조상)의 크기를 기준으로 매칭되므로, 같은 카드라도 사이드바에선 1단으로 메인에선 2단으로 자연스럽게 적응할 수 있어요. `@media`는 항상 viewport 기준이고요"
+   },
+   {
+    "id": "c",
+    "text": "`@container`는 viewport보다 작은 영역에서는 동작하지 않아요"
+   },
+   {
+    "id": "d",
+    "text": "`@container`는 JS 런타임에서만 평가되며 빌드 타임에 미리 계산할 수 없어요"
+   }
+  ],
+  "explanation": "Container query는 \"부모 컨테이너의 사이즈\"를 기준으로 자식의 스타일을 결정해서, 같은 카드 컴포넌트가 폭 좁은 사이드바에 들어가면 1단, 넓은 메인 영역에 들어가면 2단으로 자동 분기되도록 작성할 수 있어요. 컴포넌트 단위로 반응형을 짜는 데 강력하답니다.\n쓰려면 조상 어딘가에 `container-type` (또는 `container-name`까지)을 지정해야 해요. 매칭되는 size 컨테이너가 하나도 없으면 viewport로 폴백되는 게 아니라 그냥 그 `@container` 규칙이 적용되지 않으니, 컨테이너 선언이 빠졌는지 먼저 확인해 봐요.\nChrome/Safari/Firefox 모두 2023년 이후 안정 지원이라 신규 컴포넌트 시스템에서 도입해 봐도 좋을 시점이에요.\n",
+  "references": [
+   {
+    "title": "MDN — @container",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@container"
+   }
+  ],
+  "tags": [
+   "container-queries",
+   "responsive",
+   "modern-css"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "css-020",
+  "category": "css",
+  "difficulty": "hard",
+  "question": "다음 CSS에서 `<a>`의 최종 `color`는?\n",
+  "code": "@layer reset, base, theme;\n\n@layer reset { a { color: black; } }\n@layer base  { a { color: red;   } }\n@layer theme { a { color: blue;  } }\n\na { color: green; }\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`black` — reset 레이어가 가장 먼저 선언돼서 우선이에요"
+   },
+   {
+    "id": "b",
+    "text": "`blue` — 가장 마지막 레이어가 우선이에요"
+   },
+   {
+    "id": "c",
+    "text": "`green` — 어느 레이어에도 속하지 않은 일반 규칙은 모든 레이어보다 우선이에요"
+   },
+   {
+    "id": "d",
+    "text": "`red` — base 레이어가 평균적으로 가장 흔히 적용돼요"
+   }
+  ],
+  "explanation": "Cascade Layers의 우선순위는 \"unlayered > layered\"가 핵심이에요. layer에 속하지 않은 일반 규칙은 어떤 layer 안의 규칙보다도 강하답니다.\nlayer끼리 비교할 때는 \"나중에 등록된 layer가 우선\"이에요. 첫 줄 `@layer reset, base, theme;`가 등록 순서를 정하므로 theme(blue) > base(red) > reset(black)이지만, 일반 규칙 `green`이 그 위를 덮어버려요.\n순서 의존을 줄이려고 디자인 시스템·리셋·서드파티 CSS를 layer로 격리하면, 페이지 단의 일반 CSS가 안전하게 덮어쓸 수 있게 돼서 specificity 전쟁이 줄어들어요.\n",
+  "references": [
+   {
+    "title": "MDN — @layer",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@layer"
+   }
+  ],
+  "tags": [
+   "cascade",
+   "layer",
+   "specificity"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "css-021",
+  "category": "css",
+  "difficulty": "easy",
+  "question": "Reset CSS와 Normalize CSS의 차이로 가장 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "Reset CSS는 브라우저 기본 스타일을 가능한 한 제거하고, Normalize CSS는 유용한 기본값은 유지하면서 브라우저 간 차이를 보정해요"
+   },
+   {
+    "id": "b",
+    "text": "Reset CSS는 JavaScript 번들 크기를 줄이고, Normalize CSS는 이미지 용량을 줄여요"
+   },
+   {
+    "id": "c",
+    "text": "Reset CSS는 접근성 속성을 자동으로 추가하고, Normalize CSS는 HTML 구조를 시맨틱하게 바꿔요"
+   },
+   {
+    "id": "d",
+    "text": "둘은 완전히 같은 파일이며 이름만 달라요"
+   }
+  ],
+  "explanation": "Reset CSS는 요소의 margin, padding, heading 크기 같은 브라우저 기본 스타일을 넓게 초기화해서 거의 빈 캔버스에서 디자인을 시작하게 해 줘요. 디자인 시스템처럼 모든 요소의 스타일을 직접 통제하고 싶을 때 예측 가능성이 높지만, 기본 스타일을 다시 세심하게 정의해야 하는 부담이 있어요.\nNormalize CSS는 기본 스타일을 전부 없애기보다 브라우저마다 다르게 보이는 부분을 고치고, 폼·타이포그래피 같은 유용한 기본 동작은 최대한 유지하려는 접근이에요. 그래서 빠르게 제품을 만들거나 기본 HTML 스타일을 일부 활용하는 프로젝트에서는 Normalize가 더 실용적일 수 있답니다.\n오답 b/c는 CSS 초기화 도구의 역할을 번들 최적화나 HTML 변환과 혼동한 설명이고, d도 틀렸어요. 둘 다 브라우저 기본 스타일 차이를 다루지만, “완전히 지우기”와 “차이를 보정하기”라는 전략이 다른 거죠.\n",
+  "tags": [
+   "reset-css",
+   "normalize-css",
+   "browser-defaults"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "html-001",
+  "category": "html",
+  "difficulty": "easy",
+  "question": "같은 클릭 처리를 한다고 가정할 때, `<div onclick>` 대신 `<button>`을 써야 하는 이유로 **맞는 것**을 모두 골라 보세요.\n",
+  "code": "<div onclick=\"handle()\">저장</div>\n<button onclick=\"handle()\">저장</button>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "키보드 Enter/Space로도 활성화돼 키보드 사용자가 쓸 수 있어요"
+   },
+   {
+    "id": "b",
+    "text": "스크린 리더가 \"버튼\"이라는 역할을 알려 줘서 보조 기술 호환성이 좋아요"
+   },
+   {
+    "id": "c",
+    "text": "Tab 키로 자연스럽게 포커스 이동돼요 (tabindex 없이도)"
+   },
+   {
+    "id": "d",
+    "text": "`<div>`보다 항상 클릭 이벤트가 더 빠르게 처리돼요"
+   },
+   {
+    "id": "e",
+    "text": "폼 안에서 자동으로 submit/reset 같은 기본 동작을 가져요"
+   }
+  ],
+  "explanation": "- a, b, c: `<button>`은 기본적으로 키보드 활성화·포커스·\"button\" 역할을 모두 가져요. `<div>`로 흉내 내려면 `role`, `tabindex`, 키보드 핸들러까지 직접 달아야 해요.\n- e: `<form>` 안의 `<button>`은 기본 `type=\"submit\"`이라 폼 전송이 트리거돼요. 막으려면 명시적으로 `type=\"button\"`을 줘야 해요.\n- d: 잘못된 선택지예요 — 클릭 처리 속도는 둘이 사실상 차이가 없어요. 의미·접근성이 차이의 본질이에요.\n결론: 기본 동작·접근성을 공짜로 얻으려면 의미에 맞는 태그를 골라야 해요.\n",
+  "references": [
+   {
+    "title": "MDN — <button>: The Button element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/button"
+   },
+   {
+    "title": "ARIA Authoring Practices Guide — Button Pattern",
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/"
+   }
+  ],
+  "tags": [
+   "semantics",
+   "a11y",
+   "button",
+   "forms"
+  ],
+  "type": "multi_choice",
+  "answer": [
+   "a",
+   "b",
+   "c",
+   "e"
+  ]
+ },
+ {
+  "id": "html-002",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "`defer`와 `async` 외부 스크립트의 동작 차이로 **옳은 설명**은?\n",
+  "code": "<script src=\"a.js\" defer></script>\n<script src=\"b.js\" defer></script>\n<script src=\"c.js\" async></script>\n<script src=\"d.js\" async></script>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "defer/async 모두 다운로드는 비동기 + 실행 순서는 문서상 등장 순서로 보장돼요\n"
+   },
+   {
+    "id": "b",
+    "text": "defer는 다운로드 비동기 + 실행은 DOMContentLoaded 직전에 등장 순서대로,\nasync는 다운로드 비동기 + 다운로드가 끝나는 즉시 실행돼요(=실행 순서 보장 안 됨)\n"
+   },
+   {
+    "id": "c",
+    "text": "defer는 동기 다운로드, async는 비동기 다운로드 — 둘 다 등장 순서대로 실행돼요\n"
+   },
+   {
+    "id": "d",
+    "text": "defer는 head에서만 동작하고, async는 body 끝에서만 동작해요\n"
+   }
+  ],
+  "explanation": "- `defer`: HTML 파싱과 병렬로 다운로드, 실행은 **문서 등장 순서**로 DOMContentLoaded 직전에 일괄. DOM 준비가 보장되니 DOM에 의존하는 초기화에 적합.\n- `async`: 다운로드 병렬 + 끝나는 대로 즉시 실행 → 등장 순서·DOM 상태 보장 안 됨. 독립적인 분석 스크립트(예: 애널리틱스)처럼 다른 스크립트와 의존성이 없을 때 적합.\n- 둘 다 외부(`src`) 스크립트에만 적용. 인라인 `<script>`에는 무시돼요.\n",
+  "references": [
+   {
+    "title": "MDN — <script>: defer / async",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/script#defer"
+   },
+   {
+    "title": "HTML Standard — Script processing model",
+    "url": "https://html.spec.whatwg.org/multipage/scripting.html#attr-script-async"
+   }
+  ],
+  "tags": [
+   "scripts",
+   "defer",
+   "async",
+   "performance"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-003",
+  "category": "html",
+  "difficulty": "easy",
+  "question": "페이지의 **주요 콘텐츠 영역**(보통 페이지당 하나)을 감싸는 가장 적절한 시맨틱 태그는?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`<section>`"
+   },
+   {
+    "id": "b",
+    "text": "`<article>`"
+   },
+   {
+    "id": "c",
+    "text": "`<main>`"
+   },
+   {
+    "id": "d",
+    "text": "`<div role=\"main\">`"
+   }
+  ],
+  "explanation": "`<main>`은 문서의 **유일한 주요 콘텐츠**를 감싸는 랜드마크 — 한 페이지에 한 번만 가시 상태로 존재해야 해요.\n- `<section>`: 의미 있는 묶음(주제별 섹션). 보통 헤딩과 함께 써요.\n- `<article>`: 자기 완결적 콘텐츠 단위(블로그 포스트, 댓글, 카드 등). 떼어내도 의미가 통하는지가 기준이에요.\n- `<div role=\"main\">`: ARIA `main` role로 같은 의미를 부여할 수는 있지만, 시맨틱 태그(`<main>`)가 있으면 그걸 우선해요 — 레거시 브라우저 지원이 필요한 게 아니면 굳이 div + role로 우회할 이유가 없어요.\n스크린 리더는 랜드마크 키로 `<main>`으로 점프할 수 있어요 — 시맨틱 태그가 곧 접근성 인프라예요.\n(출처: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/main)\n",
+  "references": [
+   {
+    "title": "MDN — <main>: The Main element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/main"
+   },
+   {
+    "title": "MDN — ARIA landmarks roles",
+    "url": "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Roles#3._landmark_roles"
+   }
+  ],
+  "tags": [
+   "semantics",
+   "landmarks",
+   "a11y"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "html-004",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "사용자가 \"취소\" 버튼을 클릭하면 어떻게 동작할까요?\n",
+  "code": "<form action=\"/save\" method=\"post\">\n  <input name=\"title\" />\n  <button>저장</button>\n  <button onclick=\"closeModal()\">취소</button>\n</form>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "closeModal()만 실행되고 폼은 전송되지 않아요\n"
+   },
+   {
+    "id": "b",
+    "text": "closeModal()이 실행된 뒤, 폼이 /save로 POST 전송돼요\n"
+   },
+   {
+    "id": "c",
+    "text": "closeModal()이 무시되고 폼만 전송돼요\n"
+   },
+   {
+    "id": "d",
+    "text": "\"취소\"는 type 미지정이라 아무 동작도 안 해요\n"
+   }
+  ],
+  "explanation": "`<form>` 안의 `<button>`은 **`type` 속성을 생략하면 기본값이 `submit`** 이에요.\n그래서 \"취소\" 버튼도 onclick으로 closeModal() 실행 후, 기본 동작인 폼 전송이 그대로 일어나 `/save`로 POST가 날아가요.\n의도한 대로 닫기만 하려면 `<button type=\"button\" onclick=\"closeModal()\">취소</button>`로 명시하거나, 핸들러에서 `event.preventDefault()`를 호출해요.\n실수로 폼이 전송되는 흔한 버그예요 — 폼 안의 모든 비-submit 버튼에는 `type=\"button\"`을 붙이는 습관이 안전해요.\n",
+  "references": [
+   {
+    "title": "MDN — <button> type attribute",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/button#type"
+   },
+   {
+    "title": "MDN — <form>: Implicit submission",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/form"
+   }
+  ],
+  "tags": [
+   "forms",
+   "button",
+   "submit",
+   "gotcha"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-005",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "뷰포트 너비가 800px일 때, 브라우저가 로드하는 이미지는?\n",
+  "code": "<picture>\n  <source media=\"(max-width: 600px)\" srcset=\"small.jpg\" />\n  <source media=\"(max-width: 1200px)\" srcset=\"medium.jpg\" />\n  <img src=\"large.jpg\" alt=\"\" />\n</picture>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "small.jpg"
+   },
+   {
+    "id": "b",
+    "text": "medium.jpg"
+   },
+   {
+    "id": "c",
+    "text": "large.jpg"
+   },
+   {
+    "id": "d",
+    "text": "small.jpg과 medium.jpg 둘 다"
+   }
+  ],
+  "explanation": "`<picture>`는 자식 `<source>`들을 **위에서 아래 순서**로 평가해 첫 번째로 매칭되는 것을 사용해요. 매칭 안 되면 폴백인 `<img>`를 사용해요.\n뷰포트 800px:\n- `(max-width: 600px)` → 800 > 600이라 불일치, 통과.\n- `(max-width: 1200px)` → 800 ≤ 1200이라 매칭 → `medium.jpg` 선택.\n`<img>`는 매칭 실패 시 폴백 + alt·기본 width/height 등 표시 정보의 baseline이에요. 미디어 매칭 외에 화면 밀도 대응이 필요하면 `srcset=\"x.jpg 1x, x@2x.jpg 2x\"`나 `sizes` 속성을 함께 써 보세요.\n",
+  "references": [
+   {
+    "title": "MDN — <picture>: The Picture element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/picture"
+   },
+   {
+    "title": "MDN — Responsive images",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Responsive_images"
+   },
+   {
+    "title": "web.dev — Serve responsive images",
+    "url": "https://web.dev/articles/serve-responsive-images"
+   }
+  ],
+  "tags": [
+   "images",
+   "picture",
+   "srcset",
+   "responsive"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-006",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "`<dialog>` 요소의 `showModal()`과 `show()` 차이로 **틀린** 설명은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`showModal()`은 다이얼로그 외부와의 상호작용을 차단(inert)해 모달처럼 동작해요\n"
+   },
+   {
+    "id": "b",
+    "text": "`showModal()`은 `::backdrop` 가상 요소가 활성화되지만, `show()`는 활성화되지 않아요\n"
+   },
+   {
+    "id": "c",
+    "text": "`showModal()`로 연 다이얼로그는 ESC 키로 닫을 수 있어요\n"
+   },
+   {
+    "id": "d",
+    "text": "`show()`로 열어도 페이지 스크롤이 잠기고 ESC로 닫을 수 있어요\n"
+   }
+  ],
+  "explanation": "d가 틀려요 — `show()`는 다이얼로그를 **모달이 아니게** 띄우는 메서드예요.\n- `showModal()`: 백그라운드를 inert(상호작용 불가)로 만들고, `::backdrop`이 활성화되며, ESC 키로 자동 닫혀요. 시맨틱·접근성 관점에서 진짜 모달이에요.\n- `show()`: 그냥 보이게만 하고 inert·backdrop·ESC 자동 닫힘 모두 없어요 — 페이지 안 다른 요소와 자유롭게 상호작용 가능해요.\n진짜 모달이 필요하면 거의 항상 `showModal()`을 써 주세요. 닫을 땐 `dialog.close()` 또는 폼 메서드 `dialog`로 submit하는 패턴(`<form method=\"dialog\">`)도 표준이에요.\n",
+  "references": [
+   {
+    "title": "MDN — <dialog>: The Dialog element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/dialog"
+   },
+   {
+    "title": "MDN — HTMLDialogElement.showModal()",
+    "url": "https://developer.mozilla.org/ko/docs/Web/API/HTMLDialogElement/showModal"
+   }
+  ],
+  "tags": [
+   "dialog",
+   "modal",
+   "a11y"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "html-007",
+  "category": "html",
+  "difficulty": "easy",
+  "question": "체크박스에 라벨을 **연결**한 사례로 옳지 않은 것은?\n",
+  "code": "<!-- A -->\n<label for=\"agree\">동의</label>\n<input id=\"agree\" type=\"checkbox\" />\n\n<!-- B -->\n<label>\n  <input type=\"checkbox\" />\n  동의\n</label>\n\n<!-- C -->\n<input id=\"terms\" type=\"checkbox\" aria-labelledby=\"terms-text\" />\n<span id=\"terms-text\">동의</span>\n\n<!-- D -->\n<input type=\"checkbox\" />\n<span>동의</span>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "A — `<label for>`와 input의 `id`가 매칭되어 연결돼요"
+   },
+   {
+    "id": "b",
+    "text": "B — `<label>`이 input을 감싸 암묵적으로 연결돼요"
+   },
+   {
+    "id": "c",
+    "text": "C — aria-labelledby로 외부 텍스트를 라벨로 지정해요"
+   },
+   {
+    "id": "d",
+    "text": "D — span을 옆에 두면 시각적으로 라벨처럼 보이므로 연결된 것으로 간주돼요"
+   }
+  ],
+  "explanation": "d만 잘못된 연결이에요 — 시각적으로 옆에 있어도 보조 기술은 그 둘을 묶어 인식하지 못해요.\n- A: `for=\"agree\"` ↔ `id=\"agree\"` 매칭 — 가장 명시적·표준적인 방법이에요.\n- B: `<label>`이 입력을 자식으로 감싸면 암묵 연결이 돼요. 단순한 폼에 적합해요.\n- C: ARIA `aria-labelledby`는 텍스트 노드의 id를 가리켜 라벨 역할을 부여해요. label을 보일 수 없을 때나 복합 라벨이 필요할 때 써요.\n연결된 라벨은 (1) 스크린 리더가 읽어 주고 (2) 라벨 클릭으로 input 활성화 — 클릭 영역도 넓어져 모바일 UX에 도움 돼요.\n",
+  "references": [
+   {
+    "title": "MDN — <label>: The Label element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/label"
+   },
+   {
+    "title": "MDN — aria-labelledby",
+    "url": "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
+   }
+  ],
+  "tags": [
+   "a11y",
+   "forms",
+   "label",
+   "aria"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "html-008",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "반응형 페이지의 `<head>`에 들어가야 할 viewport 메타 태그로 가장 적절한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`<meta name=\"viewport\" content=\"width=1024\" />`"
+   },
+   {
+    "id": "b",
+    "text": "`<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />`"
+   },
+   {
+    "id": "c",
+    "text": "`<meta name=\"viewport\" content=\"user-scalable=no\" />`"
+   },
+   {
+    "id": "d",
+    "text": "viewport 메타는 데스크톱 전용이라 모바일 페이지엔 넣지 않는 게 맞아요"
+   }
+  ],
+  "explanation": "`width=device-width`는 가상 뷰포트 너비를 **디바이스의 CSS 픽셀 너비**에 맞추라는 뜻이에요 — 미디어 쿼리(`@media (max-width: ...)`)가 의도한 대로 동작하기 위한 전제예요.\n`initial-scale=1`은 처음 로드 시 1배율(=논리 픽셀:CSS 픽셀 1:1)로 보여주라는 뜻이에요. 둘이 합쳐져야 모바일 브라우저가 데스크톱 기준 980px로 가정하지 않고 실제 디바이스 너비로 렌더링해요.\n- a: 너비를 1024로 고정하면 작은 화면에서 가로 스크롤이 발생해요.\n- c: `user-scalable=no`는 사용자 핀치 줌을 막아 접근성에 해롭고 대부분의 신규 페이지에서 권장하지 않아요.\n- d: 메타 태그가 없으면 모바일 브라우저가 기본값(보통 980px)으로 렌더해 레이아웃이 깨져요.\n",
+  "references": [
+   {
+    "title": "MDN — Viewport meta tag",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Viewport_meta_tag"
+   },
+   {
+    "title": "web.dev — Responsive web design basics",
+    "url": "https://web.dev/articles/responsive-web-design-basics"
+   }
+  ],
+  "tags": [
+   "viewport",
+   "meta",
+   "responsive",
+   "mobile"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-009",
+  "category": "html",
+  "difficulty": "easy",
+  "question": "`<img alt>` 작성 원칙으로 **맞는 것**을 모두 골라 보세요.\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "의미 있는 콘텐츠를 가진 이미지에는 그 의미를 짧고 구체적으로\n적어요 (예: \"확인 아이콘\"보다 \"결제 완료\")\n"
+   },
+   {
+    "id": "b",
+    "text": "순수 장식용 이미지엔 `alt=\"\"`로 빈 값을 주어 스크린리더가 건너뛰게 해요"
+   },
+   {
+    "id": "c",
+    "text": "이미지에 텍스트가 들어 있다면 그 텍스트를 그대로 포함시키되 시각 정보를 보충해요"
+   },
+   {
+    "id": "d",
+    "text": "모든 이미지에 \"image of\" 또는 \"사진\" 같은 접두어를 붙이는 게 좋아요"
+   },
+   {
+    "id": "e",
+    "text": "옆 캡션이 같은 내용을 이미 전달한다면 `alt=\"\"`로 두어 중복 낭독을 막을 수 있어요"
+   }
+  ],
+  "explanation": "- a: alt는 시각 정보를 \"의미\"로 옮기는 자리예요. 같은 결과를 짧게 전달하는 문장이 핵심이에요.\n- b: 의미 없는 장식 이미지는 비워 두는 편이 스크린리더 노이즈를 줄여 줘요.\n- c: 이미지 안에 텍스트가 있다면 그 텍스트를 alt에 옮겨야 누락이 없어요.\n- d: 스크린리더가 이미 \"이미지\"라는 역할을 알려 주기 때문에 \"사진\", \"image of\" 같은 접두어는 중복 낭독이 돼서 권장하지 않아요.\n- e: 캡션 같은 텍스트가 같은 정보를 전달하면 alt=\"\"로 두는 편이 자연스러워요.\n",
+  "references": [
+   {
+    "title": "MDN — <img> alt attribute",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/img#alt"
+   },
+   {
+    "title": "W3C — An alt Decision Tree",
+    "url": "https://www.w3.org/WAI/tutorials/images/decision-tree/"
+   }
+  ],
+  "tags": [
+   "a11y",
+   "alt",
+   "semantics"
+  ],
+  "type": "multi_choice",
+  "answer": [
+   "a",
+   "b",
+   "c",
+   "e"
+  ]
+ },
+ {
+  "id": "html-010",
+  "category": "html",
+  "difficulty": "easy",
+  "question": "다음 마크업의 동작 설명으로 가장 정확한 것은?\n",
+  "code": "<details>\n  <summary>FAQ</summary>\n  내용...\n</details>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "JS 없이도 클릭/Enter로 펼침·접힘이 토글되며, 첫 자식이 `<summary>`라면 그 텍스트가 토글 라벨이 돼요. 기본 닫힘 상태이며 `open` 속성으로 펼친 상태로 시작할 수 있어요"
+   },
+   {
+    "id": "b",
+    "text": "`<details>`는 표시만 담당하고 토글 동작은 별도 JS가 필요해요"
+   },
+   {
+    "id": "c",
+    "text": "`<summary>`는 화면에 보이지 않고 a11y 트리에만 노출돼요"
+   },
+   {
+    "id": "d",
+    "text": "`<details open>`을 쓰면 모든 형제 details가 함께 열려요"
+   }
+  ],
+  "explanation": "`<details>`/`<summary>`는 브라우저가 토글 동작을 기본 제공하는 disclosure 위젯이라 JS가 필요 없어요. 시각/스크린리더 모두 \"펼쳐짐/접힘\" 상태를 알려 줘서 a11y 측면에서도 접근하기 좋아요.\n처음부터 펼쳐 두려면 `<details open>`처럼 `open` 속성을 추가하면 되고, 기본적으로는 다른 details와 자동으로 연동되진 않아요. 다만 여러 details에 같은 `name` 값을 주면 아코디언처럼 한 번에 하나만 열리게 JS 없이도 묶을 수 있어요(Baseline 지원).\n(출처: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details)\n",
+  "references": [
+   {
+    "title": "MDN — <details>: The Details disclosure element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/details"
+   },
+   {
+    "title": "MDN — <summary>: The Disclosure Summary element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/summary"
+   }
+  ],
+  "tags": [
+   "details",
+   "summary",
+   "disclosure"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "html-011",
+  "category": "html",
+  "difficulty": "easy",
+  "question": "모바일 브라우저에서 `<input type=\"email\">` / `\"tel\"` / `\"number\"`를 일반 `\"text\"` 대신 쓰는 가장 큰 이유는?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "입력값이 자동으로 서버로 전송돼요"
+   },
+   {
+    "id": "b",
+    "text": "타입에 맞는 가상 키보드(이메일은 `@` 키, 전화는 숫자패드, 숫자는 숫자키)가 떠 입력 UX가 좋아지고, 일부 타입(`email`/`number` 등)은 브라우저 기본 검증까지 함께 붙어요"
+   },
+   {
+    "id": "c",
+    "text": "CSS로 자동 스타일링되며 그 외 차이는 없어요"
+   },
+   {
+    "id": "d",
+    "text": "보안 강도가 강해져 XSS를 막아 줘요"
+   }
+  ],
+  "explanation": "타입을 알려 주면 모바일 브라우저가 입력에 어울리는 가상 키보드를 띄워 줘요. `email`은 `@`/`.com` 키가 노출되고, `tel`/`number`는 숫자 패드, `url`은 `/` 키 등 입력 효율이 올라가요.\n기본 검증은 타입에 따라 달라요. `email`은 `@` 포함 같은 형식 검증, `number`는 `min`/`max`/`step`이 동작해요. 반면 `tel`은 형식이 나라마다 달라 사실상 키보드 힌트만 주고 별도 검증은 안 돼서, 정밀한 형식 검증이 필요하면 `pattern`을 같이 쓰는 게 안전해요.\n자동완성·`inputmode`·`autocomplete` 등 다른 속성과 결합하면 폼 전반의 UX가 더 좋아져요. 보안과는 직접적인 관련이 없어요 — XSS 방어는 별도 출력 인코딩이 담당해요.\n",
+  "references": [
+   {
+    "title": "MDN — <input>: The Input element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/input"
+   },
+   {
+    "title": "MDN — <input> types",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/input#input_types"
+   }
+  ],
+  "tags": [
+   "input",
+   "mobile",
+   "ux"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-012",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "다음 두 스크립트 태그의 동작으로 가장 정확한 것은?\n",
+  "code": "<script type=\"module\" src=\"app.js\"></script>\n<script nomodule src=\"legacy.js\"></script>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘 다 모든 브라우저에서 다운로드·실행되어 코드가 두 번 실행돼요"
+   },
+   {
+    "id": "b",
+    "text": "`type=\"module\"`은 기본적으로 defer처럼 동작(파싱 차단 없음)하고 ESM 문법을 지원해요. `nomodule`은 ES 모듈을 지원하는 모던 브라우저는 무시하고 구형 브라우저만 폴백으로 실행해요"
+   },
+   {
+    "id": "c",
+    "text": "`nomodule`이 `type=\"module\"`보다 우선시되어 둘 중 하나만 실행돼요"
+   },
+   {
+    "id": "d",
+    "text": "`type=\"module\"`은 동기 실행이며 CORS와 무관해요"
+   }
+  ],
+  "explanation": "모던 빌드/레거시 빌드를 함께 배포하는 흔한 패턴이에요. ESM을 지원하는 브라우저는 `nomodule` 스크립트를 통째로 무시하고, 구형 브라우저는 `type=\"module\"`을 인식하지 못해 그 스크립트를 무시하는 식으로 자연스럽게 폴백이 분리돼요.\n`type=\"module\"`은 실제로는 defer와 비슷하게 파싱을 막지 않고 평가 순서가 보존되며, cross-origin 모듈을 받을 땐 CORS 헤더가 필요해요. 모듈 스코프가 자동으로 `strict mode`라는 점도 잊지 마세요.\n",
+  "references": [
+   {
+    "title": "MDN — JavaScript modules in <script>",
+    "url": "https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Modules"
+   },
+   {
+    "title": "MDN — <script> type=module / nomodule",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/script#type"
+   }
+  ],
+  "tags": [
+   "script",
+   "module",
+   "defer"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-013",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "`aria-label`과 `aria-labelledby` 사용 차이로 가장 정확한 것은?\n",
+  "code": "<button aria-label=\"닫기\">×</button>\n\n<h2 id=\"dialog-title\">설정</h2>\n<div role=\"dialog\" aria-labelledby=\"dialog-title\">…</div>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`aria-label`은 라벨 문자열을 직접 지정하고, `aria-labelledby`는 같은 페이지의 다른 요소 `id`를 가리켜 그 텍스트를 라벨로 빌려와요. 화면에 이미 보이는 라벨이 있다면 후자, 시각 라벨이 없다면 전자가 적합해요"
+   },
+   {
+    "id": "b",
+    "text": "둘은 완전히 동일하게 동작하며 `aria-labelledby`는 deprecated예요"
+   },
+   {
+    "id": "c",
+    "text": "`aria-labelledby`는 한 요소만 가리킬 수 있고 `aria-label`은 여러 라벨을 지원해요"
+   },
+   {
+    "id": "d",
+    "text": "`aria-label`은 화면에도 보이는 라벨을 함께 추가해요"
+   }
+  ],
+  "explanation": "- `aria-label`은 화면에 텍스트가 없는 컨트롤(아이콘 버튼 등)에 \"이 요소의 이름은 X\"라고 직접 알려 주는 속성이에요.\n- `aria-labelledby`는 같은 페이지 안 다른 요소(`id` 참조)의 텍스트를 라벨로 빌려와요. 여러 id를 공백으로 나열하면 합쳐진 텍스트가 라벨이 돼요.\n화면에 보이는 라벨과 a11y 라벨이 어긋나면 사용자가 혼란스러우니, 이미 표시되는 텍스트가 있으면 `aria-labelledby`로 그것을 그대로 가리키는 편이 자연스러워요.\n",
+  "references": [
+   {
+    "title": "MDN — aria-label",
+    "url": "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Attributes/aria-label"
+   },
+   {
+    "title": "MDN — aria-labelledby",
+    "url": "https://developer.mozilla.org/ko/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby"
+   }
+  ],
+  "tags": [
+   "a11y",
+   "aria",
+   "labels"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "html-014",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "다음 표 마크업에서 `<caption>`과 `scope` 속성의 역할로 가장 정확한 것은?\n",
+  "code": "<table>\n  <caption>2025 매출</caption>\n  <thead>\n    <tr><th scope=\"col\">분기</th><th scope=\"col\">금액</th></tr>\n  </thead>\n  <tbody>\n    <tr><th scope=\"row\">Q1</th><td>10억</td></tr>\n  </tbody>\n</table>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "시각용 장식이며 스크린리더 동작에는 영향이 없어요"
+   },
+   {
+    "id": "b",
+    "text": "`<caption>`은 표의 제목/요약을 스크린리더가 표 진입 시 알려 주고, `scope=\"col\"`/`\"row\"`은 각 셀이 어느 행/열의 헤더인지 명시해 데이터 셀을 읽을 때 헤더를 함께 읽어 주도록 해요"
+   },
+   {
+    "id": "c",
+    "text": "`<caption>`은 항상 첫 번째 자식이어야 하며 그 외 동작 차이는 없어요"
+   },
+   {
+    "id": "d",
+    "text": "`scope` 없이는 `<th>`가 동작하지 않아요"
+   }
+  ],
+  "explanation": "표는 단순히 이차원 그리드가 아니라 \"헤더-데이터\" 관계를 가진 구조라, 그 관계를 마크업으로 알려 줘야 스크린리더가 셀을 읽을 때 어떤 분기·항목인지 함께 안내해 줘요.\n`<caption>`은 표 전체에 대한 짧은 제목/요약을 제공해서 사용자가 표에 진입할 때 컨텍스트를 잡게 해 주고, `scope`은 각 `<th>`가 행 헤더인지 열 헤더인지 명시해 데이터 셀 낭독 시 그 헤더가 같이 읽혀요.\n복잡한 표라면 `headers` 속성으로 셀과 헤더를 명시적으로 연결하는 패턴도 있어요.\n",
+  "references": [
+   {
+    "title": "MDN — <caption>: The Table Caption element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/caption"
+   },
+   {
+    "title": "MDN — <th> scope attribute",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/th#scope"
+   },
+   {
+    "title": "W3C WAI — Tables Tutorial",
+    "url": "https://www.w3.org/WAI/tutorials/tables/"
+   }
+  ],
+  "tags": [
+   "a11y",
+   "table",
+   "semantics"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-015",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "`<datalist>`가 `<select>`와 다른 점으로 가장 정확한 것은?\n",
+  "code": "<input list=\"cities\" name=\"city\">\n<datalist id=\"cities\">\n  <option value=\"Seoul\"></option>\n  <option value=\"Busan\"></option>\n</datalist>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`<select>`는 보기 중 하나만 고를 수 있는 드롭다운, `<datalist>`는 자유 텍스트 입력에 자동완성 후보 목록을 제안하는 보조 위젯이라 목록 외 값도 자유롭게 입력할 수 있어요"
+   },
+   {
+    "id": "b",
+    "text": "둘은 완전히 동일하게 동작해요"
+   },
+   {
+    "id": "c",
+    "text": "`<datalist>`는 항상 다중 선택이 가능해요"
+   },
+   {
+    "id": "d",
+    "text": "`<datalist>`는 라디오 버튼 그룹의 별칭이에요"
+   }
+  ],
+  "explanation": "`<datalist>`는 input에 \"추천 후보\"를 제공하는 보조일 뿐이라 사용자가 목록에 없는 값도 그대로 적어 넣을 수 있어요. \"몇 자만 입력하면 후보를 보여주고 그 외의 임의 값도 허용\"하는 UX에 강점이 있어요.\n반대로 도메인이 좁고 고정된 보기에서 하나를 고르게 하는 경우는 `<select>`가 더 적합해요. 접근성 측면에서도 datalist는 브라우저별 구현 차이가 있어 보조적 수단으로 생각하는 게 안전해요.\n",
+  "references": [
+   {
+    "title": "MDN — <datalist>: The HTML Data List element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/datalist"
+   },
+   {
+    "title": "MDN — <select>: The HTML Select element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/select"
+   }
+  ],
+  "tags": [
+   "form",
+   "autocomplete",
+   "datalist"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "html-016",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "다음 마크업의 폼 검증 동작과 한계로 가장 정확한 것은?\n",
+  "code": "<form>\n  <input type=\"email\" required pattern=\".+@example\\.com\">\n  <button>제출</button>\n</form>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "클라이언트에서 비어 있거나 패턴이 맞지 않으면 브라우저가 기본 메시지로 제출을 막고 `:invalid` 의사 클래스로 스타일도 줄 수 있지만, 검증은 우회 가능하므로 서버 검증을 반드시 동반해야 해요"
+   },
+   {
+    "id": "b",
+    "text": "HTML 검증을 통과하면 서버 검증은 생략해도 안전해요"
+   },
+   {
+    "id": "c",
+    "text": "`pattern`은 모든 input 타입에서 필수적으로 동작해요"
+   },
+   {
+    "id": "d",
+    "text": "`required`는 JS로 폼을 제출할 때만 동작해요"
+   }
+  ],
+  "explanation": "HTML 내장 검증(`required`, `pattern`, `min`/`max`, `step` 등)은 사용자에게 즉각적인 피드백을 주어 경험을 개선하는 \"1차 방어\"로 쓰기 좋아요 — 조기 피드백과 `:invalid`·`:user-invalid` 스타일까지 공짜로 얻어요.\n하지만 사용자가 DevTools로 novalidate를 켜거나 직접 fetch로 요청을 보내면 우회할 수 있으니 결국 **서버 검증**이 최종 안전망이에요. 둘을 함께 장착하는 게 이상적이에요.\n`pattern`은 `text`/`search`/`url`/`tel`/`email`/`password`에서 동작하고 `number`·`date` 등엔 적용되지 않아요. `required`는 제출 시 자동으로 검증되고 JS 제출은 `form.requestSubmit()` / `form.checkValidity()`로 같은 흐름을 따라가요.\n",
+  "references": [
+   {
+    "title": "MDN — Client-side form validation",
+    "url": "https://developer.mozilla.org/ko/docs/Learn/Forms/Form_validation"
+   },
+   {
+    "title": "MDN — Constraint Validation API",
+    "url": "https://developer.mozilla.org/ko/docs/Web/API/Constraint_validation"
+   }
+  ],
+  "tags": [
+   "forms",
+   "validation",
+   "a11y"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "html-017",
+  "category": "html",
+  "difficulty": "medium",
+  "question": "페이지를 카카오톡·슬랙 같은 서비스에서 공유할 때 미리보기 카드가 잘 나오도록 Open Graph 메타 태그 중 **권장되는 것**을 모두 고른다면 어떤 것일까요?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`<meta property=\"og:title\" content=\"...\">`"
+   },
+   {
+    "id": "b",
+    "text": "`<meta property=\"og:description\" content=\"...\">`"
+   },
+   {
+    "id": "c",
+    "text": "`<meta property=\"og:image\" content=\"...\">`"
+   },
+   {
+    "id": "d",
+    "text": "`<meta property=\"og:url\" content=\"...\">`"
+   },
+   {
+    "id": "e",
+    "text": "`<meta property=\"og:keywords\" content=\"...\">`"
+   }
+  ],
+  "explanation": "Open Graph 명세에서 잘 알려진 핵심 태그는 `og:title`, `og:description`, `og:image`, `og:url`, `og:type` 등이에요. 대부분의 도메인 크롤러가 이 태그들을 읽어서 카드 UI를 그려 줘요.\n`og:keywords`는 OG 명세에 존재하지 않아 적용되지 않고, 일반 `<meta name=\"keywords\">`도 현대 검색 엔진이 사실상 무시해 실효가 없어요 — 키워드는 타이틀·본문·설명에 녹이는 게 더 효과적이에요.\n추가로 트위터/X 카드는 `twitter:card`, `twitter:image`를 따로 둘 수 있는데 대부분 OG를 폴백으로 공유해서 우선순위는 OG에 두는 게 효율적이에요.\n",
+  "references": [
+   {
+    "title": "The Open Graph protocol",
+    "url": "https://ogp.me/"
+   },
+   {
+    "title": "MDN — <meta>: The metadata element",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/meta"
+   }
+  ],
+  "tags": [
+   "meta",
+   "open-graph",
+   "seo"
+  ],
+  "type": "multi_choice",
+  "answer": [
+   "a",
+   "b",
+   "c",
+   "d"
+  ]
+ },
+ {
+  "id": "html-018",
+  "category": "html",
+  "difficulty": "hard",
+  "question": "HTML5의 `inert` 속성을 모달 외부 영역에 적용하는 이유로 가장 정확한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "그 영역이 시각적으로 숨겨져 보이지 않게 돼요 (`display: none`과 같음)"
+   },
+   {
+    "id": "b",
+    "text": "클릭/포커스/탭 이동/스크린리더 탐색 등 모든 인터랙션이 차단돼 모달 외부와의 상호작용을 막아요. JS로 일일이 `tabindex=\"-1\"`이나 `aria-hidden`을 다는 것보다 안전해요"
+   },
+   {
+    "id": "c",
+    "text": "그 영역의 모든 자식 요소가 자동으로 `disabled`된 폼처럼 회색으로 변해요"
+   },
+   {
+    "id": "d",
+    "text": "`inert`는 deprecated이며 대신 `tabindex=\"-1\"`을 써야 해요"
+   }
+  ],
+  "explanation": "`inert` 속성이 달린 서브트리는 포커스 타겟이 아니고 포인터 이벤트가 무시되며 접근성 트리에서도 제외돼요. 모달이 떠 있는 동안 배경 영역을 \"완전히 비활성화\"하는 데 가장 간단하고 표준적인 방법이에요.\n과거에는 `aria-hidden` + 모든 포커스 가능 요소에 `tabindex=\"-1\"` + JS 포커스 트랩을 조합해야 했는데, 누락하기 쉬웠어요. 이젠 `inert` 한 줄로 동등 효과를 보장받을 수 있고 Chrome/Safari/Firefox 모두 안정 지원해요.\n`inert`는 시각적으론 표시되지만 이벤트·a11y에서 제외되므로 CSS로 흐릿하게 처리하면 의도가 명확해져요.\n",
+  "references": [
+   {
+    "title": "MDN — inert global attribute",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Global_attributes/inert"
+   },
+   {
+    "title": "web.dev — The inert attribute",
+    "url": "https://web.dev/articles/inert"
+   }
+  ],
+  "tags": [
+   "a11y",
+   "modal",
+   "focus-management"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "html-019",
+  "category": "html",
+  "difficulty": "hard",
+  "question": "다음 두 iframe 설정의 의미와 두 번째 설정의 위험으로 가장 정확한 것은?\n",
+  "code": "<iframe src=\"ad.html\" sandbox></iframe>\n<iframe src=\"x.html\"\n        sandbox=\"allow-scripts allow-same-origin\">\n</iframe>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "첫 번째는 모든 능력을 차단(스크립트·폼·팝업 등 전부 안 됨), 두 번째는 스크립트와 same-origin 자격을 둘 다 허용해 iframe이 부모 origin의 쿠키/스토리지에 접근하면서 임의 스크립트를 실행할 수 있어 사실상 sandbox를 무력화해요"
+   },
+   {
+    "id": "b",
+    "text": "두 번째는 보안 강도를 더 높인 설정이라 권장돼요"
+   },
+   {
+    "id": "c",
+    "text": "`sandbox` 속성 없이도 같은 결과예요"
+   },
+   {
+    "id": "d",
+    "text": "`allow-scripts`만 있으면 안전하지 않으므로 `allow-same-origin`을 추가해야 해요"
+   }
+  ],
+  "explanation": "빈 `sandbox` 속성은 iframe의 모든 능력을 제한하는 최대 보수적 설정이에요. 스크립트 실행·폼 제출·팝업·동일 출처 접근·top-level 네비게이션 등이 모두 막혀요.\n`allow-scripts allow-same-origin`을 함께 주면, iframe이 자신의 실제 출처(고유 opaque origin 대신 `src`의 origin)로 취급되면서 스크립트를 실행할 수 있어요. iframe 콘텐츠가 부모와 같은 origin에서 서빙된다면 부모의 쿠키/로컬스토리지·DOM에 접근할 수 있고, 더 결정적인 문제는 iframe 안 스크립트가 부모 쪽 `<iframe>` 엘리먼트의 `sandbox` 속성을 제거한 뒤 다시 로드/네비게이션 시키면 그 시점부터 모든 제한이 풀려버린다는 거예요(`sandbox` 는 document 생성 시점에만 평가되므로) — 사실상 sandbox가 없는 것과 다름없어요.\n제삼자 콘텐츠를 실으려면 `allow-scripts`는 쓰되 `allow-same-origin`을 함께 주지 않는 게 기본 원칙이에요.\n",
+  "references": [
+   {
+    "title": "MDN — <iframe> sandbox attribute",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Element/iframe#sandbox"
+   },
+   {
+    "title": "HTML Standard — Sandboxing",
+    "url": "https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-sandbox"
+   }
+  ],
+  "tags": [
+   "iframe",
+   "sandbox",
+   "security"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "html-020",
+  "category": "html",
+  "difficulty": "hard",
+  "question": "`autocomplete`와 `inputmode` 속성의 역할 차이로 가장 정확한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘은 동일한 속성의 별칭이에요"
+   },
+   {
+    "id": "b",
+    "text": "`autocomplete`(예: `email`, `cc-number`, `one-time-code`)는 브라우저/패스워드 매니저가 입력의 의미를 이해해 자동완성·자동입력에 활용하는 용도이고, `inputmode`(예: `numeric`, `decimal`, `tel`)는 모바일 가상 키보드의 모양을 결정해요. 둘은 별개라 함께 쓰기도 해요"
+   },
+   {
+    "id": "c",
+    "text": "`inputmode`는 검증 규칙을 강제해 사용자가 다른 형식을 입력할 수 없어요"
+   },
+   {
+    "id": "d",
+    "text": "`autocomplete=\"off\"`이면 브라우저가 자동으로 `inputmode=\"none\"`을 적용해요"
+   }
+  ],
+  "explanation": "둘은 관심사가 달라요. `autocomplete`는 \"이 칸에 들어갈 의미\"를 알려 주는 메타데이터라 브라우저/패스워드 매니저가 이메일·이름·주소·카드번호·OTP 등을 적절한 칸에 자동 채워주는 데 활용돼요.\n`inputmode`는 \"키보드를 어떤 모양으로 띄워달라\"는 힌트만을 주고 입력 검증은 하지 않아요. 예를 들어 OTP 입력이라면 `autocomplete=\"one-time-code\" inputmode=\"numeric\"`처럼 둘을 함께 주는 패턴이 일반적이에요.\n`autocomplete=\"off\"`는 브라우저에 자동입력 힌트를 끌 뿐 키보드 모양에는 영향이 없고, 브라우저가 무시하는 케이스도 많아요.\n",
+  "references": [
+   {
+    "title": "MDN — HTML autocomplete attribute",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Attributes/autocomplete"
+   },
+   {
+    "title": "MDN — inputmode global attribute",
+    "url": "https://developer.mozilla.org/ko/docs/Web/HTML/Global_attributes/inputmode"
+   }
+  ],
+  "tags": [
+   "forms",
+   "autocomplete",
+   "inputmode"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-001",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 코드의 출력 순서는?\n",
+  "code": "console.log(1)\nsetTimeout(() => console.log(2))\nPromise.resolve().then(() => console.log(3))\nconsole.log(4)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "1, 2, 3, 4"
+   },
+   {
+    "id": "b",
+    "text": "1, 4, 3, 2"
+   },
+   {
+    "id": "c",
+    "text": "1, 4, 2, 3"
+   },
+   {
+    "id": "d",
+    "text": "1, 3, 4, 2"
+   }
+  ],
+  "explanation": "동기 코드(1, 4)가 먼저 → 마이크로태스크(`Promise.then`의 3) → 매크로태스크(`setTimeout`의 2) 순서로 실행돼요.\n마이크로태스크 큐는 매크로태스크 하나 처리 사이마다 전부 비워지기 때문에, `setTimeout`보다 `Promise.then`이 항상 먼저 도착해요.\n",
+  "tags": [
+   "event-loop",
+   "async",
+   "microtask"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-002",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 코드의 출력은?\n",
+  "code": "function makeCounter() {\n  let count = 0\n  return () => ++count\n}\nconst a = makeCounter()\nconst b = makeCounter()\na(); a(); b()\nconsole.log(a(), b())\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "3 1"
+   },
+   {
+    "id": "b",
+    "text": "2 2"
+   },
+   {
+    "id": "c",
+    "text": "3 2"
+   },
+   {
+    "id": "d",
+    "text": "1 1"
+   }
+  ],
+  "explanation": "`makeCounter`를 두 번 호출했으니 `a`와 `b`는 서로 다른 클로저(=다른 `count` 변수)를 잡아요.\n`a()`는 두 번 호출돼서 count(a)=2까지 올라간 상태, 마지막 `a()`에서 ++ 돼서 3을 반환해요.\n`b()`는 한 번 호출돼서 count(b)=1, 마지막 `b()`에서 ++ 돼서 2를 반환해요.\n→ \"3 2\". 같은 함수에서 만든 인스턴스라도 클로저는 호출마다 새로 생긴다는 게 포인트예요.\n",
+  "tags": [
+   "closure",
+   "scope"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "js-003",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 코드를 실행하면 어떤 일이 벌어질까요?\n",
+  "code": "console.log(a)\nconsole.log(b)\nvar a = 1\nlet b = 2\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "a, b 모두 undefined가 찍혀요"
+   },
+   {
+    "id": "b",
+    "text": "a, b 모두 ReferenceError가 발생해요"
+   },
+   {
+    "id": "c",
+    "text": "1, 2가 차례대로 찍혀요"
+   },
+   {
+    "id": "d",
+    "text": "a는 undefined가 찍히고, b에서 ReferenceError가 발생해요"
+   }
+  ],
+  "explanation": "`var`는 선언이 끌어올려지면서 `undefined`로 초기화돼요. 그래서 `console.log(a)`에서 `undefined`가 찍혀요.\n`let`/`const`는 선언은 끌어올려지지만 초기화가 안 돼서 TDZ(Temporal Dead Zone) 상태예요. 선언 라인 전에 접근하면 `ReferenceError`가 터져요.\n자주 헷갈리는데, \"let/const는 호이스팅이 안 된다\"는 흔한 오해고 정확히는 \"초기화 전 접근이 막혀 있다\"가 맞아요.\n",
+  "tags": [
+   "hoisting",
+   "tdz",
+   "var",
+   "let"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "js-004",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 코드의 출력은?\n",
+  "code": "const outer = this\nconst obj = {\n  arrow: () => this === outer,\n  normal() { return this === outer }\n}\nconsole.log(obj.arrow(), '/', obj.normal())\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "true / false"
+   },
+   {
+    "id": "b",
+    "text": "false / true"
+   },
+   {
+    "id": "c",
+    "text": "true / true"
+   },
+   {
+    "id": "d",
+    "text": "false / false"
+   }
+  ],
+  "explanation": "화살표 함수는 자기 `this`를 만들지 않고, 정의 시점의 상위 스코프 `this`를 그대로 캡처해요. 그래서 어떤 실행 환경(모듈/스크립트, strict/sloppy)이든 `obj.arrow()`의 `this`는 바깥의 `this`(= `outer`)와 항상 같아서 → `true`.\n반면 `normal`은 일반 메서드라 호출 방식(`obj.normal()`)에 따라 `this`가 호출 객체(`obj`)로 바인딩돼요. `obj`는 `outer`와 다른 객체니까 → `false`.\n→ \"객체 메서드를 화살표로 쓰면 `this`가 호출 객체를 가리키지 않고, 정의 위치의 상위 `this`를 그대로 따라간다\"가 핵심이에요.\n",
+  "tags": [
+   "this",
+   "arrow-function",
+   "scope"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "js-005",
+  "category": "javascript",
+  "difficulty": "hard",
+  "question": "다음 코드의 출력 순서는?\n",
+  "code": "console.log('A')\nsetTimeout(() => console.log('B'))\nPromise.resolve().then(() => console.log('C'))\nasync function f() {\n  console.log('D')\n  await Promise.resolve()\n  console.log('E')\n}\nf()\nconsole.log('F')\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "A, D, F, E, C, B"
+   },
+   {
+    "id": "b",
+    "text": "A, D, F, C, E, B"
+   },
+   {
+    "id": "c",
+    "text": "A, B, C, D, E, F"
+   },
+   {
+    "id": "d",
+    "text": "A, F, D, C, E, B"
+   }
+  ],
+  "explanation": "동기 코드부터: `A` → `f()` 호출 → `D` (await 만나서 일시 중단) → `F`. 여기까지 동기 한 사이클이에요.\n마이크로태스크 큐엔 먼저 등록된 `Promise.resolve().then(C)`가 앞에 있고, 그 뒤에 `await` 다음에 이어지는 `E`가 들어가요.\n→ 마이크로태스크 처리: `C` → `E`.\n매크로태스크인 `setTimeout(B)`는 마이크로태스크 큐가 다 비워진 다음에야 실행돼서 → `B`.\n최종: `A, D, F, C, E, B`.\n",
+  "tags": [
+   "promise",
+   "async",
+   "await",
+   "event-loop",
+   "microtask"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-006",
+  "category": "javascript",
+  "difficulty": "easy",
+  "question": "사용자가 검색창에 타이핑하는 동안에는 API를 부르지 않다가, 입력이 멈춘 뒤 300ms가 지나면 한 번만 부르고 싶어요. 어떤 패턴이 적합할까요?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "스로틀(throttle)"
+   },
+   {
+    "id": "b",
+    "text": "requestAnimationFrame"
+   },
+   {
+    "id": "c",
+    "text": "디바운스(debounce)"
+   },
+   {
+    "id": "d",
+    "text": "setInterval"
+   }
+  ],
+  "explanation": "디바운스는 \"마지막 호출로부터 N ms가 지나야 실행\"하는 방식이에요. 타이핑처럼 잠잠해진 뒤 한 번만 처리하고 싶을 때 잘 맞아요.\n스로틀은 \"N ms마다 최대 한 번만 실행\"이라 스크롤·리사이즈처럼 연속 이벤트의 빈도를 제한할 때 어울려요.\n`requestAnimationFrame`은 페인트 타이밍에 맞춘 애니메이션용, `setInterval`은 일정 주기 반복용이라 \"입력 멈춤 감지\"엔 안 맞아요.\n",
+  "tags": [
+   "debounce",
+   "throttle",
+   "performance"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "js-007",
+  "category": "javascript",
+  "difficulty": "easy",
+  "question": "`<ul>` 안에 `<li>`가 1000개 있고, 각각을 클릭했을 때 동작이 필요해요. 가장 효율적인 패턴은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "각 `<li>`마다 `addEventListener`를 호출해 핸들러를 달아요"
+   },
+   {
+    "id": "b",
+    "text": "각 `<li>`에 인라인 `onclick` 속성으로 핸들러를 작성해요"
+   },
+   {
+    "id": "c",
+    "text": "캡처 단계에서 각 `<li>`마다 `addEventListener`를 달아요"
+   },
+   {
+    "id": "d",
+    "text": "부모 `<ul>`에 한 번만 클릭 핸들러를 달고, `event.target`으로 어떤 `<li>`인지 판별해요"
+   }
+  ],
+  "explanation": "이벤트 위임(delegation) 패턴이에요. 클릭은 자식에서 발생해도 버블링으로 부모까지 올라오니까, 부모에 한 번만 달면 1000개 자식을 다 커버할 수 있어요.\n핸들러 함수가 1000개씩 메모리를 차지하지 않고, 자식이 동적으로 추가/삭제돼도 핸들러 재등록이 필요 없는 게 핵심 장점이에요.\n실제 구현은 `event.target.closest('li')`로 안전하게 li까지 올라가서 처리하면 돼요.\n",
+  "tags": [
+   "event-delegation",
+   "bubbling",
+   "browser"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "js-008",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 코드의 출력은?\n",
+  "code": "function Dog(name) { this.name = name }\nDog.prototype.bark = function () { return 'bark' }\nconst d = new Dog('coco')\nconsole.log(d.hasOwnProperty('name'), d.hasOwnProperty('bark'))\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "true false"
+   },
+   {
+    "id": "b",
+    "text": "true true"
+   },
+   {
+    "id": "c",
+    "text": "false true"
+   },
+   {
+    "id": "d",
+    "text": "false false"
+   }
+  ],
+  "explanation": "`name`은 생성자 안에서 `this.name = name`으로 인스턴스 자신에게 직접 박아 넣은 속성이라 → `hasOwnProperty('name')`은 `true`예요.\n`bark`는 `Dog.prototype`에 정의돼 있어요. `d.bark()`처럼 호출은 되지만 그건 프로토타입 체인을 따라가서 찾는 거고, `d` 자신이 갖고 있는 속성은 아니라서 `hasOwnProperty('bark')`는 `false`예요.\n→ 인스턴스 own property와 프로토타입 체인을 구분하는 게 포인트예요.\n",
+  "tags": [
+   "prototype",
+   "inheritance",
+   "hasOwnProperty"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "js-009",
+  "category": "javascript",
+  "difficulty": "easy",
+  "question": "다음 코드 실행 후 `nums`의 값은?\n",
+  "code": "const nums = [1, 2, 3, 4]\nconst doubled = nums.map(n => n * 2)\nconst evens = nums.filter(n => n % 2 === 0)\nnums.forEach(n => n * 100)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`[2, 4, 6, 8]`"
+   },
+   {
+    "id": "b",
+    "text": "`[1, 2, 3, 4]`"
+   },
+   {
+    "id": "c",
+    "text": "`[2, 4]`"
+   },
+   {
+    "id": "d",
+    "text": "`[100, 200, 300, 400]`"
+   }
+  ],
+  "explanation": "`map`/`filter`는 새 배열을 반환하지, 원본을 건드리지 않아요.\n`forEach`도 콜백의 반환값을 그냥 무시할 뿐, 원본 배열 자체를 바꾸진 않아요 (콜백 안에서 직접 인덱스를 쓰는 게 아니라면요).\n→ 그래서 `nums`는 원래 `[1, 2, 3, 4]` 그대로예요.\n원본을 바꾸는 메서드는 `push`, `pop`, `splice`, `sort`, `reverse` 같은 mutating 메서드들이에요.\n",
+  "tags": [
+   "array",
+   "immutability",
+   "map",
+   "filter",
+   "forEach"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-010",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 코드의 출력은?\n",
+  "code": "const a = { user: { name: '하늘' }, version: 1 }\nconst b = { ...a, version: 2 }\nb.user.name = '바다'\nconsole.log(a.user.name, '/', a.version)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "하늘 / 1"
+   },
+   {
+    "id": "b",
+    "text": "바다 / 2"
+   },
+   {
+    "id": "c",
+    "text": "바다 / 1"
+   },
+   {
+    "id": "d",
+    "text": "하늘 / 2"
+   }
+  ],
+  "explanation": "스프레드는 **얕은 복사**예요. `b`는 `a`의 최상위 프로퍼티만 새로 복사하고, 안쪽 객체(`user`)는 참조를 그대로 공유해요.\n그래서 `b.user.name = '바다'`로 바꾸면 `a.user`도 같은 객체라 같이 바뀌어서 → `a.user.name`은 `'바다'`예요.\n반면 `version`은 원시값이고 b에서 덮어썼지만, a는 자기 값(1) 그대로라 → `a.version`은 `1`이에요.\n깊은 복사가 필요하면 `structuredClone(a)` 같은 걸 써야 해요.\n",
+  "tags": [
+   "spread",
+   "shallow-copy",
+   "immutability"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "js-011",
+  "category": "javascript",
+  "difficulty": "easy",
+  "question": "다음 코드를 실행했을 때 콘솔 출력은?\n",
+  "code": "const user = { name: 'jun', count: 0, label: '' }\nconsole.log(user.count ?? 'default')\nconsole.log(user.label || 'default')\nconsole.log(user.address?.city ?? 'unknown')\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "0 / default / unknown"
+   },
+   {
+    "id": "b",
+    "text": "default / default / unknown"
+   },
+   {
+    "id": "c",
+    "text": "0 / '' / undefined"
+   },
+   {
+    "id": "d",
+    "text": "default / '' / unknown"
+   }
+  ],
+  "explanation": "- `??`(nullish coalescing)은 좌측이 `null`/`undefined`일 때만 우측을 써요. `0`은 nullish가 아니라 그대로 `0`이에요.\n- `||`는 falsy(`0`, `''`, `null`, `undefined`, `NaN`, `false`)에 모두 우측이 나오므로 빈 문자열은 `'default'`로 대체돼요.\n- `?.`은 좌측이 nullish면 평가를 멈추고 `undefined`를 돌려줘요. 거기에 `?? 'unknown'`을 붙였으니 `'unknown'`이 돼요.\n실수로 0이나 빈 문자열을 기본값으로 갈아엎고 싶지 않다면 `||` 대신 `??`를 쓰는 게 안전해요.\n",
+  "tags": [
+   "optional-chaining",
+   "nullish-coalescing",
+   "es2020"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "js-012",
+  "category": "javascript",
+  "difficulty": "easy",
+  "question": "자바스크립트에서 `0.1 + 0.2 === 0.3` 평가 결과와 그 이유로 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "true — IEEE 754 double은 모든 십진 소수를 정확히 표현해요."
+   },
+   {
+    "id": "b",
+    "text": "false — 0.1과 0.2가 이진 부동소수점에서 무한 반복 비트로 표현돼 합이 0.30000000000000004가 돼요."
+   },
+   {
+    "id": "c",
+    "text": "true — 비교 시 자동으로 반올림돼 같다고 판정해요."
+   },
+   {
+    "id": "d",
+    "text": "false — `===`가 같은 타입의 숫자도 항상 별개의 객체로 비교하기 때문이에요."
+   }
+  ],
+  "explanation": "자바스크립트의 `number`는 IEEE 754 64bit double이라 0.1, 0.2처럼 십진수에서 깔끔한 소수가 이진 부동소수점에선 무한 반복돼서 정확히 표현 안 돼요. 그 결과 합이 `0.30000000000000004`가 되고 `=== 0.3`은 false예요.\n실무에서는 `Math.abs(a - b) < 허용오차`로 근사 비교하는데, `Number.EPSILON`을 그대로 임계값으로 쓰는 건 크기가 1 근처인 수에서만 유효해요 — 수가 커지면 비교하는 값의 크기에 맞게 허용오차를 키워야 해요. 금액처럼 정밀도가 중요한 값은 정수 단위(원/센트)로 다루는 게 안전해요.\n(출처: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/EPSILON)\n",
+  "tags": [
+   "number",
+   "ieee754",
+   "precision"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-013",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 코드 실행 후 `a.profile.city`와 `b.profile.city`의 값은?\n",
+  "code": "const a = { name: 'jun', profile: { city: 'Seoul' } }\nconst b = { ...a }\nb.profile.city = 'Busan'\nconsole.log(a.profile.city, b.profile.city)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "Seoul Seoul"
+   },
+   {
+    "id": "b",
+    "text": "Seoul Busan"
+   },
+   {
+    "id": "c",
+    "text": "Busan Busan"
+   },
+   {
+    "id": "d",
+    "text": "Busan Seoul"
+   }
+  ],
+  "explanation": "스프레드 `{...a}`는 1단계만 복사하는 얕은 복사예요. `b.profile`은 여전히 `a.profile`과 같은 객체를 가리키므로 `b.profile.city`를 바꾸면 `a.profile.city`도 같이 바뀌어 둘 다 `'Busan'`이 돼요.\n중첩 객체까지 끊어 내려면 `structuredClone(a)`(브라우저/Node 17+ 내장)나 lodash `cloneDeep`을 써야 해요. `JSON.parse(JSON.stringify(a))`도 자주 쓰이지만 `Date`/`Map`/`Set`/함수/순환참조에서 깨지니 주의해 주세요.\n",
+  "tags": [
+   "clone",
+   "spread",
+   "structured-clone"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "js-014",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 비교 표현식 중 `true`로 평가되는 것을 모두 고른 묶음은?\n",
+  "code": "// (1) null == undefined\n// (2) NaN === NaN\n// (3) 0 == false\n// (4) '' == 0\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "(1)만"
+   },
+   {
+    "id": "b",
+    "text": "(1), (3), (4)"
+   },
+   {
+    "id": "c",
+    "text": "(1), (3)만"
+   },
+   {
+    "id": "d",
+    "text": "전부"
+   }
+  ],
+  "explanation": "- (1) `null == undefined`는 명세상 특별 케이스로 `true`예요. `===`는 타입까지 보니 `false`예요.\n- (2) `NaN`은 자기 자신과도 같지 않다고 정의돼 있어 `NaN === NaN`은 항상 `false`예요. 판별은 `Number.isNaN(x)`로 해요.\n- (3) `0 == false`: `==`는 boolean을 숫자(0/1)로 변환 후 비교 → `0 == 0` → `true`예요.\n- (4) `'' == 0`: 빈 문자열은 숫자로 캐스팅 시 `0` → `0 == 0` → `true`예요.\n팀 코드에서 `==`를 쓰면 이런 암묵 변환이 깔리니 의도가 명확하지 않다면 `===`로 통일하는 게 안전해요.\n",
+  "tags": [
+   "equality",
+   "coercion",
+   "nan"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-015",
+  "category": "javascript",
+  "difficulty": "hard",
+  "question": "다음 코드의 출력 순서는?\n",
+  "code": "function* gen() {\n  console.log('A')\n  yield 1\n  console.log('B')\n  yield 2\n  console.log('C')\n}\nconst g = gen()\nconsole.log(g.next().value)\nconsole.log(g.next().value)\nconsole.log(g.next().done)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "1 A 2 B C true"
+   },
+   {
+    "id": "b",
+    "text": "A B C 1 2 true"
+   },
+   {
+    "id": "c",
+    "text": "A 1 B 2 C false"
+   },
+   {
+    "id": "d",
+    "text": "A 1 B 2 C true"
+   }
+  ],
+  "explanation": "generator는 호출 즉시 실행되지 않고 iterator를 반환해요. `g.next()`가 처음 호출되면 함수 본문이 시작돼 `'A'`를 찍고 `yield 1`에서 멈춰 `{ value: 1, done: false }`를 돌려줘요.\n두 번째 `g.next()`는 멈췄던 자리에서 재개해 `'B'` → `yield 2`. 세 번째 `g.next()`는 `'C'`까지 실행하고 함수가 끝나 `{ value: undefined, done: true }`를 반환해요.\n그래서 출력은 `A` `1` `B` `2` `C` `true` 순이에요. 일시 중단/재개를 활용해 lazy 시퀀스를 만들거나 비동기 흐름 제어에 유용해요.\n",
+  "tags": [
+   "generator",
+   "iterator",
+   "control-flow"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "js-016",
+  "category": "javascript",
+  "difficulty": "easy",
+  "question": "다음 코드의 출력은?\n",
+  "code": "const obj = {}\nconst map = new Map()\nconst a = { id: 1 }, b = { id: 2 }\nobj[a] = 'A'; obj[b] = 'B'\nmap.set(a, 'A'); map.set(b, 'B')\nconsole.log(Object.keys(obj).length, map.size)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`1 2` — Object 키는 toString되어 둘 다 `\"[object Object]\"`로 충돌해 덮어쓰지만, Map은 객체 참조 자체를 키로 보존해요"
+   },
+   {
+    "id": "b",
+    "text": "`2 2` — 둘 다 객체를 키로 그대로 보관해요"
+   },
+   {
+    "id": "c",
+    "text": "`2 1` — Map이 toString을 사용하고 Object가 객체 참조를 보존해요"
+   },
+   {
+    "id": "d",
+    "text": "`1 1` — 둘 다 마지막 값으로 덮어써요"
+   }
+  ],
+  "explanation": "Object의 키는 string/Symbol만 가능해서 객체를 키로 넣으면 `toString()`이 호출돼 `\"[object Object]\"`라는 같은 문자열이 돼요. 그래서 `obj[a]`와 `obj[b]`가 같은 키를 덮어써 `Object.keys(obj).length`는 1이에요.\n반면 Map은 어떤 값(객체 포함)이든 그대로 키로 쓰고 참조 동등성으로 비교해서 a와 b가 별개의 키로 들어가 `map.size`는 2예요.\n키 타입이 객체이거나 빈번하게 추가/삭제되는 동적 컬렉션엔 Map을 쓰는 게 안전해요.\n",
+  "tags": [
+   "map",
+   "object",
+   "collections"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "js-017",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "`Promise.all` / `Promise.allSettled` / `Promise.race`의 동작 차이로 가장 정확한 설명은?\n",
+  "code": "const tasks = [\n  Promise.resolve(1),\n  Promise.reject('X'),\n  Promise.resolve(3),\n]\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`Promise.all(tasks)`는 첫 reject 즉시 reject('X')로 끝나고, `Promise.allSettled(tasks)`는 3개 결과 객체 배열({status, value/reason})로 fulfill되며, `Promise.race(tasks)`는 가장 먼저 settle된 값으로 settle돼요"
+   },
+   {
+    "id": "b",
+    "text": "셋 다 첫 reject가 발생하면 전체가 reject돼요"
+   },
+   {
+    "id": "c",
+    "text": "`Promise.all`은 모든 결과를 기다린 뒤 reject('X')만 반환해요"
+   },
+   {
+    "id": "d",
+    "text": "`Promise.race`는 가장 먼저 fulfill된 값만 받고 reject는 무시해요"
+   }
+  ],
+  "explanation": "- `Promise.all`은 모든 promise가 fulfill될 때까지 기다리지만 그 사이 하나라도 reject되면 즉시 reject를 전파해 종료(short-circuit)해요.\n- `Promise.allSettled`는 reject도 결과로 묶어 항상 fulfill되니, 일부 실패를 허용하면서 결과를 모아야 할 때 적합해요.\n- `Promise.race`는 가장 먼저 settle(성공/실패 무관)된 promise의 결과로 settle돼서 timeout 패턴에 쓰기 좋아요.\n여기선 `tasks`가 모두 동기적으로 settle된 값이라 race는 첫 번째 `Promise.resolve(1)`로 fulfill돼요.\n",
+  "tags": [
+   "promise",
+   "async",
+   "error-handling"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "js-018",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "다음 `memoize`로 감싼 함수가 5번 호출됐을 때 `calls`의 최종 값은?\n",
+  "code": "function memoize(fn) {\n  const cache = new Map()\n  return (n) => {\n    if (cache.has(n)) return cache.get(n)\n    const r = fn(n)\n    cache.set(n, r)\n    return r\n  }\n}\nlet calls = 0\nconst square = memoize((n) => { calls++; return n * n })\nsquare(2); square(3); square(2); square(3); square(2)\nconsole.log(calls)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "5 — 매 호출마다 원본 함수가 새로 실행돼요"
+   },
+   {
+    "id": "b",
+    "text": "2 — `2`와 `3` 각 첫 호출에서만 원본을 실행하고 나머지 3번은 캐시 히트예요"
+   },
+   {
+    "id": "c",
+    "text": "3 — 마지막 호출 시 캐시가 초기화돼 다시 실행돼요"
+   },
+   {
+    "id": "d",
+    "text": "0 — `cache.has(n)` 검사가 항상 true라 원본이 호출되지 않아요"
+   }
+  ],
+  "explanation": "`memoize`가 클로저로 잡은 `cache`가 호출 사이에 살아남기 때문에, 같은 인자(`2`, `3`)에 대한 두 번째부터의 호출은 `cache.has`가 true가 돼 원본 함수가 실행되지 않아요.\n결과적으로 `calls`는 처음 `square(2)`와 `square(3)`에서만 증가해 2가 돼요. 캐시 키로 객체를 쓰려면 `Map`(여기처럼) 또는 `WeakMap`이 안전해요. 원본의 입력이 매번 새 객체라면 캐시 적중률이 0이 되니 키 정규화가 필요해요.\n",
+  "tags": [
+   "closure",
+   "memoization",
+   "cache"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-019",
+  "category": "javascript",
+  "difficulty": "hard",
+  "question": "다음 코드의 출력 순서는?\n",
+  "code": "async function* gen() {\n  yield 1\n  yield Promise.resolve(2)\n  yield 3\n}\n;(async () => {\n  for await (const v of gen()) {\n    console.log(v)\n  }\n  console.log('done')\n})()\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`1`, `Promise { 2 }`, `3`, `done` — Promise가 풀리지 않고 객체 그대로 로깅돼요"
+   },
+   {
+    "id": "b",
+    "text": "`1`, `2`, `3`, `done` — async generator의 `yield`가 Promise를 풀어 일반 값으로 흘려보내고, `for await...of`는 그 결과를 그대로 받아요"
+   },
+   {
+    "id": "c",
+    "text": "`1`, `3`, `2`, `done` — Promise는 마이크로태스크로 미뤄져 마지막에 처리돼요"
+   },
+   {
+    "id": "d",
+    "text": "TypeError — async generator는 Promise를 yield할 수 없어요"
+   }
+  ],
+  "explanation": "Promise를 풀어주는 주체는 `for await...of`가 아니라 **async generator의 `yield`** 예요. 명세(AsyncGeneratorYield)상 yield는 `value ← Await(value)`를 먼저 수행해서, `yield Promise.resolve(2)`를 만나면 generator 안에서 Promise가 풀려 `2`가 되고, 그게 `{ value: 2, done: false }`로 감긴 Promise가 `next()` 결과로 나가요.\n`for await...of`는 그 `next()` 결과 Promise를 await해서 `{ value, done }`을 꺼내고, `value`를 그대로 루프 변수에 바인딩해요 — value 자체는 추가로 await하지 않아요. (`async function*`이 아닌 손으로 만든 async iterator가 Promise를 그대로 value로 내보내면 본문에선 `Promise { ... }`가 그대로 들어와요.)\n그래서 본문에는 이미 풀린 `2`가 들어오고, 출력은 `1`, `2`, `3`, `done`이 돼요.\n- a: yield 시점에 Promise가 풀려서 객체 형태 그대로 찍히지 않아요.\n- c: yield 순서 자체는 보존돼요 — Promise라고 뒤로 미뤄지는 게 아니에요.\n- d: async generator는 동기 값이든 Promise든 자유롭게 yield할 수 있어요.\nHTTP 스트리밍·파일 청크 읽기처럼 \"비동기로 도착하는 시퀀스\"를 다룰 때 자연스럽게 쓸 수 있어요.\n",
+  "tags": [
+   "async-iterator",
+   "generator",
+   "for-await"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-020",
+  "category": "javascript",
+  "difficulty": "hard",
+  "question": "다음 `curry` 구현으로 감싼 `add3`을 호출했을 때, 각 `console.log` 라인의 **출력값**을 위에서부터 차례대로 나열한 것은?\n",
+  "code": "const curry = (fn) =>\n  function curried(...args) {\n    return args.length >= fn.length\n      ? fn(...args)\n      : (...rest) => curried(...args, ...rest)\n  }\nconst add3 = curry((a, b, c) => a + b + c)\nconsole.log(add3(1)(2)(3))\nconsole.log(add3(1, 2)(3))\nconsole.log(add3(1)(2, 3))\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`6`, `6`, `6` — 인자가 `fn.length`(=3)에 도달하면 호출되고 부족하면 부분 적용 함수가 반환돼요"
+   },
+   {
+    "id": "b",
+    "text": "`6`, `NaN`, `NaN` — 그룹 호출(`a, b, c`)만 동작해요"
+   },
+   {
+    "id": "c",
+    "text": "`TypeError` — 가변 인자 호출은 지원되지 않아요"
+   },
+   {
+    "id": "d",
+    "text": "`1`, `2`, `3` — 매 호출이 마지막 인자만 반환해요"
+   }
+  ],
+  "explanation": "`curried`는 누적 인자 길이가 원본 함수의 인자 개수(`fn.length`)에 도달하면 `fn(...args)`로 즉시 호출하고, 부족하면 남은 인자를 받는 함수를 반환해요.\n그래서 `add3(1)(2)(3)`, `add3(1, 2)(3)`, `add3(1)(2, 3)` 모두 누적 인자가 3개에 도달한 시점에 동일한 `1 + 2 + 3 = 6`을 반환해요.\n주의: `fn.length`는 \"필수 인자\"만 세고 default value/rest 파라미터는 제외해서, default가 있는 함수에 그대로 적용하면 호출 시점이 어긋날 수 있어요.\n",
+  "tags": [
+   "functional",
+   "currying",
+   "closure"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "js-021",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "아래 코드에서 사용자가 `#save` 버튼을 클릭했을 때, `event.target.id`와 `event.currentTarget.id`로 찍히는 값은?\n",
+  "code": "const menu = document.querySelector('#menu')\n\nmenu.addEventListener('click', (event) => {\n  console.log(event.target.id)\n  console.log(event.currentTarget.id)\n})\n\n// <ul id=\"menu\">\n//   <li><button id=\"save\">저장</button></li>\n// </ul>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘 다 `save`"
+   },
+   {
+    "id": "b",
+    "text": "둘 다 `menu`"
+   },
+   {
+    "id": "c",
+    "text": "`target`은 `save`, `currentTarget`은 `menu`"
+   },
+   {
+    "id": "d",
+    "text": "`target`은 `menu`, `currentTarget`은 `save`"
+   }
+  ],
+  "explanation": "`event.target`은 이벤트가 실제로 발생한 가장 안쪽 요소를 가리키므로, 사용자가 누른 `<button id=\"save\">`가 돼요. 반면 `event.currentTarget`은 현재 실행 중인 이벤트 리스너가 붙어 있는 요소라서, 이 코드에서는 리스너를 등록한 `<ul id=\"menu\">`를 가리켜요.\n이 차이는 이벤트 버블링과 이벤트 위임을 구현할 때 중요해요. `target`만 믿고 처리하면 버튼 안의 아이콘이나 텍스트 노드처럼 더 깊은 자식이 들어올 수 있으니, 실무에서는 `closest()`로 원하는 항목까지 올려 찾거나 `currentTarget`으로 리스너 기준 컨테이너를 명확히 구분하는 패턴을 자주 써요.\n오답 a/b/d는 이벤트가 발생한 요소와 리스너가 실행되는 요소를 같은 것으로 착각한 경우예요. 버블링 중에는 같은 이벤트 객체라도 리스너가 붙은 위치에 따라 `currentTarget`이 달라질 수 있다는 점을 기억해 주세요.\n",
+  "tags": [
+   "event",
+   "target",
+   "currentTarget",
+   "bubbling"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "js-022",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "`CommonJS`와 `ES Module`의 차이를 설명한 내용으로 가장 적절한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`CommonJS`는 `import`/`export`를 쓰고, `ES Module`은 `require`/`module.exports`를 써요."
+   },
+   {
+    "id": "b",
+    "text": "`ES Module`은 정적 구조라 번들러가 의존성을 분석하기 쉽고, 트리 쉐이킹에 더 유리해요."
+   },
+   {
+    "id": "c",
+    "text": "`CommonJS`는 브라우저 표준 모듈 시스템이라 `<script type=\"module\">` 없이도 바로 동작해요."
+   },
+   {
+    "id": "d",
+    "text": "두 방식은 문법만 다르고 로딩 방식이나 최적화 가능성에는 차이가 없어요."
+   }
+  ],
+  "explanation": "`ES Module`은 `import`/`export`가 파일 최상위의 정적인 형태로 선언되기 때문에, 번들러가 어떤 값이 실제로 사용되는지 분석하기 쉬워요. 그래서 사용하지 않는 export를 제거하는 트리 쉐이킹이나 브라우저의 네이티브 모듈 로딩과 잘 맞아요.\n`CommonJS`는 주로 Node.js에서 쓰인 `require`/`module.exports` 기반 방식이고, 런타임에 조건부로 `require()`를 호출할 수 있어 정적 분석이 상대적으로 어려워요. 브라우저에서 그대로 표준처럼 실행되는 방식도 아니어서 보통 번들러 변환이 필요해요.\n오답 a는 두 문법을 반대로 설명했고, c는 브라우저 표준 모듈 시스템을 잘못 짚었어요. d처럼 단순 문법 차이만 있는 것이 아니라 로딩 시점, 분석 가능성, 번들 최적화 전략까지 실무 선택에 영향을 줘요.\n",
+  "tags": [
+   "module",
+   "commonjs",
+   "esm",
+   "tree-shaking"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "js-023",
+  "category": "javascript",
+  "difficulty": "easy",
+  "question": "다음 코드의 각 `typeof` 결과를 위에서부터 차례대로 나열한 것은 무엇일까요?",
+  "code": "console.log(typeof null);\nconsole.log(typeof []);\nconsole.log(typeof function () {});\nconsole.log(typeof undefined);",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`\"object\"`, `\"array\"`, `\"function\"`, `\"undefined\"`"
+   },
+   {
+    "id": "b",
+    "text": "`\"null\"`, `\"object\"`, `\"function\"`, `\"undefined\"`"
+   },
+   {
+    "id": "c",
+    "text": "`\"object\"`, `\"object\"`, `\"function\"`, `\"undefined\"`"
+   },
+   {
+    "id": "d",
+    "text": "`\"object\"`, `\"object\"`, `\"object\"`, `\"undefined\"`"
+   }
+  ],
+  "explanation": "자바스크립트의 `typeof`는 몇 가지 역사적 특이점이 있어요. `typeof null`은 언어 초창기의 버그성 설계로 `\"object\"`를 반환하고, 배열은 별도 타입이 아니라 객체이므로 `typeof []`도 `\"object\"`예요. 반면 함수는 호출 가능한 객체라는 특별 케이스로 `\"function\"`을 돌려주고, `typeof undefined`는 그대로 `\"undefined\"`예요. 배열인지 판별하려면 `Array.isArray()`를, `null` 여부는 `value === null`로 직접 비교해야 해요.",
+  "references": [
+   {
+    "title": "MDN — typeof",
+    "url": "https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/typeof"
+   },
+   {
+    "title": "MDN — Array.isArray()",
+    "url": "https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
+   }
+  ],
+  "tags": [
+   "typeof",
+   "type-check",
+   "null",
+   "array"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "js-024",
+  "category": "javascript",
+  "difficulty": "medium",
+  "question": "자바스크립트 애플리케이션에서 메모리 누수를 유발하기 쉬운 상황으로 가장 적절한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "함수 안에서 만든 지역 변수가 함수 실행이 끝난 뒤 더 이상 참조되지 않는 경우예요."
+   },
+   {
+    "id": "b",
+    "text": "제거된 DOM 요소를 참조하는 이벤트 리스너나 클로저를 계속 유지하는 경우예요."
+   },
+   {
+    "id": "c",
+    "text": "`const`로 선언한 원시값 변수를 여러 번 읽는 경우예요."
+   },
+   {
+    "id": "d",
+    "text": "사용이 끝난 객체의 모든 참조가 사라져 가비지 컬렉션 대상이 되는 경우예요."
+   }
+  ],
+  "explanation": "메모리 누수는 더 이상 필요 없는 객체가 어떤 경로로든 계속 참조되어 가비지 컬렉터가 회수하지 못할 때 발생해요. 제거된 DOM 요소에 붙은 이벤트 리스너를 해제하지 않거나, 클로저가 큰 객체·DOM 노드를 계속 붙잡고 있으면 화면에서는 사라졌어도 메모리에 남을 수 있어요.\na와 d는 참조가 사라져 정상적으로 회수될 수 있는 상황이라 누수라고 보기 어려워요. c처럼 원시값을 읽는 행위 자체도 누수를 만들지 않아요. 실무에서는 컴포넌트 unmount 시 `removeEventListener`, 타이머 해제, 구독 해제 등을 cleanup으로 처리하고, Chrome DevTools Memory 탭의 heap snapshot으로 남아 있는 참조를 확인하는 방식이 도움이 돼요.\n",
+  "tags": [
+   "memory-leak",
+   "garbage-collection",
+   "event-listener",
+   "closure"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "next-001",
+  "category": "nextjs",
+  "difficulty": "easy",
+  "question": "Next.js에서 SSR과 SSG 선택 기준으로 가장 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "SSR은 요청마다 최신 데이터가 필요할 때, SSG는 빌드 시점 결과를 재사용해도 되는 정적 콘텐츠에 적합해요."
+   },
+   {
+    "id": "b",
+    "text": "SSR은 항상 CDN 캐싱이 불가능하고, SSG는 사용자별 데이터를 안전하게 포함할 수 있어요."
+   },
+   {
+    "id": "c",
+    "text": "SSG는 매 요청 서버에서 HTML을 만들고, SSR은 빌드 시 한 번만 만들어요."
+   },
+   {
+    "id": "d",
+    "text": "둘의 차이는 파일 확장자가 `.tsx`인지 `.jsx`인지뿐이에요."
+   }
+  ],
+  "explanation": "SSR은 사용자의 요청이 들어올 때 서버에서 HTML을 만들어 응답하므로, 로그인 사용자별 화면이나 자주 바뀌는 데이터처럼 요청 시점 정보가 중요한 페이지에 적합해요.\nSSG는 빌드 시점에 HTML을 만들어 두고 CDN에서 빠르게 제공하기 좋아서 문서·마케팅 페이지·블로그처럼 내용이 비교적 고정된 화면에 잘 맞아요. 실제 Next.js 앱에서는 ISR, fetch cache, 동적 렌더링을 섞어 최신성과 응답 속도 사이의 균형을 잡아요.\n",
+  "tags": [
+   "ssr",
+   "ssg",
+   "rendering"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "next-002",
+  "category": "nextjs",
+  "difficulty": "medium",
+  "question": "Next.js App Router의 `fetch` 캐시 옵션 설명으로 맞는 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`cache: \"no-store\"`는 요청 결과를 저장하지 않고 매 요청 새로 가져오려는 의도에 가까워요."
+   },
+   {
+    "id": "b",
+    "text": "`next: { revalidate: 60 }`은 브라우저가 60초마다 강제로 새로고침한다는 뜻이에요."
+   },
+   {
+    "id": "c",
+    "text": "모든 `fetch`는 기본적으로 사용자 쿠키와 무관하게 영구 캐시돼요."
+   },
+   {
+    "id": "d",
+    "text": "캐시 옵션은 Client Component에서만 동작하고 Server Component에서는 무시돼요."
+   }
+  ],
+  "explanation": "App Router의 서버 렌더링에서 `fetch` 옵션은 데이터 캐싱과 페이지 렌더링 전략에 영향을 줄 수 있어요. `cache: \"no-store\"`는 요청 결과를 저장하지 않고 매번 새로 가져오겠다는 의미에 가까워서, 사용자별 데이터나 항상 최신이어야 하는 데이터에 사용해요.\n`next: { revalidate: 60 }`은 브라우저가 60초마다 새로고침한다는 뜻이 아니라, 서버 쪽에서 캐시된 데이터를 일정 시간 후 재검증할 수 있게 하는 설정이에요. 캐시를 잘못 고르면 오래된 데이터가 보이거나 반대로 매 요청이 느려질 수 있으니 데이터 성격에 맞춰 고르는 게 좋아요.\n",
+  "tags": [
+   "app-router",
+   "fetch-cache",
+   "revalidate"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "next-003",
+  "category": "nextjs",
+  "difficulty": "medium",
+  "question": "Next.js Server Actions에 대한 설명으로 가장 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "서버에서 실행되는 함수를 form action이나 클라이언트 호출 경로와 연결해 mutation을 처리할 수 있어요."
+   },
+   {
+    "id": "b",
+    "text": "브라우저 번들에 데이터베이스 secret을 포함해 클라이언트에서 직접 쿼리하게 해줘요."
+   },
+   {
+    "id": "c",
+    "text": "정적 HTML만 만들 수 있어서 사용자 입력 처리는 불가능해요."
+   },
+   {
+    "id": "d",
+    "text": "Server Component를 모두 Client Component로 바꾸는 기능이에요."
+   }
+  ],
+  "explanation": "Server Actions는 서버에서 실행되는 함수를 form action이나 클라이언트 호출 흐름과 연결해 mutation을 처리할 수 있게 해줘요. 예를 들어 게시글 작성, 좋아요, 설정 저장처럼 서버 데이터가 바뀌는 작업을 별도 API Route 없이 액션으로 표현할 수 있어요.\n서버에서 실행되므로 DB secret이나 서버 전용 SDK를 클라이언트 번들에 넣지 않아도 되는 장점이 있어요. 다만 “서버에서 실행된다”는 이유만으로 안전해지는 건 아니고, 사용자 권한 확인·입력 검증·CSRF 같은 보안 고려는 액션 내부에서 명확히 처리해야 해요.\n",
+  "tags": [
+   "server-actions",
+   "mutation",
+   "app-router"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "next-004",
+  "category": "nextjs",
+  "difficulty": "hard",
+  "question": "App Router에서 Streaming SSR과 `Suspense`를 함께 쓰는 이유로 가장 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "느린 데이터 영역을 기다리는 동안 먼저 준비된 UI와 fallback을 보내 사용자가 더 빨리 화면을 보기 위해서예요."
+   },
+   {
+    "id": "b",
+    "text": "모든 JavaScript를 제거해 Client Component 사용을 금지하기 위해서예요."
+   },
+   {
+    "id": "c",
+    "text": "서버 렌더링을 중단하고 CSR만 사용하도록 강제하기 위해서예요."
+   },
+   {
+    "id": "d",
+    "text": "이미지 파일을 자동으로 WebP로 변환하기 위해서예요."
+   }
+  ],
+  "explanation": "전통적인 SSR은 페이지에 필요한 데이터가 모두 준비될 때까지 HTML 응답이 늦어질 수 있어요. Streaming SSR은 준비된 부분부터 클라이언트로 흘려보내고, 느린 영역은 나중에 이어서 보낼 수 있게 해줘요.\n`Suspense`는 이 느린 영역의 경계를 선언하고 fallback UI를 먼저 보여주는 역할을 해요. 예를 들어 상단 레이아웃과 기본 콘텐츠는 먼저 보여주고, 추천 목록처럼 느린 데이터는 skeleton을 보여주다가 준비되면 교체할 수 있어 사용자 체감 대기 시간을 줄일 수 있어요.\n",
+  "tags": [
+   "streaming-ssr",
+   "suspense",
+   "app-router",
+   "rendering"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "next-005",
+  "category": "nextjs",
+  "difficulty": "easy",
+  "question": "Next.js Proxy를 쓰기 좋은 경우는?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "요청이 라우트에 도달하기 전에 인증 여부를 확인해 redirect하거나 rewrite해요."
+   },
+   {
+    "id": "b",
+    "text": "React 컴포넌트의 로컬 state를 저장해요."
+   },
+   {
+    "id": "c",
+    "text": "이미지 압축 알고리즘을 직접 구현해요."
+   },
+   {
+    "id": "d",
+    "text": "브라우저에서만 접근 가능한 DOM 크기를 측정해요."
+   }
+  ],
+  "explanation": "Next.js 16 기준으로 예전 Middleware는 Proxy라는 파일 컨벤션으로 이름이 바뀌었고, 요청이 라우트에 도달하기 전에 실행되는 얇은 계층이라는 역할은 이어져요. 그래서 로그인하지 않은 사용자를 `/login`으로 redirect하거나, A/B 테스트용 rewrite를 하거나, 요청/응답 헤더를 조정하는 작업에 잘 맞아요.\n다만 Proxy는 모든 관련 요청 경로에서 실행될 수 있으므로 무거운 DB 작업이나 복잡한 비즈니스 로직을 넣으면 전체 응답 시간이 느려질 수 있어요. DOM 크기 측정처럼 브라우저에서만 가능한 작업도 Proxy의 역할이 아니에요. 기존 자료에서 Middleware라고 부르는 경우가 있지만, 새 코드에서는 Proxy 용어와 `proxy.ts` 컨벤션을 우선으로 보는 게 좋아요.\n",
+  "tags": [
+   "proxy",
+   "middleware",
+   "redirect",
+   "rewrite",
+   "auth"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "next-006",
+  "category": "nextjs",
+  "difficulty": "easy",
+  "question": "App Router의 특수 파일 중, 같은 세그먼트에서 에러가 던져졌을 때 fallback UI를 보여 주는 파일은 무엇인가요?",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`loading.tsx`"
+   },
+   {
+    "id": "b",
+    "text": "`error.tsx`"
+   },
+   {
+    "id": "c",
+    "text": "`not-found.tsx`"
+   },
+   {
+    "id": "d",
+    "text": "`layout.tsx`"
+   }
+  ],
+  "explanation": "App Router는 세그먼트 단위로 규약(convention) 파일을 둬요. `error.tsx`는 해당 세그먼트(또는 하위)에서 발생한 런타임 에러를 React Error Boundary로 잡아 fallback UI를 보여줘요. `loading.tsx`는 Suspense 기반 로딩 UI, `not-found.tsx`는 `notFound()` 호출 시 띄우는 404, `layout.tsx`는 공통 레이아웃을 정의하는 파일이라 역할이 달라요.",
+  "references": [
+   {
+    "title": "Next.js Docs — error.js",
+    "url": "https://nextjs.org/docs/app/api-reference/file-conventions/error"
+   },
+   {
+    "title": "Next.js Docs — Routing: File Conventions",
+    "url": "https://nextjs.org/docs/app/api-reference/file-conventions"
+   }
+  ],
+  "tags": [
+   "app-router",
+   "error-boundary",
+   "file-conventions",
+   "routing"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "next-007",
+  "category": "nextjs",
+  "difficulty": "medium",
+  "question": "Next.js에서 기본 `<img>` 대신 `next/image`를 사용하는 이유로 가장 적절한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "모든 이미지를 무조건 base64 문자열로 HTML에 인라인 삽입해서 네트워크 요청을 없애기 때문이에요."
+   },
+   {
+    "id": "b",
+    "text": "이미지 크기 조정, 최신 포맷 제공, lazy loading, placeholder 같은 최적화와 UX 기능을 프레임워크 차원에서 제공하기 때문이에요."
+   },
+   {
+    "id": "c",
+    "text": "외부 도메인 이미지는 별도 설정 없이 항상 자동 최적화되기 때문이에요."
+   },
+   {
+    "id": "d",
+    "text": "`next/image`를 쓰면 이미지의 `width`와 `height`를 전혀 지정하지 않아도 레이아웃 이동이 항상 방지돼요."
+   }
+  ],
+  "explanation": "`next/image`는 요청 상황에 맞는 이미지 크기와 포맷을 제공하고, 기본 lazy loading과 placeholder 같은 기능으로 초기 로딩 성능과 사용자 경험을 개선할 수 있어요. 직접 `<img loading=\"lazy\">`나 이미지 CDN을 조합해도 비슷한 최적화를 만들 수 있지만, Next.js에서는 이를 컴포넌트와 설정으로 일관되게 다룰 수 있다는 장점이 있어요.\na처럼 모든 이미지를 인라인으로 바꾸는 기능은 아니고, c처럼 외부 이미지를 아무 설정 없이 항상 처리하는 것도 아니에요. 보통 외부 이미지는 `next.config.js`의 `images.remotePatterns` 같은 허용 설정이 필요해요. d도 과장된 설명으로, 레이아웃 안정성을 위해서는 이미지의 크기 정보나 `fill` 사용 시 부모 컨테이너 설계가 필요해요.\n",
+  "tags": [
+   "next-image",
+   "image-optimization",
+   "lazy-loading",
+   "placeholder"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "perf-001",
+  "category": "performance",
+  "difficulty": "easy",
+  "question": "Core Web Vitals의 대표 지표 조합으로 가장 알맞은 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "LCP, INP, CLS"
+   },
+   {
+    "id": "b",
+    "text": "TTFB, FPS, CPU"
+   },
+   {
+    "id": "c",
+    "text": "FOUT, FOIT, DNS"
+   },
+   {
+    "id": "d",
+    "text": "DOM, CSSOM, VDOM"
+   }
+  ],
+  "explanation": "Core Web Vitals는 사용자 경험에 직접 연결되는 대표 성능 지표 묶음이에요. LCP는 주요 콘텐츠가 얼마나 빨리 보이는지, INP는 클릭·입력 같은 상호작용에 페이지가 얼마나 빨리 반응하는지, CLS는 예상치 못한 레이아웃 이동이 얼마나 적은지를 봐요.\nTTFB, FPS, CPU 사용량도 성능 분석에서 중요하지만, 현재 Core Web Vitals의 핵심 3종 조합은 LCP·INP·CLS로 보는 게 맞아요.\n",
+  "tags": [
+   "core-web-vitals",
+   "lcp",
+   "inp",
+   "cls"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "perf-002",
+  "category": "performance",
+  "difficulty": "medium",
+  "question": "LCP 개선에 가장 직접적으로 도움이 되는 선택은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "첫 화면의 hero 이미지를 최적화하고 우선 로드해요."
+   },
+   {
+    "id": "b",
+    "text": "보이지 않는 하단 이미지를 모두 eager loading해요."
+   },
+   {
+    "id": "c",
+    "text": "클릭 핸들러 내부 로직을 모두 `setTimeout`으로 감싸요."
+   },
+   {
+    "id": "d",
+    "text": "서버 응답과 무관하게 CSS 애니메이션만 늘려요."
+   }
+  ],
+  "explanation": "LCP는 사용자가 처음 보는 viewport 안에서 가장 큰 이미지·텍스트 블록 같은 주요 콘텐츠가 언제 렌더링되는지를 측정해요. 따라서 첫 화면 hero 이미지가 크거나 늦게 다운로드되면 LCP가 바로 나빠질 수 있어요.\n이미지의 실제 표시 크기에 맞는 리사이징, WebP/AVIF 같은 효율적인 포맷, 적절한 캐싱, 우선순위 조정이 직접적인 개선책이 돼요. Next.js 16에서는 `Image`의 `priority` prop이 deprecated되고 동작이 명확한 `preload` prop으로 대체됐어요. 다만 `preload`는 `<head>`에 preload `<link>`를 삽입하는 방식이라 hero 이미지처럼 확실한 LCP 후보에만 쓰고, `loading`이나 `fetchPriority`를 지정한 이미지에는 함께 쓰지 말라고 안내돼요 — 공식 문서는 대부분의 경우 `preload` 대신 `loading=\"eager\"`나 `fetchPriority=\"high\"`를 쓰라고 해요. 반대로 화면 아래 이미지를 eager loading하면 네트워크 경쟁만 늘 수 있어요.\n(출처: https://nextjs.org/docs/app/api-reference/components/image#preload)\n",
+  "references": [
+   {
+    "title": "web.dev — Largest Contentful Paint (LCP)",
+    "url": "https://web.dev/articles/lcp"
+   },
+   {
+    "title": "Next.js — Image preload prop",
+    "url": "https://nextjs.org/docs/app/api-reference/components/image#preload"
+   }
+  ],
+  "tags": [
+   "lcp",
+   "image-optimization",
+   "preload"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "perf-003",
+  "category": "performance",
+  "difficulty": "medium",
+  "question": "CLS를 줄이는 데 도움이 되는 방법을 모두 고르면?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "이미지와 광고 영역에 미리 `width`, `height` 또는 `aspect-ratio`를 지정해요."
+   },
+   {
+    "id": "b",
+    "text": "웹 폰트 교체로 레이아웃이 흔들리지 않도록 폰트 로딩 전략을 조정해요."
+   },
+   {
+    "id": "c",
+    "text": "첫 화면 위쪽에 동적으로 배너를 삽입할 때 기존 콘텐츠를 아래로 밀어도 예약 공간은 두지 않아요."
+   },
+   {
+    "id": "d",
+    "text": "스켈레톤이나 placeholder로 늦게 도착하는 콘텐츠의 공간을 확보해요."
+   }
+  ],
+  "explanation": "CLS는 페이지 로딩 중 또는 사용 중에 요소가 갑자기 움직여 사용자가 잘못 클릭하거나 읽던 위치를 잃는 문제를 수치화한 지표예요. 이미지·광고·임베드처럼 늦게 로드되는 요소는 `width`, `height`, `aspect-ratio` 등으로 공간을 미리 확보하는 게 중요해요.\n웹 폰트 교체로 글자 폭이 크게 달라지는 경우도 레이아웃 이동을 만들 수 있으므로 폰트 로딩 전략을 조정해야 해요. 상단에 예약 공간 없이 배너를 삽입하면 기존 콘텐츠가 아래로 밀리기 때문에 CLS를 악화시키는 대표 패턴이에요.\n",
+  "tags": [
+   "cls",
+   "layout-shift",
+   "font-loading",
+   "image"
+  ],
+  "type": "multi_choice",
+  "answer": [
+   "a",
+   "b",
+   "d"
+  ]
+ },
+ {
+  "id": "perf-004",
+  "category": "performance",
+  "difficulty": "hard",
+  "question": "INP가 나쁜 페이지에서 클릭 직후 300ms 이상의 긴 JavaScript 작업이 반복돼요. 가장 적절한 개선 방향은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "클릭 핸들러의 무거운 작업을 쪼개거나 지연해서 메인 스레드 점유 시간을 줄여요."
+   },
+   {
+    "id": "b",
+    "text": "모든 이미지를 더 큰 해상도로 바꿔 LCP만 개선해요."
+   },
+   {
+    "id": "c",
+    "text": "`z-index` 값을 낮춰 브라우저가 이벤트를 더 빨리 받게 해요."
+   },
+   {
+    "id": "d",
+    "text": "이벤트 핸들러를 더 많이 등록해 같은 작업을 병렬로 실행해요."
+   }
+  ],
+  "explanation": "INP는 사용자가 클릭·탭·키 입력을 했을 때 브라우저가 이벤트를 처리하고 다음 화면 업데이트를 보여주기까지의 지연을 봐요. 클릭 직후 긴 JavaScript 작업이 메인 스레드를 막고 있으면 이벤트 처리, React 렌더링, Paint가 모두 밀릴 수 있어요.\n개선하려면 한 번에 오래 도는 작업을 작은 chunk로 나누거나, 즉시 필요하지 않은 작업은 뒤로 미루고, 무거운 계산은 Web Worker로 옮기는 식으로 메인 스레드 점유 시간을 줄여야 해요. React 앱이라면 불필요한 리렌더와 큰 동기 작업도 같이 줄이는 게 좋아요.\n",
+  "tags": [
+   "inp",
+   "long-task",
+   "main-thread",
+   "responsiveness"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "perf-005",
+  "category": "performance",
+  "difficulty": "easy",
+  "question": "버튼 hover 시 살짝 위로 이동하는 애니메이션을 만들 때 성능 관점에서 더 선호되는 방식은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`position: relative`와 `top: -4px`를 변경해요."
+   },
+   {
+    "id": "b",
+    "text": "`transform: translateY(-4px)`를 사용해요."
+   },
+   {
+    "id": "c",
+    "text": "`margin-top: -4px`를 변경해요."
+   },
+   {
+    "id": "d",
+    "text": "`height`를 줄여서 위로 올라간 것처럼 보이게 해요."
+   }
+  ],
+  "explanation": "hover나 drag처럼 자주 변하는 시각적 이동은 `transform`이 보통 더 유리해요. `transform: translateY(...)`는 요소가 원래 차지하는 레이아웃 공간을 바꾸지 않고 합성 단계에서 처리될 가능성이 높아, 매 프레임 Layout을 다시 계산하는 비용을 줄일 수 있어요.\n`top`, `margin`, `height` 같은 속성은 요소의 배치나 주변 흐름에 영향을 줄 수 있어 Reflow를 유발하기 쉬워요. 다만 실제 문서 흐름 자체가 바뀌어야 하는 UI라면 `position`이나 레이아웃 속성을 써야 하므로, 성능과 의미를 함께 보는 게 좋아요.\n",
+  "tags": [
+   "transform",
+   "composite",
+   "animation",
+   "reflow"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "react-001",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "버튼을 한 번 클릭했을 때, 클릭 직후 화면에 표시되는 숫자와 console에 찍히는 값은?\n",
+  "code": "function Counter() {\n  const [n, setN] = useState(0)\n  function handleClick() {\n    setN(n + 1)\n    setN(n + 1)\n    setN(n + 1)\n    console.log('clicked, n =', n)\n  }\n  return <button onClick={handleClick}>{n}</button>\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "버튼: 1, console: clicked, n = 0"
+   },
+   {
+    "id": "b",
+    "text": "버튼: 3, console: clicked, n = 3"
+   },
+   {
+    "id": "c",
+    "text": "버튼: 1, console: clicked, n = 1"
+   },
+   {
+    "id": "d",
+    "text": "버튼: 3, console: clicked, n = 0"
+   }
+  ],
+  "explanation": "세 번의 `setN(n + 1)` 호출 모두 클로저로 잡힌 같은 `n`(=0)을 읽어서 매번 `setN(1)`을 예약해요. 결과적으로 React가 세 업데이트를 배치 처리한 뒤 한 번 리렌더하지만, 다음 렌더의 `n`은 결국 1이에요.\n`console.log`는 클릭 시점의 렌더 컨텍스트 안이라 그 시점의 `n`(=0)을 그대로 출력해요.\n3까지 올리고 싶으면 함수형 업데이트 `setN(prev => prev + 1)`로 바꿔 주세요.\n",
+  "references": [
+   {
+    "title": "React — useState",
+    "url": "https://ko.react.dev/reference/react/useState"
+   },
+   {
+    "title": "React — state 업데이트 큐",
+    "url": "https://ko.react.dev/learn/queueing-a-series-of-state-updates"
+   }
+  ],
+  "tags": [
+   "hooks",
+   "useState",
+   "closure",
+   "batching"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "react-002",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "다음 useEffect의 cleanup 함수는 언제 실행될까요?\n",
+  "code": "useEffect(() => {\n  const id = setInterval(tick, 1000)\n  return () => clearInterval(id)\n}, [tick])\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "컴포넌트가 언마운트될 때만"
+   },
+   {
+    "id": "b",
+    "text": "매 렌더링이 끝난 직후 항상"
+   },
+   {
+    "id": "c",
+    "text": "절대 실행되지 않음 (effect는 한 번만 등록되므로)"
+   },
+   {
+    "id": "d",
+    "text": "`tick`이 바뀌면 다음 effect가 돌기 직전에, 그리고 컴포넌트 언마운트 시"
+   }
+  ],
+  "explanation": "cleanup은 \"다음 effect가 시작되기 직전\" + \"컴포넌트가 언마운트될 때\" 두 시점에 실행돼요.\n의존성 배열의 `tick`이 새 참조가 되면, 이전 effect를 정리(cleanup)한 뒤에 새 effect를 다시 등록하는 식이에요.\n그래서 setInterval 같은 리소스를 깔끔히 해제하지 않으면, 옛 타이머가 살아있는 채로 새 타이머도 등록돼서 누수가 나요.\n",
+  "references": [
+   {
+    "title": "React — useEffect",
+    "url": "https://ko.react.dev/reference/react/useEffect"
+   },
+   {
+    "title": "React — Effect로 동기화하기",
+    "url": "https://ko.react.dev/learn/synchronizing-with-effects"
+   }
+  ],
+  "tags": [
+   "useEffect",
+   "cleanup",
+   "hooks"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "react-003",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "컴포넌트가 마운트되자마자 DOM의 크기를 측정해서, 그 값으로 위치를 보정해야 해요. 사용자 눈에 깜빡임(jank)이 보이지 않아야 한다면 어떤 훅을 골라야 할까요?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "useLayoutEffect — 브라우저가 paint하기 전에 동기적으로 실행돼서 측정/보정 후의 결과만 화면에 그려짐"
+   },
+   {
+    "id": "b",
+    "text": "useEffect — paint 이후 비동기적으로 실행돼서 한 번 그렸다가 다시 그릴 위험이 있음"
+   },
+   {
+    "id": "c",
+    "text": "useMemo — 계산을 캐시해서 보정 가능"
+   },
+   {
+    "id": "d",
+    "text": "useState — 초기값에 측정 결과를 넣으면 됨"
+   }
+  ],
+  "explanation": "실행 타이밍이 핵심이에요. `useLayoutEffect`는 DOM 변경 직후 **paint 전에 동기적으로** 실행되니까, 측정·보정한 결과만 사용자가 보게 돼요.\n`useEffect`는 paint 직후 **비동기적으로** 실행돼서, 보정 전 상태가 한 번 깜빡 보일 수 있어요.\n단점도 같이 알아두면 좋아요. `useLayoutEffect`는 브라우저 paint를 잠시 막아서 무거운 로직을 넣으면 렌더가 느려져요. 깜빡임 보정이 꼭 필요할 때만 써 주세요.\n",
+  "references": [
+   {
+    "title": "React — useLayoutEffect",
+    "url": "https://ko.react.dev/reference/react/useLayoutEffect"
+   },
+   {
+    "title": "React — useEffect",
+    "url": "https://ko.react.dev/reference/react/useEffect"
+   }
+  ],
+  "tags": [
+   "useEffect",
+   "useLayoutEffect",
+   "hooks",
+   "rendering"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "react-004",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "React.memo, useMemo, useCallback에 대한 설명 중 **틀린** 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "React.memo는 props가 얕게 같으면 자식 컴포넌트의 리렌더를 스킵해요"
+   },
+   {
+    "id": "b",
+    "text": "React.memo로 감싸면 컴포넌트 내부 state가 변해도 리렌더가 막혀요"
+   },
+   {
+    "id": "c",
+    "text": "useMemo는 의존성이 같을 때 계산 결과(반환값)를 재사용해요"
+   },
+   {
+    "id": "d",
+    "text": "useCallback은 의존성이 같을 때 같은 함수 참조를 유지해요"
+   }
+  ],
+  "explanation": "`React.memo`는 **props 비교**로 리렌더를 스킵할 뿐, 자기 자신의 state나 사용 중인 context가 바뀌면 당연히 리렌더돼요. \"state까지 막아준다\"는 건 흔한 오해예요.\n`useMemo`는 값(반환값) 캐시, `useCallback`은 함수 참조 캐시라고 짝지어 외워 두면 헷갈리지 않아요.\n세 도구 모두 비교 비용/메모리를 쓰니까 진짜 필요한 자리에만 써야 해요. 무지성으로 두르는 건 오히려 손해예요.\n",
+  "references": [
+   {
+    "title": "React — memo",
+    "url": "https://ko.react.dev/reference/react/memo"
+   },
+   {
+    "title": "React — useMemo",
+    "url": "https://ko.react.dev/reference/react/useMemo"
+   },
+   {
+    "title": "React — useCallback",
+    "url": "https://ko.react.dev/reference/react/useCallback"
+   }
+  ],
+  "tags": [
+   "memoization",
+   "memo",
+   "useMemo",
+   "useCallback"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "react-005",
+  "category": "react",
+  "difficulty": "easy",
+  "question": "개발 환경에서 `<StrictMode>`로 감싼 컴포넌트의 useEffect가 **두 번** 실행되는 이유는?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "React 19부터 모든 effect가 두 번 실행되도록 기본 동작이 바뀌어서"
+   },
+   {
+    "id": "b",
+    "text": "의존성 배열이 빈 배열일 때만 두 번 실행되는 버그"
+   },
+   {
+    "id": "c",
+    "text": "마운트 → 언마운트 → 재마운트를 시뮬레이션해서 cleanup 누락이나 부수효과를 잡아내기 위해 (개발 모드 전용)"
+   },
+   {
+    "id": "d",
+    "text": "Hot Reload 때문에 항상 두 번 실행됨"
+   }
+  ],
+  "explanation": "StrictMode는 **개발 환경에서만** 컴포넌트를 한 번 더 마운트/언마운트해서 effect의 cleanup이 제대로 되는지 강제로 검사해 줘요.\n그래서 cleanup이 없는 effect가 두 번 작동하면 서버 호출이 중복되거나 타이머가 두 개 도는 등 버그가 드러나는 거예요. 그게 의도된 동작이에요.\n프로덕션 빌드에서는 한 번만 실행되니 걱정하지 않아도 돼요. 두 번 도는 게 거슬리면 cleanup을 제대로 짜는 게 정답이에요.\n",
+  "references": [
+   {
+    "title": "React — StrictMode",
+    "url": "https://ko.react.dev/reference/react/StrictMode"
+   },
+   {
+    "title": "React — Effect로 동기화하기",
+    "url": "https://ko.react.dev/learn/synchronizing-with-effects"
+   }
+  ],
+  "tags": [
+   "strict-mode",
+   "useEffect",
+   "dev-mode"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "react-006",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "아래 코드에서 `count`가 바뀔 때마다 모든 `UserContext` consumer가 리렌더돼요. 가장 적절한 해결책은?\n",
+  "code": "function App() {\n  const [count, setCount] = useState(0)\n  return (\n    <UserContext.Provider value={{ name: '하늘' }}>\n      <Page />\n    </UserContext.Provider>\n  )\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "Provider 자체를 `React.memo`로 감싸요"
+   },
+   {
+    "id": "b",
+    "text": "`useCallback`으로 `value` 객체를 감싸요"
+   },
+   {
+    "id": "c",
+    "text": "`value`를 JSON 문자열로 변환해 넘겨요"
+   },
+   {
+    "id": "d",
+    "text": "Provider의 `value` 객체를 `useMemo`로 감싸 의존성이 같을 때 같은 참조를 유지해요"
+   }
+  ],
+  "explanation": "매 렌더마다 `{ name: '하늘' }`이 **새 객체 리터럴**로 만들어져 참조가 바뀌니까, Context는 \"값이 바뀌었네\"라고 판단하고 모든 consumer를 리렌더해요.\n`useMemo(() => ({ name: '하늘' }), [])`로 감싸면 의존성이 바뀌지 않는 한 같은 참조를 유지해서 consumer가 흔들리지 않아요.\n`useCallback`은 함수 참조용이라 객체엔 맞지 않고, `React.memo`는 Provider 자체의 props 비교라 도움이 되지 않아요.\n",
+  "references": [
+   {
+    "title": "React — useContext",
+    "url": "https://ko.react.dev/reference/react/useContext"
+   },
+   {
+    "title": "React — useMemo",
+    "url": "https://ko.react.dev/reference/react/useMemo"
+   }
+  ],
+  "tags": [
+   "context",
+   "useMemo",
+   "rerender"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "react-007",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "아래 코드에서 `items` 배열 **앞쪽에** 새 항목을 `unshift`하면 어떤 일이 벌어질까요?\n",
+  "code": "{items.map((item, i) => (\n  <Row key={i} item={item} />\n))}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "기존 Row들이 인덱스가 한 칸씩 밀려 잘못된 item과 재매칭돼서, 내부 state·input 포커스·애니메이션이 엉켜요"
+   },
+   {
+    "id": "b",
+    "text": "맨 앞에 새 Row만 마운트되고 나머지는 그대로 유지돼요"
+   },
+   {
+    "id": "c",
+    "text": "React가 자동으로 key를 재계산해서 문제가 생기지 않아요"
+   },
+   {
+    "id": "d",
+    "text": "key 충돌로 컴파일 에러가 발생해요"
+   }
+  ],
+  "explanation": "`key={i}`로 인덱스를 쓰면 React 입장에서 \"0번 자리, 1번 자리, ...\"로 식별하는 셈이에요.\n앞에 항목이 추가되면 모든 인덱스가 한 칸씩 밀리는데, key는 그대로 0,1,2...이니까 React는 \"같은 key의 컴포넌트가 다른 item을 받았다\"고 판단해서 props만 갈아끼우게 돼요.\n그러면 Row 내부 state(예: 입력 중인 텍스트)나 포커스가 엉뚱한 항목에 따라붙어요. 해결책은 항목 고유의 안정적인 id를 key로 쓰는 거예요.\n",
+  "references": [
+   {
+    "title": "React — 리스트 렌더링",
+    "url": "https://ko.react.dev/learn/rendering-lists"
+   },
+   {
+    "title": "React — state 보존과 초기화",
+    "url": "https://ko.react.dev/learn/preserving-and-resetting-state"
+   }
+  ],
+  "tags": [
+   "key",
+   "list",
+   "reconciliation"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "react-008",
+  "category": "react",
+  "difficulty": "easy",
+  "question": "React form input에서 controlled와 uncontrolled를 구분하는 핵심 차이는?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "controlled는 onChange 핸들러가 없고, uncontrolled는 onChange가 있어요"
+   },
+   {
+    "id": "b",
+    "text": "controlled는 input의 값을 React state로 관리하고, uncontrolled는 DOM이 자체적으로 값을 들고 있다가 ref로 읽어요"
+   },
+   {
+    "id": "c",
+    "text": "controlled는 form submit 시 자동으로 reset돼요"
+   },
+   {
+    "id": "d",
+    "text": "둘은 동작이 같고 코드 스타일만 달라요"
+   }
+  ],
+  "explanation": "controlled는 `value={state}` + `onChange={...}`로 React가 input 값의 단일 출처(single source of truth)를 갖는 패턴이에요.\nuncontrolled는 `defaultValue`로 초기값만 주고, 실제 값은 DOM이 알아서 들고 있다가 필요할 때 `ref.current.value`로 읽는 패턴이에요.\ncontrolled는 검증·동적 표시가 쉽고, uncontrolled는 큰 폼에서 리렌더 비용이 적어요. 상황에 맞게 골라 주세요.\n",
+  "references": [
+   {
+    "title": "React — <input>",
+    "url": "https://ko.react.dev/reference/react-dom/components/input"
+   },
+   {
+    "title": "React — ref로 DOM 조작하기",
+    "url": "https://ko.react.dev/learn/manipulating-the-dom-with-refs"
+   }
+  ],
+  "tags": [
+   "form",
+   "controlled",
+   "uncontrolled",
+   "ref"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "react-009",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "Error Boundary가 **잡지 못하는** 에러는?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "자식 컴포넌트의 render 단계에서 동기적으로 `throw`된 에러"
+   },
+   {
+    "id": "b",
+    "text": "constructor 또는 `useState` 초기화 함수 안에서 `throw`된 에러"
+   },
+   {
+    "id": "c",
+    "text": "`onClick` 같은 이벤트 핸들러 안에서 `throw`된 에러"
+   },
+   {
+    "id": "d",
+    "text": "`componentDidMount`에서 동기적으로 `throw`된 에러"
+   }
+  ],
+  "explanation": "Error Boundary는 **렌더 단계, 생명주기, 생성자**에서 동기적으로 throw된 에러만 잡아요. 트리 어디든 깊이 상관 없이 가장 가까운 boundary로 전파되긴 해요.\n못 잡는 대표 케이스 3가지: ① 이벤트 핸들러 ② 비동기 코드(setTimeout, Promise.then) ③ SSR이에요. boundary가 잡기엔 호출 시점이 React 렌더 흐름 밖이거든요.\n이벤트 핸들러는 `try/catch`로 직접 처리하거나, 에러 상태를 state로 끌어올려 다음 렌더에서 throw해야 boundary가 잡을 수 있어요.\n",
+  "references": [
+   {
+    "title": "React — Component (Error Boundary)",
+    "url": "https://ko.react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary"
+   }
+  ],
+  "tags": [
+   "error-boundary",
+   "error-handling"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "react-010",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "React의 Render Phase와 Commit Phase에 대한 설명 중 **옳은** 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "Render Phase에서 직접 DOM을 수정해도 React가 잘 동기화해 줘요"
+   },
+   {
+    "id": "b",
+    "text": "Commit Phase는 Virtual DOM 트리를 만드는 단계예요"
+   },
+   {
+    "id": "c",
+    "text": "useEffect 콜백은 Render Phase 안에서 실행돼요"
+   },
+   {
+    "id": "d",
+    "text": "Render Phase는 순수해야 하고(side effect 없음), 실제 DOM 변경은 Commit Phase에서, useEffect 콜백은 Commit이 끝난 뒤에 실행돼요"
+   }
+  ],
+  "explanation": "Render Phase는 React가 컴포넌트를 호출해 새 Virtual DOM을 만들고 diff를 계산하는 단계예요. 같은 입력에 같은 출력이 나와야 해서 **순수**해야 하고, StrictMode에서 일부러 두 번 호출해 검사하기도 해요.\n실제 DOM 변경(mutation)은 **Commit Phase 안에서** 적용되고, `useEffect` 콜백은 그 커밋이 끝나고 브라우저 paint 이후에 비동기적으로 실행돼요. 반면 `useLayoutEffect`와 클래스의 `componentDidMount`/`componentDidUpdate`는 paint 전, Commit 단계에서 동기로 돌아요.\n그래서 render 안에서 `setState`를 무한히 부르거나 DOM을 직접 만지면 안 되는 거예요.\n",
+  "references": [
+   {
+    "title": "React — 렌더와 커밋",
+    "url": "https://ko.react.dev/learn/render-and-commit"
+   },
+   {
+    "title": "React — useLayoutEffect",
+    "url": "https://ko.react.dev/reference/react/useLayoutEffect"
+   }
+  ],
+  "tags": [
+   "render-phase",
+   "commit-phase",
+   "lifecycle"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "react-011",
+  "category": "react",
+  "difficulty": "easy",
+  "question": "`useState` 대신 `useReducer`를 쓰는 게 가장 자연스러운 상황은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "단일 boolean 토글 상태 하나만 관리할 때"
+   },
+   {
+    "id": "b",
+    "text": "여러 액션 타입과 복잡한 상태 전이가 있고, 다음 상태가 이전 상태와 액션에 따라 결정될 때"
+   },
+   {
+    "id": "c",
+    "text": "서버에서 받아온 값을 단순히 보여 주기만 할 때"
+   },
+   {
+    "id": "d",
+    "text": "한 컴포넌트 안에서만 쓰는 임시 입력 값을 잠깐 저장할 때"
+   }
+  ],
+  "explanation": "`useReducer`는 (state, action) → state 형태로 상태 전이를 한 곳(reducer)에 모으기 때문에, 액션 종류가 많고 분기가 복잡하거나 여러 필드를 한 번에 갱신해야 할 때 가독성·테스트성에서 이점이 커요.\n단순 토글이나 텍스트 입력처럼 전이가 자명한 경우엔 `useState`가 더 짧고 명확해요. \"상태가 다음 상태를 만들고, 패턴이 반복된다\"는 신호가 보이면 `useReducer`를 떠올려 보세요.\n",
+  "references": [
+   {
+    "title": "React — useReducer",
+    "url": "https://ko.react.dev/reference/react/useReducer"
+   },
+   {
+    "title": "React — state 로직을 reducer로 추출하기",
+    "url": "https://ko.react.dev/learn/extracting-state-logic-into-a-reducer"
+   }
+  ],
+  "tags": [
+   "hooks",
+   "useReducer",
+   "state-management"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "react-012",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "React Hook 규칙에 따라 다음 코드에서 **규칙을 위반**하는 항목을 모두 고르면?\n",
+  "code": "function Profile({ userId }) {\n  if (!userId) {\n    const [name, setName] = useState('')   // (가)\n    return null\n  }\n  const data = useFetch(userId)            // (나)\n  useEffect(() => {                        // (다)\n    document.title = data?.name ?? ''\n  }, [data])\n  return <div>{data?.name}</div>\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "(가)만"
+   },
+   {
+    "id": "b",
+    "text": "(가), (나)"
+   },
+   {
+    "id": "c",
+    "text": "(가), (다)"
+   },
+   {
+    "id": "d",
+    "text": "(가), (나), (다) 모두"
+   }
+  ],
+  "explanation": "훅은 컴포넌트가 매 렌더에서 **항상 같은 순서, 같은 개수**로 호출돼야 해요. `if`/`for`/조기 `return` 등으로 호출 여부가 바뀌는 위치에서 훅을 쓰면 안 돼요.\n- (가)는 `if (!userId)` 블록 안에서 `useState`를 호출해서 명백한 위반이에요.\n- (나) `useFetch`와 (다) `useEffect`도 `if (!userId) return null` 뒤에 위치해 있어서, `userId`가 falsy인 렌더와 truthy인 렌더에서 호출 여부가 달라져 같은 위반에 해당해요.\n올바른 패턴은 모든 훅을 컴포넌트 함수 최상단에서 호출하고, 분기는 그 뒤에 두는 거예요:\n```js\nfunction Profile({ userId }) {\n  const [name, setName] = useState('')\n  const data = useFetch(userId)\n  useEffect(() => { document.title = data?.name ?? '' }, [data])\n  if (!userId) return null\n  return <div>{data?.name}</div>\n}\n```\nESLint 플러그인 `react-hooks/rules-of-hooks`를 켜 두면 이런 패턴을 자동으로 잡아 줘요.\n",
+  "references": [
+   {
+    "title": "React — Hook 규칙",
+    "url": "https://ko.react.dev/reference/rules/rules-of-hooks"
+   },
+   {
+    "title": "React — 커스텀 Hook으로 로직 재사용하기",
+    "url": "https://ko.react.dev/learn/reusing-logic-with-custom-hooks"
+   }
+  ],
+  "tags": [
+   "hooks",
+   "rules-of-hooks",
+   "lint"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "react-013",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "`React.lazy`로 불러오는 컴포넌트를 `<Suspense>` 없이 렌더하면 어떻게 될까요?\n",
+  "code": "const Heavy = React.lazy(() => import('./Heavy'))\n\nfunction App() {\n  return <Heavy />\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "lazy가 자동으로 fallback을 만들어 빈 div를 보여 줘요."
+   },
+   {
+    "id": "b",
+    "text": "동기로 즉시 모듈을 로딩한 뒤 렌더해요."
+   },
+   {
+    "id": "c",
+    "text": "상위에 Suspense 경계가 없으면 React가 커밋을 미뤄서, 모듈이 로드될 때까지 그 트리는 화면에 반영되지 않아요."
+   },
+   {
+    "id": "d",
+    "text": "처음 한 번만 fallback 없이 렌더되고, 이후엔 정상 렌더돼요."
+   }
+  ],
+  "explanation": "`React.lazy`로 만든 컴포넌트는 첫 렌더에서 모듈을 비동기로 불러오는 동안 렌더 트리를 \"일시 중단(suspend)\"시켜요. 상위에 이걸 받아 줄 `<Suspense fallback={...}>`이 없으면, React 18+의 concurrent 루트(`createRoot`)에서는 에러 대신 **커밋 자체가 미뤄져서** 모듈이 로드될 때까지 그 트리가 화면에 아무것도 반영되지 않아요. 사용자 입장에선 로딩 표시도 없이 멈춘 것처럼 보이는 거죠.\n참고로 옛 legacy 루트(`ReactDOM.render`)에서는 경계 없이 suspend하면 에러를 던졌어요. 어느 쪽이든 로딩 UI를 보여 주려면 보통 라우트 단위로 `<Suspense fallback={<Spinner />}>`로 감싸는 패턴을 써요. 코드 스플리팅으로 초기 번들을 줄일 때 자주 등장해요.\n(출처: https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberThrow.js)\n",
+  "references": [
+   {
+    "title": "React — lazy",
+    "url": "https://ko.react.dev/reference/react/lazy"
+   },
+   {
+    "title": "React — <Suspense>",
+    "url": "https://ko.react.dev/reference/react/Suspense"
+   }
+  ],
+  "tags": [
+   "code-splitting",
+   "suspense",
+   "lazy"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "react-014",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "부모에서 자식 함수형 컴포넌트의 `<input>` DOM에 ref를 직접 연결하려고 해요. 다음 중 React 18 기준 올바른 패턴은?\n",
+  "code": "// 부모\nconst ref = useRef(null)\nreturn <MyInput ref={ref} />\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "자식을 그냥 `function MyInput(props) { return <input {...props} /> }`로 두고 부모에서 ref를 넘겨요."
+   },
+   {
+    "id": "b",
+    "text": "자식에 `ref` prop을 직접 받아 `<input ref={props.ref} />`로 넘겨요."
+   },
+   {
+    "id": "c",
+    "text": "자식에서 `useImperativeHandle`만 호출하면 자동으로 ref가 연결돼요."
+   },
+   {
+    "id": "d",
+    "text": "자식을 `const MyInput = forwardRef((props, ref) => <input ref={ref} {...props} />)`로 정의해요."
+   }
+  ],
+  "explanation": "React 18까지의 함수형 컴포넌트는 기본적으로 `ref` prop을 받지 못해요. 그래서 부모가 `<MyInput ref={ref} />`처럼 넘겨도 자식에 닿지 않고, \"Function components cannot be given refs\" 경고가 떠요.\n해결은 `forwardRef`로 컴포넌트를 감싸서 두 번째 인자로 들어오는 `ref`를 자식 DOM에 연결하는 거예요. 더 추상화된 명령형 API가 필요하면 그 안에서 `useImperativeHandle`을 조합해 쓰면 돼요.\n참고로 React 19부터는 함수형 컴포넌트가 `ref`를 일반 prop처럼 받을 수 있게 되어 `forwardRef`는 deprecated 예정이라고 공식 문서에 명시돼 있어요. 다만 React 18 코드베이스에선 여전히 forwardRef가 표준 패턴이에요. (출처: https://react.dev/reference/react/forwardRef)\n",
+  "references": [
+   {
+    "title": "React — forwardRef",
+    "url": "https://ko.react.dev/reference/react/forwardRef"
+   },
+   {
+    "title": "React — ref로 DOM 조작하기",
+    "url": "https://ko.react.dev/learn/manipulating-the-dom-with-refs"
+   }
+  ],
+  "tags": [
+   "refs",
+   "forwardRef",
+   "dom"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "react-015",
+  "category": "react",
+  "difficulty": "hard",
+  "question": "`useTransition`과 `useDeferredValue`의 차이로 가장 정확한 설명은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘 다 동일한 API이고 React 19부터는 useTransition이 deprecated돼요."
+   },
+   {
+    "id": "b",
+    "text": "`useTransition`은 컴포넌트를 메모이즈하고, `useDeferredValue`는 effect 실행을 지연시켜요."
+   },
+   {
+    "id": "c",
+    "text": "둘 다 동기 렌더링을 강제해서 사용자 입력 응답성을 높여요."
+   },
+   {
+    "id": "d",
+    "text": "`useTransition`은 상태 업데이트(setter 호출) 자체를 낮은 우선순위 트랜지션으로 감쌀 때, `useDeferredValue`는 렌더에서 소비할 값의 지연된 복사본을 만들어 무거운 서브트리의 우선순위를 낮추고 싶을 때 써요."
+   }
+  ],
+  "explanation": "- `useTransition`은 `startTransition(() => setState(...))`처럼 **상태 업데이트(setter 호출)** 를 \"긴급하지 않은 트랜지션\"으로 마킹해서, 무거운 리렌더가 입력 같은 더 급한 업데이트를 막지 않도록 해 줘요. 보너스로 `isPending`을 받아 로딩 표시도 할 수 있어요.\n- `useDeferredValue`는 어떤 값(직접 가진 state든 부모로부터 받은 props든 파생 값이든)을 인자로 받아서 **한 박자 늦은 \"지연된 복사본\"** 을 돌려줘요. 이 deferred value를 무거운 서브트리에 흘려 보내면 그 트리의 리렌더만 낮은 우선순위로 처리돼서, 입력 같은 급한 업데이트를 가로막지 않아요.\n- 그래서 setter를 내가 가지고 있지 않은 props에 대해서도 쓸 수 있지만, 거꾸로 `const deferred = useDeferredValue(state)`처럼 내가 만든 state에 그대로 적용해도 괜찮아요.\n큰 그림은 비슷하지만 \"어느 지점에서 우선순위를 낮추느냐\"가 달라요. 업데이트 발생 지점(setter 호출 단위)에서 낮추면 `useTransition`, 렌더에서 소비할 값 단위로 낮추면 `useDeferredValue`예요.\n",
+  "references": [
+   {
+    "title": "React — useTransition",
+    "url": "https://ko.react.dev/reference/react/useTransition"
+   },
+   {
+    "title": "React — useDeferredValue",
+    "url": "https://ko.react.dev/reference/react/useDeferredValue"
+   }
+  ],
+  "tags": [
+   "concurrent",
+   "useTransition",
+   "useDeferredValue"
+  ],
+  "type": "single_choice",
+  "answer": "d"
+ },
+ {
+  "id": "react-016",
+  "category": "react",
+  "difficulty": "easy",
+  "question": "다음 컴포넌트에서 `<>...</>` (Fragment)를 쓰는 이유로 가장 적절한 것은?\n",
+  "code": "function List({ items }) {\n  return (\n    <>\n      {items.map(it => <li key={it}>{it}</li>)}\n    </>\n  )\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "부모 DOM 노드를 추가하지 않고 여러 형제 요소를 반환할 수 있게 해 줘요"
+   },
+   {
+    "id": "b",
+    "text": "React 컴포넌트는 항상 단일 `<div>`로 감싸야 해서, Fragment가 그 `<div>` 역할을 대신하지만 결과 DOM에도 동등한 노드가 생성돼요"
+   },
+   {
+    "id": "c",
+    "text": "`<div>`보다 렌더링이 더 빠르도록 React가 GPU 가속을 적용해요"
+   },
+   {
+    "id": "d",
+    "text": "리스트 렌더링 시 `key`를 자동으로 부여해서 경고를 제거해요"
+   }
+  ],
+  "explanation": "Fragment(`<>...</>`)는 그룹화만 해 주고 DOM에 추가 노드를 남기지 않아요. 테이블/리스트처럼 불필요한 wrapper가 레이아웃을 깨거나 CSS 선택자를 꼬이게 할 때 유용해요.\n`<div>`로 감싸는 것과 달리 DOM 노드가 늘지 않고, key가 필요한 케이스엔 `<React.Fragment key={...}>`로 풀어 쓸 수 있어요.\nGPU나 key 자동 부여 같은 동작은 Fragment의 실제 역할이 아니에요.\n",
+  "references": [
+   {
+    "title": "React — <Fragment> (<>)",
+    "url": "https://ko.react.dev/reference/react/Fragment"
+   }
+  ],
+  "tags": [
+   "fragment",
+   "jsx",
+   "dom"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "react-017",
+  "category": "react",
+  "difficulty": "easy",
+  "question": "커스텀 훅 이름을 `use`로 시작해야 하는 이유로 가장 적절한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "단순한 컨벤션일 뿐 동작상 차이는 없어요"
+   },
+   {
+    "id": "b",
+    "text": "ESLint 플러그인 `react-hooks/rules-of-hooks`와 커뮤니티 컨벤션이\n\"이 함수는 훅을 호출한다\"고 판단하는 기준이라, 이름이 다르면\n정적 분석이 훅 규칙 위반을 잡아내지 못해요\n"
+   },
+   {
+    "id": "c",
+    "text": "`use`로 시작해야 React가 자동으로 메모이즈해 줘요"
+   },
+   {
+    "id": "d",
+    "text": "`use` prefix가 있어야 JSX를 반환할 수 있는 컴포넌트로 인식돼요"
+   }
+  ],
+  "explanation": "React 런타임은 함수 이름을 검사해서 훅 규칙을 적용하는 게 아니에요 — 호출 순서/디스패처 기반으로 동작해요. 다만 `react-hooks/rules-of-hooks` ESLint 플러그인이 \"대문자 컴포넌트 / `use`로 시작하는 훅\" 패턴으로 검사 대상을 골라 내요. 이름이 다르면 그 안에서 `useState` 같은 훅을 조건부로 호출해도 정적 분석이 위반을 놓쳐서 버그가 런타임까지 새 나가요.\n자동 메모이즈(c)나 컴포넌트 인식(d)은 React의 실제 동작과 무관해요. 결론은 \"린트와 커뮤니티 컨벤션이 prefix를 기준으로 검사하니까, 안전하게 검사받으려면 따르자\"는 거예요.\n",
+  "references": [
+   {
+    "title": "React — 커스텀 Hook으로 로직 재사용하기",
+    "url": "https://ko.react.dev/learn/reusing-logic-with-custom-hooks"
+   },
+   {
+    "title": "React — Hook 규칙",
+    "url": "https://ko.react.dev/reference/rules/rules-of-hooks"
+   }
+  ],
+  "tags": [
+   "hooks",
+   "custom-hook",
+   "naming",
+   "lint"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "react-018",
+  "category": "react",
+  "difficulty": "easy",
+  "question": "`useId()` 훅의 주요 용도로 가장 적절한 것은?\n",
+  "code": "function Field() {\n  const id = useId()\n  return (\n    <>\n      <label htmlFor={id}>이메일</label>\n      <input id={id} />\n    </>\n  )\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "안정적인 고유 ID를 만들어 label-input 같은 a11y 연결에 쓰고, SSR/CSR 사이의 ID 불일치(hydration mismatch)도 방지해요"
+   },
+   {
+    "id": "b",
+    "text": "리스트 렌더의 `key` prop을 자동으로 생성하는 용도예요"
+   },
+   {
+    "id": "c",
+    "text": "무작위 UUID를 만들어 데이터베이스 PK로 쓰기 위해 도입됐어요"
+   },
+   {
+    "id": "d",
+    "text": "컴포넌트가 리렌더될 때마다 새 ID로 갱신돼서 캠페인 추적 ID로 쓰기 좋아요"
+   }
+  ],
+  "explanation": "`useId`는 트리 위치 기반으로 결정적인 ID를 만들어 돌려줘요. 마운트 이후에도 같은 값을 유지해서 (d는 틀려요), 주로 label/input, aria-describedby, headlessui 같은 a11y 패턴에 써요.\n제일 중요한 건 서버와 클라이언트에서 **같은 ID**가 나와서 hydration 불일치를 막는 거예요. 직접 카운터나 `Math.random()`은 그 보장이 없으니 피해야 해요.\nPK나 캠페인 식별자처럼 전역 고유성이 필요하면 `crypto.randomUUID()`나 서버 생성 ID를 따로 써야 해요.\n",
+  "references": [
+   {
+    "title": "React — useId",
+    "url": "https://ko.react.dev/reference/react/useId"
+   }
+  ],
+  "tags": [
+   "hooks",
+   "useId",
+   "a11y",
+   "ssr"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "react-019",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "모달을 `createPortal`로 `document.body` 아래에 마운트하는 이유로 가장 정확한 것은?\n",
+  "code": "import { createPortal } from 'react-dom'\n\nfunction Modal({ children }) {\n  return createPortal(\n    <div className=\"modal\">{children}</div>,\n    document.body,\n  )\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "React 컴포넌트 트리(이벤트 버블링, context)는 그대로 부모를 따르지만 DOM 위치만 body로 옮겨서 조상의 `overflow: hidden`이나 stacking context 영향을 회피해요"
+   },
+   {
+    "id": "b",
+    "text": "portal로 옮긴 노드는 React 트리에서도 분리돼서 부모 context를 받지 못해요"
+   },
+   {
+    "id": "c",
+    "text": "성능상 body에 마운트하는 게 빨라서 일반 컴포넌트보다 리렌더가 적어요"
+   },
+   {
+    "id": "d",
+    "text": "portal은 이벤트가 React 트리를 거치지 않고 DOM 트리만 따라가요"
+   }
+  ],
+  "explanation": "Portal의 핵심은 \"DOM으로는 다른 곳에 그리고, React 입장에선 여전히 그 자리에 있는 것처럼 동작\"이에요. 그래서 context를 그대로 구독하고 이벤트도 React 트리를 따라 버블링돼요.\n상위의 `overflow: hidden` / `transform`/`z-index` 때문에 모달/툴팁이 잘리거나 다른 요소 뒤에 숨는 일을 막을 때 포털이 제격이에요.\nb/d는 포털 동작과 정반대이고, c는 성능 주장이 근거가 없어요.\n",
+  "references": [
+   {
+    "title": "React — createPortal",
+    "url": "https://ko.react.dev/reference/react-dom/createPortal"
+   }
+  ],
+  "tags": [
+   "portal",
+   "modal",
+   "dom",
+   "context"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "react-020",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "다음 코드에서 `useImperativeHandle`을 `forwardRef`와 함께 쓰는 이유로 가장 정확한 것은?\n",
+  "code": "const Input = forwardRef((props, ref) => {\n  const local = useRef(null)\n  useImperativeHandle(ref, () => ({\n    focus: () => local.current?.focus(),\n  }), [])\n  return <input ref={local} {...props} />\n})\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "부모에게 자식의 DOM 전체를 그대로 노출하는 대신, 외부에서 호출 가능한 명령형 API(`focus()` 등)만 선택적으로 노출하기 위해서예요"
+   },
+   {
+    "id": "b",
+    "text": "자식 내부 ref를 동기화하지 않아도 부모가 자동으로 DOM을 받게 돼서예요"
+   },
+   {
+    "id": "c",
+    "text": "ref를 children prop으로 전달할 수 있게 해 주기 위해서예요"
+   },
+   {
+    "id": "d",
+    "text": "함수형 컴포넌트의 ref 전달 경고를 우회하려는 ESLint 트릭이에요"
+   }
+  ],
+  "explanation": "`forwardRef`만 쓰면 부모가 자식의 DOM 노드 전체를 다룰 수 있게 돼요—DOM의 구조가 구현 세부사항이라 그게 외부에 의존되면 리팩터링이 극도로 어려워져요.\n`useImperativeHandle`은 부모가 동일한 `ref`로 볼 객체를 내가 전달할 수 있게 해 줘요. 일부 명령형 API(예: `focus`, `scrollIntoView`, `play`)만 노출하고 나머지는 감추는 패턴이 권장돼요.\n대부분의 React 코드는 선언적 prop으로 해결하는 게 좋고, `useImperativeHandle`은 양날의 검처럼 아껴서 써야 해요.\n",
+  "references": [
+   {
+    "title": "React — useImperativeHandle",
+    "url": "https://ko.react.dev/reference/react/useImperativeHandle"
+   },
+   {
+    "title": "React — forwardRef",
+    "url": "https://ko.react.dev/reference/react/forwardRef"
+   }
+  ],
+  "tags": [
+   "refs",
+   "forwardRef",
+   "useImperativeHandle",
+   "encapsulation"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "react-021",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "React 컴포넌트 안에서 타이머 ID처럼 렌더 사이에 유지돼야 하지만 값 변경만으로 리렌더링할 필요는 없는 값을 저장하려고 해요. 가장 적절한 선택은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "컴포넌트 함수 본문에 `let timerId`를 선언해요"
+   },
+   {
+    "id": "b",
+    "text": "`useRef`로 `timerRef.current`에 저장해요"
+   },
+   {
+    "id": "c",
+    "text": "`useMemo`의 반환값에 타이머 ID를 저장하고 직접 수정해요"
+   },
+   {
+    "id": "d",
+    "text": "전역 변수에 타이머 ID를 저장해서 모든 컴포넌트가 공유해요"
+   }
+  ],
+  "explanation": "`useRef`가 만든 객체는 렌더 사이에 같은 참조로 유지되고, `current`를 바꿔도 그 자체로 리렌더링을 트리거하지 않아요. 그래서 `setTimeout`/`setInterval` ID, 이전 값, DOM 노드처럼 화면 출력 상태는 아니지만 컴포넌트 인스턴스에 붙어 있어야 하는 값을 보관하기 좋아요.\n컴포넌트 함수 본문의 `let` 변수는 렌더링이 다시 실행될 때마다 새로 만들어지니까 이전 렌더의 값을 안정적으로 보존하지 못해요. `useMemo`는 계산 결과 캐싱용이지 임의로 mutable 저장소처럼 쓰는 도구가 아니고, 전역 변수는 여러 컴포넌트 인스턴스가 값을 공유해 버려서 cleanup이나 동시 렌더링 상황에서 버그를 만들기 쉬워요.\n다만 값 변경이 UI에 반영돼야 한다면 `useRef`가 아니라 `useState`를 써야 해요. `useRef`는 “리렌더링 없는 저장소”이지 “화면 상태 관리”의 대체재가 아니에요.\n",
+  "references": [
+   {
+    "title": "React — useRef",
+    "url": "https://ko.react.dev/reference/react/useRef"
+   },
+   {
+    "title": "React — ref로 값 참조하기",
+    "url": "https://ko.react.dev/learn/referencing-values-with-refs"
+   }
+  ],
+  "tags": [
+   "useRef",
+   "render",
+   "state",
+   "timer"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "react-022",
+  "category": "react",
+  "difficulty": "medium",
+  "question": "TanStack Query에서 `staleTime`과 `gcTime`의 차이를 설명한 내용으로 맞는 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`staleTime`은 쿼리가 안 쓰인 뒤 캐시에서 삭제되기까지의 시간이고, `gcTime`은 데이터를 신선하게 보는 시간이에요."
+   },
+   {
+    "id": "b",
+    "text": "`staleTime` 동안 데이터는 fresh로 간주되어 불필요한 refetch를 피할 수 있고, `gcTime`은 inactive 쿼리 캐시를 얼마나 유지할지 정해요."
+   },
+   {
+    "id": "c",
+    "text": "`staleTime`이 지나면 캐시 데이터는 즉시 삭제되어 화면에 더 이상 사용할 수 없어요."
+   },
+   {
+    "id": "d",
+    "text": "`gcTime`을 길게 설정하면 쿼리가 active 상태여도 항상 네트워크 요청을 막아요."
+   }
+  ],
+  "explanation": "`staleTime`은 데이터를 가져온 뒤 얼마 동안 fresh로 볼지를 정하는 값이에요. 이 시간 안에는 refetch가 트리거될 만한 상황이 와도 캐시 데이터를 신선하다고 보고 불필요한 네트워크 요청을 줄일 수 있어요.\n`gcTime`은 쿼리를 사용하는 컴포넌트가 없어져 inactive 상태가 된 뒤, 그 캐시를 메모리에 얼마나 더 남겨둘지 정해요. `staleTime`이 지났다고 캐시가 바로 삭제되는 것은 아니고, stale 데이터도 새 데이터를 받아오기 전까지 기존 화면을 보여 주는 데 활용될 수 있어요.\n오답 a는 두 개념을 서로 바꿔 말했고, c는 stale과 garbage collection을 혼동한 설명이에요. d도 `gcTime`이 신선도나 refetch 여부를 직접 제어하는 값처럼 설명해서 틀렸어요.\n",
+  "tags": [
+   "tanstack-query",
+   "cache",
+   "staleTime",
+   "gcTime"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "react-023",
+  "category": "react",
+  "difficulty": "easy",
+  "question": "다음 `Card` 컴포넌트를 `<Card>안녕하세요</Card>` 처럼 사용했을 때, 컴포넌트 안에서 `안녕하세요` 텍스트에 접근하려면 어떤 prop을 읽어야 할까요?",
+  "code": "function Card(props) {\n  return <div className=\"card\">{/* ??? */}</div>\n}\n\n// 사용:\n// <Card>안녕하세요</Card>",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`props.children`"
+   },
+   {
+    "id": "b",
+    "text": "`props.content`"
+   },
+   {
+    "id": "c",
+    "text": "`props.body`"
+   },
+   {
+    "id": "d",
+    "text": "`props.text`"
+   }
+  ],
+  "explanation": "JSX에서 여는 태그와 닫는 태그 사이에 넣은 내용은 React가 자동으로 `children`이라는 특별한 prop으로 전달해 줘요. 그래서 `<Card>안녕하세요</Card>`처럼 쓰면 `Card` 안에서는 `props.children`으로 그 내용을 읽고 원하는 위치에 `{props.children}`으로 렌더할 수 있어요. `content`·`body`·`text` 같은 이름은 React가 자동으로 만들어 주는 prop이 아니라, 직접 속성으로 넘겨야만 채워지는 일반 prop이에요.",
+  "references": [
+   {
+    "title": "Passing JSX as children – react.dev",
+    "url": "https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children"
+   },
+   {
+    "title": "Components and Props – react.dev",
+    "url": "https://react.dev/learn/your-first-component"
+   }
+  ],
+  "tags": [
+   "props",
+   "children",
+   "jsx",
+   "components"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-001",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "`any`와 `unknown`의 차이는?\n",
+  "code": "function f(x: any) {\n  x.toUpperCase()    // ①\n}\nfunction g(x: unknown) {\n  x.toUpperCase()    // ②\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "①, ② 모두 컴파일 통과 — 둘은 사실상 같은 타입"
+   },
+   {
+    "id": "b",
+    "text": "①은 통과, ②는 컴파일 에러 — `unknown`은 좁히기 전에 사용 불가"
+   },
+   {
+    "id": "c",
+    "text": "①은 에러, ②는 통과 — `any`는 더 엄격한 최상위 타입"
+   },
+   {
+    "id": "d",
+    "text": "①, ② 모두 컴파일 에러 — 둘 다 사용 전 검사 필요"
+   }
+  ],
+  "explanation": "`any`는 타입 검사를 끄는 탈출구라 무엇이든 통과시켜요.\n`unknown`은 \"모든 값\"을 표현하는 안전한 최상위 타입이에요 — 사용하려면 `typeof x === 'string'`, `x instanceof ...` 같은 가드로 좁혀야 해요.\n외부 입력(JSON 파싱, 라이브러리 경계)을 받을 때 `any` 대신 `unknown`을 쓰면 컴파일러가 좁히기를 강제해서 안전해져요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Everyday Types (any)",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#any"
+   },
+   {
+    "title": "TypeScript 3.0 Release Notes — New unknown Top Type",
+    "url": "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#new-unknown-top-type"
+   }
+  ],
+  "tags": [
+   "types",
+   "any",
+   "unknown",
+   "narrowing"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-002",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "`area(shape)` 호출이 컴파일을 통과하고 모든 케이스에서 올바른 결과를 내려면, 어느 구현이 적절할까요?\n",
+  "code": "type Shape =\n  | { kind: 'circle'; r: number }\n  | { kind: 'square'; s: number }\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "```ts\nfunction area(shape: Shape) {\n  return Math.PI * shape.r ** 2\n}\n```\n"
+   },
+   {
+    "id": "b",
+    "text": "```ts\nfunction area(shape: Shape) {\n  if (shape.kind === 'circle') return Math.PI * shape.r ** 2\n  return shape.s ** 2\n}\n```\n"
+   },
+   {
+    "id": "c",
+    "text": "```ts\nfunction area(shape: Shape) {\n  return shape.r ? Math.PI * shape.r ** 2 : shape.s ** 2\n}\n```\n"
+   },
+   {
+    "id": "d",
+    "text": "```ts\nfunction area(shape: Shape) {\n  return (shape as any).r ? Math.PI * (shape as any).r ** 2 : (shape as any).s ** 2\n}\n```\n"
+   }
+  ],
+  "explanation": "`kind` 같은 공통 리터럴 필드가 있는 union(=discriminated union)은 그 필드를 비교하면 컴파일러가 자동으로 분기 안에서 타입을 좁혀줘요.\n- a: `square` 분기에서 `r`이 없어서 컴파일 에러가 나요.\n- c: `shape.r` 직접 접근은 union 단계에서 차단돼요(둘 다 가지고 있는 게 아니거든요).\n- d: `as any`로 검사를 회피해요 — 런타임 동작은 우연히 맞지만 타입 안전성을 잃어요.\n- b: 정석이에요 — `kind` 좁히기로 양쪽 모두 안전하게 다룰 수 있어요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Narrowing: Discriminated unions",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions"
+   },
+   {
+    "title": "TypeScript Handbook — Everyday Types: Union Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types"
+   }
+  ],
+  "tags": [
+   "types",
+   "discriminated-union",
+   "narrowing"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-003",
+  "category": "typescript",
+  "difficulty": "easy",
+  "question": "`a`와 `b`의 추론 타입은?\n",
+  "code": "const a = ['x', 'y']\nconst b = ['x', 'y'] as const\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`a: string[]`,  `b: readonly ['x', 'y']`"
+   },
+   {
+    "id": "b",
+    "text": "`a: ['x', 'y']`,  `b: readonly ['x', 'y']`"
+   },
+   {
+    "id": "c",
+    "text": "`a: string[]`,  `b: string[]`"
+   },
+   {
+    "id": "d",
+    "text": "`a: readonly ['x', 'y']`,  `b: ['x', 'y']`"
+   }
+  ],
+  "explanation": "일반 `const` 배열 리터럴은 가변(mutable) 배열로 추론돼서 `string[]`이 돼요.\n`as const`를 붙이면 (1) 각 요소가 리터럴 타입(`'x'`, `'y'`)으로 좁혀지고, (2) 배열 전체가 `readonly` 튜플로 고정돼요.\n덕분에 `as const` 배열은 `typeof b[number]` 같은 인덱스 액세스로 값 union 타입(`'x' | 'y'`)을 만들 때 자주 쓰여요. (`keyof typeof b`는 `'0' | '1' | 'length' | ...` 같은 인덱스/메서드 키들이 잡히니 주의해 주세요.)\n",
+  "references": [
+   {
+    "title": "TypeScript 3.4 Release Notes — const assertions",
+    "url": "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions"
+   },
+   {
+    "title": "TypeScript Handbook — Everyday Types: Literal Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
+   }
+  ],
+  "tags": [
+   "types",
+   "as-const",
+   "literal-types",
+   "readonly"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-004",
+  "category": "typescript",
+  "difficulty": "easy",
+  "question": "`K`로 추론되는 타입은?\n",
+  "code": "type User = { id: number; name: string; email: string }\ntype K = keyof User\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`'id' | 'name' | 'email'`"
+   },
+   {
+    "id": "b",
+    "text": "`number | string`"
+   },
+   {
+    "id": "c",
+    "text": "`{ id: number; name: string; email: string }`"
+   },
+   {
+    "id": "d",
+    "text": "`string`"
+   }
+  ],
+  "explanation": "`keyof T`는 객체 타입 `T`의 **키 이름들의 union**을 만들어줘요. 값 타입이 아니라 키 타입이라는 점이 핵심이에요.\n`User['id']`처럼 인덱스 액세스 타입과 결합하면 \"특정 키의 값 타입\"을 꺼낼 수 있고, 이걸 매핑드 타입(`{ [K in keyof T]: ... }`)에서 자주 활용해요.\n- b는 키의 **값** 타입 union이에요 — 그건 `User[keyof User]`로 만들어요.\n- d는 인덱스 시그니처가 `string`인 객체에 대해서만 그렇게 좁혀져요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Keyof Type Operator",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/keyof-types.html"
+   },
+   {
+    "title": "TypeScript Handbook — Indexed Access Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html"
+   }
+  ],
+  "tags": [
+   "types",
+   "keyof",
+   "indexed-access"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-005",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "`Pick<User, 'id' | 'name'>`로 만들어지는 타입은?\n",
+  "code": "type User = {\n  id: number\n  name: string\n  email?: string\n  role: 'admin' | 'guest'\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`{ id: number; name: string }`"
+   },
+   {
+    "id": "b",
+    "text": "`{ id?: number; name?: string }`"
+   },
+   {
+    "id": "c",
+    "text": "`{ email?: string; role: 'admin' | 'guest' }`"
+   },
+   {
+    "id": "d",
+    "text": "`Omit`와 동일한 결과 — `User`에서 `'id'`와 `'name'`을 제거"
+   }
+  ],
+  "explanation": "`Pick<T, K>`는 `T`에서 키 `K`만 골라낸 새 타입을 만들어요. 선택적(`?`) 여부와 값 타입은 원본 그대로 유지돼요.\n- b는 `Partial<Pick<User, 'id' | 'name'>>` 같은 추가 변환이 들어가야 나오는 형태예요.\n- c는 `Omit<User, 'id' | 'name'>` — 정반대예요. `Pick`과 `Omit`은 짝이지만 결과가 서로 보완 관계라는 점, 헷갈리지 않게 주의해 주세요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Utility Types: Pick",
+    "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys"
+   },
+   {
+    "title": "TypeScript Handbook — Utility Types: Omit",
+    "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys"
+   }
+  ],
+  "tags": [
+   "types",
+   "utility-types",
+   "pick",
+   "omit"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-006",
+  "category": "typescript",
+  "difficulty": "hard",
+  "question": "`R`의 타입은?\n",
+  "code": "type ReturnOf<T> = T extends (...args: any[]) => infer U ? U : never\n\nfunction getUser() {\n  return { id: 1, name: 'minjun' }\n}\n\ntype R = ReturnOf<typeof getUser>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`{ id: number; name: string }`"
+   },
+   {
+    "id": "b",
+    "text": "`() => { id: number; name: string }`"
+   },
+   {
+    "id": "c",
+    "text": "`any`"
+   },
+   {
+    "id": "d",
+    "text": "`never`"
+   }
+  ],
+  "explanation": "`infer U`는 조건부 타입 안에서 \"여기에 들어가는 타입을 추론해서 `U`라는 이름으로 잡아줘\"라는 의미예요.\n`T extends (...args: any[]) => infer U` 패턴은 함수 타입의 **반환 타입**을 추출해요 — 표준 `ReturnType<T>`가 정확히 이렇게 구현돼 있어요.\n`getUser`는 `{ id: number; name: string }`을 반환하니 `R`은 그 객체 타입이 돼요.\n매개변수 타입이 필요하면 `T extends (...args: infer P) => any ? P : never` 형태로 같은 트릭을 써요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Conditional Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/conditional-types.html"
+   },
+   {
+    "title": "TypeScript Handbook — Conditional Types: Inferring Within Conditional Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types"
+   }
+  ],
+  "tags": [
+   "types",
+   "conditional-types",
+   "infer",
+   "return-type"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-007",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "세 변수의 동작 차이로 옳은 것은?\n",
+  "code": "type Theme = 'light' | 'dark'\ntype Config = { theme: Theme; sidebar: 'open' | 'closed' }\n\nconst a: Config = { theme: 'light', sidebar: 'open' }\nconst b           = { theme: 'light', sidebar: 'open' }\nconst c           = { theme: 'light', sidebar: 'open' } satisfies Config\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "a, b, c 모두 동일해요 — `satisfies`는 단순히 `: Config`의 다른 표기일 뿐이에요\n"
+   },
+   {
+    "id": "b",
+    "text": "`c.theme`은 리터럴 `'light'`로 좁혀지고 `Config` 모양도 검증돼요 — `a.theme`은 `Theme`, `b.theme`은 `string`이에요\n"
+   },
+   {
+    "id": "c",
+    "text": "`satisfies`는 런타임 검증이에요 — 빌드 시점엔 무시돼요\n"
+   },
+   {
+    "id": "d",
+    "text": "a만 검증되고 b, c는 모양 검사가 안 돼요\n"
+   }
+  ],
+  "explanation": "- `a: Config` — 타입 어노테이션이 값 타입을 `Config` 모양으로 **고정**해요. `a.theme`은 `Theme`(=`'light' | 'dark'`)으로 넓어져요.\n- `b` — 어노테이션·`satisfies` 모두 없으면 객체 리터럴의 가변 프로퍼티는 `string`으로 widen돼요. `Config` 모양 검사도 빠져서 오타도 못 잡아요.\n- `c ... satisfies Config` — `satisfies`는 (1) `Config` 모양을 검증하면서 (2) 결과 타입은 추론된 더 좁은 형태를 유지해요. `theme`의 contextual 타입이 `Theme` union이라, 실제 값 `'light'`가 그 안에서 가장 좁은 매칭(`'light'`)으로 추론돼요.\n핵심은 이거예요. `satisfies`가 \"리터럴 좁히기\"를 만들어주는 건 **값 타입이 union**일 때(`'light' | 'dark'`, `string | RGB` 등)예요. 단일 `string`처럼 좁힐 여지가 없는 경우엔 `: T`와 차이가 없어요. TS 4.9+ 기능이에요.\n",
+  "references": [
+   {
+    "title": "TypeScript 4.9 Release Notes — The satisfies Operator",
+    "url": "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#the-satisfies-operator"
+   },
+   {
+    "title": "TypeScript Handbook — Everyday Types: Literal Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
+   }
+  ],
+  "tags": [
+   "types",
+   "satisfies",
+   "literal-types",
+   "contextual-typing",
+   "ts49"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-008",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "`readonly number[]` 타입에서 **컴파일 에러**가 나는 사용을 모두 골라 주세요.\n",
+  "code": "function takeReadonly(xs: readonly number[]) {\n  // xs.???\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`xs.map(x => x * 2)`"
+   },
+   {
+    "id": "b",
+    "text": "`xs.push(4)`"
+   },
+   {
+    "id": "c",
+    "text": "`xs.length`"
+   },
+   {
+    "id": "d",
+    "text": "`xs.sort()`"
+   },
+   {
+    "id": "e",
+    "text": "`xs.slice(0, 2)`"
+   }
+  ],
+  "explanation": "`readonly T[]` (또는 `ReadonlyArray<T>`)는 **변경 메서드만** 차단해요.\n- `push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`, `fill`, `copyWithin` → 원본을 변형하므로 차단돼요.\n- `map`, `filter`, `slice`, `concat`, `length` 등 새 배열 반환·읽기 전용 접근은 모두 통과해요.\n주의할 점은 `sort`예요. 새 배열이 아니라 **원본을 정렬**하기 때문에 차단 대상이에요. 정렬이 필요하면 `[...xs].sort()`처럼 사본을 만들어 정렬해 주세요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Everyday Types: The ReadonlyArray Type",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#the-readonlyarray-type"
+   },
+   {
+    "title": "TypeScript Handbook — Object Types: readonly Properties",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#readonly-properties"
+   }
+  ],
+  "tags": [
+   "types",
+   "readonly",
+   "ReadonlyArray",
+   "mutation"
+  ],
+  "type": "multi_choice",
+  "answer": [
+   "b",
+   "d"
+  ]
+ },
+ {
+  "id": "ts-009",
+  "category": "typescript",
+  "difficulty": "easy",
+  "question": "TypeScript의 `type`과 `interface`에 대한 설명 중 가장 정확한 것은?\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘 다 객체 형태를 정의할 수 있고 대부분 상호 교체 가능하지만, `interface`는 같은 이름으로 다시 선언하면 자동 병합(declaration merging)되고 `type`은 유니온/인터섹션·기본 타입 별칭 등 표현력이 더 넓어요"
+   },
+   {
+    "id": "b",
+    "text": "`interface`는 객체에만 쓸 수 있고 `type`은 함수 타입에 쓸 수 없어요"
+   },
+   {
+    "id": "c",
+    "text": "`type`은 컴파일 후 런타임에 남고 `interface`는 사라져요"
+   },
+   {
+    "id": "d",
+    "text": "두 키워드는 완전히 동일해서 아무거나 써도 차이가 없어요"
+   }
+  ],
+  "explanation": "`type`과 `interface`는 객체 형태·함수 타입·제네릭 등 대부분의 케이스에서 교체 가능해요. 주요 차이는 이거예요.\n- `interface`는 같은 이름으로 재선언하면 멤버가 병합될 수 있어요(declaration merging). 라이브러리를 확장할 때 유용해요.\n- `type`은 유니온(`A | B`), 인터섹션(`A & B`), 기본 타입 별칭(`type Id = string`), 튜플, 조건부·매핑 타입 등 `interface`가 못 다루는 영역까지 표현할 수 있어요.\n둘 다 컴파일 후 사라지니 런타임 조건은 구분 근거가 아니에요. \"공개 API·클래스 계약엔 interface, 나머지엔 type\"이 대체적인 관습이에요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Everyday Types: Differences Between Type Aliases and Interfaces",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces"
+   },
+   {
+    "title": "TypeScript Handbook — Object Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html"
+   }
+  ],
+  "tags": [
+   "types",
+   "interface",
+   "type-alias"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-010",
+  "category": "typescript",
+  "difficulty": "easy",
+  "question": "다음 코드에서 컴파일 에러가 나는 줄은? (`exactOptionalPropertyTypes`는 꺼진 상태, strict이고 추가 옵션은 기본값)\n",
+  "code": "type A = { x?: number }\ntype B = { x: number | undefined }\n\nconst a: A = {}                  // (1)\nconst b: B = {}                  // (2)\nconst a2: A = { x: undefined }   // (3)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "아무 줄도 에러가 나지 않아요"
+   },
+   {
+    "id": "b",
+    "text": "(2)만 에러 — `B`는 `x` 키가 반드시 존재해야 하므로 `{}`에선 키 누락으로 오류가 나요"
+   },
+   {
+    "id": "c",
+    "text": "(1)과 (2) 둘 다 에러가 나요"
+   },
+   {
+    "id": "d",
+    "text": "(3)만 에러가 나요"
+   }
+  ],
+  "explanation": "optional `?`는 \"키 자체가 없어도 OK\"를 의미해요. 그래서 (1)의 `{}`은 `A`에 할당할 수 있어요.\n반면 `{ x: number | undefined }`는 \"키는 반드시 있되 그 값이 number 또는 undefined\"라 키 자체는 필수여서 (2)의 `{}`는 에러예요.\n(3) `{ x: undefined }`는 (`exactOptionalPropertyTypes` 플래그 OFF 기준) `A`에 허용돼요. 해당 플래그를 켜면 (3)도 에러가 나서 \"undefined 대입\"과 \"키 없음\"을 엄격히 구분해요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Object Types: Optional Properties",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#property-modifiers"
+   },
+   {
+    "title": "TSConfig — exactOptionalPropertyTypes",
+    "url": "https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes"
+   }
+  ],
+  "tags": [
+   "types",
+   "optional",
+   "undefined"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-011",
+  "category": "typescript",
+  "difficulty": "easy",
+  "question": "아래 `Palette` 타입을 만족하는 값으로 `???` 자리에 들어갈 수 있는 것은?\n",
+  "code": "type Theme = 'light' | 'dark'\ntype Palette = Record<Theme, { bg: string }>\n\nconst p: Palette = {\n  light: { bg: 'white' },\n  /* ??? */\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`dark: { bg: 'black' }` — `Record<Theme, ...>`는 `Theme`의 모든 키(`'light' | 'dark'`)에 값이 있어야 함을 강제해요"
+   },
+   {
+    "id": "b",
+    "text": "아무 것도 안 써도 통과해요 — Record는 키를 옵셔널로 취급해요"
+   },
+   {
+    "id": "c",
+    "text": "`[key: string]: any` — 인덱스 시그니처를 추가해야 해요"
+   },
+   {
+    "id": "d",
+    "text": "`dark?: ...` — Record는 부분 객체를 자동 허용해요"
+   }
+  ],
+  "explanation": "`Record<K, V>`는 \"`K`의 모든 매칭 키에 대해 `V` 값을 가진 객체\"의 단축 표기라, `Theme`가 유니온 리터럴이면 그 안의 모든 값이 키로 필수가 돼요.\n키를 부분적으로만 원하면 `Partial<Record<Theme, V>>`처럼 따로 감싸야 해요. `Record<string, V>`처럼 K가 `string`이면 인덱스 시그니처와 유사한 의미예요.\n업무에선 enum 같은 고정 키 세트에 일괄적인 값을 매핑할 때 유용하고, \"누락 없는 매핑\"을 컴파일 타임에 강제해 줘요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Utility Types: Record<Keys, Type>",
+    "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type"
+   },
+   {
+    "title": "TypeScript Handbook — Utility Types: Partial<Type>",
+    "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype"
+   }
+  ],
+  "tags": [
+   "utility-types",
+   "record",
+   "mapping"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-012",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "다음 함수의 마지막 `return v.toFixed(2)` 위치에서 TS가 `v`를 추론한 타입은?\n",
+  "code": "function foo(v: string | number | null) {\n  if (v == null) return 'nil'\n  if (typeof v === 'string') return v.toUpperCase()\n  return v.toFixed(2)\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`string | number | null`"
+   },
+   {
+    "id": "b",
+    "text": "`string`"
+   },
+   {
+    "id": "c",
+    "text": "`number`"
+   },
+   {
+    "id": "d",
+    "text": "`unknown`"
+   }
+  ],
+  "explanation": "TS의 control-flow analysis는 각 가드를 통과한 이후 남은 타입을 자동으로 좁혀줘요.\n- `v == null`은 `null`과 `undefined` 둘 다 true로 판정되어 둘 다 제거돼요 → `string | number`.\n- 그 다음 `typeof v === 'string'` 분기에서 string을 거르면 남은 흐름의 타입은 `number`가 돼요.\n이런 조기 종료 분기(`if (...) return`) 패턴을 활용하면 주된 흐름이 단순해져서 가독성이 좋아져요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Narrowing",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html"
+   },
+   {
+    "title": "TypeScript Handbook — Narrowing: typeof type guards",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards"
+   }
+  ],
+  "tags": [
+   "narrowing",
+   "typeof",
+   "control-flow"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "ts-013",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "다음 코드에서 (1), (2), (3)의 추론 타입으로 가장 정확한 것은?\n",
+  "code": "function first<T>(arr: T[]): T | undefined {\n  return arr[0]\n}\n\nconst a = first([1, 2, 3])         // (1)\nconst b = first(['a', 'b'])        // (2)\nconst c = first<boolean>([true])   // (3)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "모두 `unknown | undefined`"
+   },
+   {
+    "id": "b",
+    "text": "`number | undefined`, `string | undefined`, `boolean | undefined`"
+   },
+   {
+    "id": "c",
+    "text": "모두 `any | undefined`"
+   },
+   {
+    "id": "d",
+    "text": "`number[]`, `string[]`, `boolean[]`"
+   }
+  ],
+  "explanation": "제네릭 `T`는 인자 리터럴의 원소 타입으로 구체화돼요.\n- (1) `[1, 2, 3]` → `T = number`, 반환은 `number | undefined`예요.\n- (2) `['a', 'b']` → `T = string`이에요.\n- (3) `<boolean>`으로 명시적 구체화 → `T = boolean`이에요.\n제네릭 함수는 \"호출 시점에서만 속성이 결정되는 함수\"라, 다양한 타입을 하나의 구현으로 재사용할 수 있게 해 줘요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Generics",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html"
+   },
+   {
+    "title": "TypeScript Handbook — Generics: Working with Generic Type Variables",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#working-with-generic-type-variables"
+   }
+  ],
+  "tags": [
+   "generics",
+   "inference"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-014",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "다음 코드에서 (1)과 (2)의 결과로 가장 정확한 것은?\n",
+  "code": "function get<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key]\n}\n\nconst u = { name: 'jun', age: 30 }\nconst x = get(u, 'name')    // (1)\nconst y = get(u, 'email')   // (2)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "(1) `string` 추론, (2)는 컴파일 에러 — `'email'`이 `keyof typeof u`에 없으므로"
+   },
+   {
+    "id": "b",
+    "text": "둘 다 `any`로 추론돼요"
+   },
+   {
+    "id": "c",
+    "text": "(1) `unknown`, (2) `any`"
+   },
+   {
+    "id": "d",
+    "text": "둘 다 컴파일 에러 — `K extends keyof T`는 키를 좁히지 못해요"
+   }
+  ],
+  "explanation": "`K extends keyof T` 제약은 `K`가 `T`의 실제 키 중 하나임을 컴파일 타임에 강제해 주고, 동시에 리턴 타입 `T[K]`도 키에 따라 정확하게 추론돼요.\n그래서 `get(u, 'name')`은 `string`(`u.name`의 타입)으로 좁혀지고, `get(u, 'email')`은 `'email'`이 `keyof typeof u`( =`'name' | 'age'`)에 없어서 인자 단계에서 막혀요.\n런타임 안전한 접근 패턴에 광범위하게 쓰이는 형태예요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Generics: Generic Constraints",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-constraints"
+   },
+   {
+    "title": "TypeScript Handbook — Generics: Using Type Parameters in Generic Constraints",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html#using-type-parameters-in-generic-constraints"
+   }
+  ],
+  "tags": [
+   "generics",
+   "constraints",
+   "keyof"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-015",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "아래 `default` 분기에서 `const _exhaustive: never = shape`를 둘 이유로 가장 정확한 것은?\n",
+  "code": "type Shape =\n  | { kind: 'circle'; r: number }\n  | { kind: 'square'; s: number }\n\nfunction area(shape: Shape) {\n  switch (shape.kind) {\n    case 'circle': return Math.PI * shape.r ** 2\n    case 'square': return shape.s ** 2\n    default: {\n      const _exhaustive: never = shape\n      return _exhaustive\n    }\n  }\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`Shape`에 새 종류(예: `'triangle'`)가 추가될 때 컴파일 단계에서 에러를 내 빠뜨린 분기를 알려 주기 위함 — default가 런타임에 실행되지 않으리라는 정적 보장"
+   },
+   {
+    "id": "b",
+    "text": "`never`는 런타임에 throw를 의미하므로 자동으로 예외를 던져요"
+   },
+   {
+    "id": "c",
+    "text": "TypeScript가 패턴 매칭 키워드로 `never`를 강제해요"
+   },
+   {
+    "id": "d",
+    "text": "`default`에 `never` 없이는 함수 반환 타입이 `void`가 돼요"
+   }
+  ],
+  "explanation": "동작은 이래요. switch가 모든 `kind`를 다뤄 주면 default 위치에서 `shape`의 좁혀진 타입이 `never`가 돼서 `never`에 대입 OK예요.\n나중에 `Shape`에 `'triangle'`이 추가되면 default 위치에서의 타입이 `{ kind: 'triangle'; … }`가 되고, 그 타입은 `never`에 대입되지 않아 컴파일 에러를 터뜨려요. 다시 말해 \"완전성(exhaustiveness)에 의존하는 다른 코드도 안전하게 같이 갱신될 수 있게\" 해 주는 패턴이에요.\n`never`는 \"도달 불가능\"이라는 타입일 뿐 런타임 throw와는 관련이 없고(b 틀려요), 키워드도 아니에요(c 틀려요).\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Narrowing: Exhaustiveness checking",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking"
+   },
+   {
+    "title": "TypeScript Handbook — Narrowing: Discriminated unions",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions"
+   }
+  ],
+  "tags": [
+   "never",
+   "exhaustiveness",
+   "discriminated-union"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ },
+ {
+  "id": "ts-016",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "다음 코드의 타입 검사를 다루는 설명으로 가장 정확한 것은? (`noUncheckedIndexedAccess`가 OFF인 기본 상태)\n",
+  "code": "const a: [string, number] = ['x', 1]\nconst b: string[] = ['a', 'b']\n\na[0].toUpperCase()  // (1)\na[1].toFixed()      // (2)\na[2]                // (3)\nb[10].toUpperCase() // (4)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "모두 정상 통과해요"
+   },
+   {
+    "id": "b",
+    "text": "튜플은 길이/위치별 타입이 고정돼서 (1)·(2)는 각 자리에 맞는 메서드로 추론되고 (3)은 범위 밖 인덱스라 에러가 나요. 일반 배열 `b[10]`은 기본 추론이 `string`이라 (4)는 컴파일을 통과해요(런타임은 undefined로 깨질 수 있어요)"
+   },
+   {
+    "id": "c",
+    "text": "튜플은 길이를 강제하지 않고 모두 `string | number`로 추론돼요"
+   },
+   {
+    "id": "d",
+    "text": "`noUncheckedIndexedAccess` 없이는 (3), (4) 모두 컴파일 에러예요"
+   }
+  ],
+  "explanation": "튜플은 길이와 각 인덱스의 타입이 고정돼요. `a[0]`는 `string`, `a[1]`은 `number`로 좁혀져서 정확한 메서드가 제공돼요. `a[2]`는 튜플 속성을 벗어난 접근이라 에러가 나요.\n반면 일반 배열 `string[]`의 인덱스 접근은 기본으로 `string`으로 추론돼요(undefined 가능성을 무시해요). 범위를 벗어나도 컴파일은 통과하고 런타임에 `undefined.toUpperCase()`로 깨질 수 있어요. `noUncheckedIndexedAccess: true`를 켜면 `string | undefined`로 추론돼서 이런 버그를 정적으로 잡아 줘요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Object Types: Tuple Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/objects.html#tuple-types"
+   },
+   {
+    "title": "TSConfig — noUncheckedIndexedAccess",
+    "url": "https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess"
+   }
+  ],
+  "tags": [
+   "tuple",
+   "array",
+   "indexed-access"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-017",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "다음 코드의 (1) 위치에서 발생하는 결과로 가장 정확한 것은?\n",
+  "code": "type ReadonlyAll<T> = { readonly [K in keyof T]: T[K] }\n\ntype User = { id: number; name: string }\ntype R = ReadonlyAll<User>\n\nconst u: R = { id: 1, name: 'jun' }\nu.id = 2  // (1)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "정상 동작 — 매핑 타입은 동작에 영향을 주지 않음"
+   },
+   {
+    "id": "b",
+    "text": "컴파일 에러 — `R`은 모든 키가 readonly라 `id` 재할당이 불가능해요. 빌트인 `Readonly<T>`도 같은 방식으로 정의돼 있어요"
+   },
+   {
+    "id": "c",
+    "text": "런타임에 TypeError가 던져져요"
+   },
+   {
+    "id": "d",
+    "text": "다른 키는 자동으로 readonly가 되지 않으므로 통과해요"
+   }
+  ],
+  "explanation": "매핑 타입 `{ readonly [K in keyof T]: T[K] }`은 `T`의 각 키를 순회하며 모든 멤버에 `readonly`를 붙여 줘요. 그래서 `R = ReadonlyAll<User>`는 `id`와 `name` 모두 readonly가 돼서 재할당 시 컴파일 에러가 나요.\n명세에 있는 `Readonly<T>`, `Partial<T>`, `Required<T>`, `Pick<T, K>` 등도 대부분 동일한 매핑 타입으로 정의돼 있어요. `+/-` 수정자로 readonly/optional을 붙이거나 벗기는 식으로 제어할 수 있고, `as` 절로 키 이름도 재매핑할 수 있어요(`Capitalize` 등을 활용).\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Mapped Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/mapped-types.html"
+   },
+   {
+    "title": "TypeScript Handbook — Utility Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/utility-types.html"
+   }
+  ],
+  "tags": [
+   "mapped-type",
+   "readonly",
+   "utility-types"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-018",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "다음 코드에서 타입 `H`로 추론되는 값은?\n",
+  "code": "type EvtName = 'click' | 'hover'\ntype Handler<E extends string> = `on${Capitalize<E>}`\ntype H = Handler<EvtName>\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`'click' | 'hover'`"
+   },
+   {
+    "id": "b",
+    "text": "`'onclick' | 'onhover'`"
+   },
+   {
+    "id": "c",
+    "text": "`'onClick' | 'onHover'`"
+   },
+   {
+    "id": "d",
+    "text": "`string`"
+   }
+  ],
+  "explanation": "템플릿 리터럴 타입은 리터럴 타입 조각을 이어 붙여 새 리터럴 유니온을 만들어 줘요. `Capitalize<E>`는 유니온 구성원 각각을 대문자로 바꿔 `'Click' | 'Hover'`로 자라나고, `\"on\"`과 결합해서 `'onClick' | 'onHover'`가 돼요.\n이벤트 핸들러/CSS 프로퍼티명 같은 패턴의 타입을 자동으로 만들 때 유용해요. `Uppercase`, `Lowercase`, `Uncapitalize`도 함께 기억해 두면 좋아요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Template Literal Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html"
+   },
+   {
+    "title": "TypeScript Handbook — Template Literal Types: Intrinsic String Manipulation Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#intrinsic-string-manipulation-types"
+   }
+  ],
+  "tags": [
+   "template-literal-type",
+   "capitalize"
+  ],
+  "type": "single_choice",
+  "answer": "c"
+ },
+ {
+  "id": "ts-019",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "다음 함수 오버로드 선언에서 (1), (2), (3) 호출의 결과로 가장 정확한 것은?\n",
+  "code": "function fmt(x: string): string\nfunction fmt(x: number): string\nfunction fmt(x: string | number): string {\n  return String(x)\n}\n\nconst a = fmt('hi')   // (1)\nconst b = fmt(42)     // (2)\nconst c = fmt(true)   // (3)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "모두 `any`로 추론돼요"
+   },
+   {
+    "id": "b",
+    "text": "(1)·(2)는 `string`, (3)은 컴파일 에러 — 외부에 공개된 오버로드에 boolean 시그니처가 없어서 호출부에서 거부돼요"
+   },
+   {
+    "id": "c",
+    "text": "모두 통과 — 구현 시그니처가 union을 받기 때문이에요"
+   },
+   {
+    "id": "d",
+    "text": "(3)은 `string`을 반환하며 정상 동작해요"
+   }
+  ],
+  "explanation": "호출부가 참조하는 건 **외부에 공개된 오버로드 시그니처**이지 구현 시그니처가 아니에요. 공개된 건 `(string) => string`과 `(number) => string` 둘뿐이라 boolean 인자 호출은 매칭되는 시그니처가 없어서 에러가 나요.\n구현 시그니처의 union은 함수 내부에서만 보이는 \"어떤 호출도 받을 수 있도록 넉넉하게 잡은\" 타입이에요. 대부분의 케이스는 오버로드 대신 union을 인자로 받는 단일 시그니처가 더 간단하고 추론도 좋아요.\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — More on Functions: Function Overloads",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#function-overloads"
+   },
+   {
+    "title": "TypeScript Handbook — More on Functions: Writing Good Overloads",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/functions.html#writing-good-overloads"
+   }
+  ],
+  "tags": [
+   "overload",
+   "signature"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-020",
+  "category": "typescript",
+  "difficulty": "medium",
+  "question": "아래 (A)와 (B) 방식의 차이로 가장 정확한 설명은?\n",
+  "code": "function isStr(v: unknown): v is string {\n  return typeof v === 'string'\n}\n\n// (A)\nfunction lenA(v: unknown) {\n  return (v as string).length\n}\n\n// (B)\nfunction lenB(v: unknown) {\n  if (isStr(v)) return v.length\n  return 0\n}\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "둘 다 동일한 안전성을 가져요"
+   },
+   {
+    "id": "b",
+    "text": "(A)는 컴파일러를 속이는 단언이라 컴파일은 통과하지만, 런타임에\n실제로 string이 아닌 값(예: `null`/`undefined`)이 들어오면\n`.length` 접근에서 그대로 깨져요. (B)는 `v is string` 술어를\n가진 타입 가드로 실제 검사 후에만 좁혀서 안전해요\n"
+   },
+   {
+    "id": "c",
+    "text": "(A)는 컴파일 에러, (B)는 통과"
+   },
+   {
+    "id": "d",
+    "text": "(B)는 `as`보다 성능이 느려서 비추돼요"
+   }
+  ],
+  "explanation": "`as`는 \"내가 더 잘 알아\"하고 컴파일러에게 대신 말해 주는 단언이라, 컴파일 단계에선 무조건 통과시켜 줘요. 그 대신 실제로 들어온 값이 단언과 다르면 그 값을 사용하는 코드(`.length`, `.map()` 등)에서 런타임 예외가 그대로 터져요.\n타입 가드 함수(`v is string`)는 **실제 검사 로직**과 **타입 좁힘 정보**를 한 곳에 묶어 둔 안전한 패턴이에요. 표준 라이브러리에도 `Array.isArray`(`arg is any[]`)처럼 타입 가드로 정의된 API가 있어요. (참고로 `Number.isFinite`는 그냥 `boolean`을 반환해서 타입 가드가 아니에요.)\n`as`는 외부 경계(JSON 파싱, 타사 API)에서 \"이미 검증되었음\"이 분명한 경우에만 조심스럽게 쓰는 게 좋아요.\n(출처: https://github.com/microsoft/TypeScript/blob/main/src/lib/es5.d.ts, https://github.com/microsoft/TypeScript/blob/main/src/lib/es2015.core.d.ts)\n",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Narrowing: Using type predicates",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates"
+   },
+   {
+    "title": "TypeScript Handbook — Everyday Types: Type Assertions",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions"
+   }
+  ],
+  "tags": [
+   "type-guard",
+   "as",
+   "narrowing"
+  ],
+  "type": "single_choice",
+  "answer": "b"
+ },
+ {
+  "id": "ts-021",
+  "category": "typescript",
+  "difficulty": "easy",
+  "question": "다음 두 선언 `A`와 `B`의 차이로 가장 정확한 설명은 무엇일까요?",
+  "code": "// A\nenum Direction {\n  Up = 'UP',\n  Down = 'DOWN',\n}\n\n// B\ntype Direction2 = 'UP' | 'DOWN'\n\nfunction move(d: Direction) {}\nfunction move2(d: Direction2) {}\n\nmove('UP')        // (1)\nmove2('UP')       // (2)\n",
+  "choices": [
+   {
+    "id": "a",
+    "text": "`A`는 런타임 객체(`Direction.Up` 같은 멤버 접근)를 만들지만, `B`는 컴파일 후 사라지는 타입-온리 선언이에요. (1)은 컴파일 에러, (2)는 정상 통과예요."
+   },
+   {
+    "id": "b",
+    "text": "`A`와 `B`는 컴파일 결과가 완전히 동일하고, 둘 다 `move('UP')` 호출이 그대로 통과해요."
+   },
+   {
+    "id": "c",
+    "text": "`B`는 런타임 객체를 만들지만 `A`는 만들지 않아요. 그래서 (1)이 더 빠르게 동작해요."
+   },
+   {
+    "id": "d",
+    "text": "`A`도 문자열 리터럴이라 `move('UP')`이 통과하고, `B`는 유니온이라 (2)에서 컴파일 에러가 나요."
+   }
+  ],
+  "explanation": "`enum`은 타입과 함께 **런타임 값**(객체)을 생성해요. 예를 들어 `Direction.Up`은 컴파일 후에도 남아 있는 객체 프로퍼티 접근이에요. 반면 유니온 리터럴 타입은 타입 검사용으로만 존재하고 컴파일 결과물에는 흔적이 없어요. 또 `enum`은 명목(nominal)에 가깝게 동작해서 멤버가 아닌 raw 문자열 `'UP'`을 직접 넘기면 거부해요. 유니온 리터럴은 구조적으로 동일한 리터럴이면 그대로 받기 때문에 `move2('UP')`은 통과해요.",
+  "references": [
+   {
+    "title": "TypeScript Handbook — Enums",
+    "url": "https://www.typescriptlang.org/docs/handbook/enums.html"
+   },
+   {
+    "title": "TypeScript Handbook — Literal Types",
+    "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types"
+   }
+  ],
+  "tags": [
+   "enum",
+   "literal-types",
+   "union",
+   "runtime"
+  ],
+  "type": "single_choice",
+  "answer": "a"
+ }
+]

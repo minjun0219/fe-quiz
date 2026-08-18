@@ -1,0 +1,26 @@
+# Copy to `.dev.vars` and fill in real values. (`.dev.vars`는 gitignored)
+#
+# 서버 전용 secrets — 로컬 dev에서 workerd로 주입된다.
+# 배포 환경(preview/production)에는 커밋하지 말고:
+#   wrangler secret put <NAME> --env preview
+#   wrangler secret put <NAME> --env production
+#
+# vars(APP_ENV, SITE_URL, POSTHOG_HOST)는 wrangler.jsonc에서 env별 관리.
+
+# --- Anthropic (Claude Haiku 4.5 피드백 스트리밍) ---
+# 미설정 시 /api/quiz/feedback이 503 → 클라이언트는 stub 문구로 폴백.
+ANTHROPIC_API_KEY=
+
+# --- Rate limiting (Upstash Redis) ---
+# 미설정 시 fail-open(rate limit 비활성). 로컬 dev엔 선택, production 권장.
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+
+# --- Logging ---
+# 미설정/허용 외 값은 dev=debug / prod=info / test=silent.
+# 허용: trace | debug | info | warn | error | fatal | silent
+LOG_LEVEL=
+
+# --- PostHog 서버 (에러 리포팅 + 서버 이벤트) ---
+# 미설정이면 서버 PostHog는 no-op. 클라이언트 키는 `.env`의 VITE_POSTHOG_KEY.
+POSTHOG_KEY=

@@ -89,8 +89,7 @@ export type AnalyticsEvents = {
  * 키 유무는 빌드 타임에 inlining 되므로 모듈 로드 시 한 번만 본다. 키 없는
  * dev/CI에서는 큐잉도 하지 않고 즉시 no-op.
  */
-const HAS_KEY =
-  typeof process !== "undefined" && !!process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const HAS_KEY = !!import.meta.env.VITE_POSTHOG_KEY;
 
 type QueuedEvent = {
   event: keyof AnalyticsEvents;

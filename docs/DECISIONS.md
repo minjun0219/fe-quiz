@@ -29,7 +29,7 @@
 스트릭, 하트, 티어, 리더보드, 매일 출석, 광고. **Duolingo가 아닌 토스 미니퀴즈/카훗 결**.
 학습 압박 요소는 모두 제거해요.
 
-차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, Supabase CLI 로컬 dev DB, 콘텐츠/엔진 저장소 분리.
+차후 검토하되 현재는 의도적으로 보류한 항목: AI 면접관 모드(주관식·꼬리질문), 사용자 계정/누적 진척도, 카테고리 확장, 콘텐츠/엔진 저장소 분리.
 
 ### 매일 자동 출제 (2026-05) — [ADR 0001](./adr/0001-daily-quiz-generation-hybrid.md)
 
@@ -48,18 +48,18 @@ GitHub Actions가 **월~금 KST 05:00** 출근길 검수 타이밍에 랜덤 1�
 - **공백 영역**: 한국어 + 인터랙티브 + AI 피드백 + 캐주얼 톤
 - **바이럴 핵심**: 결과 공유 OG 이미지 + 친구에게 같은 라운드 보내기
 
-## 기술 스택
+## 기술 스택 — [ADR 0006](./adr/0006-react-router-workers-d1.md)
 
-- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4
-- **DB**: Supabase (`shares` 테이블 1개)
+- **Frontend**: React Router v8 (framework mode) + `@cloudflare/vite-plugin`, React 19, TypeScript, Tailwind CSS v4
+- **DB**: Cloudflare D1 (`shares` 테이블 1개, Worker binding으로만 접근)
 - **AI**: Anthropic Claude Haiku 4.5 (`claude-haiku-4-5`) — 종합 피드백 전용
 - **Rate limit**: Upstash Redis (`@upstash/ratelimit`) — 미설정 시 fail-open
-- **Logging**: pino
-- **Analytics/Error monitoring**: PostHog (`posthog-js`/`posthog-node`, 키 미설정 시 양쪽 no-op) + `@vercel/analytics`(루트 layout에 `<Analytics />` 마운트로 활성, Vercel 배포에서만 동작)
-- **호스팅 가정**: Vercel
-- **OG 이미지**: `next/og` 기반 `/r/[slug]/opengraph-image`
+- **Logging**: console 기반 경량 로거 (`lib/logger.server.ts`) → Workers Logs
+- **Analytics/Error monitoring**: PostHog (`posthog-js`/`posthog-node`, 키 미설정 시 양쪽 no-op)
+- **호스팅**: Cloudflare Workers (`fe-quiz` = production, `fe-quiz-preview` = preview, workers.dev)
+- **OG 이미지**: `workers-og`(satori) 기반 `/r/:slug/og.png` 리소스 라우트
 - **공유 ID**: `nanoid` 8자리
-- **콘텐츠**: `.yaml` 파일, `yaml` 파싱 + `zod` 스키마 검증
+- **콘텐츠**: `.yaml` 파일, `yaml` 파싱 + `zod` 스키마 검증 → 빌드 타임에 `lib/questions.generated.json`으로 번들 (Workers엔 런타임 fs가 없음)
 - **폰트**: Pretendard (CDN)
 
 ## 아키텍처
@@ -122,37 +122,37 @@ tags: [event-loop, async]
 
 | 경로 | 역할 | 특징 |
 | --- | --- | --- |
-| `POST /api/quiz/submit` | 라운드 채점 | 서버사이드 정답 검증, Shiki HTML 포함 결과 반환 |
+| `POST /api/quiz/submit` | 라운드 채점 | 서버사이드 정답 검증, 렌더된 HTML 포함 결과 반환 |
 | `POST /api/quiz/feedback` | AI 피드백 생성 | Claude Haiku 4.5 plain text 스트리밍 |
 | `POST /api/share` | 공유 row 생성 | 서버 재채점 후 저장, slug/url 반환 |
 
-세 라우트 모두 `runtime = "nodejs"`, `dynamic = "force-dynamic"`입니다.
+세 라우트 모두 React Router 리소스 라우트(`app/routes/api.*.ts`)의 `action`이고,
+URL은 Next 시절 계약 그대로예요(클라이언트 fetch가 하드코딩). GET은 405.
 
-### Supabase 스키마 — [ADR 0002](./adr/0002-supabase-server-only-secret-key.md), [ADR 0003](./adr/0003-vercel-env-environment-split.md)
+### D1 스키마 — [ADR 0006](./adr/0006-react-router-workers-d1.md)
 
 ```sql
-create table shares (
-  id text primary key,
-  question_ids text[] not null,
-  score int not null check (score between 0 and 100),
-  feedback text not null,
-  result_type text not null,
-  category_scores jsonb not null,
-  created_at timestamptz default now()
+CREATE TABLE shares (
+  id              TEXT PRIMARY KEY,
+  question_ids    TEXT NOT NULL CHECK (json_valid(question_ids)),   -- JSON 배열
+  score           INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
+  feedback        TEXT NOT NULL,
+  result_type     TEXT NOT NULL,
+  category_scores TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(category_scores)),
+  created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
 
-create index idx_shares_created on shares (created_at desc);
+CREATE INDEX idx_shares_created_at ON shares (created_at DESC);
 ```
 
-현재 정책은 **서버 전용 secret/service-role key만 `shares`에 접근**하는 방향입니다.
-초기 anon insert/select 정책은 `20260509000002_lock_down_shares_rls.sql`에서 제거했고, `anon`, `authenticated` 권한도 회수했습니다.
+D1은 Worker binding(`env.DB`)이 유일한 접근 경로라 공개 REST 표면이 없어요 —
+구 Supabase 시절의 RLS/GRANT 잠금(ADR 0002)이 통째로 불필요해졌어요.
 
 중요:
 
-- 서버 환경변수는 secret/service-role key 사용 — 운영은 `SUPABASE_SECRET_KEY`, 비-운영(preview/local/CI)은 `SUPABASE_DEV_SECRET_KEY`
-- 두 키 모두 RLS를 우회하므로 클라이언트 노출 금지
-- `lib/supabase.ts`가 `VERCEL_ENV === "production"` 여부로 두 프로젝트를 분기 (NODE_ENV X — `next start`가 로컬에서도 prod NODE_ENV를 세팅하기 때문)
-- `NEXT_PUBLIC_SUPABASE_*` 클라이언트 접근 모델이 아님
+- 환경 분리는 wrangler env: 로컬 dev(로컬 sqlite) / `fe-quiz-shares-preview` / `fe-quiz-shares`
+- 환경 선택은 **빌드 타임** `CLOUDFLARE_ENV` — `wrangler deploy --env`가 아님 (`wrangler.jsonc` 상단 주석 참고)
+- 마이그레이션은 `migrations/*.sql` + `wrangler d1 migrations apply` (CI: `.github/workflows/migrate.yml` — PR→preview, main→prod)
 
 ### 공유 바이럴 플로우
 
@@ -167,7 +167,7 @@ create index idx_shares_created on shares (created_at desc);
 **중요**: 같은 라운드를 친구가 풀 때 10문제 순서까지 동일해야 합니다.
 점수 비교 의미를 살려야 바이럴이 작동합니다.
 
-환경변수 표는 `README.md`가 단일 출처예요. `.env.local.example`도 함께 참조해 주세요. Upstash·PostHog·Anthropic은 키가 비면 모두 no-op/fail-open으로 떨어지는 게 기본 원칙이고, 공유/메타 URL의 base는 별도 env 없이 `VERCEL_URL` / `VERCEL_PROJECT_PRODUCTION_URL` + 요청 헤더 화이트리스트로 도출돼요.
+환경변수 표는 `README.md`가 단일 출처예요. `.dev.vars.example`(서버 secrets)과 `.env.example`(클라이언트 `VITE_*`)도 함께 참조해 주세요. Upstash·PostHog·Anthropic은 키가 비면 모두 no-op/fail-open으로 떨어지는 게 기본 원칙이고, 공유/메타 URL의 base는 wrangler env별 `SITE_URL` var + 요청 헤더 화이트리스트로 도출돼요.
 
 ## 톤 & UX 가이드라인
 
@@ -185,23 +185,28 @@ create index idx_shares_created on shares (created_at desc);
 - [ ] 처음부터 저장소 분리
 - [ ] 광고 모듈 (컨셉 자체가 깨짐)
 - [ ] 정답을 클라이언트로 내려보내기 (보안 + 컨셉 둘 다 위반)
-- [ ] Supabase anon/publishable key로 `shares` 직접 insert/select 허용
+- [ ] `lib/questions.generated.json`을 클라이언트 코드에서 직접 import (정답 포함 원본)
 
 ## 디렉토리 컨벤션
 
 ```
 fe-quiz/
-├── app/                         # Next.js App Router
-│   ├── api/quiz/submit          # 서버 채점
-│   ├── api/quiz/feedback        # AI 피드백 스트리밍
-│   ├── api/share                # 공유 생성
-│   ├── play/                    # 라운드 UI
-│   ├── r/[slug]/                # 공유 결과 + OG 이미지
-│   ├── error.tsx                # 라우트 에러 바운더리
-│   ├── global-error.tsx         # root layout 에러 바운더리
-│   ├── layout.tsx               # 한국어 메타 + Pretendard
-│   ├── page.tsx                 # 랜딩
-│   └── globals.css              # Tailwind v4 @theme
+├── app/                         # React Router framework mode (appDirectory)
+│   ├── routes.ts                # 라우트 정의 (config 방식 — 파일 규약 아님)
+│   ├── routes/
+│   │   ├── home.tsx             # 랜딩
+│   │   ├── play.tsx             # 라운드 loader + Suspense 셸
+│   │   ├── share.tsx            # /r/:slug 공유 결과 (loader + meta)
+│   │   ├── share-og.ts          # /r/:slug/og.png (workers-og)
+│   │   ├── api.quiz-submit.ts   # 서버 채점 (action)
+│   │   ├── api.quiz-feedback.ts # AI 피드백 스트리밍 (action)
+│   │   ├── api.share.ts         # 공유 생성 (action)
+│   │   └── robots.ts, sitemap.ts
+│   ├── play/                    # 라운드 클라이언트 컴포넌트 (round-runner, result)
+│   ├── root.tsx                 # 한국어 메타 + Pretendard + ErrorBoundary(404/500)
+│   ├── entry.server.tsx         # SSR 스트리밍 + handleError → PostHog
+│   └── app.css                  # Tailwind v4 @theme
+├── workers/app.ts               # Worker 진입점 — /ingest 프록시 + RR 핸들러
 ├── components/
 │   └── PostHogProvider.tsx      # 클라이언트 PostHog 부트스트랩
 ├── content/
@@ -210,38 +215,36 @@ fe-quiz/
 │   ├── AGENTS.md                # 콘텐츠 강제 규칙 (영어)
 │   ├── INDEX.md                 # 카테고리별 카탈로그 (questions:index 산출)
 │   └── questions/               # YAML 시드 문제 (카테고리별 폴더)
-├── lib/                         # 도메인 로직
+├── lib/                         # 도메인 로직 (.server.ts = 서버 전용)
 │   ├── categories.ts            # 카테고리 단일 출처
 │   ├── question.schema.ts       # zod 질문 스키마
 │   ├── levels.ts                # 난이도 3단계 단일 출처
-│   ├── round.ts                 # 라운드 로드/공개 데이터
+│   ├── questions.generated.json # 빌드 타임 문제 번들 (questions:bundle 산출)
+│   ├── questions.server.ts      # 문제 풀 접근자
+│   ├── round.server.ts          # 라운드 로드/공개 데이터
 │   ├── round-picker.ts          # 라운드 픽커 + ROUND_SIZE 단일 출처
 │   ├── grading.ts               # 채점
 │   ├── diagnosis.ts             # 진단/페르소나
 │   ├── feedback-prompt.ts       # LLM 프롬프트
-│   ├── share-store.ts           # shares 저장/조회
+│   ├── share-store.server.ts    # shares 저장/조회 (D1)
 │   ├── highlight.ts             # 마크다운/코드 렌더
-│   ├── supabase.ts              # 서버 Supabase 클라이언트
-│   ├── rate-limit.ts            # Upstash rate limit
-│   ├── logger.ts                # pino 싱글턴
-│   └── posthog-server.ts        # 서버 PostHog 싱글턴
+│   ├── rate-limit.server.ts     # Upstash rate limit
+│   ├── logger.server.ts         # console 기반 로거 + PostHog 포워딩
+│   └── posthog-server.server.ts # 서버 PostHog + captureServerError
+├── migrations/                  # D1 마이그레이션 (wrangler d1 migrations)
 ├── scripts/
 │   ├── check-questions.ts
 │   ├── check-round.ts
+│   ├── build-questions-json.ts  # questions.generated.json 생성/검증
 │   └── lint-question-prose.ts   # prose vs code 휴리스틱 검사
-├── supabase/
-│   ├── AGENTS.md                # 마이그레이션 운영 가이드 (영어)
-│   └── migrations/
 ├── docs/
 │   ├── DECISIONS.md             # 이 문서 — 영구 설계 결정 (살아있는 개요)
 │   ├── adr/                     # Architecture Decision Records (개별 결정 박제)
 │   └── quiz-generation.md       # 자동 출제 워크플로 상세 설계
-├── instrumentation.ts           # Next.js 16 onRequestError → PostHog
-├── .env.local.example
-├── .mcp.json
+├── wrangler.jsonc               # Workers 설정 — env(preview/production)별 D1·vars
+├── .dev.vars.example            # 서버 secrets 템플릿 (로컬 dev)
+├── .env.example                 # 클라이언트 VITE_* 템플릿
 ├── .nvmrc                       # Node 22
 ├── biome.json
 └── LICENSE                      # MIT
 ```
-
-마이그레이션 운영 가이드(워크플로 분기, GitHub Secrets, lock-down 주의사항)는 `supabase/AGENTS.md` 참고.

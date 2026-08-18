@@ -13,10 +13,11 @@
 | # | 제목 | 상태 |
 |---|---|---|
 | [0001](./0001-daily-quiz-generation-hybrid.md) | 매일 자동 출제 — 스크립트 + sub-agent 하이브리드 | Accepted |
-| [0002](./0002-supabase-server-only-secret-key.md) | Supabase `shares`는 서버 전용 secret 키로만 접근 | Accepted |
-| [0003](./0003-vercel-env-environment-split.md) | 환경 분기는 `VERCEL_ENV` 기준 (`NODE_ENV` 금지) | Accepted |
+| [0002](./0002-supabase-server-only-secret-key.md) | Supabase `shares`는 서버 전용 secret 키로만 접근 | Superseded by [0006](./0006-react-router-workers-d1.md) |
+| [0003](./0003-vercel-env-environment-split.md) | 환경 분기는 `VERCEL_ENV` 기준 (`NODE_ENV` 금지) | Superseded by [0006](./0006-react-router-workers-d1.md) |
 | [0004](./0004-yaml-content-with-zod-validation.md) | 질문 콘텐츠는 YAML + Zod 검증 (마크다운 frontmatter 안 씀) | Accepted |
 | [0005](./0005-no-client-answer-exposure.md) | 클라이언트로 정답·해설·출처 안 내려보내기 | Accepted |
+| [0006](./0006-react-router-workers-d1.md) | 호스팅·프레임워크·DB를 Cloudflare 스택으로 이전 | Accepted |
 
 ## 새 ADR을 언제 쓰나
 

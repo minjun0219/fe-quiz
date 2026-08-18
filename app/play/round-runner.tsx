@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useId, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
 import { track } from "@/lib/analytics";

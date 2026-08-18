@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the question loader so tests don't depend on the actual content/* tree
 // or hit the fs at all. Each test sets up its own minimal pool.
-vi.mock("./questions", () => {
+vi.mock("./questions.server", () => {
   // biome-ignore lint/suspicious/noExplicitAny: test pool is mutable
   let pool: any[] = [];
   return {
@@ -28,13 +28,13 @@ vi.mock("./highlight", () => ({
 }));
 
 import type { Question } from "./question.schema";
-import * as questionsMod from "./questions";
+import * as questionsMod from "./questions.server";
 import {
   pickRoundQuestions,
   pickRoundQuestionsByIds,
   publicView,
   ROUND_SIZE,
-} from "./round";
+} from "./round.server";
 
 function single(id: string): Question {
   return {
