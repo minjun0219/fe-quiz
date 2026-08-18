@@ -56,7 +56,7 @@ GitHub Actions가 **월~금 KST 05:00** 출근길 검수 타이밍에 랜덤 1�
 - **Rate limit**: Upstash Redis (`@upstash/ratelimit`) — 미설정 시 fail-open
 - **Logging**: console 기반 경량 로거 (`lib/logger.server.ts`) → Workers Logs
 - **Analytics/Error monitoring**: PostHog (`posthog-js`/`posthog-node`, 키 미설정 시 양쪽 no-op)
-- **호스팅**: Cloudflare Workers (`fe-quiz` = production, `fe-quiz-preview` = preview, workers.dev)
+- **호스팅**: Cloudflare Workers — production은 `fe-quiz` 워커 + 커스텀 도메인 `fe-quiz.minjun.dev`(workers.dev 라우트 비활성), preview는 `fe-quiz-preview.minjun.workers.dev`
 - **OG 이미지**: `workers-og`(satori) 기반 `/r/:slug/og.png` 리소스 라우트
 - **공유 ID**: `nanoid` 8자리
 - **콘텐츠**: `.yaml` 파일, `yaml` 파싱 + `zod` 스키마 검증 → 빌드 타임에 `lib/questions.generated.json`으로 번들 (Workers엔 런타임 fs가 없음)
