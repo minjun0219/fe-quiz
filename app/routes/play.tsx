@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Await } from "react-router";
 import { toLevel } from "@/lib/levels";
+import { logger } from "@/lib/logger.server";
 import type { PublicQuestion } from "@/lib/question.schema";
 import {
   pickRoundQuestions,
@@ -44,7 +45,12 @@ async function resolveQuestions(
   if (!from) {
     return pickRoundQuestions(ROUND_SIZE, level);
   }
-  const share = await getShareById(from).catch(() => null);
+  // D1 장애도 랜덤 라운드로 폴백한다(가용성 우선 — 친구는 어쨌든 풀 수
+  // 있어야 함). 대신 조용히 삼키지 않고 로깅해 관측은 남긴다.
+  const share = await getShareById(from).catch((err) => {
+    logger.error({ err, from }, "[play] getShareById failed — random fallback");
+    return null;
+  });
   if (!share) {
     return pickRoundQuestions(ROUND_SIZE, level);
   }

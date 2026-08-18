@@ -87,10 +87,25 @@ export async function createShare({
  * 수동 조작으로 형태가 어긋난 row가 NaN 폭/undefined 라벨로 새는 것보다
  * "없는 결과" 취급이 안전하다.
  */
+// D1은 write 직후 read가 다른 콜로에서 잠깐 못 볼 수 있다(복제 지연 — 공유
+// 생성 → "미리보기" 즉시 클릭 경로에서 실측). null일 때만 짧게 재시도해
+// 간헐적 404를 흡수한다. 진짜 없는 slug는 404가 ~300ms 늦어질 뿐.
+const NOT_FOUND_RETRIES = 2;
+const NOT_FOUND_RETRY_DELAY_MS = 150;
+
 export async function getShareById(id: string): Promise<ShareRow | null> {
-  const raw = await env.DB.prepare("SELECT * FROM shares WHERE id = ?1")
-    .bind(id)
-    .first<Record<string, unknown>>();
+  let raw: Record<string, unknown> | null = null;
+  for (let attempt = 0; ; attempt++) {
+    raw = await env.DB.prepare("SELECT * FROM shares WHERE id = ?1")
+      .bind(id)
+      .first<Record<string, unknown>>();
+    if (raw || attempt >= NOT_FOUND_RETRIES) {
+      break;
+    }
+    await new Promise((resolve) =>
+      setTimeout(resolve, NOT_FOUND_RETRY_DELAY_MS),
+    );
+  }
   if (!raw) {
     return null;
   }

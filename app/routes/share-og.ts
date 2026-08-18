@@ -56,7 +56,15 @@ export async function loader({ params }: Route.LoaderArgs) {
   // Pretendard는 서드파티 CDN — fetch가 실패해도(5xx, egress 차단) OG 엔드
   // 포인트가 500 나는 것보단 satori 내장 sans 폴백으로 그리는 게 낫다.
   const [share, fontData] = await Promise.all([
-    getShareById(params.slug).catch(() => null),
+    // D1 장애도 "결과 없음" 카드로 폴백한다(소셜 스크레이퍼에 500 대신
+    // 렌더 가능한 이미지). 대신 조용히 삼키지 않고 로깅해 관측은 남긴다.
+    getShareById(params.slug).catch((err) => {
+      logger.error(
+        { err, slug: params.slug },
+        "[og] getShareById failed — not-found card fallback",
+      );
+      return null;
+    }),
     getFontData().catch((err) => {
       logger.warn({ err }, "[og] Pretendard fetch failed");
       return null;
