@@ -27,9 +27,12 @@ const LEVEL_VALUES: Record<Level | "silent", number> = {
 };
 
 const isTest = process.env.NODE_ENV === "test";
+// wrangler types는 APP_ENV를 wrangler.jsonc vars의 리터럴 유니온("production" |
+// "preview")으로 좁히지만, 로컬 dev에선 .dev.vars가 "development"를 주입하므로
+// 런타임 값은 타입보다 넓다 — string으로 되돌려 비교한다.
+const appEnv: string | undefined = process.env.APP_ENV;
 const isDev =
-  process.env.APP_ENV === "development" ||
-  process.env.NODE_ENV === "development";
+  appEnv === "development" || process.env.NODE_ENV === "development";
 
 const defaultLevel: keyof typeof LEVEL_VALUES = isTest
   ? "silent"

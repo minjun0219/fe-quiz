@@ -41,8 +41,5 @@ jobs:
         run: pnpm check
 
       - name: Production build
-        env:
-          # 빌드 타임 env 선택 (wrangler.jsonc 참고). CI 가드가 미지정 빌드를
-          # 실패시키므로 여기서도 명시 — 실제 배포와 같은 설정으로 검증.
-          CLOUDFLARE_ENV: production
+        # 기본 빌드가 곧 production 설정 (wrangler.jsonc top-level).
         run: pnpm build

@@ -12,7 +12,7 @@
     "prebuild": "pnpm questions:check && pnpm questions:index:check && pnpm questions:bundle:check && pnpm round:check",
     "build": "react-router build",
     "preview": "vite preview",
-    "deploy": "CLOUDFLARE_ENV=production pnpm run build && wrangler deploy",
+    "deploy": "pnpm run build && wrangler deploy",
     "deploy:preview": "CLOUDFLARE_ENV=preview pnpm run build && wrangler deploy",
     "typecheck": "wrangler types && react-router typegen && tsc -b",
     "cf-typegen": "wrangler types",

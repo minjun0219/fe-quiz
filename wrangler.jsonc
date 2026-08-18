@@ -1,18 +1,21 @@
 /**
  * Wrangler 설정 — https://developers.cloudflare.com/workers/wrangler/configuration/
  *
- * 환경 구조:
- *   - top-level        로컬 dev (`pnpm dev` — vite + workerd, D1은 로컬 sqlite)
- *   - env.preview      PR 프리뷰 배포 (전용 preview D1 — prod 바인딩 격리)
- *   - env.production   운영 (main 브랜치)
+ * 환경 구조 (top-level = production이 기본값):
+ *   - top-level        production — `pnpm build`가 그대로 배포 빌드다.
+ *                      Workers Builds 기본 커맨드(`pnpm build`)와 일치.
+ *   - env.preview      수동 프리뷰 배포 (`pnpm deploy:preview` — 전용 preview D1)
+ *   - 로컬 dev          `pnpm dev`는 D1을 로컬 sqlite로 시뮬레이션하고,
+ *                      vars 오버라이드(APP_ENV/SITE_URL)는 `.dev.vars`가 담당.
  *
- * ⚠️ 환경 선택은 배포 시점이 아니라 **빌드 시점** — @cloudflare/vite-plugin이
- * `CLOUDFLARE_ENV`로 env를 골라 resolved config를 build/server/wrangler.json에
- * 굽고, `wrangler deploy`는 그걸 그대로 올린다. (`wrangler deploy --env`는
- * 무시됨.) 예: `CLOUDFLARE_ENV=production pnpm build && wrangler deploy`.
+ * env 선택은 빌드 타임 — @cloudflare/vite-plugin이 `CLOUDFLARE_ENV`로 env를
+ * 골라 resolved config를 build/server/wrangler.json에 굽고, `wrangler deploy`는
+ * 그걸 그대로 올린다. **기본(미지정) = production**이므로 명시가 필요한 건
+ * preview뿐이다 (`CLOUDFLARE_ENV=preview pnpm build`). `wrangler deploy --env`는
+ * 무시된다.
  *
  * secrets(ANTHROPIC_API_KEY, UPSTASH_*, POSTHOG_KEY)는 여기 두지 않는다 —
- * 로컬은 `.dev.vars`, 배포 env는 `wrangler secret put <NAME> --env <env>`.
+ * 로컬은 `.dev.vars`, 배포는 `wrangler secret put <NAME>` (preview는 --env preview).
  * `nodejs_compat` + 최신 compatibility_date에서 vars/secrets는 `process.env`로도
  * 주입되므로 서버 코드는 `process.env.*` 읽기를 그대로 쓴다.
  */
@@ -27,16 +30,17 @@
   },
   "upload_source_maps": true,
   "vars": {
-    "APP_ENV": "development",
-    "SITE_URL": "http://localhost:3000",
+    "APP_ENV": "production",
+    // 커스텀 도메인 (2026-08-19 스위칭, workers.dev 라우트 비활성).
+    // 공유 URL·og:image·sitemap의 canonical origin.
+    "SITE_URL": "https://fe-quiz.minjun.dev",
     "POSTHOG_HOST": "https://us.i.posthog.com"
   },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "fe-quiz-shares-preview",
-      // 로컬 dev는 miniflare sqlite를 쓰므로 id가 실제로 조회되진 않는다.
-      "database_id": "69bb7a3f-66b3-4d89-8104-9f0e45ee1ac7"
+      "database_name": "fe-quiz-shares",
+      "database_id": "9ab01bfd-bf8c-47e2-a7e2-b53c6d1741f0"
     }
   ],
   "env": {
@@ -52,24 +56,6 @@
           "binding": "DB",
           "database_name": "fe-quiz-shares-preview",
           "database_id": "69bb7a3f-66b3-4d89-8104-9f0e45ee1ac7"
-        }
-      ]
-    },
-    "production": {
-      // 운영은 top-level 이름 그대로 fe-quiz — URL이 가장 짧다.
-      "name": "fe-quiz",
-      "vars": {
-        "APP_ENV": "production",
-        // 커스텀 도메인 (2026-08-19 스위칭). workers.dev 라우트는 비활성 —
-        // 이 값이 공유 URL·og:image·sitemap의 canonical origin이다.
-        "SITE_URL": "https://fe-quiz.minjun.dev",
-        "POSTHOG_HOST": "https://us.i.posthog.com"
-      },
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "fe-quiz-shares",
-          "database_id": "9ab01bfd-bf8c-47e2-a7e2-b53c6d1741f0"
         }
       ]
     }

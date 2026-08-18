@@ -3,7 +3,7 @@
 
 React Router v8 framework mode + `@cloudflare/vite-plugin`. Next.js 파일 규약(page/layout/loading/route.ts)은 여기 없어요 — 라우트는 `app/routes.ts` config가 단일 출처, 서버 로직은 loader/action, worker 진입점은 `workers/app.ts`. 학습 데이터의 Remix/RR v7 지식과도 다를 수 있으니 API가 애매하면 `node_modules/react-router/` 타입과 공식 문서로 확인부터.
 
-**배포 환경 선택은 빌드 타임**: `CLOUDFLARE_ENV=production|preview`가 vite 빌드에서 env를 굽고, `wrangler deploy`는 그 산출물을 올려요. `wrangler deploy --env`는 무시돼요 (`wrangler.jsonc` 상단 주석 참고).
+**배포 환경 선택은 빌드 타임**: vite 빌드가 env를 구워요 — **기본(미지정) = production**이고, preview만 `CLOUDFLARE_ENV=preview`를 명시해요 (`pnpm deploy:preview`). 로컬 dev 오버라이드는 `.dev.vars`. `wrangler deploy --env`는 무시돼요 (`wrangler.jsonc` 상단 주석 참고).
 <!-- END:react-router-agent-rules -->
 
 <!-- BEGIN:tailwind-agent-rules -->

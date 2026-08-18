@@ -151,7 +151,7 @@ D1은 Worker binding(`env.DB`)이 유일한 접근 경로라 공개 REST 표면�
 중요:
 
 - 환경 분리는 wrangler env: 로컬 dev(로컬 sqlite) / `fe-quiz-shares-preview` / `fe-quiz-shares`
-- 환경 선택은 **빌드 타임** `CLOUDFLARE_ENV` — `wrangler deploy --env`가 아님 (`wrangler.jsonc` 상단 주석 참고)
+- 환경 선택은 **빌드 타임** — 기본(미지정) 빌드 = production, preview만 `CLOUDFLARE_ENV=preview` 명시. `wrangler deploy --env`가 아님 (`wrangler.jsonc` 상단 주석 참고)
 - 마이그레이션은 `migrations/*.sql` + `wrangler d1 migrations apply` (CI: `.github/workflows/migrate.yml` — PR→preview, main→prod)
 
 ### 공유 바이럴 플로우
