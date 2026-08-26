@@ -23,39 +23,43 @@ export const POSTHOG_UI_HOST = (() => {
 })();
 
 /**
- * 클라이언트 PostHog 프로바이더.
+ * 클라이언트 PostHog 초기화. **entry.client.tsx가 하이드레이션 전에 호출**한다
+ * — React effect에서 init하면 자식 effect(PageviewTracker, RoundRunner의
+ * track 큐)가 부모 init보다 먼저 돌아 첫 $pageview가 영구 드롭되고, init이
+ * 큐 드레인 타임아웃(~1s)보다 늦으면 라운드 이벤트도 버려진다. 하이드레이션
+ * 전에 끝내면 모든 effect 시점에 `__loaded`가 보장된다.
  *
- * - 키 미설정 시 init을 건너뛰어 dev/CI에서 throw 없이 no-op.
- * - `/ingest`로 reverse proxy되므로 ad-blocker에 막히지 않음 (workers/app.ts).
+ * - 키 미설정 시 no-op — dev/CI에서 throw 없음.
  * - 익명 가입 없는 제품이라 identified_only로 설정해 봇/무지성 방문이
  *   사용자 카운트를 부풀리지 않도록 함.
  * - 세션 리플레이: form 입력은 전부 마스킹(`maskAllInputs`), 텍스트는 기본
  *   노출이고 민감한 영역에 `data-ph-mask` 속성을 붙여 opt-in 마스킹. 이 앱은
  *   퀴즈 콘텐츠가 본질적으로 공개 텍스트라 default-mask는 디버깅만 어렵게 함.
  */
+export function initPostHog(): void {
+  const key = import.meta.env.VITE_POSTHOG_KEY;
+  if (!key) {
+    return;
+  }
+  if (posthog.__loaded) {
+    return;
+  }
+
+  posthog.init(key, {
+    api_host: POSTHOG_API_HOST,
+    ui_host: POSTHOG_UI_HOST,
+    person_profiles: "identified_only",
+    capture_pageview: false, // 라우트 변경 직접 감지 (아래 PageviewTracker)
+    capture_pageleave: true,
+    session_recording: {
+      maskAllInputs: true,
+      maskTextSelector: "[data-ph-mask]",
+    },
+  });
+}
+
+/** 클라이언트 PostHog 프로바이더 — init은 entry.client에서 이미 끝난 상태. */
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    const key = import.meta.env.VITE_POSTHOG_KEY;
-    if (!key) {
-      return;
-    }
-    if (posthog.__loaded) {
-      return;
-    }
-
-    posthog.init(key, {
-      api_host: POSTHOG_API_HOST,
-      ui_host: POSTHOG_UI_HOST,
-      person_profiles: "identified_only",
-      capture_pageview: false, // 라우트 변경 직접 감지 (아래 PageviewTracker)
-      capture_pageleave: true,
-      session_recording: {
-        maskAllInputs: true,
-        maskTextSelector: "[data-ph-mask]",
-      },
-    });
-  }, []);
-
   return (
     <Provider client={posthog}>
       <PageviewTracker />

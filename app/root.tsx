@@ -9,11 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import {
-  POSTHOG_API_HOST,
-  POSTHOG_UI_HOST,
-  PostHogProvider,
-} from "@/components/PostHogProvider";
+import { initPostHog, PostHogProvider } from "@/components/PostHogProvider";
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -112,20 +108,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     if (isNotFound) {
       return;
     }
-    const key = import.meta.env.VITE_POSTHOG_KEY;
-    if (!key) {
+    if (!import.meta.env.VITE_POSTHOG_KEY) {
       return;
     }
-    if (!posthog.__loaded) {
-      posthog.init(key, {
-        api_host: POSTHOG_API_HOST,
-        ui_host: POSTHOG_UI_HOST,
-        person_profiles: "identified_only",
-        // 에러 경로는 거의 안 타므로 세션 리플레이/페이지뷰는 굳이 안 켬.
-        capture_pageview: false,
-        autocapture: false,
-      });
-    }
+    // entry.client에서 이미 init됐지만, 하이드레이션 자체가 깨진 극단 경로
+    // 대비 안전망 — initPostHog는 이미 로드됐으면 no-op.
+    initPostHog();
     posthog.captureException(
       error instanceof Error ? error : new Error(String(error)),
     );
