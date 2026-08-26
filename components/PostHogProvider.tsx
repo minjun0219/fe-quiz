@@ -36,8 +36,8 @@ export const POSTHOG_UI_HOST = (() => {
  *   노출이고 민감한 영역에 `data-ph-mask` 속성을 붙여 opt-in 마스킹. 이 앱은
  *   퀴즈 콘텐츠가 본질적으로 공개 텍스트라 default-mask는 디버깅만 어렵게 함.
  */
-// `posthog.__loaded`는 posthog-js 최신 버전에서 더 이상 설정되지 않는 죽은
-// 플래그다(타입에만 잔존) — 재초기화 가드는 자체 플래그로 관리한다.
+// 재초기화 가드. (posthog.__loaded로도 판별 가능하지만 우리 쪽 상태는 우리
+// 플래그로 관리하는 게 명시적이다.)
 let initialized = false;
 
 export function initPostHog(): void {

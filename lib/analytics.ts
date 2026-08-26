@@ -95,9 +95,12 @@ const HAS_KEY = !!import.meta.env.VITE_POSTHOG_KEY;
  * 타입 안전한 PostHog 이벤트 캡처.
  *
  * init은 entry.client가 하이드레이션 전에 끝내므로(`initPostHog`) 어떤 effect
- * 시점에도 바로 capture해도 안전하다 — 과거의 `posthog.__loaded` 게이트 + 큐는
- * 제거했다. `__loaded`는 posthog-js 최신 버전에서 더 이상 설정되지 않는 죽은
- * 플래그라(타입에만 남아 있음) 게이트로 쓰면 모든 이벤트가 조용히 버려진다.
+ * 시점에도 바로 capture해도 안전하다 — init 완료를 기다리던 과거의
+ * `__loaded` 게이트 + 큐는 불필요해져 제거했다.
+ *
+ * 참고: 자동화 브라우저(Playwright 등)에선 posthog-js의 봇 필터
+ * (`navigator.webdriver`/UA 검사)가 capture를 조용히 드롭한다 — E2E에서
+ * 이벤트가 안 보이는 건 버그가 아니라 의도된 동작.
  */
 export function track<K extends keyof AnalyticsEvents>(
   event: K,
