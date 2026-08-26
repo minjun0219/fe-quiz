@@ -27,7 +27,7 @@ export const POSTHOG_UI_HOST = (() => {
  * — React effect에서 init하면 자식 effect(PageviewTracker, RoundRunner의
  * track 큐)가 부모 init보다 먼저 돌아 첫 $pageview가 영구 드롭되고, init이
  * 큐 드레인 타임아웃(~1s)보다 늦으면 라운드 이벤트도 버려진다. 하이드레이션
- * 전에 끝내면 모든 effect 시점에 `__loaded`가 보장된다.
+ * 전에 끝내면 모든 effect 시점에 초기화가 보장된다.
  *
  * - 키 미설정 시 no-op — dev/CI에서 throw 없음.
  * - 익명 가입 없는 제품이라 identified_only로 설정해 봇/무지성 방문이
@@ -36,14 +36,16 @@ export const POSTHOG_UI_HOST = (() => {
  *   노출이고 민감한 영역에 `data-ph-mask` 속성을 붙여 opt-in 마스킹. 이 앱은
  *   퀴즈 콘텐츠가 본질적으로 공개 텍스트라 default-mask는 디버깅만 어렵게 함.
  */
+// `posthog.__loaded`는 posthog-js 최신 버전에서 더 이상 설정되지 않는 죽은
+// 플래그다(타입에만 잔존) — 재초기화 가드는 자체 플래그로 관리한다.
+let initialized = false;
+
 export function initPostHog(): void {
   const key = import.meta.env.VITE_POSTHOG_KEY;
-  if (!key) {
+  if (!key || initialized) {
     return;
   }
-  if (posthog.__loaded) {
-    return;
-  }
+  initialized = true;
 
   posthog.init(key, {
     api_host: POSTHOG_API_HOST,
@@ -77,7 +79,8 @@ function PageviewTracker() {
   const location = useLocation();
 
   useEffect(() => {
-    if (!posthog.__loaded) {
+    // init은 entry.client에서 하이드레이션 전에 끝났으므로 키 유무만 본다.
+    if (!import.meta.env.VITE_POSTHOG_KEY) {
       return;
     }
     const url = location.search
