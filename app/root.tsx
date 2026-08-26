@@ -9,7 +9,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { PostHogProvider } from "@/components/PostHogProvider";
+import {
+  POSTHOG_API_HOST,
+  POSTHOG_UI_HOST,
+  PostHogProvider,
+} from "@/components/PostHogProvider";
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -114,7 +118,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     }
     if (!posthog.__loaded) {
       posthog.init(key, {
-        api_host: "/ingest",
+        api_host: POSTHOG_API_HOST,
+        ui_host: POSTHOG_UI_HOST,
         person_profiles: "identified_only",
         // 에러 경로는 거의 안 타므로 세션 리플레이/페이지뷰는 굳이 안 켬.
         capture_pageview: false,

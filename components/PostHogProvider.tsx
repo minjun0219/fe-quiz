@@ -3,16 +3,24 @@ import { PostHogProvider as Provider } from "posthog-js/react";
 import { useEffect } from "react";
 import { useLocation } from "react-router";
 
+const RAW_HOST = import.meta.env.VITE_POSTHOG_HOST;
+
 /**
- * `ui_host`는 PostHog UI/툴바 도메인(`{region}.posthog.com`)이라 ingest 도메인
- * (`{region}.i.posthog.com`)을 그대로 넣으면 안 됨. 같은 env에서 파생.
+ * 이벤트 수집 엔드포인트. `VITE_POSTHOG_HOST`가 있으면 그 호스트로 직접
+ * (production은 리버스 프록시 z.minjun.kim — 수집 트래픽이 워커 할당량을 안
+ * 먹음), 없으면 같은 오리진 `/ingest` 프록시(workers/app.ts)로 폴백 (로컬 dev).
  */
-const INGEST_HOST =
-  import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.com";
-const UI_HOST = INGEST_HOST.replace(
-  /^(https?:\/\/)([a-z]+)\.i\.posthog\.com\/?$/,
-  "$1$2.posthog.com",
-);
+export const POSTHOG_API_HOST = RAW_HOST ?? "/ingest";
+
+/**
+ * `ui_host`는 PostHog UI/툴바 도메인(`{region}.posthog.com`)이라 ingest
+ * 도메인을 그대로 넣으면 안 됨. PostHog Cloud 호스트면 패턴에서 파생하고,
+ * 커스텀 리버스 프록시(z.minjun.kim 등)면 파생 불가라 us 리전으로 폴백.
+ */
+export const POSTHOG_UI_HOST = (() => {
+  const m = RAW_HOST?.match(/^(https?:\/\/)([a-z]+)\.i\.posthog\.com\/?$/);
+  return m ? `${m[1]}${m[2]}.posthog.com` : "https://us.posthog.com";
+})();
 
 /**
  * 클라이언트 PostHog 프로바이더.
@@ -36,8 +44,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     }
 
     posthog.init(key, {
-      api_host: "/ingest",
-      ui_host: UI_HOST,
+      api_host: POSTHOG_API_HOST,
+      ui_host: POSTHOG_UI_HOST,
       person_profiles: "identified_only",
       capture_pageview: false, // 라우트 변경 직접 감지 (아래 PageviewTracker)
       capture_pageleave: true,
