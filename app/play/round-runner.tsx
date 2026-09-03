@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { CodeBlock } from "@/components/code-block";
 import { track } from "@/lib/analytics";
 import type { Level } from "@/lib/levels";
@@ -99,7 +99,8 @@ function reachableLimit(
       return i;
     }
   }
-  return questions.length - 1;
+  // 시드가 비어 있으면 length-1이 -1이 되어 `?q=-1`을 URL에 써버린다.
+  return Math.max(0, questions.length - 1);
 }
 
 export default function RoundRunner({ questions, level, replay }: Props) {
@@ -121,9 +122,13 @@ export default function RoundRunner({ questions, level, replay }: Props) {
   // 뒤로가기가 /play 자체를 벗어나 라운드가 통째로 날아간다 — 문제 세트가
   // 랜덤이라 되돌아와도 복구되지 않는다.
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const limit = reachableLimit(questions, answers);
-  const cursor = parseCursor(searchParams.get("q"));
-  const index = Math.min(cursor, limit);
+  const rawCursor = searchParams.get("q");
+  const index = Math.min(parseCursor(rawCursor), limit);
+  // 이 index의 정규형 `q` 값. 파싱 결과가 아니라 raw와 비교해야 `?q=foo`,
+  // `?q=-1`, `?q=0`처럼 0으로 파싱되는 쓰레기 값도 정리된다.
+  const canonicalCursor = index === 0 ? null : String(index);
 
   /** 스크롤은 scrollToTop()이 직접 관리하므로 라우터 복원은 끈다. */
   function goTo(nextIndex: number) {
@@ -136,14 +141,14 @@ export default function RoundRunner({ questions, level, replay }: Props) {
   // 라운드 중간 새로고침 등 — 새로고침은 랜덤 세트를 새로 뽑으므로 커서가
   // 통째로 무의미해진다). 히스토리를 늘리지 않도록 replace.
   useEffect(() => {
-    if (cursor === index) {
+    if (rawCursor === canonicalCursor) {
       return;
     }
     setSearchParams((prev) => withCursor(prev, index), {
       preventScrollReset: true,
       replace: true,
     });
-  }, [cursor, index, setSearchParams]);
+  }, [rawCursor, canonicalCursor, index, setSearchParams]);
 
   useEffect(() => {
     if (questions.length === 0) {
@@ -328,7 +333,12 @@ export default function RoundRunner({ questions, level, replay }: Props) {
 
   function prevStep() {
     scrollToTop();
-    goTo(index - 1);
+    // 새 항목을 push하지 않고 실제로 히스토리를 되감는다. push하면 `← 이전`
+    // 직후의 브라우저 back이 방금 떠난 문항으로 되돌아가고(전진처럼 보임),
+    // 이전을 누를수록 /play를 벗어나는 데 필요한 back 횟수가 늘어난다.
+    // 이 버튼은 index > 0에서만 보이고 직접 진입은 limit이 0으로 접으므로,
+    // 직전 항목은 항상 이 라운드의 index-1이다.
+    navigate(-1);
   }
 
   return (

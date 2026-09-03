@@ -47,9 +47,18 @@ export function loader({ request }: Route.LoaderArgs) {
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   currentUrl,
   nextUrl,
-}) =>
-  currentUrl.searchParams.get("from") !== nextUrl.searchParams.get("from") ||
-  currentUrl.searchParams.get("level") !== nextUrl.searchParams.get("level");
+}) => roundIdentity(currentUrl) !== roundIdentity(nextUrl);
+
+/**
+ * 로더가 실제로 보는 값만 추린 라운드 식별자. 로더와 같은 정규화를 써야
+ * 결과가 달라지지 않는 URL 변경에 라운드가 리셋되지 않는다 — `?level=foo`는
+ * `toLevel()`이 기본값으로 접고, `?from=`(빈 문자열)은 로더의 `if (!from)`이
+ * 미지정과 똑같이 취급한다.
+ */
+function roundIdentity(url: URL): string {
+  const from = url.searchParams.get("from") || "";
+  return `${from}::${toLevel(url.searchParams.get("level"))}`;
+}
 
 async function resolveQuestions(
   from: string | undefined,
