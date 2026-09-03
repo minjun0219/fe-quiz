@@ -3,6 +3,11 @@ import { nanoid } from "nanoid";
 import type { GradedRound } from "./grading";
 import { logger } from "./logger.server";
 import { type ShareRow, ShareRowSchema } from "./share.schema";
+import {
+  computeStanding,
+  type Standing,
+  type StandingAggregate,
+} from "./standing";
 
 const SLUG_LENGTH = 8;
 const MAX_SLUG_RETRIES = 3;
@@ -131,4 +136,52 @@ export async function getShareById(id: string): Promise<ShareRow | null> {
     return null;
   }
   return parsed.data;
+}
+
+/**
+ * 이 라운드를 푼 사람들 사이에서 `share`의 위치.
+ *
+ * 라운드는 `question_ids` 문자열이 같은 row들로 묶는다 — 공유 링크 재도전은
+ * 같은 문제를 같은 순서로 풀고, 저장 경로가 `JSON.stringify(순서대로의 id
+ * 배열)` 하나뿐이라 문자열이 바이트 단위로 같다(마이그레이션 0002 주석 참고).
+ * 그래서 별도 round_id 컬럼도, 클라이언트가 보내는 `from`도 필요 없다.
+ *
+ * 순위 계산은 `lib/standing.ts`(순수 함수, 테스트 있음)가 맡고 여기서는
+ * 집계만 뽑는다. D1 장애 시 null을 돌려 점수판만 빠지고 결과 페이지 자체는
+ * 뜨게 한다 — 공유 링크를 받은 사람에게 500을 보여줄 이유가 없다.
+ */
+export async function getRoundStanding(
+  share: ShareRow,
+): Promise<Standing | null> {
+  const questionIdsJson = JSON.stringify(share.question_ids);
+  try {
+    const row = await env.DB.prepare(
+      `SELECT
+         COUNT(*) AS players,
+         COALESCE(SUM(CASE WHEN score > ?2 THEN 1 ELSE 0 END), 0) AS better,
+         COALESCE(AVG(score), 0) AS average,
+         COALESCE(MAX(score), 0) AS best
+       FROM shares
+       WHERE question_ids = ?1`,
+    )
+      .bind(questionIdsJson, share.score)
+      .first<Record<string, number>>();
+    if (!row) {
+      return null;
+    }
+    const agg: StandingAggregate = {
+      players: Number(row.players) || 0,
+      better: Number(row.better) || 0,
+      // AVG는 소수를 돌려준다 — 화면에 63.33333이 새지 않게 여기서 접는다.
+      average: Math.round(Number(row.average) || 0),
+      best: Math.round(Number(row.best) || 0),
+    };
+    return computeStanding(agg);
+  } catch (err) {
+    logger.error(
+      { err, id: share.id },
+      "[share-store] getRoundStanding failed — 점수판 없이 렌더",
+    );
+    return null;
+  }
 }

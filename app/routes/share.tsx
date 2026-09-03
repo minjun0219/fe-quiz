@@ -10,8 +10,9 @@ import {
 } from "@/lib/diagnosis";
 import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Category } from "@/lib/question.schema";
-import { getShareById } from "@/lib/share-store.server";
+import { getRoundStanding, getShareById } from "@/lib/share-store.server";
 import { resolveSiteUrl } from "@/lib/site-url.server";
+import { describeStanding } from "@/lib/standing";
 import type { Route } from "./+types/share";
 
 /**
@@ -29,6 +30,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const siteUrl = resolveSiteUrl(request);
   return {
     share,
+    // 점수판은 실패해도 null — 결과 페이지 자체는 떠야 한다.
+    standing: await getRoundStanding(share),
     ogImageUrl: new URL(`/r/${params.slug}/og.png`, siteUrl).toString(),
   };
 }
@@ -37,11 +40,16 @@ export const meta: Route.MetaFunction = ({ loaderData }) => {
   if (!loaderData) {
     return [{ title: "결과를 못 찾았어 — FE 퀴즈" }];
   }
-  const { share, ogImageUrl } = loaderData;
+  const { share, standing, ogImageUrl } = loaderData;
   const hero = resolveResultHero(share.result_type);
   const total = share.question_ids.length;
   const title = `${hero.emoji} ${hero.name} (${share.score}점) — FE 퀴즈`;
-  const description = `${hero.blurb} 너도 같은 ${total}문제 풀어봐.`;
+  // 점수판이 있으면 순위를 카드에 실어 보낸다 — 링크를 받는 쪽에 "같은 문제로
+  // 겨뤄보자"가 바로 읽히는 게 이 기능의 요점이다. 혼자면 비교 대상이 없어
+  // 기존 문구 그대로.
+  const standingLine =
+    standing && !standing.alone ? `${describeStanding(standing)} — ` : "";
+  const description = `${hero.blurb} ${standingLine}너도 같은 ${total}문제 풀어봐.`;
   return [
     { title },
     { name: "description", content: description },
@@ -63,7 +71,7 @@ export default function SharePage({
   loaderData,
   params,
 }: Route.ComponentProps) {
-  const { share } = loaderData;
+  const { share, standing } = loaderData;
 
   const hero = resolveResultHero(share.result_type);
   const total = share.question_ids.length;
@@ -109,6 +117,49 @@ export default function SharePage({
           </span>
         </p>
       </section>
+
+      {standing && (
+        <section className="mb-8 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+            같은 문제를 푼 사람들
+          </h2>
+          {standing.alone ? (
+            <p className="text-base text-zinc-700 dark:text-zinc-200">
+              아직 이 라운드 첫 주자예요. 링크를 넘겨서 누가 더 잘하나 봐요.
+            </p>
+          ) : (
+            <>
+              <p className="mb-3 text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
+                {standing.players}명 중{" "}
+                <span className="text-rose-500">{standing.rank}등</span>
+                <span className="ml-2 text-base font-medium text-zinc-500 dark:text-zinc-400">
+                  상위 {standing.top_percent}%
+                </span>
+              </p>
+              <dl className="flex gap-6 text-sm">
+                <div>
+                  <dt className="text-zinc-500 dark:text-zinc-400">평균</dt>
+                  <dd className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-100">
+                    {standing.average}점
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-zinc-500 dark:text-zinc-400">최고</dt>
+                  <dd className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-100">
+                    {standing.best}점
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-zinc-500 dark:text-zinc-400">내 점수</dt>
+                  <dd className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-100">
+                    {share.score}점
+                  </dd>
+                </div>
+              </dl>
+            </>
+          )}
+        </section>
+      )}
 
       <section className="mb-8 rounded-2xl border border-rose-100 bg-rose-50/40 p-5 dark:border-rose-900/30 dark:bg-rose-500/5">
         <div className="mb-2 text-xs font-semibold tracking-wider text-rose-500 uppercase">
