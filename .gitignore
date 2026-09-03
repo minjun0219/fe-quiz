@@ -10,6 +10,8 @@
 
 # playwright
 /playwright-report
+# Playwright MCP 세션 산출물(스냅샷·콘솔 로그) — 디버깅용 임시 파일
+/.playwright-mcp
 /test-results
 /playwright/.cache
 

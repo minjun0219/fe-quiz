@@ -13,7 +13,24 @@ import { initPostHog, PostHogProvider } from "@/components/PostHogProvider";
 import type { Route } from "./+types/root";
 import "./app.css";
 
-export const meta: Route.MetaFunction = () => [
+/**
+ * meta()는 클라이언트 내비게이션에서도 실행되므로 env 접근은 loader에서
+ * 끝내고 절대 URL을 데이터로 내려보낸다 (share.tsx와 같은 이유). og:image는
+ * 상대 경로가 허용되지 않아 절대 URL이 필수고, origin이 env별로 다르다.
+ */
+export function loader() {
+  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  return {
+    siteUrl,
+    ogImageUrl: new URL("/og.png", siteUrl).toString(),
+  };
+}
+
+/**
+ * 루트 meta는 자체 meta가 없는 라우트(홈·`/play`)의 카드가 된다. `/r/:slug`는
+ * 자기 meta로 통째로 대체하므로 결과 카드와 충돌하지 않는다.
+ */
+export const meta: Route.MetaFunction = ({ loaderData }) => [
   { title: "FE 퀴즈 — 누룽지가 내는 프론트엔드 퀴즈" },
   {
     name: "description",
@@ -28,6 +45,19 @@ export const meta: Route.MetaFunction = () => [
   { property: "og:type", content: "website" },
   { property: "og:locale", content: "ko_KR" },
   { property: "og:site_name", content: "FE 퀴즈" },
+  ...(loaderData
+    ? [
+        { property: "og:url", content: loaderData.siteUrl },
+        { property: "og:image", content: loaderData.ogImageUrl },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        {
+          property: "og:image:alt",
+          content: "누룽지가 내는 프론트엔드 퀴즈 — 10문제 5분",
+        },
+        { name: "twitter:image", content: loaderData.ogImageUrl },
+      ]
+    : []),
   { name: "twitter:card", content: "summary_large_image" },
   { name: "twitter:title", content: "FE 퀴즈" },
   {

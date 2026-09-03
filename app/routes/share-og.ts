@@ -5,52 +5,16 @@ import {
   resolveResultHero,
 } from "@/lib/diagnosis";
 import { logger } from "@/lib/logger.server";
+import {
+  compactHtml,
+  escapeHtml,
+  getFontData,
+  OG_HEIGHT,
+  OG_WIDTH,
+  ogOptions,
+} from "@/lib/og.server";
 import { getShareById } from "@/lib/share-store.server";
 import type { Route } from "./+types/share-og";
-
-// satori는 woff2를 지원하지 않으므로 정적 woff를 쓴다. (모노레포 경로 주의 —
-// `packages/pretendard/` 프리픽스가 빠지면 404.)
-const FONT_URL =
-  "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/static/woff/Pretendard-Bold.woff";
-
-// Cache the font fetch across requests on the same warm isolate. On *any*
-// failure (non-2xx, network reject, DNS) we null the cache so the next
-// request can retry — otherwise a single transient error would pin a
-// rejected promise for the lifetime of the process.
-let fontPromise: Promise<ArrayBuffer> | null = null;
-function getFontData(): Promise<ArrayBuffer> {
-  if (!fontPromise) {
-    fontPromise = fetch(FONT_URL)
-      .then((r) => {
-        if (!r.ok) {
-          throw new Error(`Pretendard font fetch failed: ${r.status}`);
-        }
-        return r.arrayBuffer();
-      })
-      .catch((err) => {
-        fontPromise = null;
-        throw err;
-      });
-  }
-  return fontPromise;
-}
-
-/**
- * satori는 명시적 flex가 아닌 노드에 자식이 2개 이상이면 throw하는데,
- * 템플릿 리터럴의 들여쓰기/줄바꿈이 텍스트 노드로 파싱돼 자식 수를 부풀린다.
- * 태그 사이 공백을 제거해 마크업 구조만 남긴다.
- */
-function compactHtml(html: string): string {
-  return html.replace(/>\s+</g, "><").trim();
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 export async function loader({ params }: Route.LoaderArgs) {
   // Pretendard는 서드파티 CDN — fetch가 실패해도(5xx, egress 차단) OG 엔드
@@ -71,18 +35,11 @@ export async function loader({ params }: Route.LoaderArgs) {
     }),
   ]);
 
-  const options = {
-    width: 1200,
-    height: 630,
-    fonts: fontData
-      ? [{ name: "Pretendard", data: fontData, weight: 700 as const }]
-      : undefined,
-    emoji: "twemoji" as const,
-  };
+  const options = ogOptions(fontData);
 
   if (!share) {
     return new ImageResponse(
-      `<div style="display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; background-color: #fafaf9; color: #71717a; font-family: Pretendard; font-size: 56px;">결과를 찾을 수 없어요 😅</div>`,
+      `<div style="display: flex; width: ${OG_WIDTH}px; height: ${OG_HEIGHT}px; align-items: center; justify-content: center; background-color: #fafaf9; color: #71717a; font-family: Pretendard; font-size: 56px;">결과를 찾을 수 없어요 😅</div>`,
       options,
     );
   }
@@ -109,9 +66,9 @@ export async function loader({ params }: Route.LoaderArgs) {
   // Korean persona names are short today (max 6 chars), but guard against
   // future longer names by clamping to a single line (nowrap + ellipsis).
   const html = `
-  <div style="display: flex; flex-direction: column; width: 100%; height: 100%; padding: 72px 96px; background-color: #fafaf9; color: #18181b; font-family: Pretendard;">
+  <div style="display: flex; flex-direction: column; width: ${OG_WIDTH}px; height: ${OG_HEIGHT}px; padding: 72px 96px; background-color: #fafaf9; color: #18181b; font-family: Pretendard;">
     <div style="display: flex; font-size: 32px; color: #f43f5e; margin-bottom: 8px; letter-spacing: -0.5px;">FE 퀴즈</div>
-    <div style="display: flex; flex-direction: column; flex: 1; justify-content: center;">
+    <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;">
       <div style="display: flex; font-size: 160px; line-height: 1; margin-bottom: 16px;">${hero.emoji}</div>
       <div style="display: flex; font-size: 88px; font-weight: 700; line-height: 1.1; margin-bottom: 12px; letter-spacing: -2px; white-space: nowrap; overflow: hidden; width: 100%;">${escapeHtml(hero.name)}</div>
       ${chipHtml}
