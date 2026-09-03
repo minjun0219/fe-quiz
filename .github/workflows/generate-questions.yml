@@ -69,15 +69,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       # pnpm 버전은 package.json 의 `packageManager: "pnpm@x.y.z"` 가 SoT.
       # 여기서 `with: version: …` 을 따로 지정하면 v4 action 이 충돌로 fail 함.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: ".nvmrc"
           cache: "pnpm"
@@ -227,7 +227,7 @@ jobs:
         if: >
           steps.diff.outputs.changed == 'true' &&
           github.event.inputs.dry_run != 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: claude/generate-quiz-${{ github.run_id }}
           add-paths: |
