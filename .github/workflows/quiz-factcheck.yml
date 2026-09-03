@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
 
       # pnpm 버전은 package.json의 `packageManager`에서 단일 소스로 관리.
-      # action-setup@v4는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
+      # action-setup@v6는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v5
