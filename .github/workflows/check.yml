@@ -13,25 +13,32 @@ on:
 permissions:
   contents: read
 
-# 같은 ref에 새 커밋이 들어오면 진행 중인 run 취소 — PR 빠른 iteration용.
+# 같은 PR에 새 커밋이 들어오면 진행 중인 run 취소 — PR 빠른 iteration용.
+# main push run은 취소 대상이 아니다: 머지 커밋의 Check가 main의 유일한 상태 신호라
+# 한 번 취소되면 그 커밋은 영영 초록이 되지 않는다.
+#
+# 그룹 키를 `github.ref`가 아니라 PR 번호로 잡는 이유 — Check가 시작되기 전에 PR이
+# 머지되면 `refs/pull/<n>/merge`가 사라지고, 뒤늦게 생성된 pull_request run의
+# `github.ref`가 base(`refs/heads/main`)로 떨어진다. ref 기반 그룹이면 이 run이
+# 같은 그룹의 main push run을 취소해 버린다 (#101, run 32917294027 실제 사례).
 concurrency:
-  group: check-${{ github.ref }}
-  cancel-in-progress: true
+  group: check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # pnpm 버전은 package.json의 `packageManager`에서 단일 소스로 관리.
-      # action-setup@v4는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
-      - uses: pnpm/action-setup@v4
+      # action-setup@v6는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version-file: ".nvmrc"
           cache: pnpm
 
       - name: Install deps
