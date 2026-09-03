@@ -22,11 +22,23 @@ type QuestionViewedProps = {
   category: Category;
   difficulty: Difficulty;
   question_type: QuestionType;
+  /**
+   * 뒤로가기로 되돌아온 재방문이면 true. 문항 진행 퍼널을 그릴 때는
+   * `is_revisit = false`로 걸러야 index당 1회만 세어진다 — 안 거르면 왕복한
+   * 사용자가 같은 index를 여러 번 찍어 이탈률이 실제보다 낮게 보인다.
+   */
+  is_revisit: boolean;
 };
 
-type QuestionAnsweredProps = QuestionViewedProps & {
+type QuestionAnsweredProps = Omit<QuestionViewedProps, "is_revisit"> & {
   dwell_ms: number;
   selection_count: number;
+  /**
+   * 이미 답한 문항으로 돌아와 다시 확정한 경우 true. 퍼널은
+   * `is_revision = false`로 거른다. 거르지 않은 전체는 "몇 번 고쳐 답했나"
+   * (=헷갈리는 문항 탐지) 신호로 쓸 수 있다.
+   */
+  is_revision: boolean;
 };
 
 type RoundSubmittedProps = {

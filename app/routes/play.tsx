@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Await } from "react-router";
+import { Await, type ShouldRevalidateFunction } from "react-router";
 import { toLevel } from "@/lib/levels";
 import { logger } from "@/lib/logger.server";
 import type { PublicQuestion } from "@/lib/question.schema";
@@ -37,6 +37,19 @@ export function loader({ request }: Route.LoaderArgs) {
     questions: resolveQuestions(from, level),
   };
 }
+
+/**
+ * `?q=`는 "지금 몇 번째 문항이냐"는 커서일 뿐이라 로더를 다시 돌릴 이유가 없다.
+ * 오히려 다시 돌면 `pickRoundQuestions`가 새 랜덤 세트를 뽑아서 풀던 라운드가
+ * 통째로 갈린다 — 문항 이동이 곧 라운드 리셋이 되는 셈. 라운드의 정체성을
+ * 정하는 `from`/`level`이 바뀔 때만 revalidate 한다.
+ */
+export const shouldRevalidate: ShouldRevalidateFunction = ({
+  currentUrl,
+  nextUrl,
+}) =>
+  currentUrl.searchParams.get("from") !== nextUrl.searchParams.get("from") ||
+  currentUrl.searchParams.get("level") !== nextUrl.searchParams.get("level");
 
 async function resolveQuestions(
   from: string | undefined,
