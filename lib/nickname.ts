@@ -126,3 +126,34 @@ export function storeNickname(nickname: string): void {
     // no-op
   }
 }
+
+/**
+ * 피드백 스트림 앞머리에서 LLM이 지어준 닉네임을 떼어낸다.
+ *
+ * 형식(`lib/feedback-prompt.ts`가 지시): 첫 줄 `닉네임: <이름>`, 다음 줄 `---`,
+ * 그 아래가 피드백 본문.
+ *
+ * **엄격하게만 인정한다.** 모델이 형식을 어기면 닉네임을 포기하고 받은 걸
+ * 전부 본문으로 돌려준다 — 마커가 화면에 새는 것보다 이름을 정적 풀로
+ * 폴백하는 편이 낫다. 스트림이 아직 구분선까지 오지 않았을 때도 같은 취급을
+ * 해야 하므로, 호출부는 구분선이 도착한 뒤(또는 스트림이 끝난 뒤) 부른다.
+ */
+export function splitNicknameFromFeedback(raw: string): {
+  nickname: string | null;
+  feedback: string;
+} {
+  const match = /^\s*닉네임:[ \t]*(.+?)[ \t]*\r?\n-{3,}\r?\n/.exec(raw);
+  if (!match) {
+    return { nickname: null, feedback: raw };
+  }
+  const nickname = normalizeNickname(match[1]);
+  if (!nickname) {
+    return { nickname: null, feedback: raw };
+  }
+  return { nickname, feedback: raw.slice(match[0].length) };
+}
+
+/** 스트림 앞머리가 아직 `닉네임:` 줄을 쓰는 중인지 — 그동안은 본문을 그리지 않는다. */
+export function looksLikeNicknamePrefix(raw: string): boolean {
+  return /^\s*(닉|닉네|닉네임|닉네임:)/.test(raw) && !/\n-{3,}\r?\n/.test(raw);
+}

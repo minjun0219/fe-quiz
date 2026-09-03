@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
 import { ContributeNote } from "@/components/credits";
 import { track } from "@/lib/analytics";
@@ -6,10 +6,12 @@ import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Level } from "@/lib/levels";
 import {
+  looksLikeNicknamePrefix,
   NICKNAME_MAX_LENGTH,
   normalizeNickname,
   randomNickname,
   readStoredNickname,
+  splitNicknameFromFeedback,
   storeNickname,
 } from "@/lib/nickname";
 import type { Category } from "@/lib/question.schema";
@@ -81,18 +83,48 @@ export default function Result({ data, level }: Props) {
   // share flow.
   const canShare =
     feedbackStatus !== "loading" && feedbackStatus !== "streaming";
-  // SSR에는 localStorage가 없으므로 마운트 후에 정한다. 저장된 이름이 없으면
-  // 정적 풀에서 뽑아 바로 굳혀서, 이후 라운드에도 같은 이름이 따라오게 한다.
+  // 이름이 이미 정해졌는지. localStorage에서 왔거나, LLM 이름을 받았거나,
+  // 사용자가 직접 정했거나, 폴백으로 뽑은 경우 true.
+  const nicknameLockedRef = useRef(false);
+
+  /**
+   * 이름을 확정한다. 이미 정해진 게 있으면 무시 — 라운드마다 이름이 바뀌면
+   * 친구가 나를 못 알아보고, 그 고정이 이 기능의 전제다.
+   *
+   * 피드백 effect가 부르므로 참조가 고정돼야 한다. 매 렌더 새로 만들면
+   * 의존성에 넣는 순간 effect가 다시 돌아 피드백을 또 fetch한다(= 비용).
+   * ref와 setState만 쓰므로 의존성이 비어도 stale해지지 않는다.
+   */
+  const settleNickname = useCallback((name: string) => {
+    if (nicknameLockedRef.current) {
+      return;
+    }
+    nicknameLockedRef.current = true;
+    setNickname(name);
+    storeNickname(name);
+  }, []);
+
+  // SSR에는 localStorage가 없으므로 마운트 후에 읽는다. 저장된 이름이 없으면
+  // **여기서는 아무것도 정하지 않는다** — 임시로 풀 이름을 띄워두면 잠시 뒤
+  // LLM 이름이 도착하면서 눈앞에서 이름이 한 번 바뀐다. 공유 버튼도 피드백이
+  // 끝나야 열리므로(`canShare`) 그 전에 이름을 보여줄 이유가 없다.
   useEffect(() => {
     const stored = readStoredNickname();
     if (stored) {
+      nicknameLockedRef.current = true;
       setNickname(stored);
+    }
+  }, []);
+
+  // 피드백이 끝났는데도 이름이 없으면 — LLM이 형식을 어겼거나, 키가 없거나,
+  // 호출이 실패했다 — 정적 풀에서 뽑는다. 선택적 연동이 없어도 이름은 항상
+  // 붙어야 한다(fail-open). 여기까지 오면 더 기다릴 게 없으므로 바로 굳힌다.
+  useEffect(() => {
+    if (feedbackStatus === "loading" || feedbackStatus === "streaming") {
       return;
     }
-    const fresh = randomNickname();
-    storeNickname(fresh);
-    setNickname(fresh);
-  }, []);
+    settleNickname(randomNickname());
+  }, [feedbackStatus, settleNickname]);
 
   useEffect(() => {
     setCanNativeShare(
@@ -164,6 +196,7 @@ export default function Result({ data, level }: Props) {
   /** 편집 종료. 비우고 저장하면 이름 없이 남지 않도록 새로 뽑아 채운다. */
   function commitNickname() {
     const cleaned = normalizeNickname(nickname) ?? randomNickname();
+    nicknameLockedRef.current = true;
     setNickname(cleaned);
     storeNickname(cleaned);
     setEditingNickname(false);
@@ -315,6 +348,20 @@ export default function Result({ data, level }: Props) {
         }
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
+        // 스트림 앞머리에 `닉네임: …` + `---`가 실려 온다. 구분선이 도착할
+        // 때까지는 본문을 그리지 않고, 도착하면 떼어낸 뒤 나머지만 그린다.
+        // 형식이 아니면 그 자리에서 포기하고 전부 본문으로 돌린다 — 마커가
+        // 화면에 새는 것보다 이름을 정적 풀로 폴백하는 편이 낫다.
+        let head = "";
+        let nicknameResolved = false;
+        const resolveHead = () => {
+          nicknameResolved = true;
+          const split = splitNicknameFromFeedback(head);
+          if (split.nickname) {
+            settleNickname(split.nickname);
+          }
+          setFeedback(split.feedback);
+        };
         while (true) {
           const { done, value } = await reader.read();
           if (done || ignore) {
@@ -322,7 +369,14 @@ export default function Result({ data, level }: Props) {
           }
           const chunk = decoder.decode(value, { stream: true });
           charCount += chunk.length;
-          setFeedback((prev) => prev + chunk);
+          if (nicknameResolved) {
+            setFeedback((prev) => prev + chunk);
+            continue;
+          }
+          head += chunk;
+          if (!looksLikeNicknamePrefix(head)) {
+            resolveHead();
+          }
         }
         // Flush any byte sequence that was held back on a UTF-8 boundary —
         // Korean characters are 3 bytes, easy to bisect across chunks.
@@ -330,7 +384,15 @@ export default function Result({ data, level }: Props) {
           const tail = decoder.decode();
           if (tail) {
             charCount += tail.length;
-            setFeedback((prev) => prev + tail);
+            if (nicknameResolved) {
+              setFeedback((prev) => prev + tail);
+            } else {
+              head += tail;
+            }
+          }
+          // 스트림이 닉네임 줄을 쓰다 끊겼을 수도 있다 — 여기서 마무리한다.
+          if (!nicknameResolved) {
+            resolveHead();
           }
           setFeedbackStatus("done");
           track("feedback_completed", {
@@ -358,7 +420,7 @@ export default function Result({ data, level }: Props) {
       ignore = true;
       abort.abort();
     };
-  }, [data, level]);
+  }, [data, level, settleNickname]);
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
