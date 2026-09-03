@@ -502,6 +502,63 @@ export default function Result({ data, level }: Props) {
             )}
           </p>
         )}
+
+        {/* 이름도 한마디도 같은 응답에서 같은 순간에 온다 — 한 덩어리로 둔다.
+            공유하기 전까지만 보이면 되므로 링크가 만들어지면 감춘다. */}
+        {shareStatus !== "ready" && nickname && (
+          <div className="mt-4 flex items-center gap-2 border-t border-rose-100 pt-3 text-sm dark:border-rose-900/30">
+            <span className="shrink-0 text-zinc-500 dark:text-zinc-400">
+              점수판 이름
+            </span>
+            {editingNickname ? (
+              <>
+                <input
+                  // biome-ignore lint/a11y/noAutofocus: 사용자가 "바꾸기"를 눌러 연 입력이라 포커스가 그리로 가는 게 기대 동작이다.
+                  autoFocus
+                  value={nickname}
+                  maxLength={NICKNAME_MAX_LENGTH}
+                  onChange={(e) => setNickname(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      commitNickname();
+                    }
+                  }}
+                  className="min-w-0 flex-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                  aria-label="점수판에 표시할 이름"
+                />
+                <button
+                  type="button"
+                  onClick={() => setNickname(randomNickname())}
+                  className="shrink-0 rounded-full border border-zinc-300 px-2 py-1.5 text-zinc-600 transition hover:bg-white dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  aria-label="다른 이름으로 다시 뽑기"
+                  title="다시 뽑기"
+                >
+                  🎲
+                </button>
+                <button
+                  type="button"
+                  onClick={commitNickname}
+                  className="shrink-0 rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  저장
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="min-w-0 flex-1 truncate font-medium text-zinc-800 dark:text-zinc-100">
+                  {nickname}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setEditingNickname(true)}
+                  className="shrink-0 rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 transition hover:bg-white dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  바꾸기
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="mb-8">
@@ -670,60 +727,6 @@ export default function Result({ data, level }: Props) {
       </section>
 
       <div className="mt-auto flex flex-col gap-2">
-        {shareStatus !== "ready" && nickname && (
-          <div className="mb-1 flex items-center gap-2 text-sm">
-            <span className="shrink-0 text-zinc-500 dark:text-zinc-400">
-              점수판 이름
-            </span>
-            {editingNickname ? (
-              <>
-                <input
-                  // biome-ignore lint/a11y/noAutofocus: 사용자가 "바꾸기"를 눌러 연 입력이라 포커스가 그리로 가는 게 기대 동작이다.
-                  autoFocus
-                  value={nickname}
-                  maxLength={NICKNAME_MAX_LENGTH}
-                  onChange={(e) => setNickname(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      commitNickname();
-                    }
-                  }}
-                  className="min-w-0 flex-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
-                  aria-label="점수판에 표시할 이름"
-                />
-                <button
-                  type="button"
-                  onClick={() => setNickname(randomNickname())}
-                  className="shrink-0 rounded-full border border-zinc-300 px-2 py-1.5 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                  aria-label="다른 이름으로 다시 뽑기"
-                  title="다시 뽑기"
-                >
-                  🎲
-                </button>
-                <button
-                  type="button"
-                  onClick={commitNickname}
-                  className="shrink-0 rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-                >
-                  저장
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="min-w-0 flex-1 truncate font-medium text-zinc-800 dark:text-zinc-100">
-                  {nickname}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setEditingNickname(true)}
-                  className="shrink-0 rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                >
-                  바꾸기
-                </button>
-              </>
-            )}
-          </div>
-        )}
         {shareStatus === "ready" && shareUrl ? (
           <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-xs font-semibold tracking-wider uppercase">
