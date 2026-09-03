@@ -38,15 +38,15 @@ jobs:
     env:
       IS_PROD: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # pnpm 버전은 package.json `packageManager`가 단일 소스. 둘 다 지정 시
-      # action-setup@v4가 ERR_PNPM_BAD_PM_VERSION으로 거부.
-      - uses: pnpm/action-setup@v4
+      # action-setup@v6가 ERR_PNPM_BAD_PM_VERSION으로 거부.
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: ".nvmrc"
           cache: pnpm
 
       - name: Install deps

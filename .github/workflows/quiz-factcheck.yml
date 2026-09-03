@@ -46,15 +46,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       # pnpm 버전은 package.json의 `packageManager`에서 단일 소스로 관리.
-      # action-setup@v4는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
-      - uses: pnpm/action-setup@v4
+      # action-setup@v6는 둘 다 지정되면 ERR_PNPM_BAD_PM_VERSION으로 거부.
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: ".nvmrc"
           cache: "pnpm"
@@ -141,7 +141,7 @@ jobs:
           steps.diff.outputs.changed == 'true' &&
           github.event_name != 'pull_request' &&
           github.event.inputs.dry_run != 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: claude/factcheck-${{ github.run_id }}
           add-paths: |
