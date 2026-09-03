@@ -5,6 +5,13 @@ import { track } from "@/lib/analytics";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Level } from "@/lib/levels";
+import {
+  NICKNAME_MAX_LENGTH,
+  normalizeNickname,
+  randomNickname,
+  readStoredNickname,
+  storeNickname,
+} from "@/lib/nickname";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 import type { ShareCreateResponse } from "@/lib/share.schema";
@@ -48,6 +55,11 @@ export default function Result({ data, level }: Props) {
   const [feedbackStatus, setFeedbackStatus] =
     useState<FeedbackStatus>("loading");
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
+  // 닉네임은 라운드마다 바뀌면 안 된다 — 친구가 나를 못 알아본다.
+  // localStorage에 있으면 그걸 쓰고, 없으면 정적 풀에서 한 번 뽑아 굳힌다.
+  // (2단계에서 LLM이 지어준 이름을 이 자리에 채울 예정)
+  const [nickname, setNickname] = useState<string>("");
+  const [editingNickname, setEditingNickname] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
   // navigator.share availability is detected after mount so SSR / non-secure
@@ -69,6 +81,18 @@ export default function Result({ data, level }: Props) {
   // share flow.
   const canShare =
     feedbackStatus !== "loading" && feedbackStatus !== "streaming";
+  // SSR에는 localStorage가 없으므로 마운트 후에 정한다. 저장된 이름이 없으면
+  // 정적 풀에서 뽑아 바로 굳혀서, 이후 라운드에도 같은 이름이 따라오게 한다.
+  useEffect(() => {
+    const stored = readStoredNickname();
+    if (stored) {
+      setNickname(stored);
+      return;
+    }
+    const fresh = randomNickname();
+    storeNickname(fresh);
+    setNickname(fresh);
+  }, []);
 
   useEffect(() => {
     setCanNativeShare(
@@ -137,6 +161,14 @@ export default function Result({ data, level }: Props) {
     copyResetRef.current = setTimeout(() => setCopyStatus("idle"), 1500);
   }
 
+  /** 편집 종료. 비우고 저장하면 이름 없이 남지 않도록 새로 뽑아 채운다. */
+  function commitNickname() {
+    const cleaned = normalizeNickname(nickname) ?? randomNickname();
+    setNickname(cleaned);
+    storeNickname(cleaned);
+    setEditingNickname(false);
+  }
+
   async function handleShare() {
     if (!canShare || shareStatus === "creating" || shareStatus === "ready") {
       return;
@@ -162,6 +194,7 @@ export default function Result({ data, level }: Props) {
           feedback: (
             feedback.trim() || "(누룽지가 자리 비웠을 때 만든 결과)"
           ).slice(0, 2000),
+          nickname: nickname || undefined,
         }),
       });
       if (!res.ok) {
@@ -575,6 +608,60 @@ export default function Result({ data, level }: Props) {
       </section>
 
       <div className="mt-auto flex flex-col gap-2">
+        {shareStatus !== "ready" && nickname && (
+          <div className="mb-1 flex items-center gap-2 text-sm">
+            <span className="shrink-0 text-zinc-500 dark:text-zinc-400">
+              점수판 이름
+            </span>
+            {editingNickname ? (
+              <>
+                <input
+                  // biome-ignore lint/a11y/noAutofocus: 사용자가 "바꾸기"를 눌러 연 입력이라 포커스가 그리로 가는 게 기대 동작이다.
+                  autoFocus
+                  value={nickname}
+                  maxLength={NICKNAME_MAX_LENGTH}
+                  onChange={(e) => setNickname(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      commitNickname();
+                    }
+                  }}
+                  className="min-w-0 flex-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                  aria-label="점수판에 표시할 이름"
+                />
+                <button
+                  type="button"
+                  onClick={() => setNickname(randomNickname())}
+                  className="shrink-0 rounded-full border border-zinc-300 px-2 py-1.5 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  aria-label="다른 이름으로 다시 뽑기"
+                  title="다시 뽑기"
+                >
+                  🎲
+                </button>
+                <button
+                  type="button"
+                  onClick={commitNickname}
+                  className="shrink-0 rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  저장
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="min-w-0 flex-1 truncate font-medium text-zinc-800 dark:text-zinc-100">
+                  {nickname}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setEditingNickname(true)}
+                  className="shrink-0 rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  바꾸기
+                </button>
+              </>
+            )}
+          </div>
+        )}
         {shareStatus === "ready" && shareUrl ? (
           <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-xs font-semibold tracking-wider uppercase">

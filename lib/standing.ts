@@ -7,6 +7,19 @@
  * — `cloudflare:workers`를 import하는 `.server.ts`는 vitest에서 못 돈다.
  */
 
+/** 점수판 목록 한 줄. */
+export interface StandingEntry {
+  /** shares row id. 현재 보고 있는 slug와 같으면 "나" 줄이다. */
+  id: string;
+  /** 없으면(예전 row·닉네임 미전송) null → 화면에서 "익명". */
+  nickname: string | null;
+  score: number;
+  /** 1-based 순위. 동점은 같은 값. */
+  rank: number;
+  /** 현재 보고 있는 결과. */
+  is_me: boolean;
+}
+
 /** `getRoundStanding`의 SQL 집계 결과. */
 export interface StandingAggregate {
   /** 이 라운드를 푼 총 인원(= 같은 question_ids를 가진 shares row 수). */
@@ -26,6 +39,8 @@ export interface Standing extends StandingAggregate {
   top_percent: number;
   /** 참가자가 나 혼자인 라운드. 순위를 말할 대상이 없어 UI가 다른 문구를 쓴다. */
   alone: boolean;
+  /** 상위 몇 명 + (내가 그 밖이면) 내 줄. `rankEntries`가 만든다. */
+  entries: StandingEntry[];
 }
 
 /**
@@ -35,7 +50,10 @@ export interface Standing extends StandingAggregate {
  * 만들지 않았다 — created_at으로 가르면 "같은 점수인데 내가 4등"이 되어
  * 설명할 수 없는 억울함만 생긴다.
  */
-export function computeStanding(agg: StandingAggregate): Standing {
+export function computeStanding(
+  agg: StandingAggregate,
+  entries: StandingEntry[] = [],
+): Standing {
   const players = Math.max(1, agg.players);
   const rank = agg.better + 1;
   return {
@@ -44,7 +62,41 @@ export function computeStanding(agg: StandingAggregate): Standing {
     rank,
     top_percent: Math.max(1, Math.round((rank / players) * 100)),
     alone: players <= 1,
+    entries,
   };
+}
+
+/** `rankEntries`에 넘기는 원본 row — DB에서 점수 내림차순으로 뽑아 온다. */
+export interface RawEntry {
+  id: string;
+  nickname: string | null;
+  score: number;
+}
+
+/**
+ * 점수 내림차순 row에 순위를 매긴다. 동점 규칙은 `computeStanding`과 같아야
+ * 한다 — 집계가 말하는 "3등"과 목록에 찍힌 "3등"이 다르면 바로 티가 난다.
+ * 그래서 여기서도 "나보다 **높은** 점수 수 + 1"을 쓴다(= 앞선 서로 다른
+ * 점수의 개수가 아니라, 앞에 있는 row 중 점수가 더 높은 것의 개수).
+ *
+ * `myId`가 목록 밖이면 호출부가 내 줄을 따로 붙인다 — 여기서는 받은 것만
+ * 매긴다.
+ */
+export function rankEntries(rows: RawEntry[], myId: string): StandingEntry[] {
+  let lastScore: number | null = null;
+  let lastRank = 0;
+  return rows.map((row, i) => {
+    const rank = row.score === lastScore ? lastRank : i + 1;
+    lastScore = row.score;
+    lastRank = rank;
+    return {
+      id: row.id,
+      nickname: row.nickname,
+      score: row.score,
+      rank,
+      is_me: row.id === myId,
+    };
+  });
 }
 
 /** 점수판 한 줄 요약. 공유 문구로 그대로 쓸 수 있는 형태. */

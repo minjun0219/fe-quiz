@@ -9,6 +9,7 @@ import {
   WEAK_THRESHOLD,
 } from "@/lib/diagnosis";
 import { renderFeedbackInline } from "@/lib/feedback-render";
+import { ANONYMOUS_LABEL } from "@/lib/nickname";
 import type { Category } from "@/lib/question.schema";
 import { getRoundStanding, getShareById } from "@/lib/share-store.server";
 import { resolveSiteUrl } from "@/lib/site-url.server";
@@ -136,7 +137,7 @@ export default function SharePage({
                   상위 {standing.top_percent}%
                 </span>
               </p>
-              <dl className="flex gap-6 text-sm">
+              <dl className="mb-5 flex gap-6 text-sm">
                 <div>
                   <dt className="text-zinc-500 dark:text-zinc-400">평균</dt>
                   <dd className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-100">
@@ -156,6 +157,34 @@ export default function SharePage({
                   </dd>
                 </div>
               </dl>
+
+              <ol className="flex flex-col gap-1">
+                {standing.entries.map((entry) => (
+                  <li
+                    key={entry.id}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm ${
+                      entry.is_me
+                        ? "bg-rose-50 font-semibold text-zinc-900 dark:bg-rose-500/10 dark:text-zinc-50"
+                        : "text-zinc-700 dark:text-zinc-300"
+                    }`}
+                  >
+                    <span className="w-6 shrink-0 text-right tabular-nums text-zinc-400 dark:text-zinc-500">
+                      {entry.rank}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {entry.nickname ?? ANONYMOUS_LABEL}
+                      {entry.is_me && (
+                        <span className="ml-2 text-xs font-medium text-rose-500">
+                          나
+                        </span>
+                      )}
+                    </span>
+                    <span className="shrink-0 tabular-nums">
+                      {entry.score}점
+                    </span>
+                  </li>
+                ))}
+              </ol>
             </>
           )}
         </section>

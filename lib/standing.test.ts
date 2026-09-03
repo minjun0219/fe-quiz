@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeStanding, describeStanding } from "./standing";
+import { computeStanding, describeStanding, rankEntries } from "./standing";
 
 describe("computeStanding", () => {
   it("나보다 높은 점수 수 + 1이 순위", () => {
@@ -67,5 +67,56 @@ describe("computeStanding", () => {
       best: 90,
     });
     expect(describeStanding(s)).toBe("12명 중 3등 · 상위 25%");
+  });
+});
+
+describe("rankEntries", () => {
+  const rows = [
+    { id: "a", nickname: "느긋한 물범", score: 90 },
+    { id: "b", nickname: "성실한 두더지", score: 80 },
+    { id: "c", nickname: null, score: 70 },
+    { id: "me", nickname: "조용한 수달", score: 70 },
+    { id: "d", nickname: "바쁜 다람쥐", score: 40 },
+  ];
+
+  it("동점은 같은 순위, 그 다음은 자리 수만큼 건너뛴다", () => {
+    const ranked = rankEntries(rows, "me");
+    expect(ranked.map((e) => e.rank)).toEqual([1, 2, 3, 3, 5]);
+  });
+
+  it("집계가 말하는 내 순위와 목록의 내 순위가 일치해야 한다", () => {
+    // 같은 데이터로 두 경로를 돌렸을 때 어긋나면 화면에서 바로 티가 난다.
+    const agg = computeStanding({
+      players: rows.length,
+      better: rows.filter((r) => r.score > 70).length,
+      average: 70,
+      best: 90,
+    });
+    const mine = rankEntries(rows, "me").find((e) => e.is_me);
+    expect(mine?.rank).toBe(agg.rank);
+  });
+
+  it("내 줄만 is_me", () => {
+    const ranked = rankEntries(rows, "me");
+    expect(ranked.filter((e) => e.is_me).map((e) => e.id)).toEqual(["me"]);
+  });
+
+  it("닉네임 없는 row는 null을 그대로 들고 온다 — 라벨은 UI가 붙인다", () => {
+    expect(
+      rankEntries(rows, "me").find((e) => e.id === "c")?.nickname,
+    ).toBeNull();
+  });
+
+  it("빈 목록도 안전", () => {
+    expect(rankEntries([], "me")).toEqual([]);
+  });
+
+  it("전원 동점이면 모두 1등", () => {
+    const tied = [
+      { id: "x", nickname: null, score: 50 },
+      { id: "y", nickname: null, score: 50 },
+      { id: "z", nickname: null, score: 50 },
+    ];
+    expect(rankEntries(tied, "x").map((e) => e.rank)).toEqual([1, 1, 1]);
   });
 });

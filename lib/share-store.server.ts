@@ -2,11 +2,15 @@ import { env } from "cloudflare:workers";
 import { nanoid } from "nanoid";
 import type { GradedRound } from "./grading";
 import { logger } from "./logger.server";
+import { normalizeNickname } from "./nickname";
 import { type ShareRow, ShareRowSchema } from "./share.schema";
 import {
   computeStanding,
+  type RawEntry,
+  rankEntries,
   type Standing,
   type StandingAggregate,
+  type StandingEntry,
 } from "./standing";
 
 const SLUG_LENGTH = 8;
@@ -16,6 +20,8 @@ interface CreateShareInput {
   graded: GradedRound;
   result_type: string;
   feedback: string;
+  /** 점수판 표시용. 없거나 정리 후 비면 NULL로 저장한다. */
+  nickname?: string;
 }
 
 /**
@@ -44,6 +50,7 @@ export async function createShare({
   graded,
   result_type,
   feedback,
+  nickname,
 }: CreateShareInput): Promise<string> {
   // Clamp to the DB CHECK constraint range so any rounding edge case (or a
   // future caller passing a score > total) can't trip the constraint.
@@ -55,13 +62,15 @@ export async function createShare({
 
   const questionIdsJson = JSON.stringify(graded.per_question.map((q) => q.id));
   const categoryScoresJson = JSON.stringify(graded.category_scores);
+  // 클라이언트가 보낸 값 — 제어문자·공백·길이를 여기서 정리한다.
+  const cleanNickname = normalizeNickname(nickname);
 
   let lastError: string | null = null;
   for (let attempt = 0; attempt < MAX_SLUG_RETRIES; attempt++) {
     const slug = nanoid(SLUG_LENGTH);
     try {
       await env.DB.prepare(
-        "INSERT INTO shares (id, question_ids, score, feedback, result_type, category_scores) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        "INSERT INTO shares (id, question_ids, score, feedback, result_type, category_scores, nickname) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
       )
         .bind(
           slug,
@@ -70,6 +79,7 @@ export async function createShare({
           feedback,
           result_type,
           categoryScoresJson,
+          cleanNickname,
         )
         .run();
       return slug;
@@ -95,6 +105,9 @@ export async function createShare({
 // D1은 write 직후 read가 다른 콜로에서 잠깐 못 볼 수 있다(복제 지연 — 공유
 // 생성 → "미리보기" 즉시 클릭 경로에서 실측). null일 때만 짧게 재시도해
 // 간헐적 404를 흡수한다. 진짜 없는 slug는 404가 ~300ms 늦어질 뿐.
+/** 점수판에 한 번에 보여줄 최대 인원. 내가 이 밖이면 내 줄만 따로 붙인다. */
+const BOARD_LIMIT = 10;
+
 const NOT_FOUND_RETRIES = 2;
 const NOT_FOUND_RETRY_DELAY_MS = 150;
 
@@ -176,7 +189,36 @@ export async function getRoundStanding(
       average: Math.round(Number(row.average) || 0),
       best: Math.round(Number(row.best) || 0),
     };
-    return computeStanding(agg);
+
+    // 목록은 상위 N명만. 참가자가 많아져도 페이지가 무한정 길어지지 않고,
+    // 동점 정렬은 먼저 푼 순(created_at)으로 안정화한다 — 순위 자체는
+    // 점수만 보므로(rankEntries) 이 정렬은 표시 순서에만 영향을 준다.
+    const list = await env.DB.prepare(
+      `SELECT id, nickname, score
+         FROM shares
+        WHERE question_ids = ?1
+        ORDER BY score DESC, created_at ASC
+        LIMIT ${BOARD_LIMIT}`,
+    )
+      .bind(questionIdsJson)
+      .all<RawEntry>();
+
+    const ranked = rankEntries(list.results ?? [], share.id);
+    // 내가 상위 N 밖이면 내 줄을 꼬리에 붙인다. 순위는 집계에서 이미 나왔다.
+    const entries: StandingEntry[] = ranked.some((e) => e.is_me)
+      ? ranked
+      : [
+          ...ranked,
+          {
+            id: share.id,
+            nickname: share.nickname,
+            score: share.score,
+            rank: agg.better + 1,
+            is_me: true,
+          },
+        ];
+
+    return computeStanding(agg, entries);
   } catch (err) {
     logger.error(
       { err, id: share.id },
