@@ -67,21 +67,41 @@ export const meta: Route.MetaFunction = ({ loaderData }) => [
   },
 ];
 
+const FONT_ORIGIN = "https://s.minjun.dev";
+
+// 경로에 버전 세그먼트가 없다 — 오리진 규약이 그렇다. 캐시는 일주일
+// (`max-age=604800, stale-while-revalidate=2592000`)이고 갱신되면 같은 URL의
+// 내용이 바뀐다. 소비자가 할 일은 없고, 지금 어느 버전이 서빙되는지는
+// `/manifest.json`에서 본다.
+const PRETENDARD_CSS = `${FONT_ORIGIN}/pretendard/variable/pretendardvariable-dynamic-subset.css`;
+
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico" },
+  // 폰트 파일은 CORS로 받으므로 preconnect에도 crossOrigin이 붙어야 연결이
+  // 재사용된다 — 없으면 non-CORS 연결만 미리 열려 헛돈다.
   {
     rel: "preconnect",
-    href: "https://cdn.jsdelivr.net",
+    href: FONT_ORIGIN,
     crossOrigin: "anonymous",
   },
+  // dynamic-subset: unicode-range로 쪼갠 92조각 중 화면에 실제로 쓰인 글자가
+  // 든 것만 받는다. 서브셋 없는 풀 variable(`pretendardvariable.css`)은
+  // 첫 화면에서 2.0 MB woff2 하나를 통째로 받는데, 하필 그게 텍스트 렌더를
+  // 막는 자리에 걸린다.
+  //
+  // "어차피 한 번 캐시되면 같지 않냐"는 성립하지 않는다 — 실측(홈 → 3라운드
+  // 완주):  풀 2,010 KB 고정  vs  서브셋 362 → 553 → 642 → 695 KB.
+  // 조각 증가폭이 +191 → +89 → +53 KB로 꺾여서, 흔한 음절을 다 받고 나면
+  // 사실상 멈춘다. 역전되려면 92조각(≈3.2 MB)을 다 받아야 하는데 한글 음절
+  // 전체를 볼 일이 없다. 대가는 요청 수(3라운드에 72 vs 2)뿐이다.
   {
     rel: "preload",
     as: "style",
-    href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css",
+    href: PRETENDARD_CSS,
   },
   {
     rel: "stylesheet",
-    href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css",
+    href: PRETENDARD_CSS,
   },
 ];
 
