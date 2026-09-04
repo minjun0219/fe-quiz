@@ -12,6 +12,13 @@ name: Schema guard
 # 규칙: **마이그레이션은 별도 PR로 먼저 머지한다.** 그 PR은 `.sql`만 담으므로
 # paths-ignore에 걸려 이 워크플로가 돌지 않는다. 마이그레이션과 코드를 한 PR에
 # 섞으면 여기서 막힌다 — 그게 의도다.
+#
+# 이 가드가 잡는 것과 못 잡는 것을 분명히 해 둔다:
+#   ✓ 코드 PR에 마이그레이션이 섞여 있다
+#   ✓ main에 머지된 마이그레이션이 프로덕션에 적용되지 않았다(migrate.yml 실패 등)
+#   ✗ 코드가 **아직 안 열린/안 머지된 다른 PR**의 컬럼에 의존한다
+# 마지막 건은 SQL과 스키마를 정적 분석해야 해서 여기서 다루지 않는다. 규칙을
+# 지키면(마이그레이션 PR 먼저 머지) 코드 PR이 머지 가능해질 때 이미 적용돼 있다.
 
 on:
   pull_request:
@@ -34,6 +41,17 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
+
+      # wrangler는 **작업 트리의** migrations/ 를 프로덕션과 비교한다. PR
+      # 브랜치만 보면 main에 이미 머지된 마이그레이션을 놓치므로, main 것을
+      # 겹쳐서 "main ∪ 이 PR" 기준으로 검사한다. 경로 체크아웃이라 이 PR에만
+      # 있는 파일은 지워지지 않는다(= 합집합).
+      - name: main의 마이그레이션을 겹친다
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin main
+          git checkout FETCH_HEAD -- migrations/
+          ls -1 migrations/
 
       - uses: pnpm/action-setup@v6
 
