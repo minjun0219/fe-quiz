@@ -38,10 +38,11 @@ export const meta: Route.MetaFunction = () => [
 
 const FONT_ORIGIN = "https://s.minjun.dev";
 
-// 버전 고정 경로(1년 immutable). `latest`는 302를 한 번 타고 1시간 캐시라
-// 렌더를 막는 자리에 리다이렉트가 끼고, 주간 자동 갱신이 알림 없이 폰트를
-// 바꾼다 — 서체가 조용히 달라지는 건 원치 않는다.
-const PRETENDARD_CSS = `${FONT_ORIGIN}/pretendard/1.3.9/variable/pretendardvariable-dynamic-subset.css`;
+// 경로에 버전 세그먼트가 없다 — 오리진 규약이 그렇다. 캐시는 일주일
+// (`max-age=604800, stale-while-revalidate=2592000`)이고 갱신되면 같은 URL의
+// 내용이 바뀐다. 소비자가 할 일은 없고, 지금 어느 버전이 서빙되는지는
+// `/manifest.json`에서 본다.
+const PRETENDARD_CSS = `${FONT_ORIGIN}/pretendard/variable/pretendardvariable-dynamic-subset.css`;
 
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico" },
