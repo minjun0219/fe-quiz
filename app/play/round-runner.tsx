@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { CodeBlock } from "@/components/code-block";
 import { track } from "@/lib/analytics";
 import type { Level } from "@/lib/levels";
@@ -63,8 +64,46 @@ function normalize(a: AnswerState): SubmittedAnswer {
   return a;
 }
 
+/** `?q=` 파싱. 빠졌거나 쓰레기값이면 첫 문항. */
+function parseCursor(raw: string | null): number {
+  const n = Number(raw);
+  return Number.isInteger(n) && n > 0 ? n : 0;
+}
+
+/**
+ * `?q=`만 갈아끼운 새 파라미터. level·from 같은 라운드 파라미터는 보존한다.
+ * 첫 문항은 `q` 없는 URL이 정규형 — 그래야 라운드 진입 직후의 뒤로가기
+ * 한 번이 정확히 홈으로 나간다.
+ */
+function withCursor(prev: URLSearchParams, index: number): URLSearchParams {
+  const next = new URLSearchParams(prev);
+  if (index === 0) {
+    next.delete("q");
+  } else {
+    next.set("q", String(index));
+  }
+  return next;
+}
+
+/**
+ * URL로 도달할 수 있는 가장 뒤쪽 문항. "다음" 버튼과 같은 규칙 — 앞 문항을
+ * 모두 답해야 그 다음으로 갈 수 있다. `?q=9`를 직접 입력하거나 그 URL에서
+ * 새로고침해도(=답이 전부 비어 있음) 건너뛰기가 되지 않게 막는 클램프다.
+ */
+function reachableLimit(
+  questions: PublicQuestion[],
+  answers: AnswerState[],
+): number {
+  for (let i = 0; i < questions.length; i += 1) {
+    if (!canProceed(questions[i], answers[i])) {
+      return i;
+    }
+  }
+  // 시드가 비어 있으면 length-1이 -1이 되어 `?q=-1`을 URL에 써버린다.
+  return Math.max(0, questions.length - 1);
+}
+
 export default function RoundRunner({ questions, level, replay }: Props) {
-  const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerState[]>(() =>
     initialAnswers(questions),
   );
@@ -74,13 +113,48 @@ export default function RoundRunner({ questions, level, replay }: Props) {
   // 변하지 않는 값이라 ref로 충분.
   const roundStartedAtRef = useRef<number>(Date.now());
   const questionViewedAtRef = useRef<number>(Date.now());
+  // 이미 본 / 이미 답을 확정한 index. 재방문 여부를 이벤트에 실어 보내
+  // 퍼널이 index당 1회만 세도록 거를 수 있게 한다.
+  const seenRef = useRef<Set<number>>(new Set());
+  const answeredRef = useRef<Set<number>>(new Set());
+
+  // 현재 문항은 URL(`?q=`)이 단일 출처다. 컴포넌트 state로 두면 브라우저
+  // 뒤로가기가 /play 자체를 벗어나 라운드가 통째로 날아간다 — 문제 세트가
+  // 랜덤이라 되돌아와도 복구되지 않는다.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const limit = reachableLimit(questions, answers);
+  const rawCursor = searchParams.get("q");
+  const index = Math.min(parseCursor(rawCursor), limit);
+  // 이 index의 정규형 `q` 값. 파싱 결과가 아니라 raw와 비교해야 `?q=foo`,
+  // `?q=-1`, `?q=0`처럼 0으로 파싱되는 쓰레기 값도 정리된다.
+  const canonicalCursor = index === 0 ? null : String(index);
+
+  /** 스크롤은 scrollToTop()이 직접 관리하므로 라우터 복원은 끈다. */
+  function goTo(nextIndex: number) {
+    setSearchParams((prev) => withCursor(prev, nextIndex), {
+      preventScrollReset: true,
+    });
+  }
+
+  // 화면은 클램프됐는데 URL만 앞서 있는 상태를 정리한다(`?q=9` 직접 진입,
+  // 라운드 중간 새로고침 등 — 새로고침은 랜덤 세트를 새로 뽑으므로 커서가
+  // 통째로 무의미해진다). 히스토리를 늘리지 않도록 replace.
+  useEffect(() => {
+    if (rawCursor === canonicalCursor) {
+      return;
+    }
+    setSearchParams((prev) => withCursor(prev, index), {
+      preventScrollReset: true,
+      replace: true,
+    });
+  }, [rawCursor, canonicalCursor, index, setSearchParams]);
 
   useEffect(() => {
     if (questions.length === 0) {
       return;
     }
     roundStartedAtRef.current = Date.now();
-    questionViewedAtRef.current = Date.now();
     track("round_started", {
       level,
       question_count: questions.length,
@@ -90,16 +164,27 @@ export default function RoundRunner({ questions, level, replay }: Props) {
       mix: difficultyMix(questions),
       replay,
     });
-    const first = questions[0];
+  }, [questions, level, replay]);
+
+  // 문항이 바뀔 때마다(앞으로든 뒤로든) 조회 이벤트 + dwell 타이머 리셋.
+  useEffect(() => {
+    if (questions.length === 0) {
+      return;
+    }
+    const q = questions[index];
+    questionViewedAtRef.current = Date.now();
+    const isRevisit = seenRef.current.has(index);
+    seenRef.current.add(index);
     track("question_viewed", {
       level,
-      index: 0,
-      question_id: first.id,
-      category: first.category,
-      difficulty: first.difficulty,
-      question_type: first.type,
+      index,
+      question_id: q.id,
+      category: q.category,
+      difficulty: q.difficulty,
+      question_type: q.type,
+      is_revisit: isRevisit,
     });
-  }, [questions, level, replay]);
+  }, [questions, index, level]);
 
   async function submit() {
     const submittedAt = Date.now();
@@ -224,6 +309,8 @@ export default function RoundRunner({ questions, level, replay }: Props) {
 
   function nextStep() {
     const now = Date.now();
+    const isRevision = answeredRef.current.has(index);
+    answeredRef.current.add(index);
     track("question_answered", {
       level,
       index,
@@ -233,23 +320,25 @@ export default function RoundRunner({ questions, level, replay }: Props) {
       question_type: current.type,
       dwell_ms: now - questionViewedAtRef.current,
       selection_count: selectionCount(selected),
+      is_revision: isRevision,
     });
     scrollToTop();
     if (isLast) {
       submit();
       return;
     }
-    const next = questions[index + 1];
-    questionViewedAtRef.current = now;
-    track("question_viewed", {
-      level,
-      index: index + 1,
-      question_id: next.id,
-      category: next.category,
-      difficulty: next.difficulty,
-      question_type: next.type,
-    });
-    setIndex((i) => i + 1);
+    // `question_viewed`와 dwell 타이머는 index 변경 effect가 맡는다.
+    goTo(index + 1);
+  }
+
+  function prevStep() {
+    scrollToTop();
+    // 새 항목을 push하지 않고 실제로 히스토리를 되감는다. push하면 `← 이전`
+    // 직후의 브라우저 back이 방금 떠난 문항으로 되돌아가고(전진처럼 보임),
+    // 이전을 누를수록 /play를 벗어나는 데 필요한 back 횟수가 늘어난다.
+    // 이 버튼은 index > 0에서만 보이고 직접 진입은 limit이 0으로 접으므로,
+    // 직전 항목은 항상 이 라운드의 index-1이다.
+    navigate(-1);
   }
 
   return (
@@ -362,12 +451,21 @@ export default function RoundRunner({ questions, level, replay }: Props) {
         </ul>
       </fieldset>
 
-      <div className="mt-auto pt-10">
+      <div className="mt-auto flex items-center gap-3 pt-10">
+        {index > 0 && (
+          <button
+            type="button"
+            onClick={prevStep}
+            className="inline-flex h-14 shrink-0 items-center justify-center rounded-full border-2 border-zinc-200 px-6 text-base font-semibold text-zinc-600 transition hover:border-zinc-300 hover:text-zinc-900 active:scale-[0.99] dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
+          >
+            ← 이전
+          </button>
+        )}
         <button
           type="button"
           onClick={nextStep}
           disabled={!proceed}
-          className="inline-flex h-14 w-full items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:enabled:hover:bg-zinc-200"
+          className="inline-flex h-14 flex-1 items-center justify-center rounded-full bg-zinc-900 px-8 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:bg-zinc-800 enabled:active:scale-[0.99] dark:bg-zinc-100 dark:text-zinc-900 dark:enabled:hover:bg-zinc-200"
         >
           {isLast ? "결과 보기" : "다음 →"}
         </button>

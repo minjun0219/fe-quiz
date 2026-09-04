@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Await } from "react-router";
+import { Await, type ShouldRevalidateFunction } from "react-router";
 import { toLevel } from "@/lib/levels";
 import { logger } from "@/lib/logger.server";
 import type { PublicQuestion } from "@/lib/question.schema";
@@ -36,6 +36,28 @@ export function loader({ request }: Route.LoaderArgs) {
     replay: Boolean(from),
     questions: resolveQuestions(from, level),
   };
+}
+
+/**
+ * `?q=`는 "지금 몇 번째 문항이냐"는 커서일 뿐이라 로더를 다시 돌릴 이유가 없다.
+ * 오히려 다시 돌면 `pickRoundQuestions`가 새 랜덤 세트를 뽑아서 풀던 라운드가
+ * 통째로 갈린다 — 문항 이동이 곧 라운드 리셋이 되는 셈. 라운드의 정체성을
+ * 정하는 `from`/`level`이 바뀔 때만 revalidate 한다.
+ */
+export const shouldRevalidate: ShouldRevalidateFunction = ({
+  currentUrl,
+  nextUrl,
+}) => roundIdentity(currentUrl) !== roundIdentity(nextUrl);
+
+/**
+ * 로더가 실제로 보는 값만 추린 라운드 식별자. 로더와 같은 정규화를 써야
+ * 결과가 달라지지 않는 URL 변경에 라운드가 리셋되지 않는다 — `?level=foo`는
+ * `toLevel()`이 기본값으로 접고, `?from=`(빈 문자열)은 로더의 `if (!from)`이
+ * 미지정과 똑같이 취급한다.
+ */
+function roundIdentity(url: URL): string {
+  const from = url.searchParams.get("from") || "";
+  return `${from}::${toLevel(url.searchParams.get("level"))}`;
 }
 
 async function resolveQuestions(
