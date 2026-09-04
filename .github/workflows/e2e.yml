@@ -1,0 +1,110 @@
+name: E2E (deployed)
+
+# 배포된 것을 실제 브라우저로 검증한다. 로컬 빌드가 아니라 **Workers Builds가
+# 올린 그 버전**을 친다 — 로컬에서 통과하는데 배포에서 깨지는 것들(폰트 오리진
+# CORS, OG 이미지, 자산 경로)이 실제로 있었기 때문이다.
+#
+#   PR      → 그 PR의 Workers Builds 프리뷰 URL
+#   main    → 프로덕션 (fe-quiz.minjun.dev)
+#
+# 쓰기가 들어가는 테스트(공유 생성)는 `E2E_BASE_URL`이 붙으면 스스로 skip한다 —
+# 프리뷰와 프로덕션이 같은 D1을 쓰기 때문에 실제 점수판이 오염된다
+# (`e2e/share-create.spec.ts` 주석 참고).
+#
+# 피드백 API는 대부분 모킹한다. 실제 Anthropic 호출은 `@live` 하나뿐이라
+# 재시도가 rate limit(분당 5)에 걸리지 않는다.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  checks: read
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      # Workers Builds는 GitHub Actions가 아니라 Cloudflare가 만드는 체크라
+      # `needs:`로 묶을 수 없다. 해당 커밋의 체크가 끝날 때까지 폴링하고,
+      # 프리뷰 URL은 그 체크의 출력에서 꺼낸다(브랜치명에서 유추하면 잘림·특수
+      # 문자 규칙에 걸린다).
+      - name: 배포 대상 URL 정하기
+        id: target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            json=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
+              --jq '[.check_runs[] | select(.name | startswith("Workers Builds"))][0] // empty')
+            status=$(echo "${json:-}" | jq -r '.status // "missing"')
+            conclusion=$(echo "${json:-}" | jq -r '.conclusion // ""')
+            if [ "$status" = "completed" ]; then
+              if [ "$conclusion" != "success" ]; then
+                echo "::error::Workers Builds가 실패했습니다 ($conclusion) — e2e를 돌릴 배포본이 없습니다"
+                exit 1
+              fi
+              break
+            fi
+            echo "Workers Builds 대기 중… ($attempt/60, status=$status)"
+            sleep 10
+          done
+          if [ "${status:-}" != "completed" ]; then
+            echo "::error::Workers Builds가 10분 안에 끝나지 않았습니다"
+            exit 1
+          fi
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            url="https://fe-quiz.minjun.dev"
+          else
+            # 출력 요약에 두 URL이 들어 있다:
+            #   Preview URL:       https://<version-id>-fe-quiz.…  ← 이 커밋의 빌드에 고정
+            #   Preview Alias URL: https://<branch>-fe-quiz.…      ← 브랜치의 최신 빌드
+            # 앞의 것을 쓴다(정렬상 먼저 나온다). alias는 그사이 다른 푸시가
+            # 들어오면 다른 빌드를 가리켜, 테스트가 검증한 대상이 흔들린다.
+            url=$(echo "$json" | jq -r '.output.summary // ""' \
+              | grep -oE 'https://[^ )]*-fe-quiz\.[^ )]*workers\.dev' | head -1)
+            if [ -z "$url" ]; then
+              echo "::error::프리뷰 URL을 찾지 못했습니다. Workers Builds 출력 형식이 바뀌었을 수 있습니다"
+              exit 1
+            fi
+          fi
+          echo "대상: $url"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run e2e
+        env:
+          E2E_BASE_URL: ${{ steps.target.outputs.url }}
+        run: pnpm exec playwright test
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 7
