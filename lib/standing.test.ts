@@ -16,9 +16,11 @@ describe("computeStanding", () => {
 
   it("동점자는 같은 순위 — 나보다 '높은' 점수만 세기 때문", () => {
     // 70점이 셋, 그 위에 두 명. 셋 다 3등이어야 한다.
+    // 70점인 나와 70점인 남이 같은 집계를 받으므로 같은 순위가 나와야 한다.
     const agg = { players: 5, better: 2, average: 70, best: 100 };
     expect(computeStanding(agg).rank).toBe(3);
-    expect(computeStanding(agg).rank).toBe(computeStanding(agg).rank);
+    // 동점자 하나가 더 늘어도(players 6) 내 순위는 그대로 — better만이 순위를 정한다.
+    expect(computeStanding({ ...agg, players: 6 }).rank).toBe(3);
   });
 
   it("1등은 상위 0%가 아니라 1%로 바닥을 둔다", () => {

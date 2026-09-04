@@ -212,6 +212,12 @@ export default function Result({ data, level }: Props) {
       pct: overallPct,
     });
     const startedAt = Date.now();
+    // 이름은 피드백 정착 effect가 정하는데, `canShare`와 그 effect가 같은
+    // `feedbackStatus`에서 갈리므로 "버튼은 열렸는데 이름은 아직 빈 문자열"인
+    // 찰나가 이론상 존재한다. 여기서 한 번 더 확정해 DB에 NULL이 들어가지
+    // 않게 한다 — 점수판에서 이름 없는 줄이 나오는 게 이 기능의 실패다.
+    const nicknameToSend = nickname || randomNickname();
+    settleNickname(nicknameToSend);
     setShareStatus("creating");
     try {
       const res = await fetch("/api/share", {
@@ -227,7 +233,7 @@ export default function Result({ data, level }: Props) {
           feedback: (
             feedback.trim() || "(누룽지가 자리 비웠을 때 만든 결과)"
           ).slice(0, 2000),
-          nickname: nickname || undefined,
+          nickname: nicknameToSend,
         }),
       });
       if (!res.ok) {

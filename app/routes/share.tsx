@@ -125,9 +125,32 @@ export default function SharePage({
             같은 문제를 푼 사람들
           </h2>
           {standing.alone ? (
-            <p className="text-base text-zinc-700 dark:text-zinc-200">
-              아직 이 라운드 첫 주자예요. 링크를 넘겨서 누가 더 잘하나 봐요.
-            </p>
+            <>
+              {/* 첫 공유 수신자가 가장 먼저 보는 화면이다. 여기서 이름을
+                  숨기면 "누가 보낸 결과인지 알아보기"라는 이 기능의 목적이
+                  가장 흔한 흐름에서 그대로 실패한다. */}
+              <p className="mb-3 text-base text-zinc-700 dark:text-zinc-200">
+                아직 이 라운드 첫 주자예요. 링크를 넘겨서 누가 더 잘하나 봐요.
+              </p>
+              <ol className="flex flex-col gap-1">
+                {standing.entries.map((entry) => (
+                  <li
+                    key={entry.id}
+                    className="flex items-center gap-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-zinc-900 dark:bg-rose-500/10 dark:text-zinc-50"
+                  >
+                    <span className="w-6 shrink-0 text-right tabular-nums text-zinc-400 dark:text-zinc-500">
+                      {entry.rank}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {entry.nickname ?? ANONYMOUS_LABEL}
+                    </span>
+                    <span className="shrink-0 tabular-nums">
+                      {entry.score}점
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </>
           ) : (
             <>
               <p className="mb-3 text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
@@ -173,9 +196,12 @@ export default function SharePage({
                     </span>
                     <span className="min-w-0 flex-1 truncate">
                       {entry.nickname ?? ANONYMOUS_LABEL}
+                      {/* `is_me`는 "이 페이지를 보는 사람"이 아니라 "URL이
+                          가리키는 공유 행"이다. 링크를 받은 친구에게 "나"라고
+                          쓰면 남의 기록을 자기 것으로 읽게 된다. */}
                       {entry.is_me && (
                         <span className="ml-2 text-xs font-medium text-rose-500">
-                          나
+                          이 결과
                         </span>
                       )}
                     </span>
