@@ -61,7 +61,11 @@ jobs:
           for attempt in $(seq 1 60); do
             json=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
               --jq '[.check_runs[] | select(.name | startswith("Workers Builds"))][0] // empty')
+            # 체크런이 아직 없으면 gh가 빈 출력을 준다. jq는 빈 입력에 에러가
+            # 아니라 **아무것도 출력하지 않으므로**(exit 0) `// "missing"`이
+            # 안 먹는다 — 셸에서 한 번 더 접어야 로그에 상태가 남는다.
             status=$(echo "${json:-}" | jq -r '.status // "missing"')
+            status=${status:-missing}
             conclusion=$(echo "${json:-}" | jq -r '.conclusion // ""')
             if [ "$status" = "completed" ]; then
               if [ "$conclusion" != "success" ]; then
