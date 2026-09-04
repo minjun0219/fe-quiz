@@ -1,15 +1,19 @@
 import { expect, type Page } from "@playwright/test";
 
 /**
- * 배포된 대상(프리뷰·프로덕션)을 검증 중인가.
+ * e2e가 만든 shares row를 나중에 알아보기 위한 마커. 저장되는 `feedback`
+ * 맨 앞에 붙는다.
  *
- * 프리뷰와 프로덕션은 **같은 D1을 공유한다** — Workers Builds 프리뷰가
- * production 빌드라 프로덕션 바인딩을 쓰기 때문이다(Cloudflare가 Workers의
- * production/non-production 바인딩 분리를 지원하지 않는다). 그래서 쓰기가
- * 들어가는 테스트는 배포 대상에서 돌리면 실제 점수판을 오염시킨다.
- * `writeTest()`가 이 플래그로 알아서 건너뛴다.
+ * 정리는 CI가 잡 끝에 D1 API로 한다(`DELETE … WHERE feedback LIKE '<마커>%'`).
+ * 앱에 삭제 엔드포인트를 만들지 않은 이유 — 프로덕션에 파괴적 표면과 시크릿이
+ * 영구히 생기는데, `CLOUDFLARE_API_TOKEN`은 이미 repo secrets에 있어서
+ * 아무것도 안 늘리고 같은 일을 할 수 있다.
+ *
+ * slug 목록을 넘기지 않고 마커로 지우는 건 **정리가 실패한 뒤에도 자가 회복**을
+ * 위해서다 — 테스트가 중간에 죽어도 다음 실행이 이전 잔여물까지 쓸어간다.
+ * `_`나 `%`가 들어가면 LIKE 와일드카드로 먹히므로 대괄호를 쓴다.
  */
-export const IS_REMOTE = Boolean(process.env.E2E_BASE_URL);
+export const E2E_MARKER = "[e2e-cleanup]";
 
 /**
  * `/api/quiz/feedback`을 가짜 응답으로 바꾼다.

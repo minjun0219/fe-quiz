@@ -7,9 +7,11 @@ name: E2E (deployed)
 #   PR      → 그 PR의 Workers Builds 프리뷰 URL
 #   main    → 프로덕션 (fe-quiz.minjun.dev)
 #
-# 쓰기가 들어가는 테스트(공유 생성)는 `E2E_BASE_URL`이 붙으면 스스로 skip한다 —
-# 프리뷰와 프로덕션이 같은 D1을 쓰기 때문에 실제 점수판이 오염된다
-# (`e2e/share-create.spec.ts` 주석 참고).
+# 쓰기 테스트(공유 생성)도 배포 대상에서 돌린다 — 이 프로젝트에서 가장 크게
+# 터진 사고가 정확히 쓰기 경로였고 배포에서만 보였다. 대신 만든 row는 잡 끝에
+# 지운다. 앱에 삭제 엔드포인트를 두지 않은 건 프로덕션에 파괴적 표면과 시크릿을
+# 영구히 만들지 않으려는 것이고, `CLOUDFLARE_API_TOKEN`은 이미 있으므로
+# 아무것도 안 늘리고 같은 일을 한다.
 #
 # 피드백 API는 대부분 모킹한다. 실제 Anthropic 호출은 `@live` 하나뿐이라
 # 재시도가 rate limit(분당 5)에 걸리지 않는다.
@@ -101,6 +103,22 @@ jobs:
         env:
           E2E_BASE_URL: ${{ steps.target.outputs.url }}
         run: pnpm exec playwright test
+
+      # 테스트가 실패해도(중간에 죽어도) 반드시 돈다. slug 목록을 넘기지 않고
+      # 마커로 지우기 때문에 이전 실행의 잔여물까지 함께 쓸어간다 — 정리가 한 번
+      # 실패해도 다음 실행이 회복한다.
+      #
+      # 프리뷰든 프로덕션이든 같은 D1이라 대상은 하나다(production은 top-level
+      # 설정이라 --env 불필요 — wrangler.jsonc 참고).
+      - name: e2e가 남긴 row 정리
+        if: always()
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          pnpm exec wrangler d1 execute fe-quiz-shares --remote \
+            --command "DELETE FROM shares WHERE feedback LIKE '[e2e-cleanup]%'"
 
       - uses: actions/upload-artifact@v7
         if: failure()
