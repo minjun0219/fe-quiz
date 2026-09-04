@@ -50,6 +50,20 @@ body {
   line-height: inherit;
 }
 
+/* 코드 하이라이팅 — 주석과 문자열 두 가지만 (#30).
+ *
+ * 코드 블록은 라이트/다크 양쪽에서 항상 `bg-zinc-900` 다크 카드라 테마 분기가
+ * 없다. 팔레트를 최소로 두는 이유는 예전에 풀 신택스 색이 모바일에서 질문
+ * 본문보다 먼저 시선을 잡아채서 걷어냈기 때문이다 — 주석은 본문(zinc-100)보다
+ * 어둡게 눌러 물러나게 하고, 색이 붙는 건 문자열 하나뿐이다. */
+.quiz-code-block .tok-c {
+  color: rgb(122 122 132); /* zinc-500보다 살짝 밝게 — zinc-900 위 대비 확보 */
+}
+
+.quiz-code-block .tok-s {
+  color: rgb(158 203 255); /* 차분한 파랑 — 로즈 액센트와 안 싸운다 */
+}
+
 /* Inline `backtick code` in explanation paragraphs. */
 .inline-code {
   font-family: var(--font-mono);

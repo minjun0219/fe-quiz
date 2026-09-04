@@ -1,17 +1,93 @@
 import { describe, expect, it } from "vitest";
 import { highlightCode, renderQuizMarkdown } from "./highlight";
 
-describe("highlightCode (plain monospace, no Shiki — see #30)", () => {
-  it("HTML-escapes the code and wraps in <pre><code>", async () => {
+/**
+ * 출력에서 태그를 걷고 엔티티를 풀면 입력과 정확히 같아야 한다.
+ *
+ * 이게 이 모듈의 안전 성질이다 — 토크나이저가 오탐해도(정규식 안의 따옴표 등)
+ * 색만 틀리지 코드 한 글자도 바뀌거나 사라지면 안 된다.
+ */
+function textOf(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&amp;", "&");
+}
+
+describe("highlightCode — 최소 팔레트 (#30)", () => {
+  it("HTML을 이스케이프하고 <pre><code>로 감싼다", async () => {
     expect(await highlightCode("<div>{x && y}</div>", "javascript")).toBe(
       "<pre><code>&lt;div&gt;{x &amp;&amp; y}&lt;/div&gt;</code></pre>",
     );
   });
 
-  it("preserves whitespace verbatim", async () => {
+  it("공백을 그대로 보존한다", async () => {
     expect(await highlightCode("  a\n  b", "javascript")).toBe(
       "<pre><code>  a\n  b</code></pre>",
     );
+  });
+
+  it("줄 주석과 블록 주석을 tok-c로", async () => {
+    const out = await highlightCode("// hi\nlet a = 1; /* b */", "javascript");
+    expect(out).toContain('<span class="tok-c">// hi</span>');
+    expect(out).toContain('<span class="tok-c">/* b */</span>');
+  });
+
+  it("따옴표 세 종류를 tok-s로", async () => {
+    const out = await highlightCode("a='x'; b=\"y\"; c=`z`;", "javascript");
+    expect(out).toContain(`<span class="tok-s">&#39;x&#39;</span>`);
+    expect(out).toContain(`<span class="tok-s">&quot;y&quot;</span>`);
+    expect(out).toContain('<span class="tok-s">`z`</span>');
+  });
+
+  it("이스케이프된 따옴표는 문자열을 안 닫는다", async () => {
+    const out = await highlightCode(`a = "x\\"y";`, "javascript");
+    expect(textOf(out)).toBe(`a = "x\\"y";`);
+    expect(out.match(/tok-s/g)?.length).toBe(1);
+  });
+
+  it("닫히지 않은 따옴표는 평문으로 되돌린다 — 뒤를 삼키면 안 된다", async () => {
+    const out = await highlightCode(
+      `const re = /["']/;\nconst s = 1;`,
+      "javascript",
+    );
+    expect(textOf(out)).toBe(`const re = /["']/;\nconst s = 1;`);
+  });
+
+  it("CSS는 // 를 주석으로 보지 않는다 (블록 주석만)", async () => {
+    const out = await highlightCode("a { background: url(//x) }", "css");
+    expect(out).not.toContain("tok-c");
+    expect(await highlightCode("/* c */", "css")).toContain('class="tok-c"');
+  });
+
+  it("HTML은 <!-- --> 주석과 태그 안 속성만 칠한다", async () => {
+    const out = await highlightCode(`<!-- c --><a href="x">don't</a>`, "html");
+    expect(out).toContain('<span class="tok-c">&lt;!-- c --&gt;</span>');
+    expect(out).toContain('<span class="tok-s">&quot;x&quot;</span>');
+    // 본문의 아포스트로피가 문자열을 열어 뒤를 삼키면 안 된다.
+    expect(textOf(out)).toBe(`<!-- c --><a href="x">don't</a>`);
+  });
+
+  it("무엇을 넣어도 텍스트가 보존된다 (왕복 성질)", async () => {
+    const samples = [
+      "const a = 'x';",
+      "// c\nlet b = `t${x}`;",
+      "/* 안 닫힌 주석",
+      `"unterminated`,
+      "a{b:'c'}",
+      `<p class='q'>x</p>`,
+      "```\nnested?\n```",
+      "&<>\"'",
+      "",
+    ];
+    for (const src of samples) {
+      for (const cat of ["javascript", "css", "html"] as const) {
+        expect(textOf(await highlightCode(src, cat))).toBe(src);
+      }
+    }
   });
 });
 
