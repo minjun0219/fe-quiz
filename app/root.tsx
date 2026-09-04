@@ -36,18 +36,24 @@ export const meta: Route.MetaFunction = () => [
   },
 ];
 
-const PRETENDARD_CSS =
-  "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css";
+const FONT_ORIGIN = "https://s.minjun.dev";
+
+// 버전 고정 경로(1년 immutable). `latest`는 302를 한 번 타고 1시간 캐시라
+// 렌더를 막는 자리에 리다이렉트가 끼고, 주간 자동 갱신이 알림 없이 폰트를
+// 바꾼다 — 서체가 조용히 달라지는 건 원치 않는다.
+const PRETENDARD_CSS = `${FONT_ORIGIN}/pretendard/1.3.9/variable/pretendardvariable-dynamic-subset.css`;
 
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico" },
+  // 폰트 파일은 CORS로 받으므로 preconnect에도 crossOrigin이 붙어야 연결이
+  // 재사용된다 — 없으면 non-CORS 연결만 미리 열려 헛돈다.
   {
     rel: "preconnect",
-    href: "https://cdn.jsdelivr.net",
+    href: FONT_ORIGIN,
     crossOrigin: "anonymous",
   },
   // dynamic-subset: unicode-range로 쪼갠 92조각 중 화면에 실제로 쓰인 글자가
-  // 든 것만 받는다. 서브셋 없는 풀 variable(`pretendardvariable.min.css`)은
+  // 든 것만 받는다. 서브셋 없는 풀 variable(`pretendardvariable.css`)은
   // 첫 화면에서 2.0 MB woff2 하나를 통째로 받는데, 하필 그게 텍스트 렌더를
   // 막는 자리에 걸린다.
   //
