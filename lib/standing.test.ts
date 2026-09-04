@@ -68,7 +68,7 @@ describe("computeStanding", () => {
       average: 63,
       best: 90,
     });
-    expect(describeStanding(s)).toBe("기록 12개 중 3등 · 상위 25%");
+    expect(describeStanding(s)).toBe("12명 중 3등 · 상위 25%");
   });
 });
 

@@ -28,9 +28,13 @@ export interface StandingEntry {
  *
  * **세는 단위는 "사람"이 아니라 "기록"이다.** 인증이 없어 같은 사람의 재도전을
  * 구분할 방법이 없다 — 한 명이 같은 라운드를 세 번 풀고 세 번 공유하면 row가
- * 셋 생긴다. 그래서 필드 이름도 화면 문구도 사람 수인 척하지 않는다.
- * (닉네임으로 묶는 방법도 있지만 검증되지 않는 값이라, 없는 신원을 있는 척하는
- * 쪽보다 표현을 사실에 맞추는 쪽을 택했다.)
+ * 셋 생긴다. 필드 이름을 `records`로 둔 건 그래서다. 코드가 제출 건수를
+ * "사람"이라 부르면 다음에 읽는 사람이 같은 오해를 한다.
+ *
+ * 반면 **화면에는 "N명"이라고 쓴다.** 점수판이 전역이 아니라 한 라운드 안에서만
+ * 돌고, 바로 아래 닉네임 목록이 중복을 그대로 드러내기 때문이다(`민준`이 세 번
+ * 보이면 읽는 사람이 안다). 그 상황에서 "기록 N개"는 정확한 대신 어색하고, 이건
+ * 친구끼리 던지는 링크에 실리는 말이라 어감이 값을 한다.
  */
 export interface StandingAggregate {
   /** 이 라운드의 기록 수(= 같은 question_ids를 가진 shares row 수). */
@@ -115,5 +119,5 @@ export function describeStanding(s: Standing): string {
   if (s.alone) {
     return "이 라운드 첫 주자예요";
   }
-  return `기록 ${s.records}개 중 ${s.rank}등 · 상위 ${s.top_percent}%`;
+  return `${s.records}명 중 ${s.rank}등 · 상위 ${s.top_percent}%`;
 }
