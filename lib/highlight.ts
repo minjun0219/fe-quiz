@@ -183,7 +183,10 @@ function highlightToHtml(code: string, lang: CodeLang): string {
   while (i < code.length) {
     const c = code[i];
 
-    if (lang === "html" && code.startsWith("<!--", i)) {
+    // `<!--`는 언어를 안 가린다. 한 블록에 HTML과 CSS가 같이 든 문항이 있는데
+    // (카테고리는 하나뿐이라 lang이 css로 잡힌다) 그때 HTML 주석이 안 눌린다.
+    // `<!--`가 JS·CSS 코드에 나올 일이 없어서 전 언어에서 인식해도 안전하다.
+    if (code.startsWith("<!--", i)) {
       const close = code.indexOf("-->", i + 4);
       const end = close === -1 ? code.length : close + 3;
       emit("tok-c", i, end);

@@ -99,6 +99,14 @@ describe("highlightCode — 최소 팔레트 (#30)", () => {
     expect(out).not.toContain('<span class="tok-k">a</span>');
   });
 
+  it("HTML 주석은 언어를 안 가린다 (한 블록에 HTML+CSS가 섞인 문항)", async () => {
+    const mixed = "/* CSS */\n.a { color: red }\n\n<!-- HTML -->\n<p>x</p>";
+    const out = await highlightCode(mixed, "css");
+    expect(out).toContain('<span class="tok-c">/* CSS */</span>');
+    expect(out).toContain('<span class="tok-c">&lt;!-- HTML --&gt;</span>');
+    expect(textOf(out)).toBe(mixed);
+  });
+
   it("HTML은 태그명을 칠한다", async () => {
     const out = await highlightCode("<div><br/></div>", "html");
     expect(out).toContain('<span class="tok-k">div</span>');
