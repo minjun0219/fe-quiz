@@ -9,22 +9,33 @@
 
 /** 점수판 목록 한 줄. */
 export interface StandingEntry {
-  /** shares row id. 현재 보고 있는 slug와 같으면 "나" 줄이다. */
+  /** shares row id. 현재 보고 있는 slug와 같으면 이 페이지가 가리키는 기록이다. */
   id: string;
   /** 없으면(예전 row·닉네임 미전송) null → 화면에서 "익명". */
   nickname: string | null;
   score: number;
   /** 1-based 순위. 동점은 같은 값. */
   rank: number;
-  /** 현재 보고 있는 결과. */
+  /**
+   * 이 페이지(URL)가 가리키는 기록. **보고 있는 사람이 아니다** — 공유 링크를
+   * 받은 친구에게 "나"로 표시하면 남의 기록을 자기 것으로 읽는다.
+   */
   is_me: boolean;
 }
 
-/** `getRoundStanding`의 SQL 집계 결과. */
+/**
+ * `getRoundStanding`의 SQL 집계 결과.
+ *
+ * **세는 단위는 "사람"이 아니라 "기록"이다.** 인증이 없어 같은 사람의 재도전을
+ * 구분할 방법이 없다 — 한 명이 같은 라운드를 세 번 풀고 세 번 공유하면 row가
+ * 셋 생긴다. 그래서 필드 이름도 화면 문구도 사람 수인 척하지 않는다.
+ * (닉네임으로 묶는 방법도 있지만 검증되지 않는 값이라, 없는 신원을 있는 척하는
+ * 쪽보다 표현을 사실에 맞추는 쪽을 택했다.)
+ */
 export interface StandingAggregate {
-  /** 이 라운드를 푼 총 인원(= 같은 question_ids를 가진 shares row 수). */
-  players: number;
-  /** 나보다 점수가 높은 인원. */
+  /** 이 라운드의 기록 수(= 같은 question_ids를 가진 shares row 수). */
+  records: number;
+  /** 이 기록보다 점수가 높은 기록 수. */
   better: number;
   /** 참가자 평균 점수(0..100). */
   average: number;
@@ -37,7 +48,7 @@ export interface Standing extends StandingAggregate {
   rank: number;
   /** "상위 N%". 1보다 작아지지 않게 바닥을 둔다 — 1등이 "상위 0%"가 되면 읽기 이상하다. */
   top_percent: number;
-  /** 참가자가 나 혼자인 라운드. 순위를 말할 대상이 없어 UI가 다른 문구를 쓴다. */
+  /** 기록이 이것 하나뿐인 라운드. 비교 대상이 없어 UI가 다른 문구를 쓴다. */
   alone: boolean;
   /** 상위 몇 명 + (내가 그 밖이면) 내 줄. `rankEntries`가 만든다. */
   entries: StandingEntry[];
@@ -54,14 +65,14 @@ export function computeStanding(
   agg: StandingAggregate,
   entries: StandingEntry[] = [],
 ): Standing {
-  const players = Math.max(1, agg.players);
+  const records = Math.max(1, agg.records);
   const rank = agg.better + 1;
   return {
     ...agg,
-    players,
+    records,
     rank,
-    top_percent: Math.max(1, Math.round((rank / players) * 100)),
-    alone: players <= 1,
+    top_percent: Math.max(1, Math.round((rank / records) * 100)),
+    alone: records <= 1,
     entries,
   };
 }
@@ -104,5 +115,5 @@ export function describeStanding(s: Standing): string {
   if (s.alone) {
     return "이 라운드 첫 주자예요";
   }
-  return `${s.players}명 중 ${s.rank}등 · 상위 ${s.top_percent}%`;
+  return `기록 ${s.records}개 중 ${s.rank}등 · 상위 ${s.top_percent}%`;
 }

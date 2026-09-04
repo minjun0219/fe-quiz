@@ -122,7 +122,7 @@ export default function SharePage({
       {standing && (
         <section className="mb-8 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
-            같은 문제를 푼 사람들
+            같은 문제를 푼 기록
           </h2>
           {standing.alone ? (
             <>
@@ -154,7 +154,7 @@ export default function SharePage({
           ) : (
             <>
               <p className="mb-3 text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
-                {standing.players}명 중{" "}
+                기록 {standing.records}개 중{" "}
                 <span className="text-rose-500">{standing.rank}등</span>
                 <span className="ml-2 text-base font-medium text-zinc-500 dark:text-zinc-400">
                   상위 {standing.top_percent}%
@@ -174,7 +174,7 @@ export default function SharePage({
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-zinc-500 dark:text-zinc-400">내 점수</dt>
+                  <dt className="text-zinc-500 dark:text-zinc-400">이 결과</dt>
                   <dd className="font-semibold tabular-nums text-zinc-800 dark:text-zinc-100">
                     {share.score}점
                   </dd>

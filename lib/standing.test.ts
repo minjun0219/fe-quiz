@@ -4,7 +4,7 @@ import { computeStanding, describeStanding, rankEntries } from "./standing";
 describe("computeStanding", () => {
   it("나보다 높은 점수 수 + 1이 순위", () => {
     const s = computeStanding({
-      players: 12,
+      records: 12,
       better: 2,
       average: 63,
       best: 90,
@@ -17,15 +17,15 @@ describe("computeStanding", () => {
   it("동점자는 같은 순위 — 나보다 '높은' 점수만 세기 때문", () => {
     // 70점이 셋, 그 위에 두 명. 셋 다 3등이어야 한다.
     // 70점인 나와 70점인 남이 같은 집계를 받으므로 같은 순위가 나와야 한다.
-    const agg = { players: 5, better: 2, average: 70, best: 100 };
+    const agg = { records: 5, better: 2, average: 70, best: 100 };
     expect(computeStanding(agg).rank).toBe(3);
-    // 동점자 하나가 더 늘어도(players 6) 내 순위는 그대로 — better만이 순위를 정한다.
-    expect(computeStanding({ ...agg, players: 6 }).rank).toBe(3);
+    // 동점 기록이 하나 더 늘어도(records 6) 순위는 그대로 — better만이 순위를 정한다.
+    expect(computeStanding({ ...agg, records: 6 }).rank).toBe(3);
   });
 
   it("1등은 상위 0%가 아니라 1%로 바닥을 둔다", () => {
     const s = computeStanding({
-      players: 200,
+      records: 200,
       better: 0,
       average: 50,
       best: 100,
@@ -36,7 +36,7 @@ describe("computeStanding", () => {
 
   it("꼴등은 상위 100%", () => {
     const s = computeStanding({
-      players: 4,
+      records: 4,
       better: 3,
       average: 50,
       best: 100,
@@ -45,30 +45,30 @@ describe("computeStanding", () => {
     expect(s.top_percent).toBe(100);
   });
 
-  it("혼자면 alone — 순위를 말할 대상이 없다", () => {
-    const s = computeStanding({ players: 1, better: 0, average: 70, best: 70 });
+  it("기록이 하나면 alone — 비교 대상이 없다", () => {
+    const s = computeStanding({ records: 1, better: 0, average: 70, best: 70 });
     expect(s.alone).toBe(true);
     expect(s.rank).toBe(1);
     expect(describeStanding(s)).toBe("이 라운드 첫 주자예요");
   });
 
-  it("players가 0으로 들어와도 1로 접어 0 나눗셈을 막는다", () => {
-    // 이론상 없어야 하지만(내 row가 항상 하나는 있다) NaN%가 화면에 새는
+  it("records가 0으로 들어와도 1로 접어 0 나눗셈을 막는다", () => {
+    // 이론상 없어야 하지만(이 결과의 row가 항상 하나는 있다) NaN%가 화면에 새는
     // 것보다 낫다.
-    const s = computeStanding({ players: 0, better: 0, average: 0, best: 0 });
-    expect(s.players).toBe(1);
+    const s = computeStanding({ records: 0, better: 0, average: 0, best: 0 });
+    expect(s.records).toBe(1);
     expect(s.alone).toBe(true);
     expect(Number.isFinite(s.top_percent)).toBe(true);
   });
 
   it("describeStanding은 공유 문구로 쓸 한 줄", () => {
     const s = computeStanding({
-      players: 12,
+      records: 12,
       better: 2,
       average: 63,
       best: 90,
     });
-    expect(describeStanding(s)).toBe("12명 중 3등 · 상위 25%");
+    expect(describeStanding(s)).toBe("기록 12개 중 3등 · 상위 25%");
   });
 });
 
@@ -89,7 +89,7 @@ describe("rankEntries", () => {
   it("집계가 말하는 내 순위와 목록의 내 순위가 일치해야 한다", () => {
     // 같은 데이터로 두 경로를 돌렸을 때 어긋나면 화면에서 바로 티가 난다.
     const agg = computeStanding({
-      players: rows.length,
+      records: rows.length,
       better: rows.filter((r) => r.score > 70).length,
       average: 70,
       best: 90,

@@ -105,7 +105,7 @@ export async function createShare({
 // D1은 write 직후 read가 다른 콜로에서 잠깐 못 볼 수 있다(복제 지연 — 공유
 // 생성 → "미리보기" 즉시 클릭 경로에서 실측). null일 때만 짧게 재시도해
 // 간헐적 404를 흡수한다. 진짜 없는 slug는 404가 ~300ms 늦어질 뿐.
-/** 점수판에 한 번에 보여줄 최대 인원. 내가 이 밖이면 내 줄만 따로 붙인다. */
+/** 점수판에 한 번에 보여줄 최대 기록 수. 이 결과가 밖이면 그 줄만 따로 붙인다. */
 const BOARD_LIMIT = 10;
 
 const NOT_FOUND_RETRIES = 2;
@@ -170,7 +170,7 @@ export async function getRoundStanding(
   try {
     const row = await env.DB.prepare(
       `SELECT
-         COUNT(*) AS players,
+         COUNT(*) AS records,
          COALESCE(SUM(CASE WHEN score > ?2 THEN 1 ELSE 0 END), 0) AS better,
          COALESCE(AVG(score), 0) AS average,
          COALESCE(MAX(score), 0) AS best
@@ -183,7 +183,7 @@ export async function getRoundStanding(
       return null;
     }
     const agg: StandingAggregate = {
-      players: Number(row.players) || 0,
+      records: Number(row.records) || 0,
       better: Number(row.better) || 0,
       // AVG는 소수를 돌려준다 — 화면에 63.33333이 새지 않게 여기서 접는다.
       average: Math.round(Number(row.average) || 0),
