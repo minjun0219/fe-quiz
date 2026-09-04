@@ -19,13 +19,13 @@ import type { Route } from "./+types/share-og";
 export async function loader({ params }: Route.LoaderArgs) {
   // Pretendard는 서드파티 CDN — fetch가 실패해도(5xx, egress 차단) OG 엔드
   // 포인트가 500 나는 것보단 satori 내장 sans 폴백으로 그리는 게 낫다.
-  const [share, fontData] = await Promise.all([
+  const [lookup, fontData] = await Promise.all([
     // D1 장애도 "결과 없음" 카드로 폴백한다(소셜 스크레이퍼에 500 대신
     // 렌더 가능한 이미지). 대신 조용히 삼키지 않고 로깅해 관측은 남긴다.
     getShareById(params.slug).catch((err) => {
       logger.error(
         { err, slug: params.slug },
-        "[og] getShareById failed — not-found card fallback",
+        "[og] getShareById threw — not-found card fallback",
       );
       return null;
     }),
@@ -37,13 +37,22 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   const options = ogOptions(fontData);
 
-  if (!share) {
+  if (lookup?.kind !== "ok") {
+    // 크롤러에는 어느 쪽이든 렌더 가능한 이미지를 준다. 다만 "없는 공유"와
+    // "못 읽은 행"은 다른 사건이라 관측만 갈라 남긴다.
+    if (lookup?.kind === "malformed") {
+      logger.error(
+        { slug: params.slug },
+        "[og] share row malformed — not-found card fallback",
+      );
+    }
     return new ImageResponse(
       `<div style="display: flex; width: ${OG_WIDTH}px; height: ${OG_HEIGHT}px; align-items: center; justify-content: center; background-color: #fafaf9; color: #71717a; font-family: Pretendard; font-size: 56px;">결과를 찾을 수 없어요 😅</div>`,
       options,
     );
   }
 
+  const { share } = lookup;
   const hero = resolveResultHero(share.result_type);
   const total = share.question_ids.length;
   const totalCorrect = Math.round((share.score * total) / 100);

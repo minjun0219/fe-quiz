@@ -96,22 +96,43 @@ export async function createShare({
   );
 }
 
-/**
- * Fetch a shares row by slug. Returns null if not found OR if the row's
- * shape doesn't survive JSON parse + `ShareRowSchema` — 과거 데이터 이전이나
- * 수동 조작으로 형태가 어긋난 row가 NaN 폭/undefined 라벨로 새는 것보다
- * "없는 결과" 취급이 안전하다.
- */
-// D1은 write 직후 read가 다른 콜로에서 잠깐 못 볼 수 있다(복제 지연 — 공유
-// 생성 → "미리보기" 즉시 클릭 경로에서 실측). null일 때만 짧게 재시도해
-// 간헐적 404를 흡수한다. 진짜 없는 slug는 404가 ~300ms 늦어질 뿐.
 /** 점수판에 한 번에 보여줄 최대 기록 수. 이 결과가 밖이면 그 줄만 따로 붙인다. */
 const BOARD_LIMIT = 10;
 
+// D1은 write 직후 read가 다른 콜로에서 잠깐 못 볼 수 있다(복제 지연 — 공유
+// 생성 → "미리보기" 즉시 클릭 경로에서 실측). 행이 안 보일 때만 짧게 재시도해
+// 간헐적 404를 흡수한다. 진짜 없는 slug는 404가 ~300ms 늦어질 뿐.
 const NOT_FOUND_RETRIES = 2;
 const NOT_FOUND_RETRY_DELAY_MS = 150;
 
-export async function getShareById(id: string): Promise<ShareRow | null> {
+/**
+ * `getShareById`의 결과.
+ *
+ * **"없는 행"과 "못 읽은 행"은 다른 사건이다.** 예전에는 둘 다 `null`이었고
+ * 호출부가 그걸 404로 뭉갰는데, 그러면 서버 문제가 "그런 결과 없어요"로 보인다:
+ * 사용자는 멀쩡히 있는 자기 결과를 두고 못 찾았다는 말을 듣고, HTTP는 404라
+ * 정상 트래픽으로 집계돼 알림이 안 울리고, 디버깅은 "왜 slug가 사라졌지"로
+ * 헛돈다.
+ *
+ * 가상의 걱정이 아니다 — 카테고리를 하나 추가했을 때 zod의 exhaustive 검사가
+ * 옛 row를 전부 reject해서 **기존 공유 링크가 전부 404**가 된 적이 있다
+ * (`lib/share.schema.ts`의 `partialRecord` 주석 참고).
+ *
+ * 어떻게 처리할지는 호출부가 정한다. 결과 페이지는 malformed를 500으로 올리고,
+ * 재도전(`?from=`)과 OG 카드는 가용성이 우선이라 폴백한다 — 친구는 어쨌든 풀 수
+ * 있어야 하고, 크롤러에 500을 주는 것보다 "결과 없음" 카드가 낫다.
+ */
+export type ShareLookup =
+  | { kind: "ok"; share: ShareRow }
+  | { kind: "not_found" }
+  | { kind: "malformed" };
+
+/**
+ * Fetch a share row by slug. 형태가 어긋난 row(과거 데이터 이전·수동 조작)를
+ * 그대로 렌더해 NaN 폭이나 undefined 라벨이 새는 것보다 막는 게 안전하다 —
+ * 다만 "막는다"와 "없다"는 다르므로 `ShareLookup`으로 구분해 돌려준다.
+ */
+export async function getShareById(id: string): Promise<ShareLookup> {
   let raw: Record<string, unknown> | null = null;
   for (let attempt = 0; ; attempt++) {
     raw = await env.DB.prepare("SELECT * FROM shares WHERE id = ?1")
@@ -125,7 +146,7 @@ export async function getShareById(id: string): Promise<ShareRow | null> {
     );
   }
   if (!raw) {
-    return null;
+    return { kind: "not_found" };
   }
 
   let revived: unknown;
@@ -137,7 +158,7 @@ export async function getShareById(id: string): Promise<ShareRow | null> {
     };
   } catch {
     logger.error({ id }, "[share-store] row has malformed JSON columns");
-    return null;
+    return { kind: "malformed" };
   }
 
   const parsed = ShareRowSchema.safeParse(revived);
@@ -146,9 +167,9 @@ export async function getShareById(id: string): Promise<ShareRow | null> {
       { id, issues: parsed.error.issues },
       "[share-store] row failed schema validation",
     );
-    return null;
+    return { kind: "malformed" };
   }
-  return parsed.data;
+  return { kind: "ok", share: parsed.data };
 }
 
 /**
