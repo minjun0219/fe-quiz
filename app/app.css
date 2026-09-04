@@ -55,22 +55,34 @@ body {
  * 코드 블록은 라이트/다크 양쪽에서 항상 `bg-zinc-900` 다크 카드라 테마 분기가
  * 없다. 팔레트를 최소로 두는 이유는 예전에 풀 신택스 색이 모바일에서 질문
  * 본문보다 먼저 시선을 잡아채서 걷어냈기 때문이다 — 주석은 본문(zinc-100)보다
- * 어둡게 눌러 물러나게 하고, 식별자·함수명·타입명은 칠하지 않는다. 거기까지
- * 가면 화면 절반이 색이 되어 걷어냈던 상태로 돌아간다. */
+ * 어둡게 눌러 물러나게 하고, 식별자·함수명·타입명은 칠하지 않는다.
+ *
+ * 네 색 모두 `bg-zinc-900` 위에서 **WCAG AA(4.5:1) 이상**이어야 한다. 주석은
+ * "물러나게" 하려다 4.17:1까지 내려간 적이 있는데, 하필 `// (1)` 처럼 답을
+ * 가리키는 표식이 주석으로 들어가는 문항이 있어 저시력 사용자가 문제를 못 푸는
+ * 상태가 된다. 값은 변수로 빼 두고 `lib/highlight.contrast.test.ts`가 고정한다
+ * — 대비는 눈으로 봐서는 회귀를 못 잡는다. */
+:root {
+  --tok-comment: rgb(136 136 146); /* 5.05:1 — 본문보다 눌리되 AA는 지킴 */
+  --tok-string: rgb(158 203 255); /* 10.50:1 */
+  --tok-keyword: rgb(196 181 253); /* 9.60:1 */
+  --tok-number: rgb(252 211 77); /* 12.29:1 */
+}
+
 .quiz-code-block .tok-c {
-  color: rgb(122 122 132); /* zinc-500보다 살짝 밝게 — zinc-900 위 대비 확보 */
+  color: var(--tok-comment);
 }
 
 .quiz-code-block .tok-s {
-  color: rgb(158 203 255); /* 차분한 파랑 — 로즈 액센트와 안 싸운다 */
+  color: var(--tok-string);
 }
 
 .quiz-code-block .tok-k {
-  color: rgb(196 181 253); /* violet-300 — 구조가 먼저 눈에 들어오게 */
+  color: var(--tok-keyword);
 }
 
 .quiz-code-block .tok-n {
-  color: rgb(252 211 77); /* amber-300 */
+  color: var(--tok-number);
 }
 
 /* Inline `backtick code` in explanation paragraphs. */
