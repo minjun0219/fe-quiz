@@ -1,0 +1,77 @@
+name: Schema guard
+
+# 코드 PR이 아직 프로덕션에 적용되지 않은 마이그레이션에 기대는 것을 막는다.
+#
+# Workers Builds는 PR마다 프리뷰를 만드는데 그 프리뷰는 production 빌드라
+# **프로덕션 D1에 붙는다** — Cloudflare가 Workers의 production/non-production
+# 바인딩 분리를 지원하지 않는다(별도 preview D1이 있어도 프리뷰는 안 쓴다).
+# 그래서 새 컬럼을 쓰는 코드는 PR이 열리는 순간 이미 프로덕션 스키마가
+# 준비돼 있어야 한다. 안 그러면 프리뷰의 쓰기 경로가 통째로 500이 된다
+# (실제로 겪었다 — `INSERT`가 없는 `nickname` 컬럼을 썼다).
+#
+# 규칙: **마이그레이션은 별도 PR로 먼저 머지한다.** 그 PR은 `.sql`만 담으므로
+# paths-ignore에 걸려 이 워크플로가 돌지 않는다. 마이그레이션과 코드를 한 PR에
+# 섞으면 여기서 막힌다 — 그게 의도다.
+
+on:
+  pull_request:
+    branches: [main]
+    # 마이그레이션만 담은 PR은 검사 대상이 아니다. 그 PR이 바로 미적용
+    # 마이그레이션을 적용하는 수단이기 때문이다.
+    paths-ignore:
+      - "migrations/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: schema-guard-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: 프로덕션 D1에 미적용 마이그레이션이 있는지
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # production은 top-level 설정이라 --env 불필요 (wrangler.jsonc 참고)
+          out=$(pnpm exec wrangler d1 migrations list fe-quiz-shares --remote 2>&1)
+          echo "$out"
+
+          # fail-closed: "적용할 게 없다"는 신호가 **확인될 때만** 통과시킨다.
+          # wrangler의 사람용 출력에 기대는 부분이라 문구가 바뀌면 여기서
+          # 막히는데, 조용히 통과하는 것보다 낫다.
+          if echo "$out" | grep -q "No migrations to apply"; then
+            echo "✓ 프로덕션 D1이 최신입니다"
+            exit 0
+          fi
+
+          cat >&2 <<'EOF'
+
+          ✗ 프로덕션 D1에 적용되지 않은 마이그레이션이 있습니다.
+
+            PR마다 만들어지는 Workers Builds 프리뷰는 프로덕션 D1에 붙습니다.
+            지금 이 코드를 올리면 프리뷰의 쓰기 경로가 500으로 죽습니다.
+
+            마이그레이션만 담은 PR을 먼저 만들어 머지한 뒤 이 PR을 올리세요.
+            (위 목록이 비어 보이는데도 실패한다면 wrangler 출력 문구가 바뀐
+             것일 수 있습니다 — 이 워크플로의 grep을 확인하세요.)
+          EOF
+          exit 1
