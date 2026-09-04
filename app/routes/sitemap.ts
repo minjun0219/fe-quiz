@@ -1,10 +1,13 @@
+import { resolveSiteUrl } from "@/lib/site-url.server";
+import type { Route } from "./+types/sitemap";
+
 /**
  * Two indexable pages: the marketing-ish landing and the play entry.
  * `/r/{slug}` URLs are intentionally excluded — see `routes/robots.ts`.
  * base URL은 wrangler.jsonc env별 `SITE_URL` var에서.
  */
-export function loader() {
-  const base = process.env.SITE_URL ?? "http://localhost:3000";
+export function loader({ request }: Route.LoaderArgs) {
+  const base = resolveSiteUrl(request);
   const urls = [
     { loc: base, changefreq: "monthly", priority: "1" },
     { loc: `${base}/play`, changefreq: "weekly", priority: "0.8" },

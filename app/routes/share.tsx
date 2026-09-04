@@ -11,6 +11,7 @@ import {
 import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Category } from "@/lib/question.schema";
 import { getShareById } from "@/lib/share-store.server";
+import { resolveSiteUrl } from "@/lib/site-url.server";
 import type { Route } from "./+types/share";
 
 /**
@@ -18,14 +19,14 @@ import type { Route } from "./+types/share";
  * 장애를 "share not found"로 뭉개면 오진이라, notFound(404)는 row가 정말
  * 없는 경우(`null`)에만 던진다.
  */
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   const share = await getShareById(params.slug);
   if (!share) {
     throw new Response("Not Found", { status: 404 });
   }
   // meta()는 클라이언트 내비게이션에서도 실행되므로 env 접근은 loader에서
   // 끝내고 절대 URL을 데이터로 내려보낸다.
-  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  const siteUrl = resolveSiteUrl(request);
   return {
     share,
     ogImageUrl: new URL(`/r/${params.slug}/og.png`, siteUrl).toString(),

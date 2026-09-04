@@ -3,6 +3,9 @@ import { index, type RouteConfig, route } from "@react-router/dev/routes";
 export default [
   index("routes/home.tsx"),
   route("play", "routes/play.tsx"),
+  // 홈 공유 카드. 결과 카드(`r/:slug/og.png`)와 짝을 이루는 "입구" 이미지로,
+  // root.tsx의 meta가 og:image로 이 경로의 절대 URL을 가리킨다.
+  route("og.png", "routes/home-og.ts"),
   route("r/:slug", "routes/share.tsx"),
   // OG 이미지는 Next의 파일 규약(opengraph-image) 대신 명시 라우트.
   // share.tsx의 meta가 og:image로 이 경로의 절대 URL을 지정한다.
