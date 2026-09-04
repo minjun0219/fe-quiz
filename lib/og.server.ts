@@ -10,10 +10,15 @@
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
-// satori는 woff2를 지원하지 않으므로 정적 woff를 쓴다. (모노레포 경로 주의 —
-// `packages/pretendard/` 프리픽스가 빠지면 404.)
+// satori는 woff2를 지원하지 않으므로 woff를 쓴다.
+//
+// 원본 저장소(`/gh/`)의 raw 경로 대신 Fontsource가 npm에 올린 것을 받는다 —
+// 같은 파일(1,129,620 B)인데 모노레포 디렉터리 구조에 묶이지 않는다. 예전
+// 경로는 `packages/pretendard/` 프리픽스가 빠지면 404였고, 업스트림이 디렉터리를
+// 옮기면 또 깨진다. 이름은 `latin`이지만 unicode-range 서브셋이 아니라 전체
+// 자소가 들어 있다(빈 `unicode.json` + 파일 크기가 근거).
 const FONT_URL =
-  "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/static/woff/Pretendard-Bold.woff";
+  "https://cdn.jsdelivr.net/npm/@fontsource/pretendard@5.3.0/files/pretendard-latin-700-normal.woff";
 
 // Cache the font fetch across requests on the same warm isolate. On *any*
 // failure (non-2xx, network reject, DNS) we null the cache so the next

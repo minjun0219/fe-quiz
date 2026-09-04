@@ -10,6 +10,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { initPostHog, PostHogProvider } from "@/components/PostHogProvider";
+import { resolveSiteUrl } from "@/lib/site-url.server";
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -18,8 +19,8 @@ import "./app.css";
  * 끝내고 절대 URL을 데이터로 내려보낸다 (share.tsx와 같은 이유). og:image는
  * 상대 경로가 허용되지 않아 절대 URL이 필수고, origin이 env별로 다르다.
  */
-export function loader() {
-  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+export function loader({ request }: Route.LoaderArgs) {
+  const siteUrl = resolveSiteUrl(request);
   return {
     siteUrl,
     ogImageUrl: new URL("/og.png", siteUrl).toString(),
