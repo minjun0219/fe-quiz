@@ -96,17 +96,12 @@ export async function createShare({
   );
 }
 
-/**
- * Fetch a shares row by slug. 형태가 어긋난 row(과거 데이터 이전·수동 조작)를
- * 그대로 렌더해 NaN 폭이나 undefined 라벨이 새는 것보다 막는 게 안전하다 —
- * 다만 "막는다"와 "없다"는 다르므로 `ShareLookup`으로 구분해 돌려준다.
- */
-// D1은 write 직후 read가 다른 콜로에서 잠깐 못 볼 수 있다(복제 지연 — 공유
-// 생성 → "미리보기" 즉시 클릭 경로에서 실측). null일 때만 짧게 재시도해
-// 간헐적 404를 흡수한다. 진짜 없는 slug는 404가 ~300ms 늦어질 뿐.
 /** 점수판에 한 번에 보여줄 최대 기록 수. 이 결과가 밖이면 그 줄만 따로 붙인다. */
 const BOARD_LIMIT = 10;
 
+// D1은 write 직후 read가 다른 콜로에서 잠깐 못 볼 수 있다(복제 지연 — 공유
+// 생성 → "미리보기" 즉시 클릭 경로에서 실측). 행이 안 보일 때만 짧게 재시도해
+// 간헐적 404를 흡수한다. 진짜 없는 slug는 404가 ~300ms 늦어질 뿐.
 const NOT_FOUND_RETRIES = 2;
 const NOT_FOUND_RETRY_DELAY_MS = 150;
 
@@ -132,6 +127,11 @@ export type ShareLookup =
   | { kind: "not_found" }
   | { kind: "malformed" };
 
+/**
+ * Fetch a share row by slug. 형태가 어긋난 row(과거 데이터 이전·수동 조작)를
+ * 그대로 렌더해 NaN 폭이나 undefined 라벨이 새는 것보다 막는 게 안전하다 —
+ * 다만 "막는다"와 "없다"는 다르므로 `ShareLookup`으로 구분해 돌려준다.
+ */
 export async function getShareById(id: string): Promise<ShareLookup> {
   let raw: Record<string, unknown> | null = null;
   for (let attempt = 0; ; attempt++) {

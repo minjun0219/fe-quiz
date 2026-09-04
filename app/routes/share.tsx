@@ -18,8 +18,9 @@ import type { Route } from "./+types/share";
 
 /**
  * D1/설정 에러는 그대로 throw — 루트 ErrorBoundary가 500 화면을 그린다.
- * 장애를 "share not found"로 뭉개면 오진이라, notFound(404)는 row가 정말
- * 없는 경우(`null`)에만 던진다.
+ *
+ * 장애를 "share not found"로 뭉개면 오진이라 세 가지를 갈라 처리한다:
+ * `not_found`만 404, `malformed`(행은 있는데 못 읽음)는 500, 나머지는 정상.
  */
 export async function loader({ params, request }: Route.LoaderArgs) {
   const lookup = await getShareById(params.slug);
