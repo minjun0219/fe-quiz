@@ -155,6 +155,7 @@ export async function action({ request }: Route.ActionArgs) {
       graded,
       result_type: diagnosis.result_type,
       feedback: parsed.data.feedback,
+      nickname: parsed.data.nickname,
     });
   } catch (err) {
     // Log full detail server-side; never echo DB / internal messages to the

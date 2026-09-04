@@ -42,6 +42,7 @@ ESLint·Prettier 없음 — lint/format은 `biome.json`이 단일 출처(single 
 - **클라이언트에 정답 노출 금지**: `PublicQuestion` 타입에서 `answer`·`explanation`을 의도적으로 제거. 채점은 서버사이드. `lib/questions.generated.json`(정답 포함 원본)을 클라이언트 코드에서 직접 import하는 것도 같은 위반이에요.
 - **선택적(optional) 연동은 env 미설정 시 no-op / fail-open**: Upstash rate limit, PostHog(서버 + 클라이언트), Anthropic. 이걸 hard requirement로 바꾸지 마세요.
 - **YAML 콘텐츠는 스키마 검증 강제**: `content/questions/` 아래를 손댔으면 `pnpm questions:check` + **`pnpm questions:bundle`**(런타임 번들 재생성 — 잊으면 `questions:bundle:check`가 빌드를 막아요) 실행. 산문(prose) vs 코드 스타일은 `content/AGENTS.md`에 정리.
+- **마이그레이션은 코드보다 먼저, 별도 PR로** — Workers Builds가 PR마다 만드는 프리뷰는 production 빌드라 **프로덕션 D1에 붙어요**(Cloudflare가 Workers의 production/non-production 바인딩 분리를 지원하지 않음 — `fe-quiz-shares-preview`가 있어도 프리뷰는 안 씁니다). 그래서 새 컬럼을 쓰는 코드는 PR이 열리는 순간 프로덕션 스키마가 이미 준비돼 있어야 해요. `.sql`만 담은 PR을 먼저 머지하고(→ `migrate.yml`이 prod 적용), 그 다음 코드 PR을 올립니다. 섞으면 `schema-guard.yml`이 막아요. 두 머지 사이에는 옛 코드가 새 스키마 위에서 도니 **마이그레이션은 항상 additive**(`ADD COLUMN`/`CREATE INDEX`)여야 하고, `DROP`/rename은 축소 단계로 나눠요.
 - **OG 이미지(satori) 함정**: 공용 조각은 `lib/og.server.ts`, 카드는 `app/routes/{share-og,home-og}.ts`. 자식 2개 이상인 노드에 `display: flex`가 필수고 태그 사이 공백도 자식으로 세요 — `compactHtml()`을 우회하지 마세요. 폰트는 woff(woff2 미지원). **루트에 `width: 100%`를 쓰면 캔버스가 아니라 콘텐츠 폭으로 줄어들고(오른쪽에 흰 띠), `flex: 1` 단축은 해석되지 않아요** — `OG_WIDTH`/`OG_HEIGHT` px과 `flex-grow`를 쓰세요. 깨져도 200에 이미지가 나오니 상태코드 말고 눈으로 확인.
 
 심화 맥락이 필요하면 작업 전에 `docs/DECISIONS.md`와 `docs/adr/`(특히 [0006](docs/adr/0006-react-router-workers-d1.md)), `content/AGENTS.md`를 먼저 읽어 주세요.

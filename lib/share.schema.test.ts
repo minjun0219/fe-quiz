@@ -34,4 +34,25 @@ describe("ShareRowSchema", () => {
     };
     expect(ShareRowSchema.safeParse(invalid).success).toBe(false);
   });
+  // 배포와 마이그레이션이 별도 워크플로라 "새 코드 + 옛 스키마"인 순간이 있다.
+  // 그때 nickname 키가 아예 없는데, 여기서 reject하면 getShareById가 404로
+  // 떨어뜨려 모든 공유 링크가 죽는다.
+  it("nickname 키가 없어도 통과하고 null로 채워진다", () => {
+    const parsed = ShareRowSchema.safeParse(baseRow);
+    expect(parsed.success).toBe(true);
+    expect(parsed.success && parsed.data.nickname).toBeNull();
+  });
+
+  it("nickname이 NULL이어도 null", () => {
+    const parsed = ShareRowSchema.safeParse({ ...baseRow, nickname: null });
+    expect(parsed.success && parsed.data.nickname).toBeNull();
+  });
+
+  it("nickname 문자열은 그대로 들고 온다", () => {
+    const parsed = ShareRowSchema.safeParse({
+      ...baseRow,
+      nickname: "느긋한 물범",
+    });
+    expect(parsed.success && parsed.data.nickname).toBe("느긋한 물범");
+  });
 });

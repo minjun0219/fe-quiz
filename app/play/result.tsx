@@ -1,10 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CodeBlock } from "@/components/code-block";
 import { ContributeNote } from "@/components/credits";
 import { track } from "@/lib/analytics";
 import { CATEGORY_DISPLAY_LABEL } from "@/lib/category-labels";
 import { renderFeedbackInline } from "@/lib/feedback-render";
 import type { Level } from "@/lib/levels";
+import {
+  looksLikeNicknamePrefix,
+  NICKNAME_MAX_LENGTH,
+  normalizeNickname,
+  randomNickname,
+  readStoredNickname,
+  splitNicknameFromFeedback,
+  storeNickname,
+} from "@/lib/nickname";
 import type { Category } from "@/lib/question.schema";
 import type { QuizSubmitResponse } from "@/lib/quiz-submit.schema";
 import type { ShareCreateResponse } from "@/lib/share.schema";
@@ -48,6 +57,11 @@ export default function Result({ data, level }: Props) {
   const [feedbackStatus, setFeedbackStatus] =
     useState<FeedbackStatus>("loading");
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
+  // 닉네임은 라운드마다 바뀌면 안 된다 — 친구가 나를 못 알아본다.
+  // localStorage에 있으면 그걸 쓰고, 없으면 정적 풀에서 한 번 뽑아 굳힌다.
+  // (2단계에서 LLM이 지어준 이름을 이 자리에 채울 예정)
+  const [nickname, setNickname] = useState<string>("");
+  const [editingNickname, setEditingNickname] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
   // navigator.share availability is detected after mount so SSR / non-secure
@@ -69,6 +83,48 @@ export default function Result({ data, level }: Props) {
   // share flow.
   const canShare =
     feedbackStatus !== "loading" && feedbackStatus !== "streaming";
+  // 이름이 이미 정해졌는지. localStorage에서 왔거나, LLM 이름을 받았거나,
+  // 사용자가 직접 정했거나, 폴백으로 뽑은 경우 true.
+  const nicknameLockedRef = useRef(false);
+
+  /**
+   * 이름을 확정한다. 이미 정해진 게 있으면 무시 — 라운드마다 이름이 바뀌면
+   * 친구가 나를 못 알아보고, 그 고정이 이 기능의 전제다.
+   *
+   * 피드백 effect가 부르므로 참조가 고정돼야 한다. 매 렌더 새로 만들면
+   * 의존성에 넣는 순간 effect가 다시 돌아 피드백을 또 fetch한다(= 비용).
+   * ref와 setState만 쓰므로 의존성이 비어도 stale해지지 않는다.
+   */
+  const settleNickname = useCallback((name: string) => {
+    if (nicknameLockedRef.current) {
+      return;
+    }
+    nicknameLockedRef.current = true;
+    setNickname(name);
+    storeNickname(name);
+  }, []);
+
+  // SSR에는 localStorage가 없으므로 마운트 후에 읽는다. 저장된 이름이 없으면
+  // **여기서는 아무것도 정하지 않는다** — 임시로 풀 이름을 띄워두면 잠시 뒤
+  // LLM 이름이 도착하면서 눈앞에서 이름이 한 번 바뀐다. 공유 버튼도 피드백이
+  // 끝나야 열리므로(`canShare`) 그 전에 이름을 보여줄 이유가 없다.
+  useEffect(() => {
+    const stored = readStoredNickname();
+    if (stored) {
+      nicknameLockedRef.current = true;
+      setNickname(stored);
+    }
+  }, []);
+
+  // 피드백이 끝났는데도 이름이 없으면 — LLM이 형식을 어겼거나, 키가 없거나,
+  // 호출이 실패했다 — 정적 풀에서 뽑는다. 선택적 연동이 없어도 이름은 항상
+  // 붙어야 한다(fail-open). 여기까지 오면 더 기다릴 게 없으므로 바로 굳힌다.
+  useEffect(() => {
+    if (feedbackStatus === "loading" || feedbackStatus === "streaming") {
+      return;
+    }
+    settleNickname(randomNickname());
+  }, [feedbackStatus, settleNickname]);
 
   useEffect(() => {
     setCanNativeShare(
@@ -137,6 +193,15 @@ export default function Result({ data, level }: Props) {
     copyResetRef.current = setTimeout(() => setCopyStatus("idle"), 1500);
   }
 
+  /** 편집 종료. 비우고 저장하면 이름 없이 남지 않도록 새로 뽑아 채운다. */
+  function commitNickname() {
+    const cleaned = normalizeNickname(nickname) ?? randomNickname();
+    nicknameLockedRef.current = true;
+    setNickname(cleaned);
+    storeNickname(cleaned);
+    setEditingNickname(false);
+  }
+
   async function handleShare() {
     if (!canShare || shareStatus === "creating" || shareStatus === "ready") {
       return;
@@ -147,6 +212,12 @@ export default function Result({ data, level }: Props) {
       pct: overallPct,
     });
     const startedAt = Date.now();
+    // 이름은 피드백 정착 effect가 정하는데, `canShare`와 그 effect가 같은
+    // `feedbackStatus`에서 갈리므로 "버튼은 열렸는데 이름은 아직 빈 문자열"인
+    // 찰나가 이론상 존재한다. 여기서 한 번 더 확정해 DB에 NULL이 들어가지
+    // 않게 한다 — 점수판에서 이름 없는 줄이 나오는 게 이 기능의 실패다.
+    const nicknameToSend = nickname || randomNickname();
+    settleNickname(nicknameToSend);
     setShareStatus("creating");
     try {
       const res = await fetch("/api/share", {
@@ -162,6 +233,7 @@ export default function Result({ data, level }: Props) {
           feedback: (
             feedback.trim() || "(누룽지가 자리 비웠을 때 만든 결과)"
           ).slice(0, 2000),
+          nickname: nicknameToSend,
         }),
       });
       if (!res.ok) {
@@ -282,6 +354,20 @@ export default function Result({ data, level }: Props) {
         }
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
+        // 스트림 앞머리에 `닉네임: …` + `---`가 실려 온다. 구분선이 도착할
+        // 때까지는 본문을 그리지 않고, 도착하면 떼어낸 뒤 나머지만 그린다.
+        // 형식이 아니면 그 자리에서 포기하고 전부 본문으로 돌린다 — 마커가
+        // 화면에 새는 것보다 이름을 정적 풀로 폴백하는 편이 낫다.
+        let head = "";
+        let nicknameResolved = false;
+        const resolveHead = () => {
+          nicknameResolved = true;
+          const split = splitNicknameFromFeedback(head);
+          if (split.nickname) {
+            settleNickname(split.nickname);
+          }
+          setFeedback(split.feedback);
+        };
         while (true) {
           const { done, value } = await reader.read();
           if (done || ignore) {
@@ -289,7 +375,14 @@ export default function Result({ data, level }: Props) {
           }
           const chunk = decoder.decode(value, { stream: true });
           charCount += chunk.length;
-          setFeedback((prev) => prev + chunk);
+          if (nicknameResolved) {
+            setFeedback((prev) => prev + chunk);
+            continue;
+          }
+          head += chunk;
+          if (!looksLikeNicknamePrefix(head)) {
+            resolveHead();
+          }
         }
         // Flush any byte sequence that was held back on a UTF-8 boundary —
         // Korean characters are 3 bytes, easy to bisect across chunks.
@@ -297,7 +390,15 @@ export default function Result({ data, level }: Props) {
           const tail = decoder.decode();
           if (tail) {
             charCount += tail.length;
-            setFeedback((prev) => prev + tail);
+            if (nicknameResolved) {
+              setFeedback((prev) => prev + tail);
+            } else {
+              head += tail;
+            }
+          }
+          // 스트림이 닉네임 줄을 쓰다 끊겼을 수도 있다 — 여기서 마무리한다.
+          if (!nicknameResolved) {
+            resolveHead();
           }
           setFeedbackStatus("done");
           track("feedback_completed", {
@@ -325,7 +426,7 @@ export default function Result({ data, level }: Props) {
       ignore = true;
       abort.abort();
     };
-  }, [data, level]);
+  }, [data, level, settleNickname]);
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-5 py-10">
@@ -406,6 +507,63 @@ export default function Result({ data, level }: Props) {
               <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-rose-400 align-middle" />
             )}
           </p>
+        )}
+
+        {/* 이름도 한마디도 같은 응답에서 같은 순간에 온다 — 한 덩어리로 둔다.
+            공유하기 전까지만 보이면 되므로 링크가 만들어지면 감춘다. */}
+        {shareStatus !== "ready" && nickname && (
+          <div className="mt-4 flex items-center gap-2 border-t border-rose-100 pt-3 text-sm dark:border-rose-900/30">
+            <span className="shrink-0 text-zinc-500 dark:text-zinc-400">
+              점수판 이름
+            </span>
+            {editingNickname ? (
+              <>
+                <input
+                  // biome-ignore lint/a11y/noAutofocus: 사용자가 "바꾸기"를 눌러 연 입력이라 포커스가 그리로 가는 게 기대 동작이다.
+                  autoFocus
+                  value={nickname}
+                  maxLength={NICKNAME_MAX_LENGTH}
+                  onChange={(e) => setNickname(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      commitNickname();
+                    }
+                  }}
+                  className="min-w-0 flex-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                  aria-label="점수판에 표시할 이름"
+                />
+                <button
+                  type="button"
+                  onClick={() => setNickname(randomNickname())}
+                  className="shrink-0 rounded-full border border-zinc-300 px-2 py-1.5 text-zinc-600 transition hover:bg-white dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  aria-label="다른 이름으로 다시 뽑기"
+                  title="다시 뽑기"
+                >
+                  🎲
+                </button>
+                <button
+                  type="button"
+                  onClick={commitNickname}
+                  className="shrink-0 rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  저장
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="min-w-0 flex-1 truncate font-medium text-zinc-800 dark:text-zinc-100">
+                  {nickname}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setEditingNickname(true)}
+                  className="shrink-0 rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 transition hover:bg-white dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                >
+                  바꾸기
+                </button>
+              </>
+            )}
+          </div>
         )}
       </section>
 
