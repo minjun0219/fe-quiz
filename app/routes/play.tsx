@@ -69,15 +69,20 @@ async function resolveQuestions(
   }
   // D1 장애도 랜덤 라운드로 폴백한다(가용성 우선 — 친구는 어쨌든 풀 수
   // 있어야 함). 대신 조용히 삼키지 않고 로깅해 관측은 남긴다.
-  const share = await getShareById(from).catch((err) => {
-    logger.error({ err, from }, "[play] getShareById failed — random fallback");
+  const lookup = await getShareById(from).catch((err) => {
+    logger.error({ err, from }, "[play] getShareById threw — random fallback");
     return null;
   });
-  if (!share) {
+  if (lookup?.kind !== "ok") {
+    // 어느 쪽이든 랜덤 라운드로 간다 — 친구는 어쨌든 풀 수 있어야 한다.
+    // 다만 "그런 공유가 없다"와 "행을 못 읽었다"는 다른 사건이라 따로 남긴다.
+    if (lookup?.kind === "malformed") {
+      logger.error({ from }, "[play] share row malformed — random fallback");
+    }
     return pickRoundQuestions(ROUND_SIZE, level);
   }
   const replayed = await pickRoundQuestionsByIds(
-    share.question_ids.slice(0, REPLAY_CAP),
+    lookup.share.question_ids.slice(0, REPLAY_CAP),
   );
   return replayed.length > 0 ? replayed : pickRoundQuestions(ROUND_SIZE, level);
 }

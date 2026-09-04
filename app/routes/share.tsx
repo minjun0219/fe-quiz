@@ -22,10 +22,17 @@ import type { Route } from "./+types/share";
  * 없는 경우(`null`)에만 던진다.
  */
 export async function loader({ params, request }: Route.LoaderArgs) {
-  const share = await getShareById(params.slug);
-  if (!share) {
+  const lookup = await getShareById(params.slug);
+  if (lookup.kind === "malformed") {
+    // 행은 있는데 못 읽었다 — 이건 서버 문제다. 404로 뭉개면 사용자는 멀쩡히
+    // 있는 자기 결과를 두고 "못 찾았다"는 말을 듣고, 우리는 정상 트래픽으로
+    // 집계된 404를 보느라 장애를 놓친다.
+    throw new Response("Malformed share row", { status: 500 });
+  }
+  if (lookup.kind === "not_found") {
     throw new Response("Not Found", { status: 404 });
   }
+  const { share } = lookup;
   // meta()는 클라이언트 내비게이션에서도 실행되므로 env 접근은 loader에서
   // 끝내고 절대 URL을 데이터로 내려보낸다.
   const siteUrl = resolveSiteUrl(request);
