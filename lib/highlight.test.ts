@@ -71,6 +71,40 @@ describe("highlightCode — 최소 팔레트 (#30)", () => {
     expect(textOf(out)).toBe(`<!-- c --><a href="x">don't</a>`);
   });
 
+  it("JS 키워드와 숫자를 칠한다", async () => {
+    const out = await highlightCode("const a = 42;", "javascript");
+    expect(out).toContain('<span class="tok-k">const</span>');
+    expect(out).toContain('<span class="tok-n">42</span>');
+  });
+
+  it("식별자 안의 부분 문자열을 키워드로 잡지 않는다", async () => {
+    const out = await highlightCode("constant = iffy + newness;", "javascript");
+    expect(out).not.toContain("tok-k");
+  });
+
+  it("식별자·함수명은 칠하지 않는다 (다이어트 유지)", async () => {
+    const out = await highlightCode("foo(bar, baz)", "javascript");
+    expect(out).not.toContain("tok-k");
+    expect(out).not.toContain("tok-n");
+  });
+
+  it("CSS는 블록 안 속성명과 @규칙만 — 선택자의 :hover는 아니다", async () => {
+    const out = await highlightCode(
+      "@media (min-width: 40rem) { a:hover { color: red } }",
+      "css",
+    );
+    expect(out).toContain('<span class="tok-k">@media</span>');
+    expect(out).toContain('<span class="tok-k">color</span>');
+    // `a:hover`의 `a`는 선택자다 — 깊이 0이라 안 칠해진다.
+    expect(out).not.toContain('<span class="tok-k">a</span>');
+  });
+
+  it("HTML은 태그명을 칠한다", async () => {
+    const out = await highlightCode("<div><br/></div>", "html");
+    expect(out).toContain('<span class="tok-k">div</span>');
+    expect(out).toContain('<span class="tok-k">/div</span>');
+  });
+
   it("무엇을 넣어도 텍스트가 보존된다 (왕복 성질)", async () => {
     const samples = [
       "const a = 'x';",
@@ -81,6 +115,9 @@ describe("highlightCode — 최소 팔레트 (#30)", () => {
       `<p class='q'>x</p>`,
       "```\nnested?\n```",
       "&<>\"'",
+      "const a = 0x1f + 1_000n;",
+      "@media(x){y:1px}",
+      "<a b='c'>d</a>",
       "",
     ];
     for (const src of samples) {
@@ -161,23 +198,24 @@ describe("renderQuizMarkdown — fenced blocks", () => {
       "javascript",
     );
     expect(html).toMatch(/^intro\n<div class="quiz-code-block /);
-    expect(html).toContain("<pre><code>const x = 1</code></pre>");
+    expect(html).toContain("<pre><code>");
+    expect(textOf(html)).toContain("const x = 1");
     expect(html).toMatch(/<\/div>\nouttro$/);
   });
 
   it("escapes HTML inside fenced code", async () => {
     const html = await renderQuizMarkdown("```html\n<div>&</div>\n```", "html");
-    expect(html).toContain(
-      "<pre><code>&lt;div&gt;&amp;&lt;/div&gt;</code></pre>",
-    );
+    // 태그명은 칠해지고 나머지는 이스케이프된다.
+    expect(html).toContain('<span class="tok-k">div</span>');
+    expect(textOf(html)).toContain("<div>&</div>");
   });
 
-  it("ignores info-string and language fallback (no highlighting in this build)", async () => {
+  it("모르는 info-string은 js로 떨어진다", async () => {
     const html = await renderQuizMarkdown(
       "```rust\nfn main() {}\n```",
       "javascript",
     );
-    expect(html).toContain("<pre><code>fn main() {}</code></pre>");
+    expect(textOf(html)).toContain("fn main() {}");
   });
 
   it("renders multiple fences and preserves surrounding inline markup", async () => {
@@ -186,8 +224,8 @@ describe("renderQuizMarkdown — fenced blocks", () => {
       "javascript",
     );
     expect(html).toContain("<strong>strong</strong>");
-    expect(html).toContain("<pre><code>let a</code></pre>");
-    expect(html).toContain("<pre><code>let b</code></pre>");
+    expect(textOf(html)).toContain("let a");
+    expect(textOf(html)).toContain("let b");
     expect(html).toContain('<code class="inline-code">code</code>');
   });
 

@@ -13,11 +13,13 @@ function escapeHtml(s: string): string {
 }
 
 /**
- * 코드 블록 하이라이팅 — **주석과 문자열 두 가지만** 칠한다 (#30).
+ * 코드 블록 하이라이팅 — 주석·문자열·키워드·숫자 넷만 칠한다 (#30).
  *
  * 예전에 Shiki를 걷어낸 이유는 성능이 아니라 UX였다: 풀 신택스 색이 모바일에서
  * 질문 본문보다 먼저 시선을 잡아챘다. 그래서 색을 되살리되 최소로만 둔다 —
- * 주석은 본문보다 **어둡게** 눌러 물러나게 하고, 색이 붙는 건 문자열 하나뿐이다.
+ * 주석은 본문보다 **어둡게** 눌러 물러나게 하고, 색은 문자열·키워드·숫자에만
+ * 붙인다. 식별자·함수명·타입명은 일부러 뺐다 — 거기까지 칠하면 화면 절반이
+ * 색이 되어 원래 걷어냈던 상태로 돌아간다.
  *
  * 라이브러리를 안 쓴다. 시드 전체의 코드가 11 KB(73문항 평균 149바이트)라
  * Shiki + Oniguruma WASM을 워커에 싣는 건 과하고, 두 토큰만 쓸 거면 스캐너가
@@ -65,12 +67,106 @@ function scanString(code: string, start: number, quote: string): number {
   return -1;
 }
 
+// JS/TS/JSX 공통. 값(`true`/`null`)까지 넣은 건 키워드와 같은 무게로 읽히기
+// 때문이다. 식별자·함수명·타입명은 일부러 뺐다 — 거기까지 칠하면 화면 절반이
+// 색이 되어 #30이 걷어냈던 상태로 돌아간다.
+const JS_KEYWORDS = new Set([
+  "as",
+  "async",
+  "await",
+  "break",
+  "case",
+  "catch",
+  "class",
+  "const",
+  "continue",
+  "declare",
+  "default",
+  "delete",
+  "do",
+  "else",
+  "enum",
+  "export",
+  "extends",
+  "false",
+  "finally",
+  "for",
+  "from",
+  "function",
+  "get",
+  "if",
+  "implements",
+  "import",
+  "in",
+  "instanceof",
+  "interface",
+  "keyof",
+  "let",
+  "new",
+  "null",
+  "of",
+  "readonly",
+  "return",
+  "satisfies",
+  "set",
+  "static",
+  "super",
+  "switch",
+  "this",
+  "throw",
+  "true",
+  "try",
+  "type",
+  "typeof",
+  "undefined",
+  "var",
+  "void",
+  "while",
+  "yield",
+]);
+
+const WORD_RE = /[A-Za-z_$][\w$]*/y;
+const NUMBER_RE =
+  /(?:0[xXbBoO][\da-fA-F_]+|\d[\d_]*(?:\.[\d_]+)?(?:[eE][+-]?\d+)?)n?/y;
+// CSS 속성명 후보: `word-word :` 형태. 깊이만으로는 부족하다 —
+// `@media { a:hover { … } }`처럼 중첩되면 선택자도 깊이 1이라 `a`가 속성으로
+// 잡힌다. `:` 뒤를 훑어 `{`가 먼저 나오면 선택자로 보고 넘긴다
+// (`isDeclaration` 참고).
+const CSS_PROP_RE = /-{0,2}[a-zA-Z][\w-]*(?=\s*:)/y;
+// HTML 태그명: `<` 또는 `</` 바로 뒤.
+const HTML_TAG_RE = /\/?[a-zA-Z][\w:-]*/y;
+
+/**
+ * `:` 뒤가 선언(`color: red;`)인지 선택자(`a:hover {`)인지.
+ * `;`나 `}`가 먼저 오면 선언, `{`가 먼저 오면 선택자다.
+ */
+function isDeclaration(code: string, colonAt: number): boolean {
+  for (let i = colonAt + 1; i < code.length; i += 1) {
+    const c = code[i];
+    if (c === "{") {
+      return false;
+    }
+    if (c === ";" || c === "}") {
+      return true;
+    }
+  }
+  return true;
+}
+
+function matchAt(re: RegExp, code: string, i: number): string | null {
+  re.lastIndex = i;
+  const m = re.exec(code);
+  return m ? m[0] : null;
+}
+
 function highlightToHtml(code: string, lang: CodeLang): string {
   let out = "";
   let plainStart = 0;
   // HTML은 태그 안에서만 따옴표를 문자열로 본다 — 본문의 "don't" 같은
   // 아포스트로피가 문자열을 열어 뒤를 삼키는 걸 막는다.
   let inTag = lang !== "html";
+  let justOpenedTag = false;
+  let depth = 0;
 
   const flush = (end: number) => {
     if (end > plainStart) {
@@ -111,6 +207,7 @@ function highlightToHtml(code: string, lang: CodeLang): string {
 
     if (lang === "html" && (c === "<" || c === ">")) {
       inTag = c === "<";
+      justOpenedTag = inTag;
       i += 1;
       continue;
     }
@@ -121,6 +218,73 @@ function highlightToHtml(code: string, lang: CodeLang): string {
         emit("tok-s", i, end);
         i = end;
         continue;
+      }
+    }
+
+    if (lang === "html" && justOpenedTag) {
+      justOpenedTag = false;
+      const tag = matchAt(HTML_TAG_RE, code, i);
+      if (tag) {
+        emit("tok-k", i, i + tag.length);
+        i += tag.length;
+        continue;
+      }
+    }
+
+    if (lang === "js") {
+      const word = matchAt(WORD_RE, code, i);
+      if (word) {
+        if (JS_KEYWORDS.has(word)) {
+          emit("tok-k", i, i + word.length);
+        }
+        // 키워드가 아니어도 통째로 건너뛴다 — 식별자 안의 부분 문자열이
+        // 키워드로 잡히는 걸 막는다(`constant`의 `const` 등).
+        i += word.length;
+        continue;
+      }
+      const num = matchAt(NUMBER_RE, code, i);
+      if (num) {
+        emit("tok-n", i, i + num.length);
+        i += num.length;
+        continue;
+      }
+    }
+
+    if (lang === "css") {
+      if (c === "{") {
+        depth += 1;
+        i += 1;
+        continue;
+      }
+      if (c === "}") {
+        depth = Math.max(0, depth - 1);
+        i += 1;
+        continue;
+      }
+      if (c === "@") {
+        const at = matchAt(WORD_RE, code, i + 1);
+        if (at) {
+          emit("tok-k", i, i + 1 + at.length);
+          i += 1 + at.length;
+          continue;
+        }
+      }
+      if (depth > 0) {
+        const prop = matchAt(CSS_PROP_RE, code, i);
+        if (prop) {
+          const colonAt = code.indexOf(":", i + prop.length);
+          if (colonAt !== -1 && isDeclaration(code, colonAt)) {
+            emit("tok-k", i, i + prop.length);
+            i += prop.length;
+            continue;
+          }
+        }
+        const num = matchAt(NUMBER_RE, code, i);
+        if (num) {
+          emit("tok-n", i, i + num.length);
+          i += num.length;
+          continue;
+        }
       }
     }
 
