@@ -1,4 +1,4 @@
-import type { Question } from "./question.schema";
+import type { BundledQuestion } from "./question.schema";
 import questionsData from "./questions.generated.json";
 
 /**
@@ -10,27 +10,29 @@ import questionsData from "./questions.generated.json";
  * 서버 전용(.server.ts) — 정답·해설이 포함된 원본이므로 클라이언트 코드에서
  * import 금지. 클라이언트로는 `publicView()`를 거친 데이터만 나간다 (ADR 0005).
  */
-const ALL: readonly Question[] = Object.freeze(
-  questionsData as unknown as Question[],
+const ALL: readonly BundledQuestion[] = Object.freeze(
+  questionsData as unknown as BundledQuestion[],
 );
 
-export function getAllQuestions(): readonly Question[] {
+export function getAllQuestions(): readonly BundledQuestion[] {
   return ALL;
 }
 
 export function getQuestionsByCategory(
-  category: Question["category"],
-): readonly Question[] {
+  category: BundledQuestion["category"],
+): readonly BundledQuestion[] {
   return ALL.filter((q) => q.category === category);
 }
 
-const MAP: ReadonlyMap<string, Question> = new Map(ALL.map((q) => [q.id, q]));
+const MAP: ReadonlyMap<string, BundledQuestion> = new Map(
+  ALL.map((q) => [q.id, q]),
+);
 
 /** id → Question 인덱스. 모듈 초기화 시 1회 구성. */
-export function getQuestionMap(): ReadonlyMap<string, Question> {
+export function getQuestionMap(): ReadonlyMap<string, BundledQuestion> {
   return MAP;
 }
 
-export function getQuestionById(id: string): Question | undefined {
+export function getQuestionById(id: string): BundledQuestion | undefined {
   return MAP.get(id);
 }

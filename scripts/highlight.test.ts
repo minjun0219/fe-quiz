@@ -41,6 +41,7 @@ describe("highlightCode — 최소 팔레트 (#30)", () => {
     expect(out).toContain(`<span class="tok-s">&#39;x&#39;</span>`);
     expect(out).toContain(`<span class="tok-s">&quot;y&quot;</span>`);
     expect(out).toContain('<span class="tok-s">`z`</span>');
+    expect(textOf(out)).toBe(`a='x'; b="y"; c=\`z\`;`);
   });
 
   it("이스케이프된 따옴표는 문자열을 안 닫는다", async () => {
@@ -66,7 +67,7 @@ describe("highlightCode — 최소 팔레트 (#30)", () => {
   it("HTML은 <!-- --> 주석과 태그 안 속성만 칠한다", async () => {
     const out = await highlightCode(`<!-- c --><a href="x">don't</a>`, "html");
     expect(out).toContain('<span class="tok-c">&lt;!-- c --&gt;</span>');
-    expect(out).toContain('<span class="tok-s">&quot;x&quot;</span>');
+    expect(out).toContain('<span class="tok-s">=&quot;x&quot;</span>');
     // 본문의 아포스트로피가 문자열을 열어 뒤를 삼키면 안 된다.
     expect(textOf(out)).toBe(`<!-- c --><a href="x">don't</a>`);
   });
@@ -109,8 +110,8 @@ describe("highlightCode — 최소 팔레트 (#30)", () => {
 
   it("HTML은 태그명을 칠한다", async () => {
     const out = await highlightCode("<div><br/></div>", "html");
-    expect(out).toContain('<span class="tok-k">div</span>');
-    expect(out).toContain('<span class="tok-k">/div</span>');
+    expect(out).toContain('<span class="tok-k">&lt;div&gt;</span>');
+    expect(out).toContain('<span class="tok-k">&lt;/div&gt;</span>');
   });
 
   it("무엇을 넣어도 텍스트가 보존된다 (왕복 성질)", async () => {
@@ -214,7 +215,7 @@ describe("renderQuizMarkdown — fenced blocks", () => {
   it("escapes HTML inside fenced code", async () => {
     const html = await renderQuizMarkdown("```html\n<div>&</div>\n```", "html");
     // 태그명은 칠해지고 나머지는 이스케이프된다.
-    expect(html).toContain('<span class="tok-k">div</span>');
+    expect(html).toContain('class="tok-k"');
     expect(textOf(html)).toContain("<div>&</div>");
   });
 

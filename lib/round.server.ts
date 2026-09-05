@@ -1,6 +1,9 @@
-import { highlightCode, renderQuizMarkdown } from "./highlight";
 import { DEFAULT_LEVEL, type Level } from "./levels";
-import type { PublicChoice, PublicQuestion, Question } from "./question.schema";
+import type {
+  BundledQuestion,
+  PublicChoice,
+  PublicQuestion,
+} from "./question.schema";
 import { getQuestionMap, getQuestionsByCategory } from "./questions.server";
 import { pickByLevel, ROUND_SIZE, shuffle } from "./round-picker";
 
@@ -10,33 +13,26 @@ export {
   TARGET_MIN_PER_CATEGORY,
 } from "./round-picker";
 
-export async function publicView(q: Question): Promise<PublicQuestion> {
+/**
+ * 클라이언트로 나갈 모양으로 좁힌다. HTML은 번들에 이미 렌더돼 있어서
+ * 여기서는 고르기만 한다 — 예전에는 문항마다 마크다운·하이라이팅을 다시 돌렸다.
+ */
+export function publicView(q: BundledQuestion): PublicQuestion {
   const {
     answer: _answer,
     explanation: _explanation,
+    explanation_html: _explanationHtml,
     references: _references,
     choices,
     code,
+    code_html,
     ...rest
   } = q;
-  const [renderedChoices, question_html, code_html] = await Promise.all([
-    Promise.all(
-      choices.map(
-        async (c): Promise<PublicChoice> => ({
-          ...c,
-          text_html: await renderQuizMarkdown(c.text, q.category),
-        }),
-      ),
-    ),
-    renderQuizMarkdown(q.question, q.category),
-    code !== undefined
-      ? highlightCode(code, q.category)
-      : Promise.resolve(undefined),
-  ]);
   return {
     ...rest,
-    choices: renderedChoices,
-    question_html,
+    choices: choices.map(
+      (c): PublicChoice => ({ ...c, text_html: c.text_html }),
+    ),
     ...(code !== undefined ? { code, code_html } : {}),
   };
 }
@@ -59,7 +55,7 @@ export async function pickRoundQuestions(
   level: Level = DEFAULT_LEVEL,
 ): Promise<PublicQuestion[]> {
   const picked = pickByLevel(level, count, getQuestionsByCategory);
-  const views = await Promise.all(picked.map(publicView));
+  const views = picked.map(publicView);
   return views.map((q) => ({ ...q, choices: shuffle(q.choices) }));
 }
 
@@ -75,12 +71,12 @@ export async function pickRoundQuestionsByIds(
   ids: readonly string[],
 ): Promise<PublicQuestion[]> {
   const map = getQuestionMap();
-  const found: Question[] = [];
+  const found: BundledQuestion[] = [];
   for (const id of ids) {
     const q = map.get(id);
     if (q) {
       found.push(q);
     }
   }
-  return Promise.all(found.map(publicView));
+  return found.map(publicView);
 }

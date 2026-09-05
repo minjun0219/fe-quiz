@@ -19,18 +19,57 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { loadAllQuestions } from "../lib/load-questions";
+import type { BundledQuestion } from "../lib/question.schema";
+import { highlightCode, renderQuizMarkdown } from "./highlight";
 
 const ROOT = join(process.cwd(), "content/questions");
 const OUT_PATH = join(process.cwd(), "lib/questions.generated.json");
 
-function buildJson(): string {
+/**
+ * 마크다운·하이라이팅을 여기서 끝내 번들에 굽는다.
+ *
+ * 런타임에 하면 라운드마다 10문항 × 2회(출제·채점) 같은 일을 다시 한다.
+ * 빌드로 옮기면 그 비용이 0이 되고, Prism이 워커 번들에 안 들어간다 —
+ * `scripts/highlight.ts`는 여기서만 import된다(`lib/`가 아니라 `scripts/`에
+ * 두는 이유).
+ */
+async function renderAll(): Promise<BundledQuestion[]> {
   const all = loadAllQuestions(ROOT);
+  return Promise.all(
+    all.map(async (q): Promise<BundledQuestion> => {
+      const [question_html, explanation_html, code_html, choices] =
+        await Promise.all([
+          renderQuizMarkdown(q.question, q.category),
+          renderQuizMarkdown(q.explanation, q.category),
+          q.code === undefined
+            ? Promise.resolve(undefined)
+            : highlightCode(q.code, q.category),
+          Promise.all(
+            q.choices.map(async (c) => ({
+              ...c,
+              text_html: await renderQuizMarkdown(c.text, q.category),
+            })),
+          ),
+        ]);
+      return {
+        ...q,
+        choices,
+        question_html,
+        explanation_html,
+        ...(code_html === undefined ? {} : { code_html }),
+      };
+    }),
+  );
+}
+
+async function buildJson(): Promise<string> {
+  const all = await renderAll();
   // indent 1: 문제 추가/수정 PR에서 diff가 국소화되도록 줄 단위 직렬화.
   return `${JSON.stringify(all, null, 1)}\n`;
 }
 
-function main() {
-  const expected = buildJson();
+async function main() {
+  const expected = await buildJson();
   const checkMode = process.argv.includes("--check");
 
   if (checkMode) {
@@ -57,4 +96,4 @@ function main() {
   console.log(`✓ wrote ${OUT_PATH}`);
 }
 
-main();
+await main();

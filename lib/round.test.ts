@@ -18,15 +18,6 @@ vi.mock("./questions.server", () => {
   };
 });
 
-// Stub the renderer so these tests stay focused on round-picker / publicView
-// shape, not on HTML output. The real `lib/highlight` is pure-string work
-// now (no WASM), but mocking still keeps the assertions resilient to future
-// renderer tweaks (e.g. wrapping classes, escaping rules).
-vi.mock("./highlight", () => ({
-  highlightCode: async (code: string) => `<pre>${code}</pre>`,
-  renderQuizMarkdown: async (s: string) => s,
-}));
-
 import type { Question } from "./question.schema";
 import * as questionsMod from "./questions.server";
 import {
