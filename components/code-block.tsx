@@ -3,7 +3,7 @@ import { useState } from "react";
 type Size = "sm" | "xs";
 
 const SIZE_CLASSES: Record<Size, string> = {
-  sm: "rounded-xl p-4 text-[13px]",
+  sm: "rounded-xl p-4 text-xs",
   xs: "rounded-lg p-3 text-xs",
 };
 
