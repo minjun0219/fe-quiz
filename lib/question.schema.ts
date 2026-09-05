@@ -178,3 +178,29 @@ export type PublicQuestion = Omit<
   question_html?: string;
   code_html?: string;
 };
+
+/**
+ * `lib/questions.generated.json`에 실제로 들어 있는 모양 — YAML에서 온
+ * `Question`에 **빌드 타임에 렌더한 HTML**이 얹혀 있다.
+ *
+ * 런타임은 이 문자열을 그대로 내보낸다. 마크다운·하이라이팅을 요청마다 다시
+ * 하지 않으려는 것이고(라운드마다 10문항 × 2회 돌던 일이다), 덕분에 Prism이
+ * 워커 번들에 안 들어간다 — 렌더는 `scripts/highlight.ts`가 빌드 때만 한다.
+ *
+ * 필드가 optional인 이유는 생성 시점 문제가 아니라 **배포와 번들 재생성이
+ * 어긋나는 창** 때문이다. 옛 번들이 실린 채 새 코드가 뜨면 이 값들이 없는데,
+ * 그때도 원문(`question`/`code`)으로 폴백해 화면은 뜨는 게 낫다.
+ * 신선도 자체는 `pnpm questions:bundle:check`가 막는다.
+ */
+// `Question`은 single_choice/multi_choice 판별 유니온이라 그냥 `Omit`을 씌우면
+// 유니온이 뭉개진다. 조건부 타입으로 분배해 각 갈래를 따로 확장한다.
+type WithRenderedHtml<Q> = Q extends { choices: (infer C)[] }
+  ? Omit<Q, "choices"> & {
+      question_html?: string;
+      explanation_html?: string;
+      code_html?: string;
+      choices: (C & { text_html?: string })[];
+    }
+  : never;
+
+export type BundledQuestion = WithRenderedHtml<Question>;

@@ -1,5 +1,4 @@
-import { highlightCode, renderQuizMarkdown } from "./highlight";
-import type { Category, Question } from "./question.schema";
+import type { BundledQuestion, Category } from "./question.schema";
 import type {
   CategoryScore,
   QuizQuestionResult,
@@ -25,12 +24,12 @@ export interface GradedRound {
  */
 export async function gradeRound(
   req: QuizSubmitRequest,
-  lookup: (id: string) => Question | undefined,
+  lookup: (id: string) => BundledQuestion | undefined,
   opts: { withHtml?: boolean } = {},
 ): Promise<GradedRound> {
   // Resolve all ids upfront so an unknown id 400s before we run any HTML
   // render passes, and so the per-question loop doesn't repeat the lookup.
-  const questions: Question[] = req.question_ids.map((id) => {
+  const questions: BundledQuestion[] = req.question_ids.map((id) => {
     const q = lookup(id);
     if (!q) {
       throw new GradingError(`unknown question_id "${id}"`);
@@ -38,28 +37,19 @@ export async function gradeRound(
     return q;
   });
 
-  // HTML rendering is opt-in: only the submit route renders the result UI
-  // and needs the `*_html` bundle (escaped <pre><code>, inline-code spans,
-  // <strong>). /api/quiz/feedback (LLM prompt) and /api/share (id+score
-  // storage) never read these fields, so skipping the per-question render
-  // pass cuts a chunk of string work + 4 awaits per question off the path.
+  // HTML은 번들에 이미 렌더돼 있다(`scripts/build-questions-json.ts`).
+  // 예전에는 여기서 문항마다 마크다운·하이라이팅을 돌렸는데, 라운드마다
+  // 출제·채점 두 번 같은 일을 반복했다. 지금은 고르기만 한다.
+  //
+  // `withHtml` 분기는 남긴다 — /api/quiz/feedback(LLM 프롬프트)과
+  // /api/share(id+점수 저장)는 이 필드를 안 읽어서, 굳이 객체를 만들 이유가 없다.
   const htmlBundle = opts.withHtml
-    ? await Promise.all(
-        questions.map(async (q) => {
-          const [codeHtml, questionHtml, explanationHtml, choiceHtmls] =
-            await Promise.all([
-              q.code
-                ? highlightCode(q.code, q.category)
-                : Promise.resolve(undefined),
-              renderQuizMarkdown(q.question, q.category),
-              renderQuizMarkdown(q.explanation, q.category),
-              Promise.all(
-                q.choices.map((c) => renderQuizMarkdown(c.text, q.category)),
-              ),
-            ]);
-          return { codeHtml, questionHtml, explanationHtml, choiceHtmls };
-        }),
-      )
+    ? questions.map((q) => ({
+        codeHtml: q.code_html,
+        questionHtml: q.question_html,
+        explanationHtml: q.explanation_html,
+        choiceHtmls: q.choices.map((c) => c.text_html),
+      }))
     : null;
 
   const per_question: QuizQuestionResult[] = [];
@@ -130,7 +120,7 @@ export async function gradeRound(
 }
 
 function checkAnswer(
-  q: Question,
+  q: BundledQuestion,
   yours: SubmittedAnswer,
   choiceIds: Set<string>,
   qid: string,
@@ -182,17 +172,17 @@ function checkAnswer(
 }
 
 function reorderChoices(
-  choices: Question["choices"],
+  choices: BundledQuestion["choices"],
   displayedOrder: string[],
   qid: string,
-): Question["choices"] {
+): BundledQuestion["choices"] {
   if (displayedOrder.length !== choices.length) {
     throw new GradingError(
       `displayed_choice_ids for "${qid}" has ${displayedOrder.length} ids; expected ${choices.length}`,
     );
   }
   const byId = new Map(choices.map((c) => [c.id, c]));
-  const out: Question["choices"] = [];
+  const out: BundledQuestion["choices"] = [];
   const seen = new Set<string>();
   for (const id of displayedOrder) {
     if (seen.has(id)) {
