@@ -83,10 +83,17 @@ function PageviewTracker() {
     if (!import.meta.env.VITE_POSTHOG_KEY) {
       return;
     }
-    const url = location.search
+    // `$current_url`은 반드시 절대 URL이어야 한다. 상대 경로를 넣으면 서버
+    // 인제스트가 스크롤 뎁스 히트맵을 뽑을 때 `new URL($current_url)`이 던져
+    // `invalid_heatmap_data` 경고로 히트맵 커버리지가 통째로 버려진다 (웹
+    // 애널리틱스의 도메인/경로 분해도 깨짐). 경로·쿼리는 라우트의 단일 출처인
+    // RR `location`에서 뽑되 origin을 붙여 절대화한다.
+    const path = location.search
       ? `${location.pathname}${location.search}`
       : location.pathname;
-    posthog.capture("$pageview", { $current_url: url });
+    posthog.capture("$pageview", {
+      $current_url: `${window.location.origin}${path}`,
+    });
   }, [location.pathname, location.search]);
 
   return null;
