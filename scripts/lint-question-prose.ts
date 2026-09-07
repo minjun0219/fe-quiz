@@ -4,8 +4,9 @@
  * Why a separate pass (not the Zod schema in `lib/question.schema.ts`):
  *   1) the YAML parser strips comments, but we need them for the
  *      `# fmt: off-prose` opt-out marker;
- *   2) `loadAllQuestions` is reused at request time in `lib/round.ts` — the
- *      loader stays pure; this lint runs only from `scripts/check-questions.ts`.
+ *   2) `loadAllQuestions` is shared by every build-time script (bundle,
+ *      index, round check) — the loader stays pure; this lint runs only from
+ *      `scripts/check-questions.ts`.
  *
  * Heuristic: in `question:` / `choices[].text` / `explanation:` values, strip
  * everything already wrapped in inline backticks or fenced ``` blocks, then

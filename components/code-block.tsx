@@ -17,8 +17,9 @@ export function CodeBlock({
   code?: string;
   /**
    * Pre-rendered code HTML, expected to be exactly the shape produced by
-   * `highlightCode` in `lib/highlight.ts` (HTML-escaped `<pre><code>…</code></pre>`
-   * from the server-only YAML seed pipeline). Injected as-is via
+   * `highlightCode` in `scripts/highlight.ts` (HTML-escaped `<pre><code>…</code></pre>`,
+   * baked into `lib/questions.generated.json` at build time from the YAML seed —
+   * never request-derived). Injected as-is via
    * `dangerouslySetInnerHTML` — NEVER pass user-derived or external HTML.
    */
   highlightedCodeHtml?: string;
@@ -93,7 +94,7 @@ export function CodeBlock({
         {highlightedCodeHtml ? (
           <div
             className="quiz-code-block pr-8"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: prop is contracted to be `highlightCode` output (HTML-escaped <pre><code>) from server-only `lib/highlight.ts` — see `highlightedCodeHtml` JSDoc.
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: prop is contracted to be `highlightCode` output (HTML-escaped <pre><code>) baked into the question bundle at build time by `scripts/highlight.ts` — never request-derived. See `highlightedCodeHtml` JSDoc.
             dangerouslySetInnerHTML={{ __html: highlightedCodeHtml }}
           />
         ) : (

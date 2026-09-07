@@ -82,7 +82,7 @@ export interface QuizQuestionResult {
   /** Server-rendered HTML for `question` with inline backtick spans. */
   question_html?: string;
   code?: string;
-  /** Server-rendered Shiki HTML for `code`. */
+  /** Highlighted HTML for `code`, pre-rendered at build time. */
   code_html?: string;
   /** Choices include optional `text_html` with inline backtick spans applied. */
   choices: PublicChoice[];

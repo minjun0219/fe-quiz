@@ -158,10 +158,10 @@ export type Question = z.infer<typeof QuestionSchema>;
  * are intentionally omitted so the correct answer (and any topic hints from
  * MDN/spec links) never reaches the browser bundle before grading.
  *
- * Lives here (not in `lib/round.ts`) so client components can `import type`
+ * Lives here (not in `lib/round.server.ts`) so client components can `import type`
  * this without crossing a `server-only` module boundary.
  *
- * `code_html` is server-rendered Shiki output for `code`; `question_html` and
+ * `code_html` is build-time highlighter output for `code`; `question_html` and
  * each choice's `text_html` are HTML-escaped strings with single-backtick
  * runs wrapped in `<code class="inline-code">`. Clients render via
  * `dangerouslySetInnerHTML` and fall back to the raw text when absent.
