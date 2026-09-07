@@ -62,7 +62,7 @@ export function shuffle<T>(input: readonly T[]): T[] {
  * no edits here.
  *
  * Returns the raw `Question[]`; the caller decides whether to map through
- * `publicView` (server-only — pulls in Shiki) and shuffle choices.
+ * `publicView` (server-only) and shuffle choices.
  */
 export function pickStratified(
   roundSize: number,

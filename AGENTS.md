@@ -37,11 +37,13 @@ ESLint·Prettier 없음 — lint/format은 `biome.json`이 단일 출처(single 
   - `lib/categories.ts` (카테고리 목록 + id prefix)
   - `lib/levels.ts` (난이도 3단계)
   - `lib/round-picker.ts` (`ROUND_SIZE = 10`)
-- **`.server.ts` 경계**: `lib/{questions,round,share-store,rate-limit,logger,posthog-server,og}.server.ts`는 서버 전용. 클라이언트 컴포넌트에서 절대 import 금지 — RR 빌드가 에러로 잡아줘요.
+- **`.server.ts` 경계**: `lib/{questions,round,share-store,rate-limit,logger,posthog-server,og,site-url}.server.ts`는 서버 전용. 클라이언트 컴포넌트에서 절대 import 금지 — RR 빌드가 에러로 잡아줘요.
 - **환경 분기는 `APP_ENV`(wrangler vars)이지 `NODE_ENV`가 아님** — 로컬/preview/production이 wrangler env로 갈리고, D1 binding·`SITE_URL`도 env별로 달라요. `wrangler.jsonc` 참고.
 - **클라이언트에 정답 노출 금지**: `PublicQuestion` 타입에서 `answer`·`explanation`을 의도적으로 제거. 채점은 서버사이드. `lib/questions.generated.json`(정답 포함 원본)을 클라이언트 코드에서 직접 import하는 것도 같은 위반이에요.
 - **선택적(optional) 연동은 env 미설정 시 no-op / fail-open**: Upstash rate limit, PostHog(서버 + 클라이언트), Anthropic. 이걸 hard requirement로 바꾸지 마세요.
 - **YAML 콘텐츠는 스키마 검증 강제**: `content/questions/` 아래를 손댔으면 `pnpm questions:check` + **`pnpm questions:bundle`**(런타임 번들 재생성 — 잊으면 `questions:bundle:check`가 빌드를 막아요) 실행. 산문(prose) vs 코드 스타일은 `content/AGENTS.md`에 정리.
+- **번들에는 렌더까지 끝난 HTML이 들어있어요**: `pnpm questions:bundle`이 `scripts/highlight.ts`로 마크다운·하이라이팅을 미리 렌더해 굽습니다(런타임 렌더 0, Prism은 devDependency라 워커 번들엔 안 들어가요). 그래서 **하이라이터를 고쳐도 번들을 다시 만들어야** 해요 — YAML을 안 건드렸어도. 안 하면 `questions:bundle:check`가 막아요.
+- **e2e는 배포본을 칩니다**: `pnpm test:e2e`는 `E2E_BASE_URL`이 없으면 로컬 서버를 띄워 안전하지만, 값을 주면 그 배포를 직접 검증해요. **어떤 프리뷰냐가 갈라요** — Workers Builds가 PR마다 만드는 자동 프리뷰(`https://<version-id>-fe-quiz.….workers.dev`, CI가 잡는 대상)는 production 빌드라 **프로덕션 D1에 씁니다**(아래 마이그레이션 항목과 같은 이유). `pnpm deploy:preview`로 올린 `fe-quiz-preview.minjun.workers.dev`는 전용 `fe-quiz-shares-preview`에 붙어 안전해요. CI는 `[e2e-cleanup]` 마커로 잡 끝에 지웁니다.
 - **마이그레이션은 코드보다 먼저, 별도 PR로** — Workers Builds가 PR마다 만드는 프리뷰는 production 빌드라 **프로덕션 D1에 붙어요**(Cloudflare가 Workers의 production/non-production 바인딩 분리를 지원하지 않음 — `fe-quiz-shares-preview`가 있어도 프리뷰는 안 씁니다). 그래서 새 컬럼을 쓰는 코드는 PR이 열리는 순간 프로덕션 스키마가 이미 준비돼 있어야 해요. `.sql`만 담은 PR을 먼저 머지하고(→ `migrate.yml`이 prod 적용), 그 다음 코드 PR을 올립니다. 섞으면 `schema-guard.yml`이 막아요. 두 머지 사이에는 옛 코드가 새 스키마 위에서 도니 **마이그레이션은 항상 additive**(`ADD COLUMN`/`CREATE INDEX`)여야 하고, `DROP`/rename은 축소 단계로 나눠요.
 - **OG 이미지(satori) 함정**: 공용 조각은 `lib/og.server.ts`, 카드는 `app/routes/{share-og,home-og}.ts`. 자식 2개 이상인 노드에 `display: flex`가 필수고 태그 사이 공백도 자식으로 세요 — `compactHtml()`을 우회하지 마세요. 폰트는 woff(woff2 미지원). **루트에 `width: 100%`를 쓰면 캔버스가 아니라 콘텐츠 폭으로 줄어들고(오른쪽에 흰 띠), `flex: 1` 단축은 해석되지 않아요** — `OG_WIDTH`/`OG_HEIGHT` px과 `flex-grow`를 쓰세요. 깨져도 200에 이미지가 나오니 상태코드 말고 눈으로 확인.
 

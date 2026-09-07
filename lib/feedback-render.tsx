@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
  * in <code class="inline-code">.
  *
  * Mirrors the single-line / single-backtick rules from `renderInlineSegment`
- * in `lib/highlight.ts` (which is server-only and runs HTML-escape itself),
+ * in `scripts/highlight.ts` (a build-time script that runs HTML-escape itself),
  * but emits React children so it works from both client and server
  * components and lets React handle escaping. We only handle inline backticks
  * — the feedback prompt forbids any other markdown.

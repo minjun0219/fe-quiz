@@ -1,7 +1,7 @@
 # 퀴즈 콘텐츠 — 에이전트 가이드
 
 `content/questions/**/*.yaml`을 작성·수정할 때 적용되는 규칙이에요. 렌더는
-`lib/highlight.ts`의 `renderQuizMarkdown`이 담당하고, 여기 정리된 컨벤션은
+`scripts/highlight.ts`의 `renderQuizMarkdown`이 빌드 타임에 담당하고, 여기 정리된 컨벤션은
 `pnpm questions:check`(prebuild에 연결돼 있음)가 빌드 타임에 강제해요.
 
 사람용 맥락(톤·기여자 온보딩·예시)은 `content/README.md` 참고.
@@ -41,9 +41,9 @@ explanation: |
 - 한 줄이라도 ~60자를 넘겨 모바일에서 임의 줄바꿈이 발생할 때
 - JSX 트리, 멀티라인 객체/타입, template literal
 
-언어 태그 권장값: `ts`, `tsx`, `js`, `jsx`, `html`, `css`. 현재 렌더러는
-info-string을 파싱만 하고 시각적 렌더링엔 쓰지 않지만, syntax highlighting
-도입(#30) 시 즉시 적용되도록 **태그는 반드시 붙여 주세요**.
+언어 태그 권장값: `ts`, `tsx`, `js`, `jsx`, `html`, `css`. info-string이 하이라이팅
+언어를 정하고, 없으면 문항 카테고리로 떨어져요 — **태그를 붙여야** 의도한 문법으로
+칠해집니다.
 
 ```yaml
 choices:
@@ -69,7 +69,7 @@ YAML 블록 스칼라(block scalar) 안에서도 펜스는 인식돼요. 들여�
 
 - 코드 토큰을 굵게 감싸지 마세요. 코드는 백틱.
 - 지수 연산자 `**`와 인접한 굵게 표기는 양옆에 공백을 둬요. `BOLD_RE` flanking
-  규칙(`lib/highlight.ts:39`)이 `Math.PI * shape.r ** 2` 같은 패턴을 굵게로
+  규칙(`scripts/highlight.ts`의 `BOLD_RE`)이 `Math.PI * shape.r ** 2` 같은 패턴을 굵게로
   잘못 잡지는 않지만, 그런 코드는 펜스로 분리하는 게 안전.
 
 ## `code:` 필드
@@ -143,7 +143,9 @@ choices:
 
 ## 참고
 
-- 렌더 파이프라인: `lib/highlight.ts`의 `renderQuizMarkdown`
-- 인라인 텍스트 호출처: `lib/round.ts:26`, `lib/round.ts:30`, `lib/grading.ts:54`
+- 렌더 파이프라인: `scripts/highlight.ts`의 `renderQuizMarkdown` (빌드 타임)
+- 유일한 호출처: `scripts/build-questions-json.ts` — 렌더 결과가
+  `lib/questions.generated.json`에 굽히고, 런타임(`lib/round.server.ts`·
+  `lib/grading.ts`)은 그 HTML을 읽기만 해요
 - 린트 룰: `scripts/lint-question-prose.ts`
-- 굵게 flanking 규칙: `lib/highlight.ts:39` (`BOLD_RE`)
+- 굵게 flanking 규칙: `scripts/highlight.ts`의 `BOLD_RE`
