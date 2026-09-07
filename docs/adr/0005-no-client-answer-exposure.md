@@ -2,7 +2,7 @@
 
 - 상태: Accepted
 - 결정일: 초기 (프로젝트 시작 시)
-- 관련: `lib/question.schema.ts` (`PublicQuestion`), `lib/round.ts` (`publicView`), `app/api/quiz/submit/`, [docs/DECISIONS.md](../DECISIONS.md)
+- 관련: `lib/question.schema.ts` (`PublicQuestion`), `lib/round.server.ts` (`publicView`), `app/api/quiz/submit/`, [docs/DECISIONS.md](../DECISIONS.md)
 
 ## 맥락
 
@@ -36,7 +36,7 @@ export type PublicQuestion = Omit<
 서버 렌더링된 `text_html`만 추가. **`id`는 반드시 남아야** 채점 라우트가
 사용자가 어떤 선택지를 골랐는지 식별할 수 있어요.)
 
-- 변환은 `lib/round.ts`의 `publicView()` 한 곳에서만 수행. 채점은 서버
+- 변환은 `lib/round.server.ts`의 `publicView()` 한 곳에서만 수행. 채점은 서버
   사이드(`POST /api/quiz/submit`)에서 원본 `Question`을 들고 수행.
 - `PublicQuestion` 타입은 `lib/question.schema.ts`에 살아요 — 클라이언트
   컴포넌트가 `import type`으로 가져갈 때 `server-only` 모듈 경계를 안 건드림.
