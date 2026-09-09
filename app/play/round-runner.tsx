@@ -8,6 +8,7 @@ import type {
   QuizSubmitResponse,
   SubmittedAnswer,
 } from "@/lib/quiz-submit.schema";
+import HintBuddy from "./hint-buddy";
 import Result from "./result";
 
 interface Props {
@@ -117,6 +118,12 @@ export default function RoundRunner({ questions, level, replay }: Props) {
   // 퍼널이 index당 1회만 세도록 거를 수 있게 한다.
   const seenRef = useRef<Set<number>>(new Set());
   const answeredRef = useRef<Set<number>>(new Set());
+  // 문항별 선택 번복 횟수. 힌트 타이밍 신호로만 쓴다 — 답을 여러 번 갈아
+  // 치우는 건 헤매고 있다는 꽤 좋은 신호다.
+  const changeCountsRef = useRef<Map<number, number>>(new Map());
+  // 현재 문항이 재방문인지. seenRef는 effect에서 갱신되므로 렌더 중에 직접
+  // 읽으면 같은 문항 안에서 값이 뒤집힌다(첫 렌더 false → 이후 true).
+  const [isRevisit, setIsRevisit] = useState(false);
 
   // 현재 문항은 URL(`?q=`)이 단일 출처다. 컴포넌트 state로 두면 브라우저
   // 뒤로가기가 /play 자체를 벗어나 라운드가 통째로 날아간다 — 문제 세트가
@@ -173,8 +180,9 @@ export default function RoundRunner({ questions, level, replay }: Props) {
     }
     const q = questions[index];
     questionViewedAtRef.current = Date.now();
-    const isRevisit = seenRef.current.has(index);
+    const revisited = seenRef.current.has(index);
     seenRef.current.add(index);
+    setIsRevisit(revisited);
     track("question_viewed", {
       level,
       index,
@@ -182,7 +190,7 @@ export default function RoundRunner({ questions, level, replay }: Props) {
       category: q.category,
       difficulty: q.difficulty,
       question_type: q.type,
-      is_revisit: isRevisit,
+      is_revisit: revisited,
     });
   }, [questions, index, level]);
 
@@ -279,6 +287,10 @@ export default function RoundRunner({ questions, level, replay }: Props) {
   const radioGroupName = `${groupNameBase}-${current.id}`;
 
   function toggleChoice(choiceId: string) {
+    changeCountsRef.current.set(
+      index,
+      (changeCountsRef.current.get(index) ?? 0) + 1,
+    );
     setAnswers((prev) => {
       const next = prev.slice();
       if (current.type === "multi_choice") {
@@ -470,6 +482,14 @@ export default function RoundRunner({ questions, level, replay }: Props) {
           {isLast ? "결과 보기" : "다음 →"}
         </button>
       </div>
+
+      <HintBuddy
+        questionIds={questions.map((q) => q.id)}
+        answers={answers.map(normalize)}
+        index={index}
+        isRevisit={isRevisit}
+        changeCount={changeCountsRef.current.get(index) ?? 0}
+      />
     </main>
   );
 }
