@@ -22,4 +22,6 @@ answer: b
 explanation: |
   동기 코드(1, 4)가 먼저 → 마이크로태스크(`Promise.then`의 3) → 매크로태스크(`setTimeout`의 2) 순서로 실행돼요.
   마이크로태스크 큐는 매크로태스크 하나 처리 사이마다 전부 비워지기 때문에, `setTimeout`보다 `Promise.then`이 항상 먼저 도착해요.
+hint: |
+  동기 코드가 먼저 전부 돌고 난 뒤가 진짜 문제예요. `setTimeout`과 `Promise.then`이 각각 어느 큐로 들어가고, 그 두 큐가 언제 비워지는지 떠올려 보세요.
 tags: [ event-loop, async, microtask ]
