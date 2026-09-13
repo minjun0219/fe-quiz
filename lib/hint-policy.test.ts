@@ -6,9 +6,6 @@ function input(over: Partial<NudgeInput> = {}): NudgeInput {
     changeCount: 0,
     isRevisit: false,
     difficulty: "medium",
-    answered: 0,
-    correct: 0,
-    categoryWrong: 0,
     ...over,
   };
 }
@@ -24,32 +21,9 @@ describe("nudgeThresholdMs", () => {
 
   it("재방문은 다른 어떤 조정보다 우선한다", () => {
     const t = nudgeThresholdMs(
-      input({ isRevisit: true, difficulty: "hard", answered: 5, correct: 5 }),
+      input({ isRevisit: true, difficulty: "hard", changeCount: 9 }),
     );
     expect(t).toBe(0);
-  });
-
-  it("같은 카테고리에서 이미 틀렸으면 앞당긴다", () => {
-    expect(nudgeThresholdMs(input({ categoryWrong: 1 }))).toBe(20_000);
-  });
-
-  it("잘 가고 있으면 미룬다", () => {
-    expect(nudgeThresholdMs(input({ answered: 5, correct: 5 }))).toBe(60_000);
-  });
-
-  it("표본이 3문항 미만이면 잘한다고 보지 않는다", () => {
-    expect(nudgeThresholdMs(input({ answered: 2, correct: 2 }))).toBe(35_000);
-  });
-
-  it("정답률 80% 미만이면 잘한다고 보지 않는다", () => {
-    expect(nudgeThresholdMs(input({ answered: 5, correct: 3 }))).toBe(35_000);
-  });
-
-  it("카테고리 신호가 정답률보다 우선한다", () => {
-    const t = nudgeThresholdMs(
-      input({ answered: 5, correct: 4, categoryWrong: 1 }),
-    );
-    expect(t).toBe(20_000);
   });
 
   it("hard는 원래 오래 걸리므로 더 기다린다", () => {
@@ -60,13 +34,23 @@ describe("nudgeThresholdMs", () => {
     expect(nudgeThresholdMs(input({ changeCount: 3 }))).toBe(25_000);
   });
 
+  it("번복 2회까지는 고민으로 보지 않는다", () => {
+    expect(nudgeThresholdMs(input({ changeCount: 2 }))).toBe(35_000);
+  });
+
+  it("hard에서 번복하면 두 조정이 상쇄된다", () => {
+    expect(
+      nudgeThresholdMs(input({ difficulty: "hard", changeCount: 3 })),
+    ).toBe(35_000);
+  });
+
   it("신호가 겹쳐도 바닥 아래로는 안 내려간다", () => {
-    const t = nudgeThresholdMs(input({ categoryWrong: 2, changeCount: 9 }));
-    expect(t).toBe(10_000);
+    const t = nudgeThresholdMs(input({ changeCount: 99 }));
     expect(t).toBeGreaterThanOrEqual(8_000);
   });
 
-  it("답을 하나도 안 한 상태에서 0으로 나누지 않는다", () => {
-    expect(nudgeThresholdMs(input({ answered: 0, correct: 0 }))).toBe(35_000);
+  it("클라이언트가 아는 값만 받는다 — 성적은 입력이 아니다", () => {
+    const keys = Object.keys(input()).sort();
+    expect(keys).toEqual(["changeCount", "difficulty", "isRevisit"]);
   });
 });

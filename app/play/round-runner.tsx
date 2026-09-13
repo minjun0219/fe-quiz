@@ -494,8 +494,7 @@ export default function RoundRunner({ questions, level, replay }: Props) {
 
       {HINT_BUDDY_ENABLED && (
         <HintBuddy
-          questionIds={questions.map((q) => q.id)}
-          answers={answers.map(normalize)}
+          questionId={current.id}
           index={index}
           isRevisit={isRevisit}
           changeCount={changeCountsRef.current.get(index) ?? 0}

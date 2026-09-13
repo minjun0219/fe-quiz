@@ -1,4 +1,3 @@
-import { GradingError, gradeRound } from "@/lib/grading";
 import { HintRequest, type HintResponse } from "@/lib/hint.schema";
 import { nudgeThresholdMs } from "@/lib/hint-policy";
 import { getQuestionMap } from "@/lib/questions.server";
@@ -35,45 +34,16 @@ export async function action({ request }: Route.ActionArgs) {
       { status: 400 },
     );
   }
-  const { question_ids, answers, index } = parsed.data;
 
-  const lookup = getQuestionMap();
-  let graded: Awaited<ReturnType<typeof gradeRound>>;
-  try {
-    graded = await gradeRound({ question_ids, answers }, (id) =>
-      lookup.get(id),
-    );
-  } catch (err) {
-    if (err instanceof GradingError) {
-      return Response.json({ error: err.message }, { status: 400 });
-    }
-    throw err;
-  }
-
-  // gradeRound가 통과했으면 모든 id가 풀에 있다.
-  const current = lookup.get(question_ids[index]);
+  const current = getQuestionMap().get(parsed.data.question_id);
   if (!current) {
     return Response.json({ error: "unknown question" }, { status: 400 });
   }
 
-  // 채점 결과는 여기서 신호로만 소비되고 응답으로는 한 글자도 나가지 않는다.
-  // 현재 문항은 빼고 센다 — 지금 풀고 있는 문항의 정답 여부로 힌트 타이밍을
-  // 정하면 그게 곧 "지금 고른 게 틀렸다"는 통보다.
-  let answered = 0;
-  let correct = 0;
-  let categoryWrong = 0;
-  graded.per_question.forEach((row, i) => {
-    if (i === index || answers[i] === null) {
-      return;
-    }
-    answered += 1;
-    if (row.is_correct) {
-      correct += 1;
-    } else if (row.category === current.category) {
-      categoryWrong += 1;
-    }
-  });
-
+  // 임계값은 요청자가 스스로 계산할 수 있는 값으로만 정한다 — 난이도는
+  // 라운드 페이로드에 이미 있고 번복·재방문은 클라이언트가 보낸 것이다.
+  // 서버만 아는 성적을 섞으면 이 숫자가 곧 앞 문항의 채점 결과가 된다.
+  //
   // 힌트가 없는 문항에서 뱃지를 띄우면 눌렀을 때 빈손이다. 조용히 있는다.
   const nudge_at_ms =
     current.hint === undefined
@@ -82,9 +52,6 @@ export async function action({ request }: Route.ActionArgs) {
           changeCount: parsed.data.change_count,
           isRevisit: parsed.data.is_revisit,
           difficulty: current.difficulty,
-          answered,
-          correct,
-          categoryWrong,
         });
 
   const response: HintResponse = {

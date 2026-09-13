@@ -2,7 +2,6 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import type { HintResponse } from "@/lib/hint.schema";
 import { MIN_NUDGE_AT_MS } from "@/lib/hint-policy";
-import type { SubmittedAnswer } from "@/lib/quiz-submit.schema";
 
 /**
  * 구석에 상주하는 캐릭터. 헤매는 것 같으면 뱃지와 작은 움직임으로만 알린다 —
@@ -22,9 +21,9 @@ import type { SubmittedAnswer } from "@/lib/quiz-submit.schema";
  */
 
 interface Props {
-  questionIds: readonly string[];
-  /** 지금까지의 답. 서버가 힌트 타이밍을 정할 때만 쓰고 응답에는 안 나온다. */
-  answers: readonly SubmittedAnswer[];
+  /** 지금 보고 있는 문항. 서버는 이것과 아래 행동 신호만 받는다 — 답변은 안 보낸다. */
+  questionId: string;
+  /** 라운드 안 위치. 분석 이벤트에만 쓴다. */
   index: number;
   /** 앞서 봤던 문항으로 되돌아온 것인지. */
   isRevisit: boolean;
@@ -41,8 +40,7 @@ interface Entry {
 type Status = "idle" | "loading" | "ready" | "failed";
 
 export default function HintBuddy({
-  questionIds,
-  answers,
+  questionId,
   index,
   isRevisit,
   changeCount,
@@ -68,25 +66,19 @@ export default function HintBuddy({
 
   // effect 의존성에서 빼기 위한 최신값 통로. 답을 고를 때마다 바뀌는 값들이라
   // 의존성에 넣으면 선택 한 번에 타이머가 리셋된다.
-  const latestRef = useRef({ questionIds, answers, changeCount, isRevisit });
-  latestRef.current = { questionIds, answers, changeCount, isRevisit };
+  const latestRef = useRef({ changeCount, isRevisit });
+  latestRef.current = { changeCount, isRevisit };
 
-  const probe = useCallback(async (at: number): Promise<Entry | null> => {
-    const {
-      questionIds: ids,
-      answers: ans,
-      changeCount: cc,
-    } = latestRef.current;
+  const probe = useCallback(async (id: string): Promise<Entry | null> => {
+    const { changeCount: cc, isRevisit: revisit } = latestRef.current;
     try {
       const res = await fetch("/api/quiz/hint", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          question_ids: ids,
-          answers: ans,
-          index: at,
+          question_id: id,
           change_count: cc,
-          is_revisit: latestRef.current.isRevisit,
+          is_revisit: revisit,
         }),
       });
       if (!res.ok) {
@@ -142,7 +134,7 @@ export default function HintBuddy({
     probeTimerRef.current = setTimeout(
       () => {
         setStatus("loading");
-        void probe(index).then((e) => {
+        void probe(questionId).then((e) => {
           if (visitRef.current !== visit) {
             return;
           }
@@ -160,7 +152,7 @@ export default function HintBuddy({
       clearTimeout(probeTimerRef.current);
       clearTimeout(badgeTimer);
     };
-  }, [index, isRevisit, probe]);
+  }, [questionId, index, isRevisit, probe]);
 
   // 패널은 고정 오버레이라 좁은 화면에서는 보기 하나를 덮는다. 바깥을 누르면
   // 닫히게 해서 "가려서 못 고르는" 상태가 한 번의 탭으로 풀리게 한다.
@@ -202,7 +194,7 @@ export default function HintBuddy({
     if (!entry && status !== "loading") {
       const visit = visitRef.current;
       setStatus("loading");
-      const e = await probe(index);
+      const e = await probe(questionId);
       if (visitRef.current !== visit) {
         // 기다리는 사이 문항이 바뀌었다. 새 문항의 상태를 덮어쓰지 않는다.
         return;
