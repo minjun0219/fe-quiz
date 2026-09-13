@@ -81,19 +81,29 @@ YAML이면 머지 전에 사람 눈을 거치고, 런타임 비용과 지연이 
 
 기존 리소스 라우트 3형제와 같은 모양(`action`, GET은 405).
 
-요청 — `QuizSubmitRequest` + `index` + 클라이언트 행동 신호:
+요청 — `QuizSubmitRequest`의 `question_ids`/`answers` + `index` + 클라이언트 행동 신호
+(`lib/hint.schema.ts`의 `HintRequest`):
 
 ```
-{ question_ids, answers, index, dwell_ms, change_count, is_revisit }
+{ question_ids, answers, index, change_count, is_revisit }
 ```
 
-응답 — 딱 두 가지:
+**체류 시간은 보내지 않는다.** 처음 초안은 `dwell_ms`를 받아 서버가 `nudge: boolean`을
+판정하는 모양이었는데, 두 가지가 걸렸다. 임계값이 60초인 사람에게 20초에 한 번만
+물어보면 뱃지가 영영 안 뜨고, `dwell_ms`는 클라이언트가 정하는 값이라 바꿔 가며
+재요청하면 임계값을 이진 탐색으로 읽어낼 수 있다. 그래서 서버는 "얼마나 기다렸다
+알릴 것인가"만 정해 내보내고, 카운트다운은 클라이언트가 한다.
+
+응답 (`HintResponse`):
 
 ```
-{ nudge: boolean, hint: string | null, hint_html?: string }
+{ nudge_at_ms: number | null, hint: string | null, hint_html?: string }
 ```
 
-처리: zod 검증 → `gradeRound`(지금까지의 답, 미답은 `null`) → `decideNudge(...)` →
+`nudge_at_ms`는 이 문항에 이만큼 머무르면 뱃지를 띄우라는 뜻이고, 힌트가 없는
+문항이면 `null`(알릴 게 없다).
+
+처리: zod 검증 → `gradeRound`(지금까지의 답, 미답은 `null`) → `nudgeThresholdMs(...)` →
 힌트 조회. `gradeRound`는 lookup 주입 방식의 순수 함수라 그대로 재사용하고,
 `QuizSubmitRequest`는 이미 `null`(skipped)을 정식 값으로 받으므로 스키마도 재사용한다.
 
@@ -106,8 +116,9 @@ rate limit은 `checkRateLimit`을 `prefix: "hint"`로 재사용하되 LLM 호출
 그대로 돌고, 이 기능에서 유일하게 "틀리면 티 안 나게 이상해지는" 로직이라 테스트가
 실제로 필요한 부분이다.
 
-입력: 행동 신호(체류·번복·재방문) + 서버가 방금 계산한 성적(답한 수, 맞힌 수,
-**이 문항 카테고리에서 이미 틀린 수**) + 난이도.
+입력: 행동 신호(번복·재방문) + 서버가 방금 계산한 성적(답한 수, 맞힌 수,
+**이 문항 카테고리에서 이미 틀린 수**) + 난이도. 출력은 체류 임계값(ms) —
+`nudgeThresholdMs(input)`.
 
 초안 규칙:
 
@@ -115,27 +126,32 @@ rate limit은 `checkRateLimit`을 `prefix: "hint"`로 재사용하되 LLM 호출
 - 같은 카테고리에서 이미 틀린 적 있음 → 20초로 당김
 - 3문항 이상 답했고 정답률 80% 이상 → 60초로 늦춤 (잘 가는 사람 방해 금지)
 - `hard` → +10초
+- 선택을 3번 이상 갈아치움 → -10초
 - 재방문 → 즉시 (돌아왔다는 건 확실히 막혔다는 뜻)
+- 어떤 조합이든 8초(`MIN_NUDGE_AT_MS`) 밑으로는 내려가지 않는다 — 문항을 읽을 시간은 준다
 
 숫자는 전부 추측이다. 다만 PostHog에 `question_viewed`가 index·재방문 여부와 함께
 쌓이고 있어 **실제 체류 분포를 보고 조정할 재료가 있다.**
 
 ### 유출 재점검
 
-응답에서 과거 정답률에 영향받는 건 `nudge` 불리언 하나뿐이고, 그마저 on/off가 아니라
+응답에서 과거 정답률에 영향받는 건 `nudge_at_ms` 하나뿐이고, 그마저 on/off가 아니라
 **임계값 이동**이다. "뱃지가 빨리 떴다 = 아까 틀렸다"를 역추론하려면 체류 시간을
 통제하며 여러 번 재현해야 하는데, 앞 답을 고치면 화면이 그 문항으로 돌아가 관측이
 끊긴다.
 
-**지켜야 할 선: 정답률이 `nudge`를 즉시 뒤집게 만들지 않는다.** 임계값 조정 이상은
+**지켜야 할 선: 정답률이 `nudge_at_ms`를 즉시 뒤집게 만들지 않는다.** 임계값 조정 이상은
 하지 않는다.
 
 ## 4. UI — `app/play/hint-buddy.tsx`
 
 우측 하단 fixed. 상태는 `idle` → `available` → `open` 셋뿐이고 문항이 바뀌면 리셋.
 
-요청은 **문항당 최대 한 번**. 체류가 최소 임계(20초)를 넘으면 한 번 쏘고, 사용자가
-그전에 탭하면 그 자리에서 쏜다. 결과는 index별로 캐시해 앞뒤로 오가도 재요청하지 않는다.
+요청은 **방문당 한 번**. 서버가 돌려줄 수 있는 가장 이른 시점(`MIN_NUDGE_AT_MS`,
+8초)에 한 번 쏘고, 사용자가 그전에 탭하면 그 자리에서 쏘되 예약된 자동 요청은 취소한다.
+**방문마다 새로 묻고 캐시하지 않는다** — 임계값은 문항의 성질이 아니라 그 순간 사람의
+상황이라, 첫 방문의 35초를 재방문에 재사용하면 "되돌아왔다 = 확실히 막혔다"는 신호가
+통째로 묻힌다.
 
 실패하면 조용히 `idle`로 남는다. 에러 토스트를 띄우지 않는다 — Upstash·PostHog·Anthropic을
 전부 "미설정이면 no-op"으로 두는 것과 같은 결이고, 부가 기능이 본 흐름을 방해하면 안 된다.

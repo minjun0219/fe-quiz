@@ -54,6 +54,18 @@ export default function HintBuddy({
   const [available, setAvailable] = useState(false);
   const [open, setOpen] = useState(false);
 
+  // 방문 세대. 문항이 바뀔 때마다 오르고, 늦게 도착한 응답은 자기 세대가
+  // 아니면 버린다 — 자동 탐색이든 손수 연 요청이든 마찬가지다. 그러지 않으면
+  // 앞 문항의 힌트가 다음 문항 패널에 실린다.
+  const visitRef = useRef(0);
+  // 예약된 자동 탐색. 손수 열면 취소한다 — 이미 읽은 힌트를 또 받아 오고
+  // 뱃지까지 다시 띄울 이유가 없다.
+  const probeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  // 이번 방문에서 손수 열어 봤는지. 이후 뱃지는 알릴 게 없으니 띄우지 않는다.
+  const openedRef = useRef(false);
+
   // effect 의존성에서 빼기 위한 최신값 통로. 답을 고를 때마다 바뀌는 값들이라
   // 의존성에 넣으면 선택 한 번에 타이머가 리셋된다.
   const latestRef = useRef({ questionIds, answers, changeCount, isRevisit });
@@ -93,10 +105,12 @@ export default function HintBuddy({
   }, []);
 
   useEffect(() => {
+    visitRef.current += 1;
+    const visit = visitRef.current;
     const viewedAt = Date.now();
-    let cancelled = false;
     let badgeTimer: ReturnType<typeof setTimeout> | undefined;
 
+    openedRef.current = false;
     setOpen(false);
     setAvailable(false);
 
@@ -104,12 +118,12 @@ export default function HintBuddy({
       // 지역 상수로 받아둔다 — 클로저 안에서는 `e.nudgeAtMs`의 narrowing이
       // 유지되지 않는다.
       const nudgeAtMs = e.nudgeAtMs;
-      if (nudgeAtMs === null || e.hint === null) {
+      if (nudgeAtMs === null || e.hint === null || openedRef.current) {
         return;
       }
       const wait = Math.max(0, viewedAt + nudgeAtMs - Date.now());
       badgeTimer = setTimeout(() => {
-        if (cancelled) {
+        if (visitRef.current !== visit || openedRef.current) {
           return;
         }
         setAvailable(true);
@@ -125,11 +139,11 @@ export default function HintBuddy({
     //
     // 서버가 돌려줄 수 있는 가장 이른 시점에 맞춰 묻는다. 이보다 일찍 물으면
     // 빨리 넘어가는 문항에서 요청만 버려진다.
-    const probeTimer = setTimeout(
+    probeTimerRef.current = setTimeout(
       () => {
         setStatus("loading");
         void probe(index).then((e) => {
-          if (cancelled) {
+          if (visitRef.current !== visit) {
             return;
           }
           setEntry(e);
@@ -143,8 +157,7 @@ export default function HintBuddy({
     );
 
     return () => {
-      cancelled = true;
-      clearTimeout(probeTimer);
+      clearTimeout(probeTimerRef.current);
       clearTimeout(badgeTimer);
     };
   }, [index, isRevisit, probe]);
@@ -182,10 +195,18 @@ export default function HintBuddy({
     setOpen(true);
     setAvailable(false);
     track("hint_opened", { index, nudged: available });
+    // 손수 열었으니 이번 방문의 자동 탐색과 뱃지는 더 이상 필요 없다.
+    openedRef.current = true;
+    clearTimeout(probeTimerRef.current);
     // 뱃지가 뜨기 전에 눌렀으면 아직 안 받아왔다. 그 자리에서 받아온다.
     if (!entry && status !== "loading") {
+      const visit = visitRef.current;
       setStatus("loading");
       const e = await probe(index);
+      if (visitRef.current !== visit) {
+        // 기다리는 사이 문항이 바뀌었다. 새 문항의 상태를 덮어쓰지 않는다.
+        return;
+      }
       setEntry(e);
       setStatus(e ? "ready" : "failed");
     }

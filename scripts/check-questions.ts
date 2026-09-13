@@ -3,8 +3,8 @@
  * the zod schema, the loader's invariants (unique ids, directory ↔ category
  * match), the prose/code wrapping convention, and the `hint:` no-leak rule
  * (see `content/AGENTS.md`).
- * Wired into the `prebuild` script so CI/Vercel fail before Next.js starts
- * compiling on a broken seed.
+ * Wired into the `prebuild` script (and `pnpm check`) so CI and
+ * `react-router build` fail before the worker bundle is built on a broken seed.
  *
  * Run via `pnpm questions:check` (uses tsx).
  */
