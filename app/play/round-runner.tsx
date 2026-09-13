@@ -11,6 +11,15 @@ import type {
 import HintBuddy from "./hint-buddy";
 import Result from "./result";
 
+/**
+ * 힌트 캐릭터 노출 스위치. 힌트가 129문항 중 6개뿐이라 랜덤 라운드에서 거의
+ * 걸리지 않고, 뱃지 임계값도 실측 없이 잡은 값이라 지금 내보내면 눌러도 빈손인
+ * 장식이 된다. 힌트를 채우고 PostHog 체류 분포로 임계값을 맞춘 뒤 켠다.
+ * 신호 수집(선택 번복·재방문)은 꺼져 있어도 그대로 돈다 — 켤 때 손댈 곳이
+ * 이 한 줄이어야 한다.
+ */
+const HINT_BUDDY_ENABLED = false;
+
 interface Props {
   questions: PublicQuestion[];
   level: Level;
@@ -483,13 +492,15 @@ export default function RoundRunner({ questions, level, replay }: Props) {
         </button>
       </div>
 
-      <HintBuddy
-        questionIds={questions.map((q) => q.id)}
-        answers={answers.map(normalize)}
-        index={index}
-        isRevisit={isRevisit}
-        changeCount={changeCountsRef.current.get(index) ?? 0}
-      />
+      {HINT_BUDDY_ENABLED && (
+        <HintBuddy
+          questionIds={questions.map((q) => q.id)}
+          answers={answers.map(normalize)}
+          index={index}
+          isRevisit={isRevisit}
+          changeCount={changeCountsRef.current.get(index) ?? 0}
+        />
+      )}
     </main>
   );
 }

@@ -15,6 +15,10 @@ import type { SubmittedAnswer } from "@/lib/quiz-submit.schema";
  * 서버 왕복은 문항당 한 번. 응답에 담긴 `nudge_at_ms`(이만큼 머무르면 알려라)를
  * 받아 카운트다운은 여기서 한다. 실패하면 조용히 아무 일도 없던 것처럼 둔다 —
  * 부가 기능이 본 흐름에 에러를 띄우면 안 된다.
+ *
+ * **지금은 꺼져 있다.** `RoundRunner`의 `HINT_BUDDY_ENABLED`가 false라 렌더되지
+ * 않는다. 힌트가 129문항 중 6개뿐이라 라운드에서 거의 걸리지 않아서다. 신호
+ * 수집은 그대로 돌고 있으니 켤 때는 그 플래그 하나만 바꾸면 된다.
  */
 
 interface Props {
