@@ -37,13 +37,16 @@ async function renderAll(): Promise<BundledQuestion[]> {
   const all = loadAllQuestions(ROOT);
   return Promise.all(
     all.map(async (q): Promise<BundledQuestion> => {
-      const [question_html, explanation_html, code_html, choices] =
+      const [question_html, explanation_html, code_html, hint_html, choices] =
         await Promise.all([
           renderQuizMarkdown(q.question, q.category),
           renderQuizMarkdown(q.explanation, q.category),
           q.code === undefined
             ? Promise.resolve(undefined)
             : highlightCode(q.code, q.category),
+          q.hint === undefined
+            ? Promise.resolve(undefined)
+            : renderQuizMarkdown(q.hint, q.category),
           Promise.all(
             q.choices.map(async (c) => ({
               ...c,
@@ -57,6 +60,7 @@ async function renderAll(): Promise<BundledQuestion[]> {
         question_html,
         explanation_html,
         ...(code_html === undefined ? {} : { code_html }),
+        ...(hint_html === undefined ? {} : { hint_html }),
       };
     }),
   );

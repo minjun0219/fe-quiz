@@ -28,6 +28,21 @@
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
+  /* 힌트 버디가 "여기 있다"고 알릴 때 한 번만 하는 몸짓. 유한한 게 핵심 —
+   * Tailwind의 `animate-bounce`처럼 무한 반복이면 구석에서 계속 꼼지락거려
+   * 시선을 뺏고, 요소가 멈추질 않아 탭 판정도 흔들린다. 지속되는 신호는
+   * 애니메이션이 아니라 옆에 붙는 점이 맡는다. */
+  --animate-hint-nudge: hint-nudge 0.5s ease-in-out 3;
+}
+
+@keyframes hint-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 body {

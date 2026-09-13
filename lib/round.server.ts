@@ -16,6 +16,9 @@ export {
 /**
  * 클라이언트로 나갈 모양으로 좁힌다. HTML은 번들에 이미 렌더돼 있어서
  * 여기서는 고르기만 한다 — 예전에는 문항마다 마크다운·하이라이팅을 다시 돌렸다.
+ *
+ * `hint`/`hint_html`도 여기서 떨어진다. 힌트는 라운드와 함께 내려가지 않고
+ * `POST /api/quiz/hint`가 문항 하나씩만 내준다.
  */
 export function publicView(q: BundledQuestion): PublicQuestion {
   const {
@@ -23,6 +26,8 @@ export function publicView(q: BundledQuestion): PublicQuestion {
     explanation: _explanation,
     explanation_html: _explanationHtml,
     references: _references,
+    hint: _hint,
+    hint_html: _hintHtml,
     choices,
     code,
     code_html,

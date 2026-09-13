@@ -8,7 +8,17 @@ import type {
   QuizSubmitResponse,
   SubmittedAnswer,
 } from "@/lib/quiz-submit.schema";
+import HintBuddy from "./hint-buddy";
 import Result from "./result";
+
+/**
+ * 힌트 캐릭터 노출 스위치. 힌트가 129문항 중 6개뿐이라 랜덤 라운드에서 거의
+ * 걸리지 않고, 뱃지 임계값도 실측 없이 잡은 값이라 지금 내보내면 눌러도 빈손인
+ * 장식이 된다. 힌트를 채우고 PostHog 체류 분포로 임계값을 맞춘 뒤 켠다.
+ * 신호 수집(선택 번복·재방문)은 꺼져 있어도 그대로 돈다 — 켤 때 손댈 곳이
+ * 이 한 줄이어야 한다.
+ */
+const HINT_BUDDY_ENABLED = false;
 
 interface Props {
   questions: PublicQuestion[];
@@ -117,6 +127,12 @@ export default function RoundRunner({ questions, level, replay }: Props) {
   // 퍼널이 index당 1회만 세도록 거를 수 있게 한다.
   const seenRef = useRef<Set<number>>(new Set());
   const answeredRef = useRef<Set<number>>(new Set());
+  // 문항별 선택 번복 횟수. 힌트 타이밍 신호로만 쓴다 — 답을 여러 번 갈아
+  // 치우는 건 헤매고 있다는 꽤 좋은 신호다.
+  const changeCountsRef = useRef<Map<number, number>>(new Map());
+  // 현재 문항이 재방문인지. seenRef는 effect에서 갱신되므로 렌더 중에 직접
+  // 읽으면 같은 문항 안에서 값이 뒤집힌다(첫 렌더 false → 이후 true).
+  const [isRevisit, setIsRevisit] = useState(false);
 
   // 현재 문항은 URL(`?q=`)이 단일 출처다. 컴포넌트 state로 두면 브라우저
   // 뒤로가기가 /play 자체를 벗어나 라운드가 통째로 날아간다 — 문제 세트가
@@ -173,8 +189,9 @@ export default function RoundRunner({ questions, level, replay }: Props) {
     }
     const q = questions[index];
     questionViewedAtRef.current = Date.now();
-    const isRevisit = seenRef.current.has(index);
+    const revisited = seenRef.current.has(index);
     seenRef.current.add(index);
+    setIsRevisit(revisited);
     track("question_viewed", {
       level,
       index,
@@ -182,7 +199,7 @@ export default function RoundRunner({ questions, level, replay }: Props) {
       category: q.category,
       difficulty: q.difficulty,
       question_type: q.type,
-      is_revisit: isRevisit,
+      is_revisit: revisited,
     });
   }, [questions, index, level]);
 
@@ -279,6 +296,10 @@ export default function RoundRunner({ questions, level, replay }: Props) {
   const radioGroupName = `${groupNameBase}-${current.id}`;
 
   function toggleChoice(choiceId: string) {
+    changeCountsRef.current.set(
+      index,
+      (changeCountsRef.current.get(index) ?? 0) + 1,
+    );
     setAnswers((prev) => {
       const next = prev.slice();
       if (current.type === "multi_choice") {
@@ -470,6 +491,15 @@ export default function RoundRunner({ questions, level, replay }: Props) {
           {isLast ? "결과 보기" : "다음 →"}
         </button>
       </div>
+
+      {HINT_BUDDY_ENABLED && (
+        <HintBuddy
+          questionId={current.id}
+          index={index}
+          isRevisit={isRevisit}
+          changeCount={changeCountsRef.current.get(index) ?? 0}
+        />
+      )}
     </main>
   );
 }

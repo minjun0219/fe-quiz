@@ -49,6 +49,15 @@ const Base = z.object({
   code: z.string().optional(),
   choices: z.array(ChoiceSchema).min(2).max(6),
   explanation: z.string().min(1),
+  /**
+   * 풀이 중 건네는 한 조각. 정답이 아니라 **개념의 방향**만 가리킨다
+   * (규칙은 `content/AGENTS.md`, 기계 검사는 `scripts/lint-hint-leak.ts`).
+   *
+   * optional인 건 임시가 아니라 설계다 — 문항마다 힌트를 채우는 속도와
+   * 기능 배포를 묶지 않으려는 것. 힌트가 없는 문항에서는 캐릭터가 조용히
+   * 있으면 되고, 그게 정상 동작이다.
+   */
+  hint: z.string().min(1).max(200).optional(),
   references: z.array(ReferenceSchema).min(1).max(5).optional(),
   tags: z.array(z.string()).default([]),
 });
@@ -154,9 +163,13 @@ export const QuestionSchema = z
 export type Question = z.infer<typeof QuestionSchema>;
 
 /**
- * Client-safe view of a question. The answer, explanation, and references
- * are intentionally omitted so the correct answer (and any topic hints from
- * MDN/spec links) never reaches the browser bundle before grading.
+ * Client-safe view of a question. The answer, explanation, references, and
+ * hint are intentionally omitted so the correct answer (and any topic hints
+ * from MDN/spec links) never reaches the browser bundle before grading.
+ *
+ * `hint`가 빠지는 건 힌트가 정답이라서가 아니라, 라운드 페이로드에 실리면
+ * 10개가 통째로 소스에 노출돼 "지금 도와줄 때인가" 판정이 장식이 되기
+ * 때문이다. 힌트는 `POST /api/quiz/hint` 응답으로만 나간다.
  *
  * Lives here (not in `lib/round.server.ts`) so client components can `import type`
  * this without crossing a `server-only` module boundary.
@@ -172,7 +185,7 @@ export type PublicChoice = Choice & {
 
 export type PublicQuestion = Omit<
   Question,
-  "answer" | "explanation" | "choices" | "references"
+  "answer" | "explanation" | "choices" | "references" | "hint"
 > & {
   choices: PublicChoice[];
   question_html?: string;
@@ -199,6 +212,7 @@ type WithRenderedHtml<Q> = Q extends { choices: (infer C)[] }
       question_html?: string;
       explanation_html?: string;
       code_html?: string;
+      hint_html?: string;
       choices: (C & { text_html?: string })[];
     }
   : never;

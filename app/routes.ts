@@ -13,6 +13,10 @@ export default [
   // API URL은 구 Next 시절 계약 그대로 — 클라이언트 fetch가 하드코딩돼 있다.
   route("api/quiz/submit", "routes/api.quiz-submit.ts"),
   route("api/quiz/feedback", "routes/api.quiz-feedback.ts"),
+  // 라운드 진행 중 힌트. 라운드 상태를 저장하지 않으므로 요청마다 지금까지의
+  // 답을 함께 받아 재채점한다 — 채점 결과는 응답에 나가지 않고 힌트 타이밍
+  // 판정에만 쓰인다.
+  route("api/quiz/hint", "routes/api.quiz-hint.ts"),
   route("api/share", "routes/api.share.ts"),
   route("robots.txt", "routes/robots.ts"),
   route("sitemap.xml", "routes/sitemap.ts"),

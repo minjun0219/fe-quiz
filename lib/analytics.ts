@@ -78,6 +78,22 @@ type ShareCreatedProps = {
   duration_ms: number;
 };
 
+/**
+ * 힌트 뱃지가 실제로 뜬 순간. `nudge_at_ms`가 함께 실려 있어 임계값별로
+ * "뜬 다음 열어봤나"를 갈라 볼 수 있다 — `lib/hint-policy.ts`의 숫자들을
+ * 감이 아니라 실측으로 조정하려고 남긴다.
+ */
+type HintNudgedProps = {
+  index: number;
+  nudge_at_ms: number;
+};
+
+type HintOpenedProps = {
+  index: number;
+  /** 뱃지를 보고 연 것인지, 스스로 찾아 누른 것인지. */
+  nudged: boolean;
+};
+
 export type AnalyticsEvents = {
   level_selected: { level: Level };
   round_started: RoundStartedProps;
@@ -95,6 +111,8 @@ export type AnalyticsEvents = {
   share_failed: { level: Level; message: string };
   share_copy_clicked: { level: Level; surface: "panel" | "auto" };
   share_native_clicked: { level: Level };
+  hint_nudged: HintNudgedProps;
+  hint_opened: HintOpenedProps;
 };
 
 /**

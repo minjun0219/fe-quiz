@@ -60,6 +60,19 @@ describe("publicView", () => {
     expect(view.choices).toHaveLength(2);
   });
 
+  it("strips hint — 힌트는 라운드가 아니라 /api/quiz/hint로만 나간다", async () => {
+    const q = {
+      ...single("js-3"),
+      hint: "어떤 큐가 먼저 비워지는지 떠올려 보세요.",
+      hint_html: "<p>어떤 큐가 먼저 비워지는지 떠올려 보세요.</p>",
+    };
+    const view = await publicView(q);
+    // biome-ignore lint/suspicious/noExplicitAny: probe stripped fields
+    expect((view as any).hint).toBeUndefined();
+    // biome-ignore lint/suspicious/noExplicitAny: probe stripped fields
+    expect((view as any).hint_html).toBeUndefined();
+  });
+
   it("strips references so MDN/spec links don't leak before grading", async () => {
     const q: Question = {
       ...single("js-2"),

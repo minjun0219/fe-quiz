@@ -72,6 +72,33 @@ YAML 블록 스칼라(block scalar) 안에서도 펜스는 인식돼요. 들여�
   규칙(`scripts/highlight.ts`의 `BOLD_RE`)이 `Math.PI * shape.r ** 2` 같은 패턴을 굵게로
   잘못 잡지는 않지만, 그런 코드는 펜스로 분리하는 게 안전.
 
+## `hint:` 필드
+
+풀이 중 캐릭터가 건네는 한 조각이에요. **선택(optional)** 이고, 없으면 그 문항에서는
+캐릭터가 조용히 있어요 — 비워 두는 게 정상 상태지 미완성이 아니에요.
+
+지켜야 할 선은 하나예요. **힌트는 보기를 가리키지 않고 개념의 방향만 가리켜요.**
+
+| | 예시 |
+| --- | --- |
+| ✅ | `어떤 큐가 먼저 비워지는지 떠올려 보세요.` |
+| ❌ 정답 인용 | `` `space-between`을 쓰면 돼요.`` |
+| ❌ 소거법 | `` `space-around`는 아니에요.`` |
+| ❌ 메타 | `정답은 두 번째 보기예요.` |
+
+- 1~2문장, 200자 이내. 톤은 문항 본문과 같은 친근한 존댓말.
+- 코드 토큰은 다른 필드와 똑같이 백틱으로 감싸요 — `hint_html`도 같은 렌더를 거쳐요.
+- **정답에만 있는 코드 토큰을 부르지 마세요.** 보기 넷이 전부 `justify-content`로
+  시작한다면 그 이름은 불러도 아무것도 알려주지 않으니 괜찮아요. 하지만 정답에만
+  있는 `space-between`을 부르면 그 순간 답을 준 거예요.
+- 해설(`explanation:`)을 줄여 쓰지 마세요. 해설은 답을 알고 난 뒤 읽는 글이고,
+  힌트는 아직 모르는 사람이 읽는 글이에요.
+
+```yaml
+hint: |
+  네 값 모두 `justify-content`라 차이는 가장자리에도 간격을 줄 것이냐에서 갈려요.
+```
+
 ## `code:` 필드
 
 문제의 메인 코드 샘플은 YAML 최상위 `code:` 블록에 백틱 없이 plain text로
@@ -119,6 +146,10 @@ choices:
 2. `scripts/lint-question-prose.ts`의 prose-vs-code 휴리스틱 — `question:`·
    `choices[].text`·`explanation:` 값에 래핑 안 된 코드 모양 텍스트가 있으면
    비제로 종료.
+3. `scripts/lint-hint-leak.ts`의 힌트 유출 검사 — 힌트가 정답 보기 텍스트를
+   그대로 옮겨 적었거나 **정답에만 있는 코드 토큰**을 부르면 비제로 종료.
+   한국어 패러프레이즈와 소거법 단서는 **기계가 못 잡아요** — 오탐이 빌드를
+   막는 쪽이 더 비싸서 일부러 좁게 뒀어요. 그건 사람 검수 몫이에요.
 
 ### opt-out
 
@@ -143,9 +174,10 @@ choices:
 
 ## 참고
 
+- 힌트 설계 배경: `docs/design/specs/2026-09-09-hint-buddy-design.md`
 - 렌더 파이프라인: `scripts/highlight.ts`의 `renderQuizMarkdown` (빌드 타임)
 - 유일한 호출처: `scripts/build-questions-json.ts` — 렌더 결과가
   `lib/questions.generated.json`에 굽히고, 런타임(`lib/round.server.ts`·
   `lib/grading.ts`)은 그 HTML을 읽기만 해요
-- 린트 룰: `scripts/lint-question-prose.ts`
+- 린트 룰: `scripts/lint-question-prose.ts`, `scripts/lint-hint-leak.ts`
 - 굵게 flanking 규칙: `scripts/highlight.ts`의 `BOLD_RE`

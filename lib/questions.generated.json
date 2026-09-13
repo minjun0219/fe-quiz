@@ -356,6 +356,7 @@
    }
   ],
   "explanation": "- `space-between`: 양 끝 아이템이 컨테이너 가장자리에 딱 붙고, 사이 간격만 균등.\n- `space-around`: 각 아이템 양옆에 동일한 마진(가장자리 마진은 사이 마진의 절반).\n- `space-evenly`: 가장자리 포함 모든 간격이 동일.\n- `stretch`: 명세상 `justify-content`의 유효 값이지만, flex 컨테이너의 main axis에서는 늘이기가 적용 안 돼 결과적으로 `flex-start`처럼 동작. (CSS Grid에선 실제로 트랙이 늘어남)\n",
+  "hint": "네 값 모두 `justify-content`라 차이는 가장자리에도 간격을 줄 것이냐에서 갈려요. 양 끝 아이템을 컨테이너에 딱 붙인다는 조건을 먼저 붙잡아 보세요.\n",
   "references": [
    {
     "title": "MDN — justify-content",
@@ -370,7 +371,8 @@
   "type": "single_choice",
   "answer": "a",
   "question_html": "flex 컨테이너에서 자식 아이템을 main axis 양 끝에 붙이고, 사이사이는 균등 간격으로 배치하려면?\n",
-  "explanation_html": "- <code class=\"inline-code\">space-between</code>: 양 끝 아이템이 컨테이너 가장자리에 딱 붙고, 사이 간격만 균등.\n- <code class=\"inline-code\">space-around</code>: 각 아이템 양옆에 동일한 마진(가장자리 마진은 사이 마진의 절반).\n- <code class=\"inline-code\">space-evenly</code>: 가장자리 포함 모든 간격이 동일.\n- <code class=\"inline-code\">stretch</code>: 명세상 <code class=\"inline-code\">justify-content</code>의 유효 값이지만, flex 컨테이너의 main axis에서는 늘이기가 적용 안 돼 결과적으로 <code class=\"inline-code\">flex-start</code>처럼 동작. (CSS Grid에선 실제로 트랙이 늘어남)\n"
+  "explanation_html": "- <code class=\"inline-code\">space-between</code>: 양 끝 아이템이 컨테이너 가장자리에 딱 붙고, 사이 간격만 균등.\n- <code class=\"inline-code\">space-around</code>: 각 아이템 양옆에 동일한 마진(가장자리 마진은 사이 마진의 절반).\n- <code class=\"inline-code\">space-evenly</code>: 가장자리 포함 모든 간격이 동일.\n- <code class=\"inline-code\">stretch</code>: 명세상 <code class=\"inline-code\">justify-content</code>의 유효 값이지만, flex 컨테이너의 main axis에서는 늘이기가 적용 안 돼 결과적으로 <code class=\"inline-code\">flex-start</code>처럼 동작. (CSS Grid에선 실제로 트랙이 늘어남)\n",
+  "hint_html": "네 값 모두 <code class=\"inline-code\">justify-content</code>라 차이는 가장자리에도 간격을 줄 것이냐에서 갈려요. 양 끝 아이템을 컨테이너에 딱 붙인다는 조건을 먼저 붙잡아 보세요.\n"
  },
  {
   "id": "css-002",
@@ -1308,6 +1310,7 @@
    }
   ],
   "explanation": "- a, b, c: `<button>`은 기본적으로 키보드 활성화·포커스·\"button\" 역할을 모두 가져요. `<div>`로 흉내 내려면 `role`, `tabindex`, 키보드 핸들러까지 직접 달아야 해요.\n- e: `<form>` 안의 `<button>`은 기본 `type=\"submit\"`이라 폼 전송이 트리거돼요. 막으려면 명시적으로 `type=\"button\"`을 줘야 해요.\n- d: 잘못된 선택지예요 — 클릭 처리 속도는 둘이 사실상 차이가 없어요. 의미·접근성이 차이의 본질이에요.\n결론: 기본 동작·접근성을 공짜로 얻으려면 의미에 맞는 태그를 골라야 해요.\n",
+  "hint": "`<div>`로 같은 걸 흉내 내려면 손으로 뭘 더 달아야 하는지 세어 보세요. 브라우저가 `<button>`에 공짜로 얹어 주는 것들이 그대로 목록이 돼요.\n",
   "references": [
    {
     "title": "MDN — <button>: The Button element",
@@ -1333,7 +1336,8 @@
   ],
   "question_html": "같은 클릭 처리를 한다고 가정할 때, <code class=\"inline-code\">&lt;div onclick&gt;</code> 대신 <code class=\"inline-code\">&lt;button&gt;</code>을 써야 하는 이유로 <strong>맞는 것</strong>을 모두 골라 보세요.\n",
   "explanation_html": "- a, b, c: <code class=\"inline-code\">&lt;button&gt;</code>은 기본적으로 키보드 활성화·포커스·&quot;button&quot; 역할을 모두 가져요. <code class=\"inline-code\">&lt;div&gt;</code>로 흉내 내려면 <code class=\"inline-code\">role</code>, <code class=\"inline-code\">tabindex</code>, 키보드 핸들러까지 직접 달아야 해요.\n- e: <code class=\"inline-code\">&lt;form&gt;</code> 안의 <code class=\"inline-code\">&lt;button&gt;</code>은 기본 <code class=\"inline-code\">type=&quot;submit&quot;</code>이라 폼 전송이 트리거돼요. 막으려면 명시적으로 <code class=\"inline-code\">type=&quot;button&quot;</code>을 줘야 해요.\n- d: 잘못된 선택지예요 — 클릭 처리 속도는 둘이 사실상 차이가 없어요. 의미·접근성이 차이의 본질이에요.\n결론: 기본 동작·접근성을 공짜로 얻으려면 의미에 맞는 태그를 골라야 해요.\n",
-  "code_html": "<pre><code><span class=\"tok-k\">&lt;div onclick<span class=\"tok-s\">=&quot;handle()&quot;</span>&gt;</span>저장<span class=\"tok-k\">&lt;/div&gt;</span>\n<span class=\"tok-k\">&lt;button onclick<span class=\"tok-s\">=&quot;handle()&quot;</span>&gt;</span>저장<span class=\"tok-k\">&lt;/button&gt;</span>\n</code></pre>"
+  "code_html": "<pre><code><span class=\"tok-k\">&lt;div onclick<span class=\"tok-s\">=&quot;handle()&quot;</span>&gt;</span>저장<span class=\"tok-k\">&lt;/div&gt;</span>\n<span class=\"tok-k\">&lt;button onclick<span class=\"tok-s\">=&quot;handle()&quot;</span>&gt;</span>저장<span class=\"tok-k\">&lt;/button&gt;</span>\n</code></pre>",
+  "hint_html": "<code class=\"inline-code\">&lt;div&gt;</code>로 같은 걸 흉내 내려면 손으로 뭘 더 달아야 하는지 세어 보세요. 브라우저가 <code class=\"inline-code\">&lt;button&gt;</code>에 공짜로 얹어 주는 것들이 그대로 목록이 돼요.\n"
  },
  {
   "id": "html-002",
@@ -2331,6 +2335,7 @@
    }
   ],
   "explanation": "동기 코드(1, 4)가 먼저 → 마이크로태스크(`Promise.then`의 3) → 매크로태스크(`setTimeout`의 2) 순서로 실행돼요.\n마이크로태스크 큐는 매크로태스크 하나 처리 사이마다 전부 비워지기 때문에, `setTimeout`보다 `Promise.then`이 항상 먼저 도착해요.\n",
+  "hint": "동기 코드가 먼저 전부 돌고 난 뒤가 진짜 문제예요. `setTimeout`과 `Promise.then`이 각각 어느 큐로 들어가고, 그 두 큐가 언제 비워지는지 떠올려 보세요.\n",
   "tags": [
    "event-loop",
    "async",
@@ -2340,7 +2345,8 @@
   "answer": "b",
   "question_html": "다음 코드의 출력 순서는?\n",
   "explanation_html": "동기 코드(1, 4)가 먼저 → 마이크로태스크(<code class=\"inline-code\">Promise.then</code>의 3) → 매크로태스크(<code class=\"inline-code\">setTimeout</code>의 2) 순서로 실행돼요.\n마이크로태스크 큐는 매크로태스크 하나 처리 사이마다 전부 비워지기 때문에, <code class=\"inline-code\">setTimeout</code>보다 <code class=\"inline-code\">Promise.then</code>이 항상 먼저 도착해요.\n",
-  "code_html": "<pre><code>console.log(<span class=\"tok-n\">1</span>)\nsetTimeout(() =&gt; console.log(<span class=\"tok-n\">2</span>))\nPromise.resolve().then(() =&gt; console.log(<span class=\"tok-n\">3</span>))\nconsole.log(<span class=\"tok-n\">4</span>)\n</code></pre>"
+  "code_html": "<pre><code>console.log(<span class=\"tok-n\">1</span>)\nsetTimeout(() =&gt; console.log(<span class=\"tok-n\">2</span>))\nPromise.resolve().then(() =&gt; console.log(<span class=\"tok-n\">3</span>))\nconsole.log(<span class=\"tok-n\">4</span>)\n</code></pre>",
+  "hint_html": "동기 코드가 먼저 전부 돌고 난 뒤가 진짜 문제예요. <code class=\"inline-code\">setTimeout</code>과 <code class=\"inline-code\">Promise.then</code>이 각각 어느 큐로 들어가고, 그 두 큐가 언제 비워지는지 떠올려 보세요.\n"
  },
  {
   "id": "js-002",
@@ -2371,6 +2377,7 @@
    }
   ],
   "explanation": "`makeCounter`를 두 번 호출했으니 `a`와 `b`는 서로 다른 클로저(=다른 `count` 변수)를 잡아요.\n`a()`는 두 번 호출돼서 count(a)=2까지 올라간 상태, 마지막 `a()`에서 ++ 돼서 3을 반환해요.\n`b()`는 한 번 호출돼서 count(b)=1, 마지막 `b()`에서 ++ 돼서 2를 반환해요.\n→ \"3 2\". 같은 함수에서 만든 인스턴스라도 클로저는 호출마다 새로 생긴다는 게 포인트예요.\n",
+  "hint": "`makeCounter`를 두 번 호출했다는 게 핵심이에요. `a`와 `b`가 같은 `count`를 나눠 쓰는지 각자 하나씩 갖는지부터 정하고 세어 보세요.\n",
   "tags": [
    "closure",
    "scope"
@@ -2379,7 +2386,8 @@
   "answer": "c",
   "question_html": "다음 코드의 출력은?\n",
   "explanation_html": "<code class=\"inline-code\">makeCounter</code>를 두 번 호출했으니 <code class=\"inline-code\">a</code>와 <code class=\"inline-code\">b</code>는 서로 다른 클로저(=다른 <code class=\"inline-code\">count</code> 변수)를 잡아요.\n<code class=\"inline-code\">a()</code>는 두 번 호출돼서 count(a)=2까지 올라간 상태, 마지막 <code class=\"inline-code\">a()</code>에서 ++ 돼서 3을 반환해요.\n<code class=\"inline-code\">b()</code>는 한 번 호출돼서 count(b)=1, 마지막 <code class=\"inline-code\">b()</code>에서 ++ 돼서 2를 반환해요.\n→ &quot;3 2&quot;. 같은 함수에서 만든 인스턴스라도 클로저는 호출마다 새로 생긴다는 게 포인트예요.\n",
-  "code_html": "<pre><code><span class=\"tok-k\">function</span> makeCounter() {\n  <span class=\"tok-k\">let</span> count = <span class=\"tok-n\">0</span>\n  <span class=\"tok-k\">return</span> () =&gt; ++count\n}\n<span class=\"tok-k\">const</span> a = makeCounter()\n<span class=\"tok-k\">const</span> b = makeCounter()\na(); a(); b()\nconsole.log(a(), b())\n</code></pre>"
+  "code_html": "<pre><code><span class=\"tok-k\">function</span> makeCounter() {\n  <span class=\"tok-k\">let</span> count = <span class=\"tok-n\">0</span>\n  <span class=\"tok-k\">return</span> () =&gt; ++count\n}\n<span class=\"tok-k\">const</span> a = makeCounter()\n<span class=\"tok-k\">const</span> b = makeCounter()\na(); a(); b()\nconsole.log(a(), b())\n</code></pre>",
+  "hint_html": "<code class=\"inline-code\">makeCounter</code>를 두 번 호출했다는 게 핵심이에요. <code class=\"inline-code\">a</code>와 <code class=\"inline-code\">b</code>가 같은 <code class=\"inline-code\">count</code>를 나눠 쓰는지 각자 하나씩 갖는지부터 정하고 세어 보세요.\n"
  },
  {
   "id": "js-003",
@@ -3788,6 +3796,7 @@
    }
   ],
   "explanation": "세 번의 `setN(n + 1)` 호출 모두 클로저로 잡힌 같은 `n`(=0)을 읽어서 매번 `setN(1)`을 예약해요. 결과적으로 React가 세 업데이트를 배치 처리한 뒤 한 번 리렌더하지만, 다음 렌더의 `n`은 결국 1이에요.\n`console.log`는 클릭 시점의 렌더 컨텍스트 안이라 그 시점의 `n`(=0)을 그대로 출력해요.\n3까지 올리고 싶으면 함수형 업데이트 `setN(prev => prev + 1)`로 바꿔 주세요.\n",
+  "hint": "`setN`을 세 번 불렀지만 세 호출이 읽는 `n`은 전부 같은 렌더에 고정된 값이에요. `console.log`가 보는 `n`도 마찬가지고요.\n",
   "references": [
    {
     "title": "React — useState",
@@ -3808,7 +3817,8 @@
   "answer": "a",
   "question_html": "버튼을 한 번 클릭했을 때, 클릭 직후 화면에 표시되는 숫자와 console에 찍히는 값은?\n",
   "explanation_html": "세 번의 <code class=\"inline-code\">setN(n + 1)</code> 호출 모두 클로저로 잡힌 같은 <code class=\"inline-code\">n</code>(=0)을 읽어서 매번 <code class=\"inline-code\">setN(1)</code>을 예약해요. 결과적으로 React가 세 업데이트를 배치 처리한 뒤 한 번 리렌더하지만, 다음 렌더의 <code class=\"inline-code\">n</code>은 결국 1이에요.\n<code class=\"inline-code\">console.log</code>는 클릭 시점의 렌더 컨텍스트 안이라 그 시점의 <code class=\"inline-code\">n</code>(=0)을 그대로 출력해요.\n3까지 올리고 싶으면 함수형 업데이트 <code class=\"inline-code\">setN(prev =&gt; prev + 1)</code>로 바꿔 주세요.\n",
-  "code_html": "<pre><code><span class=\"tok-k\">function</span> Counter() {\n  <span class=\"tok-k\">const</span> [n, setN] = useState(<span class=\"tok-n\">0</span>)\n  <span class=\"tok-k\">function</span> handleClick() {\n    setN(n + <span class=\"tok-n\">1</span>)\n    setN(n + <span class=\"tok-n\">1</span>)\n    setN(n + <span class=\"tok-n\">1</span>)\n    console.log(<span class=\"tok-s\">&#39;clicked, n =&#39;</span>, n)\n  }\n  <span class=\"tok-k\">return</span> <span class=\"tok-k\">&lt;button onClick={handleClick}&gt;</span>{n}<span class=\"tok-k\">&lt;/button&gt;</span>\n}\n</code></pre>"
+  "code_html": "<pre><code><span class=\"tok-k\">function</span> Counter() {\n  <span class=\"tok-k\">const</span> [n, setN] = useState(<span class=\"tok-n\">0</span>)\n  <span class=\"tok-k\">function</span> handleClick() {\n    setN(n + <span class=\"tok-n\">1</span>)\n    setN(n + <span class=\"tok-n\">1</span>)\n    setN(n + <span class=\"tok-n\">1</span>)\n    console.log(<span class=\"tok-s\">&#39;clicked, n =&#39;</span>, n)\n  }\n  <span class=\"tok-k\">return</span> <span class=\"tok-k\">&lt;button onClick={handleClick}&gt;</span>{n}<span class=\"tok-k\">&lt;/button&gt;</span>\n}\n</code></pre>",
+  "hint_html": "<code class=\"inline-code\">setN</code>을 세 번 불렀지만 세 호출이 읽는 <code class=\"inline-code\">n</code>은 전부 같은 렌더에 고정된 값이에요. <code class=\"inline-code\">console.log</code>가 보는 <code class=\"inline-code\">n</code>도 마찬가지고요.\n"
  },
  {
   "id": "react-002",
@@ -4904,6 +4914,7 @@
    }
   ],
   "explanation": "`any`는 타입 검사를 끄는 탈출구라 무엇이든 통과시켜요.\n`unknown`은 \"모든 값\"을 표현하는 안전한 최상위 타입이에요 — 사용하려면 `typeof x === 'string'`, `x instanceof ...` 같은 가드로 좁혀야 해요.\n외부 입력(JSON 파싱, 라이브러리 경계)을 받을 때 `any` 대신 `unknown`을 쓰면 컴파일러가 좁히기를 강제해서 안전해져요.\n",
+  "hint": "둘 중 하나는 타입 검사를 아예 끄는 탈출구고, 다른 하나는 쓰기 전에 뭔지 확인하라고 요구해요. 어느 쪽이 컴파일러를 조용하게 만드는지 생각해 보세요.\n",
   "references": [
    {
     "title": "TypeScript Handbook — Everyday Types (any)",
@@ -4924,7 +4935,8 @@
   "answer": "b",
   "question_html": "<code class=\"inline-code\">any</code>와 <code class=\"inline-code\">unknown</code>의 차이는?\n",
   "explanation_html": "<code class=\"inline-code\">any</code>는 타입 검사를 끄는 탈출구라 무엇이든 통과시켜요.\n<code class=\"inline-code\">unknown</code>은 &quot;모든 값&quot;을 표현하는 안전한 최상위 타입이에요 — 사용하려면 <code class=\"inline-code\">typeof x === &#39;string&#39;</code>, <code class=\"inline-code\">x instanceof ...</code> 같은 가드로 좁혀야 해요.\n외부 입력(JSON 파싱, 라이브러리 경계)을 받을 때 <code class=\"inline-code\">any</code> 대신 <code class=\"inline-code\">unknown</code>을 쓰면 컴파일러가 좁히기를 강제해서 안전해져요.\n",
-  "code_html": "<pre><code><span class=\"tok-k\">function</span> f(x: any) {\n  x.toUpperCase()    <span class=\"tok-c\">// ①</span>\n}\n<span class=\"tok-k\">function</span> g(x: unknown) {\n  x.toUpperCase()    <span class=\"tok-c\">// ②</span>\n}\n</code></pre>"
+  "code_html": "<pre><code><span class=\"tok-k\">function</span> f(x: any) {\n  x.toUpperCase()    <span class=\"tok-c\">// ①</span>\n}\n<span class=\"tok-k\">function</span> g(x: unknown) {\n  x.toUpperCase()    <span class=\"tok-c\">// ②</span>\n}\n</code></pre>",
+  "hint_html": "둘 중 하나는 타입 검사를 아예 끄는 탈출구고, 다른 하나는 쓰기 전에 뭔지 확인하라고 요구해요. 어느 쪽이 컴파일러를 조용하게 만드는지 생각해 보세요.\n"
  },
  {
   "id": "ts-002",
