@@ -8,8 +8,11 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteLoaderData,
 } from "react-router";
 import { initPostHog, PostHogProvider } from "@/components/PostHogProvider";
+import { getPostHogConfig, POSTHOG_META } from "@/lib/posthog-config";
+import { clientPostHogConfig } from "@/lib/posthog-config.server";
 import { resolveSiteUrl } from "@/lib/site-url.server";
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -24,6 +27,7 @@ export function loader({ request }: Route.LoaderArgs) {
   return {
     siteUrl,
     ogImageUrl: new URL("/og.png", siteUrl).toString(),
+    posthog: clientPostHogConfig(request),
   };
 }
 
@@ -106,6 +110,9 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  // PostHog 설정은 빌드에 굽지 않고 여기서 HTML에 싣는다 — entry.client가
+  // 하이드레이션 전에 읽어야 해서 loader 데이터가 아니라 SSR된 meta로 넘긴다.
+  const posthog = useRouteLoaderData<typeof loader>("root")?.posthog;
   return (
     <html lang="ko" className="h-full antialiased">
       <head>
@@ -124,6 +131,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
           media="(prefers-color-scheme: dark)"
           content="#09090b"
         />
+        {posthog ? (
+          <>
+            <meta name={POSTHOG_META.key} content={posthog.key} />
+            {posthog.host ? (
+              <meta name={POSTHOG_META.host} content={posthog.host} />
+            ) : null}
+            {posthog.uiHost ? (
+              <meta name={POSTHOG_META.uiHost} content={posthog.uiHost} />
+            ) : null}
+          </>
+        ) : null}
         <Meta />
         <Links />
       </head>
@@ -159,7 +177,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     if (isNotFound) {
       return;
     }
-    if (!import.meta.env.VITE_POSTHOG_KEY) {
+    if (!getPostHogConfig()) {
       return;
     }
     // entry.client에서 이미 init됐지만, 하이드레이션 자체가 깨진 극단 경로

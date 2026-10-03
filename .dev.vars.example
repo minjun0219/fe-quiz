@@ -27,6 +27,7 @@ UPSTASH_REDIS_REST_TOKEN=
 # 허용: trace | debug | info | warn | error | fatal | silent
 LOG_LEVEL=
 
-# --- PostHog 서버 (에러 리포팅 + 서버 이벤트) ---
-# 미설정이면 서버 PostHog는 no-op. 클라이언트 키는 `.env`의 VITE_POSTHOG_KEY.
+# --- PostHog (서버 에러 리포팅 + 클라이언트) ---
+# project API key(phc_, write-only). 클라이언트도 이 값을 root loader가 런타임에
+# `<meta name="posthog-key">`로 받아 쓴다. 미설정이면 서버·클라이언트 모두 no-op.
 POSTHOG_KEY=

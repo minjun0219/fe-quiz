@@ -167,7 +167,7 @@ D1은 Worker binding(`env.DB`)이 유일한 접근 경로라 공개 REST 표면�
 **중요**: 같은 라운드를 친구가 풀 때 10문제 순서까지 동일해야 합니다.
 점수 비교 의미를 살려야 바이럴이 작동합니다.
 
-환경변수 표는 `README.md`가 단일 출처예요. `.dev.vars.example`(서버 secrets)과 `.env.example`(클라이언트 `VITE_*`)도 함께 참조해 주세요. Upstash·PostHog·Anthropic은 키가 비면 모두 no-op/fail-open으로 떨어지는 게 기본 원칙이고, 공유/메타 URL의 base는 wrangler env별 `SITE_URL` var + 요청 헤더 화이트리스트로 도출돼요.
+환경변수 표는 `README.md`가 단일 출처예요. `.dev.vars.example`(secrets)도 함께 참조해 주세요. 빌드에 굽는 클라이언트 env는 없고, 클라이언트 PostHog 설정은 런타임에 내려가요. Upstash·PostHog·Anthropic은 키가 비면 모두 no-op/fail-open으로 떨어지는 게 기본 원칙이고, 공유/메타 URL의 base는 wrangler env별 `SITE_URL` var + 요청 헤더 화이트리스트로 도출돼요.
 
 ## 톤 & UX 가이드라인
 
@@ -243,7 +243,6 @@ fe-quiz/
 │   └── quiz-generation.md       # 자동 출제 워크플로 상세 설계
 ├── wrangler.jsonc               # Workers 설정 — env(preview/production)별 D1·vars
 ├── .dev.vars.example            # 서버 secrets 템플릿 (로컬 dev)
-├── .env.example                 # 클라이언트 VITE_* 템플릿
 ├── .nvmrc                       # Node 22
 ├── biome.json
 └── LICENSE                      # MIT

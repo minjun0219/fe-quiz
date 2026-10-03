@@ -33,7 +33,7 @@ worker-configuration.d.ts
 npm-debug.log*
 .pnpm-debug.log*
 
-# env files — 실제 secret 파일만 무시, `.env.example`/`.dev.vars.example`은 커밋 유지.
+# env files — 실제 secret 파일만 무시, `.dev.vars.example`은 커밋 유지.
 .env
 .env*.local
 
