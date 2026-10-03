@@ -2,6 +2,7 @@
 
 import posthog from "posthog-js";
 import type { Level } from "@/lib/levels";
+import { getPostHogConfig } from "@/lib/posthog-config";
 import type { Category, Difficulty, QuestionType } from "@/lib/question.schema";
 import type { Personality } from "@/lib/quiz-submit.schema";
 
@@ -116,12 +117,6 @@ export type AnalyticsEvents = {
 };
 
 /**
- * 키 유무는 빌드 타임에 inlining 되므로 모듈 로드 시 한 번만 본다. 키 없는
- * dev/CI에서는 즉시 no-op.
- */
-const HAS_KEY = !!import.meta.env.VITE_POSTHOG_KEY;
-
-/**
  * 타입 안전한 PostHog 이벤트 캡처.
  *
  * init은 entry.client가 하이드레이션 전에 끝내므로(`initPostHog`) 어떤 effect
@@ -139,7 +134,8 @@ export function track<K extends keyof AnalyticsEvents>(
   if (typeof window === "undefined") {
     return;
   }
-  if (!HAS_KEY) {
+  // 키 없는 dev/CI/PR 프리뷰에서는 즉시 no-op.
+  if (!getPostHogConfig()) {
     return;
   }
   posthog.capture(event, props as Record<string, unknown>);

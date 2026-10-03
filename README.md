@@ -31,7 +31,6 @@ nvm use                            # .nvmrc 기준 Node 22
 corepack enable                    # pnpm 자동 활성화 (최초 1회)
 pnpm install
 cp .dev.vars.example .dev.vars     # 서버 secrets (필요한 값만)
-cp .env.example .env               # 클라이언트 VITE_* (선택)
 pnpm dev                           # vite + workerd (로컬 D1 포함)
 ```
 
@@ -39,7 +38,7 @@ pnpm dev                           # vite + workerd (로컬 D1 포함)
 
 ### 환경변수
 
-서버 secrets는 `.dev.vars.example`(로컬) / `wrangler secret put <NAME> --env <env>`(배포), 클라이언트 값은 `.env.example`(`VITE_*`, 빌드 타임 인라인)을 기준으로 설정합니다. `APP_ENV`/`SITE_URL`/`POSTHOG_HOST` 같은 비밀 아닌 vars는 `wrangler.jsonc`이 env별 단일 출처예요.
+서버 secrets는 `.dev.vars.example`(로컬) / `wrangler secret put <NAME> --env <env>`(배포)를 기준으로 설정합니다. `APP_ENV`/`SITE_URL`/`POSTHOG_HOST` 같은 비밀 아닌 vars는 `wrangler.jsonc`이 env별 단일 출처예요. 빌드에 굽는 클라이언트 env(`VITE_*`)는 없습니다 — 클라이언트 PostHog 설정도 런타임에 root loader가 `<meta>`로 내려줘요.
 
 | 변수 | 위치 | 용도 | 로컬 필수 여부 |
 | --- | --- | --- | --- |
@@ -47,13 +46,13 @@ pnpm dev                           # vite + workerd (로컬 D1 포함)
 | `UPSTASH_REDIS_REST_URL` | `.dev.vars` / secret | rate limit Redis REST URL | 선택 |
 | `UPSTASH_REDIS_REST_TOKEN` | `.dev.vars` / secret | rate limit Redis REST token | 선택 |
 | `LOG_LEVEL` | `.dev.vars` / secret | 로그 레벨 (trace…silent) | 선택 |
-| `POSTHOG_KEY` | `.dev.vars` / secret | 서버 PostHog (에러 리포팅) | 선택 |
-| `VITE_POSTHOG_KEY` | `.env` / 빌드 env | 클라이언트 PostHog project API key (write-only, 노출 OK) | 선택 |
-| `VITE_POSTHOG_HOST` | `.env` / 빌드 env | PostHog 리전 origin (기본 `https://us.i.posthog.com`) | 선택 |
+| `POSTHOG_KEY` | `.dev.vars` / secret | PostHog project API key (write-only) — 서버 에러 리포팅 + 클라이언트(런타임 `<meta>`, 공개 origin 요청에만) | 선택 |
+| `POSTHOG_HOST` | `wrangler.jsonc` vars | PostHog 수집 origin — 리버스 프록시 `https://z.minjun.kim` (서버·클라이언트 공용) | 선택 |
+| `POSTHOG_UI_HOST` | `.dev.vars` / vars | PostHog UI/툴바 도메인. 없으면 `https://us.posthog.com` | 선택 |
 
 공유 링크와 메타/OG base URL은 wrangler env별 `SITE_URL` var + 요청 헤더 화이트리스트로 도출됩니다. 로컬 dev에서는 `localhost:3000`이 폴백입니다.
 
-`ANTHROPIC_API_KEY`, `UPSTASH_*`, `POSTHOG_KEY` 값은 절대 `VITE_` 접두사를 붙이지 말고 클라이언트에 노출하지 마세요. D1은 binding이라 접속 정보 자체가 없습니다.
+`ANTHROPIC_API_KEY`, `UPSTASH_*` 값은 절대 `VITE_` 접두사를 붙이지 말고 클라이언트에 노출하지 마세요. `POSTHOG_KEY`는 수집 전용 공개 키라 예외로 root loader가 클라이언트에 내려줍니다. D1은 binding이라 접속 정보 자체가 없습니다.
 PostHog 키가 비어 있으면 서버/클라이언트 둘 다 no-op으로 떨어집니다.
 
 ## 스크립트
