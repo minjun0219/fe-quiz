@@ -48,7 +48,7 @@ pnpm dev                           # vite + workerd (로컬 D1 포함)
 | `UPSTASH_REDIS_REST_TOKEN` | `.dev.vars` / secret | rate limit Redis REST token | 선택 |
 | `LOG_LEVEL` | `.dev.vars` / secret | 로그 레벨 (trace…silent) | 선택 |
 | `POSTHOG_KEY` | `.dev.vars` / secret | 서버 PostHog (에러 리포팅) | 선택 |
-| `VITE_POSTHOG_KEY` | `.env` / 빌드 env | 클라이언트 PostHog project API key (write-only, 노출 OK) | 선택 |
+| `VITE_POSTHOG_KEY` | `.env` / Workers Builds 빌드 변수 (production 트리거) | 클라이언트 PostHog project API key (write-only, 노출 OK) | 선택 |
 | `VITE_POSTHOG_HOST` | `.env` / 빌드 env | PostHog 리전 origin (기본 `https://us.i.posthog.com`) | 선택 |
 
 공유 링크와 메타/OG base URL은 wrangler env별 `SITE_URL` var + 요청 헤더 화이트리스트로 도출됩니다. 로컬 dev에서는 `localhost:3000`이 폴백입니다.
